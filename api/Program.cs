@@ -1,3 +1,5 @@
+using api.Infrashtructure.Repositories;
+using api.Infrashtructure.Services;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +15,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("https://localhost:3000")
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
@@ -26,6 +28,9 @@ var conString = builder.Configuration.GetConnectionString("connecString") ??
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
     mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
+
+builder.Services.AddScoped<ICoderRepo, CoderRepo>();
+builder.Services.AddScoped<ICoderService, CoderService>();
 
 var app = builder.Build();
 
