@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+#pragma warning disable CS8618 // Non-nullable field
 namespace api.Models.ERD
 {
     public class HasProblem
