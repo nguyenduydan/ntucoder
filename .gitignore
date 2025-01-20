@@ -375,8 +375,11 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+#other
+front-end/node_modules/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
 
 # VS Code files for those working on multiple tools
 .vscode/*
