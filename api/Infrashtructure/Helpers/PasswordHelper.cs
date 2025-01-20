@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace ntucoderbe.Infrashtructure.Helpers
+namespace api.Infrashtructure.Helpers
 {
     public static class PasswordHelper
     {
