@@ -19,7 +19,6 @@ import { MdDelete } from 'react-icons/md';
 import SwitchField from 'components/fields/SwitchField';
 import api from 'utils/api';
 
-
 export const columnsData = [
   {
     Header: 'STT',
@@ -58,31 +57,41 @@ export const columnsData = [
     Header: 'Hành động',
     accessor: 'action',
     Cell: ({ row }) => {
-      const navigate = useNavigate();
-      const { coderID } = row;
-      const { isOpen, onOpen, onClose } = useDisclosure();
+      const navigate = useNavigate(); // Di chuyển ra ngoài loop
       const toast = useToast();
+      const { coderID } = row; // Lấy dữ liệu gốc từ React Table
+      const { isOpen, onOpen, onClose } = useDisclosure();
       const [loading, setLoading] = useState(false);
-      console.log(coderID);
-      console.log(row);
+
       const handleDetailClick = () => {
-        navigate(`/admin/coder/detail/${coderID}`);
+        if (coderID) {
+          navigate(`/admin/coder/detail/${coderID}`);
+        } else {
+          toast({
+            title: "Lỗi",
+            description: "Không tìm thấy ID của người dùng.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+            variant: "left-accent",
+          });
+        }
       };
 
       const handleDeleteClick = async () => {
         try {
           setLoading(true);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
           const response = await api.delete(`/coder/delete/${coderID}`);
           if (response.status === 200) {
             toast({
               title: "Xóa thành công!",
               description: "Người dùng đã bị xóa.",
               status: "success",
-              duration: 5000,
+              duration: 2000,
               isClosable: true,
-              position: "top-right",
+              position: "top",
+              variant: "left-accent",
             });
             onClose();
             window.location.reload();
@@ -94,9 +103,10 @@ export const columnsData = [
             title: "Lỗi",
             description: error.message || "Có lỗi xảy ra khi xóa.",
             status: "error",
-            duration: 3000,
+            duration: 2000,
             isClosable: true,
-            position: "top-right",
+            position: "top",
+            variant: "left-accent",
           });
         } finally {
           setLoading(false);
@@ -111,6 +121,7 @@ export const columnsData = [
             colorScheme="facebook"
             borderRadius="md"
             minW="auto"
+            _active={{ transform: "scale(0.90)" }}
             onClick={handleDetailClick}
           >
             <BiSolidDetail size="13" />
@@ -123,6 +134,7 @@ export const columnsData = [
             colorScheme="red"
             borderRadius="md"
             minW="auto"
+            _active={{ transform: "scale(0.90)" }}
             onClick={onOpen}
           >
             <MdDelete size="13" />
@@ -130,12 +142,14 @@ export const columnsData = [
 
           {/* Modal xác nhận xóa */}
           <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
+            <ModalOverlay bg="none" backdropFilter="auto" backdropBlur="4px" />
             <ModalContent>
               <ModalHeader>Xác nhận xóa</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <Text>Bạn có chắc chắn muốn xóa hay không?</Text>
+                <Text fontWeight="bold" fontSize="xl">
+                  Bạn có chắc chắn muốn xóa hay không?
+                </Text>
               </ModalBody>
               <ModalFooter>
                 <Button colorScheme="gray" mr={3} onClick={onClose}>

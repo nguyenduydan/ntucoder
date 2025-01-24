@@ -476,8 +476,8 @@ export const NTULogo = createIcon({
   displayName: "NTULogo",
   viewBox: "0 0 179 20", // Điều chỉnh kích thước khung nhìn
   path: (
-    <text x="0" y="20" fontSize="30" fontWeight="bolder" fill="currentColor">
-      <tspan fill="#3019ff">NTU</tspan>-CODER
+    <text x="0" y="20" fontSize="32" fontWeight="bolder" fill="currentColor">
+      <tspan fill="#3019ff">NTU</tspan> - CODER
     </text>
   ),
 });

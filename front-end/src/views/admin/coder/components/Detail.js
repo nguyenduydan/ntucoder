@@ -14,12 +14,14 @@ import {
     IconButton,
     useToast,
     Select,
+    useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import moment from 'moment-timezone';
 import api from "utils/api";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
+import ScrollToTop from "components/scroll/ScrollToTop";
 
 const genderMapping = {
     0: "Nam",
@@ -35,6 +37,8 @@ const CoderDetail = () => {
     const [avatarFile, setAvatarFile] = useState(null);
     const navigate = useNavigate();
     const toast = useToast();
+    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
+    const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
     useEffect(() => {
         const fetchCoderDetail = async () => {
             try {
@@ -87,18 +91,20 @@ const CoderDetail = () => {
                     toast({
                         title: "Cập nhật avatar thành công!",
                         status: "success",
-                        duration: 3000,
+                        duration: 2000,
                         isClosable: true,
-                        position: "top-right"
+                        position: "top",
+                        variant: "left-accent"
                     });
                 } catch (error) {
                     console.error("Đã xảy ra lỗi khi cập nhật avatar", error);
                     toast({
                         title: "Đã xảy ra lỗi khi cập nhật avatar.",
                         status: "error",
-                        duration: 3000,
+                        duration: 2000,
                         isClosable: true,
-                        position: "top-right"
+                        position: "top",
+                        variant: "left-accent"
                     });
                 }
             };
@@ -131,18 +137,20 @@ const CoderDetail = () => {
             toast({
                 title: "Cập nhật thành công!",
                 status: "success",
-                duration: 3000,
+                duration: 2000,
                 isClosable: true,
-                position: "top-right",
+                position: "top",
+                variant: "left-accent"
             });
         } catch (error) {
             console.error("Đã xảy ra lỗi khi cập nhật", error);
             toast({
                 title: "Đã xảy ra lỗi khi cập nhật.",
                 status: "error",
-                duration: 3000,
+                duration: 2000,
                 isClosable: true,
-                position: "top-right",
+                position: "top",
+                variant: "left-accent"
             });
         }
     };
@@ -152,76 +160,105 @@ const CoderDetail = () => {
     }
 
     return (
-        <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
-            <Box
-                bg="white"
-                p="6"
-                borderRadius="lg"
-                boxShadow="lg"
-                maxW="1000px"
-                mx="auto"
-                border="1px solid #e2e8f0"
-            >
-                <Flex mb="8px" justifyContent="end" align="end" px="25px">
-                    <Link>
-                        <Button
-                            variant="solid"
-                            size="lg"
-                            colorScheme="messenger"
-                            borderRadius="md"
-                            onClick={() => navigate(`/admin/coder`)}
-                        >
-                            Quay lại <MdOutlineArrowBack />
-                        </Button>
-                    </Link>
-                </Flex>
-                <VStack spacing={6} align="stretch">
-                    {/* Avatar Section */}
-                    <Flex direction="column" align="center">
-                        <Image
-                            src={editableValues.avatar || coderDetail.avatar || "default-avatar.jpg"}
-                            alt="Coder Avatar"
-                            borderRadius="full"
-                            boxSize="200px"
-                            objectFit="cover"
-                            mb={4}
-                            onClick={() => document.getElementById("avatarInput").click()}
-                            cursor="pointer"
-                        />
-                        <Input
-                            id="avatarInput"
-                            type="file"
-                            onChange={handleAvatarChange}
-                            style={{ display: "none" }}
-                        />
+        <ScrollToTop>
+            <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
+                <Box
+                    bg={boxColor}
+                    p="6"
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    maxW="1000px"
+                    mx="auto"
+                >
+                    <Flex mb="8px" justifyContent="end" align="end" px="25px">
+                        <Link>
+                            <Button
+                                variant="solid"
+                                size="lg"
+                                colorScheme="messenger"
+                                borderRadius="md"
+                                onClick={() => navigate(`/admin/coder`)}
+                            >
+                                Quay lại <MdOutlineArrowBack />
+                            </Button>
+                        </Link>
                     </Flex>
-                    <Divider />
-                    <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                        {/* Left Column */}
-                        <GridItem>
-                            <VStack align="stretch" spacing={4}>
-                                <Flex align="center">
-                                    <Text fontSize="lg">
-                                        <strong>Tên đăng nhập:</strong> {coderDetail.userName || "Chưa có thông tin"}
-                                    </Text>
-                                </Flex>
+                    <VStack spacing={6} align="stretch">
+                        {/* Avatar Section */}
+                        <Flex direction="column" align="center">
+                            <Image
+                                src={editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png"}
+                                alt="Coder Avatar"
+                                borderRadius="full"
+                                boxSize="200px"
+                                objectFit="cover"
+                                mb={4}
+                                onClick={() => document.getElementById("avatarInput").click()}
+                                cursor="pointer"
+                            />
+                            <Input
+                                id="avatarInput"
+                                type="file"
+                                onChange={handleAvatarChange}
+                                style={{ display: "none" }}
+                            />
+                        </Flex>
+                        <Divider />
+                        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                            {/* Left Column */}
+                            <GridItem>
+                                <VStack align="stretch" spacing={4}>
+                                    <Flex align="center">
+                                        <Text fontSize="lg">
+                                            <strong>Tên đăng nhập:</strong> {coderDetail.userName || "Chưa có thông tin"}
+                                        </Text>
+                                    </Flex>
 
-                                {["coderName", "coderEmail", "phoneNumber"].map((field) => (
-                                    <Flex key={field} align="center">
-                                        {editField === field ? (
-                                            <Input
-                                                value={editableValues[field] || ""}
-                                                onChange={(e) => handleInputChange(field, e.target.value)}
-                                                placeholder={`Chỉnh sửa ${field}`}
+                                    {["coderName", "coderEmail", "phoneNumber"].map((field) => (
+                                        <Flex key={field} align="center">
+                                            {editField === field ? (
+                                                <Input
+                                                    value={editableValues[field] || ""}
+                                                    onChange={(e) => handleInputChange(field, e.target.value)}
+                                                    placeholder={`Chỉnh sửa ${field}`}
+                                                />
+                                            ) : (
+                                                <Text fontSize="lg">
+                                                    <strong>{field === "coderName"
+                                                        ? "Họ và tên"
+                                                        : field === "coderEmail"
+                                                            ? "Email"
+                                                            : "Số điện thoại"}:</strong>{" "}
+                                                    {coderDetail[field] || "Chưa có thông tin"}
+                                                </Text>
+                                            )}
+                                            <IconButton
+                                                aria-label="Edit"
+                                                icon={<MdEdit />}
+                                                ml={2}
+                                                size="sm"
+                                                onClick={() => handleEdit(field)}
+                                                cursor="pointer"
                                             />
+                                        </Flex>
+                                    ))}
+
+                                    {/* Gender field */}
+                                    <Flex align="center">
+                                        {editField === "gender" ? (
+                                            <Select
+                                                value={editableValues.gender || ""}
+                                                onChange={(e) => handleInputChange("gender", e.target.value)}
+                                                placeholder="Chọn giới tính"
+                                                width="50%"
+                                            >
+                                                <option value="0">Nam</option>
+                                                <option value="1">Nữ</option>
+                                                <option value="2">Khác</option>
+                                            </Select>
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>{field === "coderName"
-                                                    ? "Họ và tên"
-                                                    : field === "coderEmail"
-                                                        ? "Email"
-                                                        : "Số điện thoại"}:</strong>{" "}
-                                                {coderDetail[field] || "Chưa có thông tin"}
+                                                <strong>Giới tính:</strong> {genderMapping[coderDetail.gender] || "Khác"}
                                             </Text>
                                         )}
                                         <IconButton
@@ -229,103 +266,75 @@ const CoderDetail = () => {
                                             icon={<MdEdit />}
                                             ml={2}
                                             size="sm"
-                                            onClick={() => handleEdit(field)}
+                                            onClick={() => handleEdit("gender")}
                                             cursor="pointer"
                                         />
                                     </Flex>
-                                ))}
 
-                                {/* Gender field */}
-                                <Flex align="center">
-                                    {editField === "gender" ? (
-                                        <Select
-                                            value={editableValues.gender || ""}
-                                            onChange={(e) => handleInputChange("gender", e.target.value)}
-                                            placeholder="Chọn giới tính"
-                                            width="50%"
-                                        >
-                                            <option value="0">Nam</option>
-                                            <option value="1">Nữ</option>
-                                            <option value="2">Khác</option>
-                                        </Select>
-                                    ) : (
-                                        <Text fontSize="lg">
-                                            <strong>Giới tính:</strong> {genderMapping[coderDetail.gender] || "Khác"}
-                                        </Text>
-                                    )}
-                                    <IconButton
-                                        aria-label="Edit"
-                                        icon={<MdEdit />}
-                                        ml={2}
-                                        size="sm"
-                                        onClick={() => handleEdit("gender")}
-                                        cursor="pointer"
-                                    />
-                                </Flex>
-
-                                {/* Description field */}
-                                <Flex align="center">
-                                    {editField === "description" ? (
-                                        <Input
-                                            value={editableValues.description || ""}
-                                            onChange={(e) => handleInputChange("description", e.target.value)}
-                                            placeholder="Chỉnh sửa mô tả"
+                                    {/* Description field */}
+                                    <Flex align="center">
+                                        {editField === "description" ? (
+                                            <Input
+                                                value={editableValues.description || ""}
+                                                onChange={(e) => handleInputChange("description", e.target.value)}
+                                                placeholder="Chỉnh sửa mô tả"
+                                            />
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Mô tả:</strong> {coderDetail.description || "Chưa có thông tin"}
+                                            </Text>
+                                        )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit("description")}
+                                            cursor="pointer"
                                         />
-                                    ) : (
-                                        <Text fontSize="lg">
-                                            <strong>Mô tả:</strong> {coderDetail.description || "Chưa có thông tin"}
-                                        </Text>
+                                    </Flex>
+                                </VStack>
+                            </GridItem>
+
+
+                            {/* Right Column */}
+                            <GridItem>
+                                <VStack align="stretch" spacing={4}>
+                                    <Text fontSize="lg">
+                                        <strong>Ngày tạo:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
+                                    </Text>
+                                    <Text fontSize="lg">
+                                        <strong>Người tạo:</strong> {coderDetail.createdBy}
+                                    </Text>
+                                    {coderDetail.updatedAt && (
+                                        <>
+                                            <Text fontSize="lg">
+                                                <strong>Ngày cập nhật:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
+                                            </Text>
+                                            <Text fontSize="lg">
+                                                <strong>Người cập nhật:</strong> {coderDetail.updatedBy}
+                                            </Text>
+                                        </>
                                     )}
-                                    <IconButton
-                                        aria-label="Edit"
-                                        icon={<MdEdit />}
-                                        ml={2}
-                                        size="sm"
-                                        onClick={() => handleEdit("description")}
-                                        cursor="pointer"
-                                    />
-                                </Flex>
-                            </VStack>
-                        </GridItem>
-
-
-                        {/* Right Column */}
-                        <GridItem>
-                            <VStack align="stretch" spacing={4}>
-                                <Text fontSize="lg">
-                                    <strong>Ngày tạo:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
-                                </Text>
-                                <Text fontSize="lg">
-                                    <strong>Người tạo:</strong> {coderDetail.createdBy}
-                                </Text>
-                                {coderDetail.updatedAt && (
-                                    <>
-                                        <Text fontSize="lg">
-                                            <strong>Ngày cập nhật:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
-                                        </Text>
-                                        <Text fontSize="lg">
-                                            <strong>Người cập nhật:</strong> {coderDetail.updatedBy}
-                                        </Text>
-                                    </>
-                                )}
-                            </VStack>
-                        </GridItem>
-                    </Grid>
-                </VStack>
-                <Flex justifyContent="flex-end" mt={6}>
-                    <Button
-                        variant="solid"
-                        size="lg"
-                        colorScheme="teal"
-                        borderRadius="md"
-                        onClick={handleSave}
-                        disabled={editField === null}
-                    >
-                        Lưu
-                    </Button>
-                </Flex>
+                                </VStack>
+                            </GridItem>
+                        </Grid>
+                    </VStack>
+                    <Flex justifyContent="flex-end" mt={6}>
+                        <Button
+                            variant="solid"
+                            size="lg"
+                            colorScheme="teal"
+                            borderRadius="md"
+                            onClick={handleSave}
+                            disabled={editField === null}
+                        >
+                            Lưu
+                        </Button>
+                    </Flex>
+                </Box>
             </Box>
-        </Box>
+        </ScrollToTop>
     );
 };
 
