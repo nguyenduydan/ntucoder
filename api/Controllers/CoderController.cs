@@ -17,7 +17,7 @@ namespace api.Controllers
             _coderService = coderService;
         }
 
-        [HttpGet]
+        [HttpGet("getlist")]
         public async Task<IActionResult> GetAllCoders([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
         {
             try
@@ -30,7 +30,7 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateCoder([FromBody] CreateCoderDTO dto)
         {
             if (dto == null)
@@ -51,7 +51,7 @@ namespace api.Controllers
                 return BadRequest(new { Errors = new List<string> { ex.Message } });
             }
         }
-        [HttpGet("{id}")]
+        [HttpGet("detail/{id}")]
         public async Task<IActionResult> GetCoderByID(int id)
         {
             try
@@ -70,7 +70,7 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCoder(int id, [FromBody] CoderDetailDTO dto)
         {
             if (dto == null)
@@ -96,7 +96,7 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCoder(int id)
         {
             try

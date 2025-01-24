@@ -10,7 +10,7 @@ export default function CoderIndex() {
 
   useEffect(() => {
     api
-      .get("/coder")
+      .get("/coder/getlist")
       .then((response) => {
         const dataWithStatus = response.data.data.map(item => ({
           ...item,

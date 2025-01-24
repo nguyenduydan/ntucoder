@@ -72,7 +72,7 @@ export const columnsData = [
           setLoading(true);
           await new Promise(resolve => setTimeout(resolve, 1000));
 
-          const response = await api.delete(`/coder/${coderID}`);
+          const response = await api.delete(`/coder/delete/${coderID}`);
           if (response.status === 200) {
             toast({
               title: "Xóa thành công!",
