@@ -23,7 +23,7 @@ export default function ColumnTable({ tableData, loading }) {
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
       <Box>
-        <Table variant="simple" color="gray.500" colorScheme="facebook" mb="12px" mt="5px" mx="15px" tableLayout="auto">
+        <Table variant="simple" color="gray.500" colorScheme="facebook" mb="12px" mt="5px" mx="15px">
           <Thead>
             <Tr>
               {columnsData.map((column) => (
@@ -46,10 +46,12 @@ export default function ColumnTable({ tableData, loading }) {
               </Tr>
             ) : (
               tableData.map((row, index) => (
-                <Tr _hover={{
-                  bg: colorMode === 'dark' ? 'gray.500' : 'gray.200', // Chọn màu nền khác nhau cho chế độ sáng và tối
-                }}
-                  key={index}>
+                <Tr
+                  _hover={{
+                    bg: colorMode === 'dark' ? 'gray.500' : 'gray.200', // Chọn màu nền khác nhau cho chế độ sáng và tối
+                  }}
+                  key={index}
+                >
                   {columnsData.map((column) => (
                     <Td
                       key={column.Header}
@@ -70,6 +72,6 @@ export default function ColumnTable({ tableData, loading }) {
           </Tbody>
         </Table>
       </Box>
-    </Card >
+    </Card>
   );
 }

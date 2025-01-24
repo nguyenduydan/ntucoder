@@ -99,25 +99,14 @@ export default function Dashboard(props) {
   const getRoutes = (routes) => {
     return routes.map((route, key) => {
       if (route.layout === '/admin') {
-        if (route.item) {
-          // Nếu có sub-routes, render các sub-route trong item
-          return (
-            <>
-              <Route path={`${route.path}`} element={route.component} key={key} />
-              {route.item.map((subRoute, subKey) => (
-                <Route
-                  key={subKey}
-                  path={`${route.path}/${subRoute.path}`}
-                  element={subRoute.component}
-                />
-              ))}
-            </>
-          );
-        } else {
-          return (
+        return (
+          <>
             <Route path={`${route.path}`} element={route.component} key={key} />
-          );
-        }
+            {route.item && route.item.map((subRoute, subKey) => (
+              <Route key={subKey} path={`${route.path}/${subRoute.path}`} element={subRoute.component} />
+            ))}
+          </>
+        );
       }
       return null;
     });
