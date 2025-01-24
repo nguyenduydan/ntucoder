@@ -8,6 +8,8 @@ import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
+//import routes
+import CoderIndex from 'views/admin/coder';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -133,7 +135,7 @@ export default function Dashboard(props) {
               <Box>
                 <Navbar
                   onOpen={onOpen}
-                  logoText={'Horizon UI Dashboard PRO'}
+                  logoText={'NTU'}
                   brandText={getActiveRoute(routes)}
                   secondary={getActiveNavbar(routes)}
                   message={getActiveNavbarText(routes)}
@@ -153,10 +155,8 @@ export default function Dashboard(props) {
               >
                 <Routes>
                   {getRoutes(routes)}
-                  <Route
-                    path="/"
-                    element={<Navigate to="/admin/default" replace />}
-                  />
+                  <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="/admin/coder" element={<CoderIndex />} />
                 </Routes>
               </Box>
             ) : null}

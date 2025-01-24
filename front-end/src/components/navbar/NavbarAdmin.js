@@ -3,10 +3,11 @@ import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Link, Text, useC
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import AdminNavbarLinks from 'components/navbar/NavbarLinksAdmin';
-
+import { useLocation } from 'react-router-dom';
+import routes from 'routes';
 export default function AdminNavbar(props) {
-	const [ scrolled, setScrolled ] = useState(false);
-
+	const [scrolled, setScrolled] = useState(false);
+	const location = useLocation();
 	useEffect(() => {
 		window.addEventListener('scroll', changeNavbar);
 
@@ -15,7 +16,20 @@ export default function AdminNavbar(props) {
 		};
 	});
 
-	const { secondary, message, brandText } = props;
+	const { secondary, message } = props;
+	let currentItem;
+	const currentRoute = routes.find(route => {
+		if (location.pathname.startsWith(route.layout) && location.pathname.includes(route.path.split('/:')[0])) {
+			currentItem = route.items?.find(item => {
+				const itemPath = item.path.split('/:')[0];
+				return location.pathname.includes(itemPath);
+			});
+			return true;
+		}
+		return false;
+	});
+
+	const brandText = currentItem ? currentItem.name : currentRoute ? currentRoute.name : 'Dashboard';
 
 	// Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
 	let mainText = useColorModeValue('navy.700', 'white');
@@ -89,18 +103,30 @@ export default function AdminNavbar(props) {
 				mb={gap}>
 				<Box mb={{ sm: '8px', md: '0px' }}>
 					<Breadcrumb>
-						<BreadcrumbItem color={secondaryText} fontSize='sm' mb='5px'>
-							<BreadcrumbLink href='#' color={secondaryText}>
-								Pages
+						<BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+							<BreadcrumbLink href="#" color={secondaryText}>
+								Admin
 							</BreadcrumbLink>
 						</BreadcrumbItem>
 
-						<BreadcrumbItem color={secondaryText} fontSize='sm' mb='5px'>
-							<BreadcrumbLink href='#' color={secondaryText}>
-								{brandText}
-							</BreadcrumbLink>
-						</BreadcrumbItem>
+						{currentRoute && (
+							<BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+								<BreadcrumbLink href={`${currentRoute.layout}${currentRoute.path}`} color={secondaryText}>
+									{currentRoute.name}
+								</BreadcrumbLink>
+							</BreadcrumbItem>
+						)}
+
+						{currentItem && (
+							<BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+								<BreadcrumbLink href="#" color={secondaryText}>
+									{currentItem.name}
+								</BreadcrumbLink>
+							</BreadcrumbItem>
+						)}
 					</Breadcrumb>
+
+
 					{/* Here we create navbar brand, based on route name */}
 					<Link
 						color={mainText}
