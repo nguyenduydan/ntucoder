@@ -19,6 +19,7 @@ import { MdDelete } from 'react-icons/md';
 import SwitchField from 'components/fields/SwitchField';
 import api from 'utils/api';
 
+
 export const columnsData = [
   {
     Header: 'STT',
@@ -62,7 +63,8 @@ export const columnsData = [
       const { isOpen, onOpen, onClose } = useDisclosure();
       const toast = useToast();
       const [loading, setLoading] = useState(false);
-
+      console.log(coderID);
+      console.log(row);
       const handleDetailClick = () => {
         navigate(`/admin/coder/detail/${coderID}`);
       };

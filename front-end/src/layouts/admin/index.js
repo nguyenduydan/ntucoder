@@ -10,6 +10,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
 //import routes
 import CoderIndex from 'views/admin/coder';
+import CoderDetail from 'views/admin/coder/components/Detail';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -35,15 +36,17 @@ export default function Dashboard(props) {
           return categoryActiveRoute;
         }
       } else {
+        // Kiểm tra nếu URL chứa đường dẫn của route
         if (
           window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
         ) {
-          return routes[i].name;
+          return routes[i].name; // Trả về tên của route
         }
       }
     }
     return activeRoute;
   };
+
   const getActiveNavbar = (routes) => {
     let activeNavbar = false;
     for (let i = 0; i < routes.length; i++) {
@@ -58,15 +61,17 @@ export default function Dashboard(props) {
           return categoryActiveNavbar;
         }
       } else {
+        // Kiểm tra nếu URL chứa đường dẫn của route
         if (
           window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
         ) {
-          return routes[i].secondary;
+          return routes[i].secondary; // Trả về navbar phụ
         }
       }
     }
     return activeNavbar;
   };
+
   const getActiveNavbarText = (routes) => {
     let activeNavbar = false;
     for (let i = 0; i < routes.length; i++) {
@@ -81,10 +86,11 @@ export default function Dashboard(props) {
           return categoryActiveNavbar;
         }
       } else {
+        // Kiểm tra nếu URL chứa đường dẫn của route
         if (
           window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
         ) {
-          return routes[i].messageNavbar;
+          return routes[i].messageNavbar; // Trả về navbar text
         }
       }
     }
@@ -93,15 +99,27 @@ export default function Dashboard(props) {
   const getRoutes = (routes) => {
     return routes.map((route, key) => {
       if (route.layout === '/admin') {
-        return (
-          <Route path={`${route.path}`} element={route.component} key={key} />
-        );
+        if (route.item) {
+          // Nếu có sub-routes, render các sub-route trong item
+          return (
+            <>
+              <Route path={`${route.path}`} element={route.component} key={key} />
+              {route.item.map((subRoute, subKey) => (
+                <Route
+                  key={subKey}
+                  path={`${route.path}/${subRoute.path}`}
+                  element={subRoute.component}
+                />
+              ))}
+            </>
+          );
+        } else {
+          return (
+            <Route path={`${route.path}`} element={route.component} key={key} />
+          );
+        }
       }
-      if (route.collapse) {
-        return getRoutes(route.items);
-      } else {
-        return null;
-      }
+      return null;
     });
   };
   document.documentElement.dir = 'ltr';
@@ -157,6 +175,7 @@ export default function Dashboard(props) {
                   {getRoutes(routes)}
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/coder" element={<CoderIndex />} />
+                  <Route path="/admin/coder/detail/:id" element={<CoderDetail />} />
                 </Routes>
               </Box>
             ) : null}

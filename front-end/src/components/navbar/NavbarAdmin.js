@@ -1,10 +1,10 @@
-// Chakra Imports
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Link, Text, useColorModeValue } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import AdminNavbarLinks from 'components/navbar/NavbarLinksAdmin';
 import { useLocation } from 'react-router-dom';
 import routes from 'routes';
+
 export default function AdminNavbar(props) {
 	const [scrolled, setScrolled] = useState(false);
 	const location = useLocation();
@@ -18,20 +18,34 @@ export default function AdminNavbar(props) {
 
 	const { secondary, message } = props;
 	let currentItem;
+	let currentCategory;
+	// Tìm kiếm trong mảng `routes` để tìm route hiện tại dựa trên đường dẫn URL
 	const currentRoute = routes.find(route => {
+		// Kiểm tra nếu `location.pathname` (đường dẫn URL hiện tại) bắt đầu bằng `route.layout`
+		// và có chứa phần đầu của `route.path` (loại bỏ tham số động như :id)
 		if (location.pathname.startsWith(route.layout) && location.pathname.includes(route.path.split('/:')[0])) {
-			currentItem = route.items?.find(item => {
+
+			// Tìm kiếm trong mảng `route.item` (các sub-routes) để xác định item con hiện tại
+			currentItem = route.item?.find(item => {
+				// Lấy phần đầu của `item.path`, loại bỏ các tham số động như :id
 				const itemPath = item.path.split('/:')[0];
+
+				// Kiểm tra nếu `location.pathname` chứa phần đường dẫn `itemPath`
 				return location.pathname.includes(itemPath);
 			});
+
+			// Nếu route hiện tại phù hợp, trả về `true` để dừng tìm kiếm
 			return true;
 		}
+
+		// Nếu không tìm thấy route phù hợp, tiếp tục tìm kiếm trong các route khác
 		return false;
 	});
 
+
 	const brandText = currentItem ? currentItem.name : currentRoute ? currentRoute.name : 'Dashboard';
 
-	// Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
+	// Màu sắc cho navbar và các phần khác
 	let mainText = useColorModeValue('navy.700', 'white');
 	let secondaryText = useColorModeValue('gray.700', 'white');
 	let navbarPosition = 'fixed';
@@ -43,6 +57,7 @@ export default function AdminNavbar(props) {
 	let secondaryMargin = '0px';
 	let paddingX = '15px';
 	let gap = '0px';
+
 	const changeNavbar = () => {
 		if (window.scrollY > 1) {
 			setScrolled(true);
@@ -117,6 +132,14 @@ export default function AdminNavbar(props) {
 							</BreadcrumbItem>
 						)}
 
+						{currentCategory && (
+							<BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+								<BreadcrumbLink href="#" color={secondaryText}>
+									{currentCategory.name}
+								</BreadcrumbLink>
+							</BreadcrumbItem>
+						)}
+
 						{currentItem && (
 							<BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
 								<BreadcrumbLink href="#" color={secondaryText}>
@@ -126,8 +149,7 @@ export default function AdminNavbar(props) {
 						)}
 					</Breadcrumb>
 
-
-					{/* Here we create navbar brand, based on route name */}
+					{/* Hiển thị navbar brand */}
 					<Link
 						color={mainText}
 						href='#'

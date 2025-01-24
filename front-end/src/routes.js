@@ -9,7 +9,8 @@ import {
 
 // Admin Imports
 import MainDashboard from 'views/admin/default';
-import CoderTable from 'views/admin/coder';
+import CoderTable from 'views/admin/coder/index';
+import CoderDetail from 'views/admin/coder/components/Detail';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -23,11 +24,18 @@ const routes = [
     component: <MainDashboard />,
   },
   {
-    name: 'Coder',
+    name: 'Người dùng',
     layout: '/admin',
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
     path: '/coder',
     component: <CoderTable />,
+    item: [
+      {
+        name: 'Chi tiết người dùng',
+        path: 'detail/:id',
+        component: <CoderDetail />,
+      }
+    ]
   },
   {
     name: 'Sign In',

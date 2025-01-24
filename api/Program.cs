@@ -13,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowMyOrigin", builder =>
     {
         builder.WithOrigins("http://localhost:3000")
                .AllowAnyHeader()
@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowAll");
+app.UseCors("AllowMyOrigin");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
