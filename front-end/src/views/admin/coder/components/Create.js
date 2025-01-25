@@ -19,6 +19,7 @@ import {
     InputGroup,
     InputRightElement,
     IconButton,
+    useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import api from "../../../../utils/api";
@@ -33,6 +34,11 @@ export default function CreateCoderModal({ isOpen, onClose }) {
     const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
+
+    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
+    const textColor = colorMode === 'light' ? 'black' : 'white';
+    //const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
+
 
     // Reset lại input khi modal mở
     useEffect(() => {
@@ -115,6 +121,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                                     placeholder="Nhập họ và tên"
                                     value={coderName}
                                     onChange={(e) => setCoderName(e.target.value)}
+                                    textColor={textColor}
                                 />
                                 <FormErrorMessage>{errors.coderName}</FormErrorMessage>
                             </FormControl>
@@ -125,6 +132,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                                     placeholder="Nhập tên đăng nhập"
                                     value={userName}
                                     onChange={(e) => setUserName(e.target.value)}
+                                    textColor={textColor}
                                 />
                                 <FormErrorMessage>{errors.userName}</FormErrorMessage>
                             </FormControl>
@@ -139,6 +147,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                                         placeholder="Nhập mật khẩu"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
+                                        textColor={textColor}
                                     />
                                     <InputRightElement>
                                         <IconButton
@@ -161,6 +170,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                                     placeholder="Nhập email"
                                     value={coderEmail}
                                     onChange={(e) => setCoderEmail(e.target.value)}
+                                    textColor={textColor}
                                 />
                                 <FormErrorMessage>{errors.coderEmail}</FormErrorMessage>
                             </FormControl>
@@ -172,6 +182,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                                     placeholder="Nhập số điện thoại"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
+                                    textColor={textColor}
                                 />
                                 <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>
                             </FormControl>
