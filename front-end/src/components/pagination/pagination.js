@@ -69,8 +69,9 @@ export default function Pagination({
                     <option value={1}>1 dòng</option>
                     <option value={5}>5 dòng</option>
                     <option value={10}>10 dòng</option>
-                    <option value={15}>15 dòng</option>
                     <option value={20}>20 dòng</option>
+                    <option value={50}>50 dòng</option>
+                    <option value={100}>100 dòng</option>
                 </Select>
             </Flex>
 
