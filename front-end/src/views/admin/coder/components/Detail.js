@@ -22,7 +22,7 @@ import api from "utils/api";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
-import Loading from "components/loading/loading";
+import Loading from "components/loading/loadingSpinner";
 
 const genderMapping = {
     0: "Nam",
@@ -156,7 +156,23 @@ const CoderDetail = () => {
         }
     };
     if (!coderDetail) {
-        return <Loading message="Đang tải thông tin coder..." />;
+        if (!coderDetail) {
+            return (
+                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
+                    <Box
+                        bg={boxColor}
+                        p="6"
+                        borderRadius="lg"
+                        boxShadow="lg"
+                        maxW="1000px"
+                        h="500px"
+                        mx="auto"
+                    >
+                        <Loading message="Đang tải thông tin người dùng..." />
+                    </Box>
+                </Box>
+            );
+        }
     }
     return (
         <ScrollToTop>
@@ -169,7 +185,7 @@ const CoderDetail = () => {
                     maxW="1000px"
                     mx="auto"
                 >
-                    <Flex mb="8px" justifyContent="end" align="end" px="25px">
+                    <Flex justifyContent="end" align="end" px="25px">
                         <Link>
                             <Button
                                 onClick={() => navigate(`/admin/coder`)}
@@ -346,7 +362,7 @@ const CoderDetail = () => {
                             size="lg"
                             colorScheme="messenger"
                             borderRadius="xl"
-                            px={5}
+                            px={10}
                             boxShadow="lg"
                             bgGradient="linear(to-l, green.500, green.300)"
                             transition="all 0.2s ease-in-out"

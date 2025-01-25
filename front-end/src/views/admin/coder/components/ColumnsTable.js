@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
+import Loading from 'components/loading/loadingSpinner';
 
 export default function ColumnTable({ tableData, loading }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
@@ -56,7 +57,7 @@ export default function ColumnTable({ tableData, loading }) {
               <Tr>
                 <Td colSpan={columnsData.length} borderColor="transparent">
                   <Flex justifyContent="center" align="center" py="20px">
-                    <Spinner size="lg" color="green.500" /> <Text ml="10px">Đang tải dữ liệu...</Text>
+                    <Loading message="Đang tải dữ liệu..." />;
                   </Flex>
                 </Td>
               </Tr>
