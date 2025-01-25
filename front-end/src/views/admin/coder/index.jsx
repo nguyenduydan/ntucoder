@@ -40,8 +40,10 @@ export default function CoderIndex() {
         title: "Lỗi khi tải dữ liệu",
         description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
         status: "error",
-        duration: 3000,
+        duration: 2000,
         isClosable: true,
+        position: "top",
+        variant: "left-accent",
       });
     } finally {
       setLoading(false);

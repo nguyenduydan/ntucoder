@@ -12,22 +12,27 @@ export default function Pagination({
     // Hàm tạo danh sách số trang cần hiển thị
     const createPageNumbers = () => {
         const pageNumbers = [];
-        const maxPagesToShow = 5;
+        const maxPagesToShow = 3; // Giới hạn số trang hiển thị ở giữa
         let startPage, endPage;
 
         if (totalPages <= maxPagesToShow) {
+            // Nếu tổng số trang ít hơn hoặc bằng số trang tối đa cần hiển thị
             startPage = 1;
             endPage = totalPages;
         } else {
-            if (currentPage <= 3) {
+            // Nếu tổng số trang nhiều hơn số trang tối đa
+            if (currentPage <= Math.ceil(maxPagesToShow / 2)) {
+                // Nếu trang hiện tại ở gần đầu
                 startPage = 1;
                 endPage = maxPagesToShow;
-            } else if (currentPage + 2 >= totalPages) {
+            } else if (currentPage + Math.floor(maxPagesToShow / 2) >= totalPages) {
+                // Nếu trang hiện tại ở gần cuối
                 startPage = totalPages - maxPagesToShow + 1;
                 endPage = totalPages;
             } else {
-                startPage = currentPage - 2;
-                endPage = currentPage + 2;
+                // Nếu trang hiện tại ở giữa
+                startPage = currentPage - Math.floor(maxPagesToShow / 2);
+                endPage = currentPage + Math.floor(maxPagesToShow / 2);
             }
         }
 
