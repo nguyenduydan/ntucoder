@@ -22,12 +22,28 @@ export default function ColumnTable({ tableData, loading }) {
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-      <Box>
-        <Table variant="simple" color="gray.500" colorScheme="facebook" mb="12px" mt="5px" mx="15px">
+      <Box
+        maxH="400px" // Đặt chiều cao tối đa cho container của bảng
+        maxW="100%"
+        overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
+        borderColor={borderColor}
+        borderRadius="md"
+        mt="10px"
+        mx="15px"
+      >
+        <Table variant="simple" borderRadius={'full'} color="gray.500" colorScheme="facebook" mb="12px" mt="5px">
           <Thead>
             <Tr>
               {columnsData.map((column) => (
-                <Th key={column.Header} borderColor={borderColor} width={column.width || 'fixed'}>
+                <Th
+                  key={column.Header}
+                  borderColor={borderColor}
+                  width={column.width || 'fixed'}
+                  position="sticky" // Giữ cố định
+                  top="0" // Đặt vị trí trên cùng khi cuộn
+                  bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
+                  zIndex="1" // Đảm bảo header nằm trên nội dung bảng
+                >
                   <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
                     {column.Header}
                   </Text>

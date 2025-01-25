@@ -157,7 +157,7 @@ export default function Dashboard(props) {
                 mx="auto"
                 p={{ base: '20px', md: '30px' }}
                 pe="20px"
-                minH="100vh"
+                minH="90vh"
                 pt="50px"
               >
                 <Routes>

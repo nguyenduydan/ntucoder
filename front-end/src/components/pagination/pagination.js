@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Button, Text, Select, Icon } from "@chakra-ui/react";
+import { Flex, Button, Text, Select, Icon, useColorMode } from "@chakra-ui/react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 export default function Pagination({
@@ -9,6 +9,8 @@ export default function Pagination({
     onPageChange,
     onPageSizeChange,
 }) {
+    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
+    const textColor = colorMode === 'light' ? 'black' : 'white'; // Đổi màu text
     // Hàm tạo danh sách số trang cần hiển thị
     const createPageNumbers = () => {
         const pageNumbers = [];
@@ -57,6 +59,12 @@ export default function Pagination({
                     ml={4}
                     variant="outline"
                     colorScheme="blue"
+                    sx={{
+                        option: {
+                            color: textColor, // Áp dụng màu từ textColor
+                            bg: colorMode === 'dark' ? 'gray.700' : 'white', // Màu nền phù hợp với chế độ sáng/tối
+                        },
+                    }}
                 >
                     <option value={1}>1 dòng</option>
                     <option value={5}>5 dòng</option>
@@ -78,6 +86,8 @@ export default function Pagination({
                     p={0}
                     _hover={{ bg: "blue.500", border: "blue.500", textColor: "white" }}
                     _active={{ transform: "scale(0.90)" }}
+                    size={"sm"}
+                    borderRadius="xl"
                 >
                     <Icon as={MdChevronLeft} w={5} h={5} ></Icon>
                 </Button>
@@ -90,6 +100,8 @@ export default function Pagination({
                             colorScheme="blue"
                             _hover={{ bg: "blue.100", border: "blue.100" }}
                             variant="outline"
+                            size={"sm"}
+                            borderRadius="xl"
                         >
                             1
                         </Button>
@@ -106,6 +118,8 @@ export default function Pagination({
                         variant={page === currentPage ? "solid" : "outline"}
                         mx={1}
                         _hover={{ bg: "blue.100", border: "blue.100" }}
+                        size={"sm"}
+                        borderRadius="xl"
                     >
                         {page}
                     </Button>
@@ -122,6 +136,8 @@ export default function Pagination({
                             colorScheme="blue"
                             variant="outline"
                             _hover={{ bg: "blue.100", border: "blue.100" }}
+                            size={"sm"}
+                            borderRadius="xl"
                         >
                             {totalPages}
                         </Button>
@@ -138,6 +154,8 @@ export default function Pagination({
                     _hover={{ bg: "blue.500", border: "blue.500", textColor: "white" }}
                     _active={{ transform: "scale(0.90)" }}
                     p={0}
+                    size={"sm"}
+                    borderRadius="xl"
                 >
                     <Icon as={MdChevronRight} w={5} h={5} ></Icon>
                 </Button>
