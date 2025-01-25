@@ -3,12 +3,12 @@ import React from 'react';
 import { Icon } from '@chakra-ui/react';
 import {
   MdBarChart,
-  //MdHome,
+  MdHome,
   MdLock,
 } from 'react-icons/md';
 
 // Admin Imports
-// import MainDashboard from 'views/admin/default';
+import MainDashboard from 'views/admin/default';
 import CoderTable from 'views/admin/coder/index';
 import CoderDetail from 'views/admin/coder/components/Detail';
 
@@ -16,13 +16,13 @@ import CoderDetail from 'views/admin/coder/components/Detail';
 import SignInCentered from 'views/auth/signIn';
 
 const routes = [
-  // {
-  //   name: 'Main Dashboard',
-  //   layout: '/admin',
-  //   path: '/dashboard',
-  //   icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-  //   component: <MainDashboard />,
-  // },
+  {
+    name: 'Main Dashboard',
+    layout: '/admin',
+    path: '/dashboard',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    component: <MainDashboard />,
+  },
   {
     name: 'Người dùng',
     layout: '/admin',
