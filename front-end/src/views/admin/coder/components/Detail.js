@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 
+
 const genderMapping = {
     0: "Nam",
     1: "Nữ",
@@ -37,8 +38,11 @@ const CoderDetail = () => {
     const [avatarFile, setAvatarFile] = useState(null);
     const navigate = useNavigate();
     const toast = useToast();
+
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
+    const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
+
     useEffect(() => {
         const fetchCoderDetail = async () => {
             try {
@@ -82,11 +86,7 @@ const CoderDetail = () => {
                 formData.append("AvatarFile", file);
 
                 try {
-                    await api.put(`/coder/detail/${id}/`, formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    });
+                    await api.put(`/coder/update/${id}/`, formData);
 
                     toast({
                         title: "Cập nhật avatar thành công!",
@@ -94,7 +94,7 @@ const CoderDetail = () => {
                         duration: 2000,
                         isClosable: true,
                         position: "top",
-                        variant: "left-accent"
+                        variant: "left-accent",
                     });
                 } catch (error) {
                     console.error("Đã xảy ra lỗi khi cập nhật avatar", error);
@@ -104,7 +104,7 @@ const CoderDetail = () => {
                         duration: 2000,
                         isClosable: true,
                         position: "top",
-                        variant: "left-accent"
+                        variant: "left-accent",
                     });
                 }
             };
@@ -123,16 +123,17 @@ const CoderDetail = () => {
                 formData.append(field, editableValues[field]);
             });
 
-            // Nếu có file avatar, đính kèm vào formData
-            if (avatarFile) {
-                formData.append("AvatarFile", avatarFile);
-            }
+            // // Nếu có file avatar, đính kèm vào formData
+            // if (avatarFile) {
+            //     formData.append("AvatarFile", avatarFile);
+            // }
+
 
             setCoderDetail((prev) => ({
                 ...prev,
                 ...editableValues,
             }));
-
+            await api.put(`/coder/update/${id}/`, formData);
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -140,7 +141,7 @@ const CoderDetail = () => {
                 duration: 2000,
                 isClosable: true,
                 position: "top",
-                variant: "left-accent"
+                variant: "left-accent",
             });
         } catch (error) {
             console.error("Đã xảy ra lỗi khi cập nhật", error);
@@ -150,10 +151,12 @@ const CoderDetail = () => {
                 duration: 2000,
                 isClosable: true,
                 position: "top",
-                variant: "left-accent"
+                variant: "left-accent",
             });
         }
     };
+
+
 
     if (!coderDetail) {
         return <Text>Loading...</Text>;
@@ -173,13 +176,24 @@ const CoderDetail = () => {
                     <Flex mb="8px" justifyContent="end" align="end" px="25px">
                         <Link>
                             <Button
+                                onClick={() => navigate(`/admin/coder`)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="messenger"
-                                borderRadius="md"
-                                onClick={() => navigate(`/admin/coder`)}
+                                borderRadius="xl"
+                                px={5}
+                                boxShadow="lg"
+                                bgGradient="linear(to-l, messenger.500, navy.300)"
+                                transition="all 0.2s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    transform: "scale(1.05)",
+                                }}
+                                _active={{
+                                    transform: "scale(0.90)",
+                                }}
                             >
-                                Quay lại <MdOutlineArrowBack />
+                                <MdOutlineArrowBack />Quay lại
                             </Button>
                         </Link>
                     </Flex>
@@ -193,6 +207,10 @@ const CoderDetail = () => {
                                 boxSize="200px"
                                 objectFit="cover"
                                 mb={4}
+                                transition="all 0.2s ease-in-out"
+                                _hover={{
+                                    transform: "scale(1.05)",
+                                }}
                                 onClick={() => document.getElementById("avatarInput").click()}
                                 cursor="pointer"
                             />
@@ -206,8 +224,8 @@ const CoderDetail = () => {
                         <Divider />
                         <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                             {/* Left Column */}
-                            <GridItem>
-                                <VStack align="stretch" spacing={4}>
+                            <GridItem >
+                                <VStack align="stretch" ps={20} spacing={4}>
                                     <Flex align="center">
                                         <Text fontSize="lg">
                                             <strong>Tên đăng nhập:</strong> {coderDetail.userName || "Chưa có thông tin"}
@@ -217,13 +235,15 @@ const CoderDetail = () => {
                                     {["coderName", "coderEmail", "phoneNumber"].map((field) => (
                                         <Flex key={field} align="center">
                                             {editField === field ? (
-                                                <Input
+                                                <Input textColor={textColor}
                                                     value={editableValues[field] || ""}
                                                     onChange={(e) => handleInputChange(field, e.target.value)}
                                                     placeholder={`Chỉnh sửa ${field}`}
+                                                    onBlur={() => setEditField(null)}
+                                                    autoFocus // Tự động focus vào ô input khi chuyển sang chế độ chỉnh sửa
                                                 />
                                             ) : (
-                                                <Text fontSize="lg">
+                                                <Text fontSize="lg" textColor={textColor}>
                                                     <strong>{field === "coderName"
                                                         ? "Họ và tên"
                                                         : field === "coderEmail"
@@ -248,6 +268,8 @@ const CoderDetail = () => {
                                         {editField === "gender" ? (
                                             <Select
                                                 value={editableValues.gender || ""}
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
                                                 onChange={(e) => handleInputChange("gender", e.target.value)}
                                                 placeholder="Chọn giới tính"
                                                 width="50%"
@@ -278,6 +300,8 @@ const CoderDetail = () => {
                                                 value={editableValues.description || ""}
                                                 onChange={(e) => handleInputChange("description", e.target.value)}
                                                 placeholder="Chỉnh sửa mô tả"
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
                                             />
                                         ) : (
                                             <Text fontSize="lg">
@@ -299,7 +323,7 @@ const CoderDetail = () => {
 
                             {/* Right Column */}
                             <GridItem>
-                                <VStack align="stretch" spacing={4}>
+                                <VStack align="stretch" ps={20} spacing={4}>
                                     <Text fontSize="lg">
                                         <strong>Ngày tạo:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
                                     </Text>
@@ -324,8 +348,19 @@ const CoderDetail = () => {
                         <Button
                             variant="solid"
                             size="lg"
-                            colorScheme="teal"
-                            borderRadius="md"
+                            colorScheme="messenger"
+                            borderRadius="xl"
+                            px={5}
+                            boxShadow="lg"
+                            bgGradient="linear(to-l, green.500, green.300)"
+                            transition="all 0.2s ease-in-out"
+                            _hover={{
+                                color: "white",
+                                transform: "scale(1.05)",
+                            }}
+                            _active={{
+                                transform: "scale(0.90)",
+                            }}
                             onClick={handleSave}
                             disabled={editField === null}
                         >

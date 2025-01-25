@@ -10,6 +10,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
 //import routes
 import CoderIndex from 'views/admin/coder';
+import CoderCreate from 'views/admin/coder/components/Create';
 import CoderDetail from 'views/admin/coder/components/Detail';
 
 // Custom Chakra theme
@@ -164,6 +165,7 @@ export default function Dashboard(props) {
                   {getRoutes(routes)}
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/coder" element={<CoderIndex />} />
+                  <Route path="/admin/coder/create" element={<CoderCreate />} />
                   <Route path="/admin/coder/detail/:id" element={<CoderDetail />} />
                 </Routes>
               </Box>

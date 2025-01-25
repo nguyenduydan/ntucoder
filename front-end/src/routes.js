@@ -10,6 +10,7 @@ import {
 // Admin Imports
 import MainDashboard from 'views/admin/default';
 import CoderTable from 'views/admin/coder/index';
+import CoderCreate from 'views/admin/coder/components/Create';
 import CoderDetail from 'views/admin/coder/components/Detail';
 
 // Auth Imports
@@ -30,6 +31,11 @@ const routes = [
     path: '/coder',
     component: <CoderTable />,
     item: [
+      {
+        name: 'Thêm mới người dùng',
+        path: 'create',
+        component: <CoderCreate />,
+      },
       {
         name: 'Chi tiết người dùng',
         path: 'detail/:id',

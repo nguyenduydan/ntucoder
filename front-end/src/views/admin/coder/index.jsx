@@ -5,7 +5,9 @@ import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { MdAdd } from "react-icons/md";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
+import { useDisclosure } from "@chakra-ui/react";
+import CreateCoder from "views/admin/coder/components/Create";
 
 export default function CoderIndex() {
   const [tableData, setTableData] = useState([]);
@@ -14,7 +16,7 @@ export default function CoderIndex() {
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const toast = useToast(); // Hiển thị thông báo
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // Gọi API lấy danh sách dữ liệu
   const fetchData = useCallback(async () => {
       setLoading(true);
@@ -81,27 +83,29 @@ export default function CoderIndex() {
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Flex mb="8px" justifyContent="end" align="end" px="25px">
-          <Link to="create">
-            <Button
-              variant="solid"
-              size="lg"
-              colorScheme="blackAlpha"
-              bgGradient="linear(to-l, green.500, green.300)"
-              borderRadius="xl"
-              boxShadow="lg"
-              transition="all 0.3s ease-in-out"
-              _hover={{
-                bgGradient: "linear(to-r, green.500, green.300)",
-                color: "white",
-              }}
-              _active={{
-                transform: "scale(0.90)",
-              }}
-            >
-              Thêm <MdAdd size="25" />
-            </Button>
-          </Link>
+          <Button
+            variant="solid"
+            size="lg"
+            colorScheme="blackAlpha"
+            bgGradient="linear(to-l, green.500, green.300)"
+            borderRadius="xl"
+            boxShadow="lg"
+            transition="all 0.3s ease-in-out"
+            _hover={{
+              bgGradient: "linear(to-r, green.500, green.300)",
+              color: "white",
+            }}
+            _active={{
+              transform: "scale(0.90)",
+            }}
+            onClick={onOpen} // Mở modal khi nhấn nút
+          >
+            Thêm <MdAdd size="25" />
+          </Button>
         </Flex>
+
+        {/* Hiển thị modal CreateCoder */}
+        <CreateCoder isOpen={isOpen} onClose={onClose} />
 
        <ColumnsTable tableData={tableData} loading={loading} />
 
