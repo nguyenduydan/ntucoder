@@ -22,7 +22,7 @@ import api from "utils/api";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
-
+import Loading from "components/loading/loading";
 
 const genderMapping = {
     0: "Nam",
@@ -155,13 +155,9 @@ const CoderDetail = () => {
             });
         }
     };
-
-
-
     if (!coderDetail) {
-        return <Text>Loading...</Text>;
+        return <Loading message="Đang tải thông tin coder..." />;
     }
-
     return (
         <ScrollToTop>
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
