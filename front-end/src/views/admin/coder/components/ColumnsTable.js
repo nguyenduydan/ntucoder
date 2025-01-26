@@ -36,7 +36,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
   };
 
   return (
-    <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
+    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
@@ -48,16 +48,18 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       >
         <Table variant="simple" borderRadius={'full'} color="gray.500" colorScheme="facebook" mb="12px" mt="5px">
           <Thead>
-            <Tr>
+            <Tr
+              position="sticky" // Giữ cố định
+              top="0" // Đặt vị trí trên cùng khi cuộn
+              zIndex={1}
+            >
               {columnsData.map((column) => (
                 <Th
                   key={column.Header}
                   borderColor={borderColor}
                   width={column.width || 'fixed'}
-                  position="sticky" // Giữ cố định
-                  top="0" // Đặt vị trí trên cùng khi cuộn
+
                   bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
-                  zIndex="1" // Đảm bảo header nằm trên nội dung bảng
                 >
                   <Flex>
                     <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
@@ -78,7 +80,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
               <Tr>
                 <Td colSpan={columnsData.length} borderColor="transparent">
                   <Flex justifyContent="center" align="center" py="20px">
-                    <Loading message="Đang tải dữ liệu..." />;
+                    <Loading message="Đang tải dữ liệu..." />
                   </Flex>
                 </Td>
               </Tr>

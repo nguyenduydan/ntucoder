@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Icon } from '@chakra-ui/react';
 import {
-  MdBarChart,
   MdHome,
   MdLock,
 } from 'react-icons/md';
@@ -15,6 +14,7 @@ import CoderDetail from 'views/admin/coder/components/Detail';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
+import { PersonIcon } from 'components/icons/Icons';
 
 const routes = [
   {
@@ -27,7 +27,7 @@ const routes = [
   {
     name: 'Người dùng',
     layout: '/admin',
-    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
     path: '/coder',
     component: <CoderTable />,
     item: [

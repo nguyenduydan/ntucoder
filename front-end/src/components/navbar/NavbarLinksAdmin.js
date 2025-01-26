@@ -6,7 +6,6 @@ import {
   Icon,
   Menu,
   MenuButton,
-  MenuItem,
   MenuList,
   Text,
   useColorModeValue,
@@ -30,7 +29,7 @@ export default function HeaderLinks(props) {
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const textColorBrand = useColorModeValue('brand.700', 'brand.400');
   // const ethColor = useColorModeValue('gray.700', 'white');
-  const borderColor = useColorModeValue('#E6ECFA', 'rgba(135, 140, 189, 0.3)');
+  // const borderColor = useColorModeValue('#E6ECFA', 'rgba(135, 140, 189, 0.3)');
   // const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
   // const ethBox = useColorModeValue('white', 'navy.800');
   const shadow = useColorModeValue(
@@ -150,15 +149,16 @@ export default function HeaderLinks(props) {
             h="40px"
           />
         </MenuButton>
-        <MenuList
+        {/* <MenuList
           boxShadow={shadow}
           p="0px"
           mt="10px"
           borderRadius="20px"
           bg={menuBg}
           border="none"
+
         >
-          <Flex w="100%" mb="0px">
+          <Flex w="100%" mb="0px" >
             <Text
               ps="20px"
               pt="16px"
@@ -173,7 +173,7 @@ export default function HeaderLinks(props) {
               👋&nbsp; Hey, Adela
             </Text>
           </Flex>
-          <Flex flexDirection="column" p="10px">
+          <Flex flexDirection="column" p="10px" >
             <MenuItem
               _hover={{ bg: 'none' }}
               _focus={{ bg: 'none' }}
@@ -200,7 +200,7 @@ export default function HeaderLinks(props) {
               <Text fontSize="sm">Log out</Text>
             </MenuItem>
           </Flex>
-        </MenuList>
+        </MenuList> */}
       </Menu>
     </Flex>
   );
