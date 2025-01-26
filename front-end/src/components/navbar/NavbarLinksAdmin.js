@@ -59,6 +59,7 @@ export default function HeaderLinks(props) {
         borderRadius="30px"
       />
       <SidebarResponsive routes={routes} />
+      {/* Notifications */}
       <Menu>
         <MenuButton p="0px">
           <Icon
@@ -70,6 +71,7 @@ export default function HeaderLinks(props) {
             me="10px"
           />
         </MenuButton>
+
         <MenuList
           boxShadow={shadow}
           p="20px"
@@ -117,6 +119,7 @@ export default function HeaderLinks(props) {
           </Flex>
         </MenuList>
       </Menu>
+      {/* Chakra Color Mode */}
       <Button
         variant="no-hover"
         bg="transparent"

@@ -176,7 +176,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                             </FormControl>
 
                             <FormControl isInvalid={errors.phoneNumber} mb={4}>
-                                <FormLabel fontWeight="bold">Số điện thoại<Text as="span" color="red.500"> *</Text></FormLabel>
+                                <FormLabel fontWeight="bold">Số điện thoại</FormLabel>
                                 <Input
                                     type="tel"
                                     placeholder="Nhập số điện thoại"

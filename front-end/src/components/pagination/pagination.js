@@ -6,6 +6,7 @@ export default function Pagination({
     currentPage,
     totalPages,
     pageSize,
+    totalRows,
     onPageChange,
     onPageSizeChange,
 }) {
@@ -63,7 +64,7 @@ export default function Pagination({
                     value={pageSize}
                     onChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
                     width={["100%", "auto"]}
-                    ml={4}
+                    ml={0}
                     variant="outline"
                     colorScheme="blue"
                     sx={{
@@ -80,8 +81,13 @@ export default function Pagination({
                     <option value={50}>50 dòng</option>
                     <option value={100}>100 dòng</option>
                 </Select>
+                <Text ml={5}>
+                    Tổng số dòng:
+                    <Text as="span" fontWeight="bold" ml="5px">
+                        {totalRows}
+                    </Text>
+                </Text>
             </Flex>
-
             {/* Hiển thị các nút phân trang */}
             <Flex alignItems="center" flexWrap="wrap" justify="center" w="100%">
                 {/* Nút Previous */}

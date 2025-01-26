@@ -24,7 +24,6 @@ export const columnsData = [
     Header: 'STT',
     accessor: 'stt',
     Cell: ({ rowIndex }) => rowIndex + 1,
-    minWidth: '20px',
   },
   {
     Header: 'Tài khoản',

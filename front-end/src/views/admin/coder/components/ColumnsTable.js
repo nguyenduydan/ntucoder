@@ -9,17 +9,31 @@ import {
   Th,
   Thead,
   Tr,
-  Spinner,
   Flex,
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
 import Loading from 'components/loading/loadingSpinner';
+import { BiSort } from 'react-icons/bi';
+import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
 
-export default function ColumnTable({ tableData, loading }) {
+export default function ColumnTable({ tableData, loading, onSort, sortField, ascending }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
   const textColor = colorMode === 'light' ? 'black' : 'white'; // Đổi màu text
   const borderColor = colorMode === 'light' ? 'gray.200' : 'whiteAlpha.300';
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) return <BiSort size="20px" />;
+    return ascending ? (
+      <Box as="span" fontWeight="bold">
+        <AiOutlineSortAscending size="20px" />
+      </Box>
+    ) : (
+      <Box as="span" fontWeight="bold">
+        <AiOutlineSortDescending size="20px" />
+      </Box>
+    );
+  };
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
@@ -45,9 +59,16 @@ export default function ColumnTable({ tableData, loading }) {
                   bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
                   zIndex="1" // Đảm bảo header nằm trên nội dung bảng
                 >
-                  <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
-                    {column.Header}
-                  </Text>
+                  <Flex>
+                    <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
+                      {column.Header}
+                    </Text>
+                    {(column.accessor === 'userName' || column.accessor === 'coderName') && onSort && (
+                      <Box onClick={() => onSort(column.accessor)} cursor="pointer">
+                        {renderSortIcon(column.accessor)}
+                      </Box>
+                    )}
+                  </Flex>
                 </Th>
               ))}
             </Tr>

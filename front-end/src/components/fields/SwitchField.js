@@ -22,29 +22,33 @@ export default function Default(props) {
     fontSize,
     ...rest
   } = props;
-  let [checked, setChecked] = React.useState(isChecked);
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  const [checked, setChecked] = React.useState(isChecked);
+
+  // Handle the switch background color
+  const switchBg = checked ? "blue.500" : "gray.300";
+
   return (
     <Box w="100%" fontWeight="500" {...rest}>
       {reversed ? (
         <Flex align="center" borderRadius="16px">
-          {isChecked ? (
-            <Switch
-              isChecked={checked}
-              id={id}
-              variant="main"
-              colorScheme="brandScheme"
-              size="md"
-              onChange={() => setChecked(!checked)}
-            />
-          ) : (
-            <Switch
-              id={id}
-              variant="main"
-              colorScheme="brandScheme"
-              size="md"
-            />
-          )}
+          <Switch
+            isChecked={checked}
+            id={id}
+            variant="main"
+            colorScheme="brandScheme"
+            size="md"
+            onChange={(e) => {
+              setChecked(e.target.checked);
+              if (onChange) onChange(e);
+            }}
+            sx={{
+              ".chakra-switch__track": {
+                bg: switchBg
+              }
+            }}
+          />
           <FormLabel
             ms="15px"
             htmlFor={id}
@@ -82,23 +86,22 @@ export default function Default(props) {
               {desc}
             </Text>
           </FormLabel>
-          {isChecked && onChange ? (
-            <Switch
-              isChecked={isChecked}
-              id={id}
-              variant="main"
-              colorScheme="brandScheme"
-              size="md"
-              onChange={onChange}
-            />
-          ) : (
-            <Switch
-              id={id}
-              variant="main"
-              colorScheme="brandScheme"
-              size="md"
-            />
-          )}
+          <Switch
+            isChecked={checked}
+            id={id}
+            variant="main"
+            colorScheme="brandScheme"
+            size="md"
+            onChange={(e) => {
+              setChecked(e.target.checked);
+              if (onChange) onChange(e);
+            }}
+            sx={{
+              ".chakra-switch__track": {
+                bg: switchBg
+              }
+            }}
+          />
         </Flex>
       )}
     </Box>

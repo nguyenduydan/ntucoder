@@ -5,18 +5,24 @@ import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { MdAdd } from "react-icons/md";
-// import { Link } from "react-router-dom";
 import { useDisclosure } from "@chakra-ui/react";
 import CreateCoder from "views/admin/coder/components/Create";
 
 export default function CoderIndex() {
+  //Biến cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sortField, setSortField] = useState("coderName");
+  const [ascending, setAscending] = useState(true);
+  // Biến cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
-  const toast = useToast(); // Hiển thị thông báo
+  const [totalRows, setTotalRows] = useState(0);
+  // Toast and modal
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   // Gọi API lấy danh sách dữ liệu
   const fetchData = useCallback(async () => {
       setLoading(true);
@@ -25,7 +31,8 @@ export default function CoderIndex() {
         params: {
           Page: currentPage,
           PageSize: pageSize,
-          ascending: true,
+          ascending: ascending,
+          sortField: sortField,
         },
       });
       const dataWithStatus = Array.isArray(response.data.data)
@@ -36,6 +43,7 @@ export default function CoderIndex() {
         : [];
       setTableData(dataWithStatus);
       setTotalPages(response.data.totalPages || 0); // Mặc định là 0 nếu không có
+      setTotalRows (response.data.totalCount || 0);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
@@ -51,9 +59,17 @@ export default function CoderIndex() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize]);
+  }, [sortField, ascending,currentPage, pageSize]);
 
-
+  // Sắp xếp dữ liệu
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setAscending(!ascending);
+    } else {
+      setSortField(field);
+      setAscending(true);
+    }
+  };
 
   // Fetch data khi currentPage hoặc pageSize thay đổi
   useEffect(() => {
@@ -75,9 +91,6 @@ export default function CoderIndex() {
       setCurrentPage(1); // Quay về trang 1 khi thay đổi số lượng phần tử
     }
   };
-
-  // Điều kiện hiển thị loading chỉ khi dữ liệu lớn hoặc có nhiều trang
-  //const shouldShowLoading = loading && (tableData?.length === 0 || totalPages === 0);
 
   return (
     <ScrollToTop>
@@ -107,11 +120,18 @@ export default function CoderIndex() {
         {/* Hiển thị modal CreateCoder */}
         <CreateCoder isOpen={isOpen} onClose={onClose} />
 
-       <ColumnsTable tableData={tableData} loading={loading} />
+       <ColumnsTable
+        tableData={tableData}
+        loading={loading}
+        onSort={handleSort}
+        sortField={sortField}
+        ascending={ascending}
+        />
 
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
+        totalRows = {totalRows}
         onPageChange={handlePageChange}
         pageSize={pageSize}
         onPageSizeChange={handlePageSizeChange}

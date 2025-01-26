@@ -42,6 +42,7 @@ namespace api.Infrashtructure.Repositories
             return sortField?.ToLower() switch
             {
                 "codername" => ascending ? query.OrderBy(a => a.UserName) : query.OrderByDescending(a => a.UserName),
+                "username" => ascending ? query.OrderBy(a => a.UserName) : query.OrderByDescending(a => a.UserName),
                 _ => query.OrderBy(a => a.CoderID)
             };
         }
