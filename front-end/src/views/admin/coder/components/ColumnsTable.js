@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
-import Loading from 'components/loading/loadingSpinner';
+import ProgressBar from 'components/loading/loadingBar';
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
 
@@ -36,7 +36,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
   };
 
   return (
-    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
+    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }} >
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
@@ -58,7 +58,6 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                   key={column.Header}
                   borderColor={borderColor}
                   width={column.width || 'fixed'}
-
                   bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
                 >
                   <Flex>
@@ -80,7 +79,8 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
               <Tr>
                 <Td colSpan={columnsData.length} borderColor="transparent">
                   <Flex justifyContent="center" align="center" py="20px">
-                    <Loading message="Đang tải dữ liệu..." />
+                    {/* Sử dụng ProgressBar thay vì Loading spinner */}
+                    <ProgressBar />
                   </Flex>
                 </Td>
               </Tr>

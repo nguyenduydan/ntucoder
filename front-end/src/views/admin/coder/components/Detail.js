@@ -22,7 +22,7 @@ import api from "utils/api";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
-import Loading from "components/loading/loadingSpinner";
+import ProgressBar from "components/loading/loadingBar";
 
 const genderMapping = {
     0: "Nam",
@@ -50,14 +50,21 @@ const CoderDetail = () => {
                 setCoderDetail(response.data);
                 setEditableValues(response.data);
             } catch (error) {
-                console.error("Đã xảy ra lỗi", error);
+                toast({
+                    title: "Đã xảy ra lỗi.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "left-accent",
+                });
             }
         };
 
         if (id) {
             fetchCoderDetail();
         }
-    }, [id]);
+    }, [id, toast]);
 
     const handleEdit = (field) => {
         setEditField(field);
@@ -184,26 +191,11 @@ const CoderDetail = () => {
         }
     };
 
-
-
     if (!coderDetail) {
-        if (!coderDetail) {
-            return (
-                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
-                    <Box
-                        bg={boxColor}
-                        p="6"
-                        borderRadius="lg"
-                        boxShadow="lg"
-                        maxW="1000px"
-                        h="500px"
-                        mx="auto"
-                    >
-                        <Loading message="Đang tải thông tin người dùng..." />
-                    </Box>
-                </Box>
-            );
-        }
+        return (
+            <ProgressBar />
+
+        );
     }
     return (
         <ScrollToTop>
