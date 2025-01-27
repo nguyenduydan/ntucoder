@@ -24,7 +24,7 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import api from "../../../../utils/api";
 
-export default function CreateCoderModal({ isOpen, onClose }) {
+export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [userName, setUserName] = useState("");
     const [coderName, setCoderName] = useState("");
     const [coderEmail, setCoderEmail] = useState("");
@@ -78,7 +78,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
                 variant: "left-accent",
             });
 
-            // Reset lại lỗi sau khi thành công
+            await fetchData();
             setErrors({});
             onClose(); // Đóng modal sau khi tạo thành công
         } catch (error) {

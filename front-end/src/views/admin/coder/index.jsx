@@ -118,7 +118,7 @@ export default function CoderIndex() {
         </Flex>
 
         {/* Hiển thị modal CreateCoder */}
-        <CreateCoder isOpen={isOpen} onClose={onClose} />
+        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={fetchData} />
 
        <ColumnsTable
         tableData={tableData}
@@ -128,14 +128,14 @@ export default function CoderIndex() {
         ascending={ascending}
         />
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalRows = {totalRows}
-        onPageChange={handlePageChange}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-      />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalRows = {totalRows}
+          onPageChange={handlePageChange}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </Box>
 
     </ScrollToTop>
