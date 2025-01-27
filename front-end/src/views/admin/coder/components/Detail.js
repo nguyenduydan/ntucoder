@@ -155,7 +155,6 @@ const CoderDetail = () => {
                         "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
                     },
                 });
-                console.log(response);  // Kiểm tra thông tin phản hồi
             } catch (error) {
                 console.error("Đã xảy ra lỗi khi cập nhật", error);
             }

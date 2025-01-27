@@ -198,8 +198,6 @@ namespace api.Infrashtructure.Repositories
                 Description = existing.Description,
                 Gender = existing.Gender,
                 PhoneNumber = existing.PhoneNumber,
-                CreatedAt = existing.CreatedAt,
-                CreatedBy = existing.CreatedBy,
                 UpdatedAt = existing.UpdatedAt,
                 UpdatedBy = existing.UpdatedBy
             };

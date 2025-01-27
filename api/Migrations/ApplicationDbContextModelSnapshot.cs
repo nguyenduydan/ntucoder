@@ -162,7 +162,7 @@ namespace api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime");
 
                     b.Property<string>("CreatedBy")
@@ -439,8 +439,8 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("TimeLimit")
-                        .HasColumnType("int");
+                    b.Property<float?>("TimeLimit")
+                        .HasColumnType("float");
 
                     b.HasKey("ProblemID");
 

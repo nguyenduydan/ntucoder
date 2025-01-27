@@ -14,7 +14,7 @@ namespace api.Models.ERD
         [Required]
         public string ProblemCode { get; set; }
 
-        public int? TimeLimit { get; set; }
+        public float? TimeLimit { get; set; }
         public int? MemoryLimit { get; set; }
         [Required]
         public string ProblemContent { get; set; }
