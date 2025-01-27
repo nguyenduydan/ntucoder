@@ -27,7 +27,7 @@ export default function CoderIndex() {
   const fetchData = useCallback(async () => {
       setLoading(true);
     try {
-      const response = await api.get(`/coder/getlist`, {
+      const response = await api.get('/coder/getlist', {
         params: {
           Page: currentPage,
           PageSize: pageSize,
