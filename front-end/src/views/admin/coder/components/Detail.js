@@ -38,7 +38,7 @@ const CoderDetail = () => {
     const [avatarFile, setAvatarFile] = useState(null);
     const navigate = useNavigate();
     const toast = useToast();
-
+    const [loading, setLoading] = useState(false);
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
@@ -125,13 +125,9 @@ const CoderDetail = () => {
     };
 
     const handleSave = async () => {
-        console.log("Editable Values before save:", editableValues); // Kiểm tra giá trị trước khi gửi
-
+        setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
             const formData = new FormData();
-
-            // Không cần thêm CoderID vào formData, vì đã có id trong URL
-            // formData.append("CoderID", id);
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
@@ -140,11 +136,6 @@ const CoderDetail = () => {
                     formData.append(field, editableValues[field]);
                 }
             });
-
-            // Kiểm tra formData
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);  // Kiểm tra tất cả các trường trong formData
-            }
 
             // Nếu có file avatar, đính kèm vào formData
             if (avatarFile) {
@@ -178,6 +169,7 @@ const CoderDetail = () => {
                 position: "top",
                 variant: "left-accent",
             });
+            setLoading(false);  // Bật trạng thái loading khi gửi yêu cầu
         } catch (error) {
             console.error("Đã xảy ra lỗi khi cập nhật", error);
             toast({
@@ -188,13 +180,13 @@ const CoderDetail = () => {
                 position: "top",
                 variant: "left-accent",
             });
+            setLoading(false);  // Bật trạng thái loading khi gửi yêu cầu
         }
     };
 
     if (!coderDetail) {
         return (
             <ProgressBar />
-
         );
     }
     return (
@@ -397,6 +389,8 @@ const CoderDetail = () => {
                                 transform: "scale(0.90)",
                             }}
                             onClick={handleSave}
+                            isLoading={loading}  // Hiển thị trạng thái loading
+                            loadingText="Đang lưu..."
                             disabled={editField === null}
                         >
                             Lưu

@@ -60,6 +60,7 @@ export default function CreateCoderModal({ isOpen, onClose }) {
     const handleSubmit = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
+            // eslint-disable-next-line
             const response = await api.post("/coder/create", {
                 userName,
                 coderName,
