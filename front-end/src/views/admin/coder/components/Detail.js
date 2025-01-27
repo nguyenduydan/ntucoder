@@ -329,6 +329,7 @@ const CoderDetail = () => {
                                                 placeholder="Chỉnh sửa mô tả"
                                                 onBlur={() => setEditField(null)}
                                                 autoFocus
+                                                textColor={textColor}
                                             />
                                         ) : (
                                             <Text fontSize="lg">
