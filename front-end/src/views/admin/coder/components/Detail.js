@@ -86,7 +86,11 @@ const CoderDetail = () => {
                 formData.append("AvatarFile", file);
 
                 try {
-                    await api.put(`/coder/update/${id}/`, formData);
+                    await api.put(`/coder/update/${id}/`, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
+                        },
+                    });
 
                     toast({
                         title: "Cập nhật avatar thành công!",
@@ -114,26 +118,50 @@ const CoderDetail = () => {
     };
 
     const handleSave = async () => {
+        console.log("Editable Values before save:", editableValues); // Kiểm tra giá trị trước khi gửi
+
         try {
             const formData = new FormData();
-            formData.append("CoderID", id);
+
+            // Không cần thêm CoderID vào formData, vì đã có id trong URL
+            // formData.append("CoderID", id);
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
-                formData.append(field, editableValues[field]);
+                // Kiểm tra để tránh đính kèm CoderID trong formData
+                if (field !== "CoderID") {
+                    formData.append(field, editableValues[field]);
+                }
             });
 
-            // // Nếu có file avatar, đính kèm vào formData
-            // if (avatarFile) {
-            //     formData.append("AvatarFile", avatarFile);
-            // }
+            // Kiểm tra formData
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);  // Kiểm tra tất cả các trường trong formData
+            }
 
+            // Nếu có file avatar, đính kèm vào formData
+            if (avatarFile) {
+                formData.append("AvatarFile", avatarFile);
+            }
 
+            // Cập nhật coderDetail sau khi chỉnh sửa
             setCoderDetail((prev) => ({
                 ...prev,
                 ...editableValues,
             }));
-            await api.put(`/coder/update/${id}/`, formData);
+
+            // Gọi API PUT để cập nhật dữ liệu
+            try {
+                const response = await api.put(`/coder/update/${id}/`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
+                    },
+                });
+                console.log(response);  // Kiểm tra thông tin phản hồi
+            } catch (error) {
+                console.error("Đã xảy ra lỗi khi cập nhật", error);
+            }
+
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -155,6 +183,9 @@ const CoderDetail = () => {
             });
         }
     };
+
+
+
     if (!coderDetail) {
         if (!coderDetail) {
             return (

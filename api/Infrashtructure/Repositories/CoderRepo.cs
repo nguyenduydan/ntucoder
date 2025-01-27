@@ -7,16 +7,19 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using api.Validator;
 using System.Security.Cryptography;
+using api.Infrashtructure.Services;
 
 namespace api.Infrashtructure.Repositories
 {
     public class CoderRepo : ICoderRepo
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMinioService _minioService;
 
-        public CoderRepo(ApplicationDbContext context)
+        public CoderRepo(ApplicationDbContext context, IMinioService minioService)
         {
             _context = context;
+            _minioService = minioService;
         }
         public async Task<PagedResponse<CoderDTO>> GetAllCoderAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
@@ -150,10 +153,6 @@ namespace api.Infrashtructure.Repositories
             {
                 existing.CoderName = dto.CoderName;
             }
-            if (dto.Avatar != null)
-            {
-                existing.Avatar = dto.Avatar;
-            }
             if (dto.Description != null)
             {
                 existing.Description = dto.Description;
@@ -166,12 +165,30 @@ namespace api.Infrashtructure.Repositories
             {
                 existing.PhoneNumber = dto.PhoneNumber;
             }
+            if (dto.AvatarFile != null)
+            {
+                // Đọc tệp tin từ AvatarFile
+                using (var stream = dto.AvatarFile.OpenReadStream())
+                {
+                    var fileName = $"avatars/"+existing.CoderID+".jpg"; // Đặt tên tệp cho ảnh
+                    var bucketName = "ntucoder"; // Thay thế bằng tên bucket bạn muốn sử dụng
+
+                    // Sử dụng MinioService để tải ảnh lên MinIO
+                    var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
+
+                    // Lưu URL của ảnh vào cơ sở dữ liệu
+                    existing.Avatar = fileUrl;
+                }
+            }
 
             existing.UpdatedAt = DateTime.UtcNow;
             existing.UpdatedBy = "admin";
 
             _context.Coders.Update(existing);
+            Console.WriteLine("Saving to database...");
             await _context.SaveChangesAsync();
+            Console.WriteLine("Data saved successfully!");
+
 
             return new CoderDetailDTO
             {

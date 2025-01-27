@@ -71,7 +71,7 @@ namespace api.Controllers
             }
         }
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateCoder(int id, [FromBody] CoderDetailDTO dto)
+        public async Task<IActionResult> UpdateCoder(int id, [FromForm] CoderDetailDTO dto)
         {
             if (dto == null)
             {

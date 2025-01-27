@@ -31,6 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ICoderRepo, CoderRepo>();
 builder.Services.AddScoped<ICoderService, CoderService>();
+builder.Services.AddScoped<IMinioService, MinioService>();
 
 var app = builder.Build();
 
