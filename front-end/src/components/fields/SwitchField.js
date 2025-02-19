@@ -30,22 +30,26 @@ export default function Default(props) {
   const switchBg = checked ? "blue.500" : "gray.300";
 
   return (
-    <Box w="100%" fontWeight="500" {...rest}>
+    <Box w="100%" fontWeight="500"{...rest}>
       {reversed ? (
-        <Flex align="center" borderRadius="16px">
+        <Flex align="center" justifyContent="center" borderRadius="16px" >
           <Switch
             isChecked={checked}
             id={id}
             variant="main"
             colorScheme="brandScheme"
             size="md"
+            position="static"
             onChange={(e) => {
               setChecked(e.target.checked);
               if (onChange) onChange(e);
             }}
             sx={{
               ".chakra-switch__track": {
-                bg: switchBg
+                bg: switchBg,
+              },
+              ".chakra-switch__thumb": {
+                position: "static !important",
               }
             }}
           />
@@ -98,7 +102,7 @@ export default function Default(props) {
             }}
             sx={{
               ".chakra-switch__track": {
-                bg: switchBg
+                bg: switchBg,
               }
             }}
           />

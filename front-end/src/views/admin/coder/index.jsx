@@ -137,7 +137,6 @@ export default function CoderIndex() {
           onPageSizeChange={handlePageSizeChange}
         />
       </Box>
-
     </ScrollToTop>
   );
 }

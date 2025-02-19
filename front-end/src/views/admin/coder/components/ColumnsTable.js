@@ -36,7 +36,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
   };
 
   return (
-    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }} >
+    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }} overflowY="hidden">
       {/* Hiển thị Loading Bar ngoài bảng */}
       {loading && (
         <Box
@@ -51,7 +51,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       )}
 
       <Box
-        maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
+        // maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
         overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
         borderColor={borderColor}
@@ -60,12 +60,12 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
         mx="15px"
       >
         <Table variant="simple" borderRadius={'full'} color="gray.500" colorScheme="facebook" mb="12px" mt="5px">
-          <Thead>
-            <Tr
-              position="sticky" // Giữ cố định
-              top="0" // Đặt vị trí trên cùng khi cuộn
-              zIndex={1}
-            >
+          <Thead
+            position="sticky" // Giữ cố định
+            top="0" // Đặt vị trí trên cùng khi cuộn
+            zIndex={0}
+          >
+            <Tr>
               {columnsData.map((column) => (
                 <Th
                   key={column.Header}
@@ -87,11 +87,11 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
               ))}
             </Tr>
           </Thead>
-          <Tbody>
+          <Tbody >
             {!loading && tableData.length === 0 && (
               <Tr>
                 <Td colSpan={columnsData.length} textAlign="center">
-                  <Text>No data available</Text>
+                  <Text>Không có dữ liệu</Text>
                 </Td>
               </Tr>
             )}
@@ -108,6 +108,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                     fontSize={{ sm: '16px' }}
                     width={column.width || 'auto'}
                     borderColor="transparent"
+                    padding="10px 15px"
                   >
                     {column.Cell ? (
                       column.Cell({ value: row[column.accessor], rowIndex: index, row })

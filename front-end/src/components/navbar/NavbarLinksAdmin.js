@@ -7,6 +7,7 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  MenuItem,
   Text,
   useColorModeValue,
   useColorMode,
@@ -29,7 +30,7 @@ export default function HeaderLinks(props) {
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const textColorBrand = useColorModeValue('brand.700', 'brand.400');
   // const ethColor = useColorModeValue('gray.700', 'white');
-  // const borderColor = useColorModeValue('#E6ECFA', 'rgba(135, 140, 189, 0.3)');
+  const borderColor = useColorModeValue('#E6ECFA', 'rgba(135, 140, 189, 0.3)');
   // const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
   // const ethBox = useColorModeValue('white', 'navy.800');
   const shadow = useColorModeValue(
@@ -97,14 +98,13 @@ export default function HeaderLinks(props) {
             </Text>
           </Flex>
           <Flex flexDirection="column">
-            {/* <MenuItem
+            <MenuItem
               _hover={{ bg: 'none' }}
               _focus={{ bg: 'none' }}
               px="0"
               borderRadius="8px"
               mb="10px"
             >
-              <ItemContent info="Horizon UI Dashboard PRO" />
             </MenuItem>
             <MenuItem
               _hover={{ bg: 'none' }}
@@ -113,8 +113,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               mb="10px"
             >
-              <ItemContent info="Horizon Design System Free" />
-            </MenuItem> */}
+            </MenuItem>
           </Flex>
         </MenuList>
       </Menu>
@@ -149,7 +148,7 @@ export default function HeaderLinks(props) {
             h="40px"
           />
         </MenuButton>
-        {/* <MenuList
+        <MenuList
           boxShadow={shadow}
           p="0px"
           mt="10px"
@@ -200,7 +199,7 @@ export default function HeaderLinks(props) {
               <Text fontSize="sm">Log out</Text>
             </MenuItem>
           </Flex>
-        </MenuList> */}
+        </MenuList>
       </Menu>
     </Flex>
   );

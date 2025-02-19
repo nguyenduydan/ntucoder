@@ -117,6 +117,7 @@ export const columnsData = [
           <Button
             variant="solid"
             size="xs"
+            position="static"
             colorScheme="facebook"
             borderRadius="md"
             minW="auto"
@@ -129,6 +130,7 @@ export const columnsData = [
           {/* Nút xóa */}
           <Button
             variant="solid"
+            position="static"
             size="xs"
             colorScheme="red"
             borderRadius="md"
