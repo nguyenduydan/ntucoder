@@ -50,6 +50,9 @@ export default function Default(props) {
               },
               ".chakra-switch__thumb": {
                 position: "static !important",
+              },
+              ".chakra-switch__thumb[data-checked]": {
+                position: "static !important",
               }
             }}
           />

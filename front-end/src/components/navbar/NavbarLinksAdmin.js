@@ -136,7 +136,7 @@ export default function HeaderLinks(props) {
           as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
         />
       </Button>
-      <Menu>
+      <Menu >
         <MenuButton p="0px">
           <Avatar
             _hover={{ cursor: 'pointer' }}
@@ -155,7 +155,7 @@ export default function HeaderLinks(props) {
           borderRadius="20px"
           bg={menuBg}
           border="none"
-
+          zIndex={2}
         >
           <Flex w="100%" mb="0px" >
             <Text

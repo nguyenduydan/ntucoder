@@ -51,7 +51,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       )}
 
       <Box
-        // maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
+        maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
         overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
         borderColor={borderColor}
@@ -61,17 +61,18 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       >
         <Table variant="simple" borderRadius={'full'} color="gray.500" colorScheme="facebook" mb="12px" mt="5px">
           <Thead
-            position="sticky" // Giữ cố định
-            top="0" // Đặt vị trí trên cùng khi cuộn
-            zIndex={0}
+
           >
             <Tr>
               {columnsData.map((column) => (
                 <Th
+                  position="sticky" // Giữ cố định
+                  top="0" // Đặt vị trí trên cùng khi cuộn
                   key={column.Header}
                   borderColor={borderColor}
                   width={column.width || 'fixed'}
                   bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
+                  zIndex={1}
                 >
                   <Flex>
                     <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
