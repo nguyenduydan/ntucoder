@@ -22,7 +22,7 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import api from "../../../../utils/api";
+import api from "../../../../config/apiConfig";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [userName, setUserName] = useState("");

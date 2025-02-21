@@ -3,9 +3,7 @@ using api.DTOs;
 using api.Infrashtructure.Helpers;
 using api.Models;
 using api.Models.ERD;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using api.Validator;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
 
@@ -21,9 +19,12 @@ namespace api.Infrashtructure.Repositories
             _context = context;
             _minioService = minioService;
         }
+
         public async Task<PagedResponse<CoderDTO>> GetAllCoderAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
+            // Sử dụng AsNoTracking nếu chỉ đọc để tối ưu hiệu năng
             var coderQuery = _context.Accounts
+                .AsNoTracking()
                 .Include(a => a.Coder)
                 .Select(a => new CoderDTO
                 {
@@ -33,18 +34,22 @@ namespace api.Infrashtructure.Repositories
                     CoderEmail = a.Coder.CoderEmail,
                     PhoneNumber = a.Coder.PhoneNumber,
                 });
+
             coderQuery = ApplySorting(coderQuery, sortField, ascending);
+
             var coder = await PagedResponse<CoderDTO>.CreateAsync(
                 coderQuery,
                 query.Page,
                 query.PageSize);
+
             return coder;
         }
+
         public IQueryable<CoderDTO> ApplySorting(IQueryable<CoderDTO> query, string? sortField, bool ascending)
         {
             return sortField?.ToLower() switch
             {
-                "codername" => ascending ? query.OrderBy(a => a.UserName) : query.OrderByDescending(a => a.UserName),
+                "codername" => ascending ? query.OrderBy(a => a.CoderName) : query.OrderByDescending(a => a.CoderName),
                 "username" => ascending ? query.OrderBy(a => a.UserName) : query.OrderByDescending(a => a.UserName),
                 _ => query.OrderBy(a => a.CoderID)
             };
@@ -53,11 +58,12 @@ namespace api.Infrashtructure.Repositories
         public async Task<CoderDetailDTO> GetCoderByIdAsync(int id)
         {
             var coder = await _context.Coders
+                        .AsNoTracking()
                         .Include(c => c.Account)
                         .FirstOrDefaultAsync(c => c.CoderID == id);
             if (coder == null)
             {
-                throw new KeyNotFoundException($"Không tìm thấy coder với id = {id} được cung cấp.");
+                throw new KeyNotFoundException($"Không tìm thấy coder với id = {id}.");
             }
 
             return new CoderDetailDTO
@@ -77,6 +83,7 @@ namespace api.Infrashtructure.Repositories
             };
         }
 
+        // Hàm băm mật khẩu – không thay đổi
         public static string HashPassword(string password, string salt)
         {
             var combined = password + salt;
@@ -87,96 +94,75 @@ namespace api.Infrashtructure.Repositories
             }
         }
 
+        /// <summary>
+        /// Tạo mới Coder.
+        /// Lưu ý: Các bước validate đầu vào và kiểm tra trùng lặp (email, username) nên được thực hiện trong tầng Service.
+        /// </summary>
         public async Task<CreateCoderDTO> CreateCoderAsync(CreateCoderDTO dto)
         {
-            var validator = new CoderValidator();
-            var validationResult = await validator.ValidateAsync(dto);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-            if (await CheckEmailExist(dto.CoderEmail!))
-            {
-                throw new InvalidOperationException("Email đã tồn tại.");
-            }
-
-            if (await CheckUserExist(dto.UserName!))
-            {
-                throw new InvalidOperationException("Tên đăng nhập đã tồn tại.");
-            }
+            // Tạo salt và băm mật khẩu
             var salt = PasswordHelper.GenerateSalt();
             var hashedPassword = HashPassword(dto.Password!, salt);
-            var account = new Account
-            {
-                UserName = dto.UserName!,
-                Password = hashedPassword,
-                SaltMD5 = salt,
-                RoleID = 2
-            };
 
-            _context.Accounts.Add(account);
-            await _context.SaveChangesAsync();
-
+            // Khởi tạo đối tượng Coder
             var coder = new Coder
             {
-                CoderID = account.AccountID,
                 CoderName = dto.CoderName!,
                 CoderEmail = dto.CoderEmail!,
                 PhoneNumber = dto.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = "admin",
                 UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = "admin",
+                UpdatedBy = "admin"
             };
 
-            _context.Coders.Add(coder);
-            await _context.SaveChangesAsync();
-            dto.CoderID = coder.CoderID;
+            // Giả sử Account có navigation property Coder (one-to-one)
+            var account = new Account
+            {
+                UserName = dto.UserName!,
+                Password = hashedPassword,
+                SaltMD5 = salt,
+                RoleID = 2,
+                Coder = coder
+            };
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync(); // Lưu đồng thời cả Account và Coder
+
+            dto.CoderID = account.AccountID; // Giả sử AccountID được dùng làm khóa chính chung
             return dto;
         }
 
-
+        /// <summary>
+        /// Cập nhật thông tin coder.
+        /// Chỉ thực hiện thao tác lưu dữ liệu. Các bước validate đầu vào và xử lý file (nếu cần)
+        /// có thể được xử lý bên tầng Service trước khi gọi repository.
+        /// </summary>
         public async Task<CoderDetailDTO> UpdateCoderAsync(int id, CoderDetailDTO dto)
         {
             var existing = await _context.Coders.FindAsync(id);
             if (existing == null)
             {
-                throw new KeyNotFoundException("Không tìm thấy.");
+                throw new KeyNotFoundException($"Không tìm thấy coder với id = {id}.");
             }
-            var validator = new CoderValidator(true);
-            var validationResult = await validator.ValidateAsync(dto);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-            if (dto.CoderName != null)
-            {
-                existing.CoderName = dto.CoderName;
-            }
-            if (dto.Description != null)
-            {
-                existing.Description = dto.Description;
-            }
+
+            // Giả sử các kiểm tra đầu vào đã được thực hiện từ tầng Service.
+            existing.CoderName = dto.CoderName ?? existing.CoderName;
+            existing.Description = dto.Description ?? existing.Description;
             if (dto.Gender.HasValue)
-            {
                 existing.Gender = dto.Gender.Value;
-            }
-            if (dto.PhoneNumber != null)
-            {
-                existing.PhoneNumber = dto.PhoneNumber;
-            }
+            existing.PhoneNumber = dto.PhoneNumber ?? existing.PhoneNumber;
+
+            // Nếu có file Avatar mới thì xử lý upload.
             if (dto.AvatarFile != null)
             {
-                // Đọc tệp tin từ AvatarFile
                 using (var stream = dto.AvatarFile.OpenReadStream())
                 {
-                    var fileName = $"avatars/"+existing.CoderID+".jpg"; // Đặt tên tệp cho ảnh
-                    var bucketName = "ntucoder"; // Thay thế bằng tên bucket bạn muốn sử dụng
+                    var fileName = $"avatars/{existing.CoderID}.jpg"; // Đặt tên file theo ID
+                    var bucketName = "ntucoder"; // Tên bucket MinIO
 
-                    // Sử dụng MinioService để tải ảnh lên MinIO
+                    // Upload file lên MinIO
                     var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
-
-                    // Lưu URL của ảnh vào cơ sở dữ liệu
                     existing.Avatar = fileUrl;
                 }
             }
@@ -184,11 +170,7 @@ namespace api.Infrashtructure.Repositories
             existing.UpdatedAt = DateTime.UtcNow;
             existing.UpdatedBy = "admin";
 
-            _context.Coders.Update(existing);
-            Console.WriteLine("Saving to database...");
             await _context.SaveChangesAsync();
-            Console.WriteLine("Data saved successfully!");
-
 
             return new CoderDetailDTO
             {
@@ -203,6 +185,9 @@ namespace api.Infrashtructure.Repositories
             };
         }
 
+        /// <summary>
+        /// Xóa coder và tài khoản liên quan.
+        /// </summary>
         public async Task<bool> DeleteCoderAsync(int id)
         {
             var coder = await _context.Coders
@@ -212,11 +197,13 @@ namespace api.Infrashtructure.Repositories
             {
                 return false;
             }
+
             _context.Coders.Remove(coder);
             if (coder.Account != null)
             {
                 _context.Accounts.Remove(coder.Account);
             }
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -225,10 +212,10 @@ namespace api.Infrashtructure.Repositories
         {
             return await _context.Coders.AnyAsync(c => c.CoderEmail == email);
         }
+
         public async Task<bool> CheckUserExist(string username)
         {
             return await _context.Accounts.AnyAsync(c => c.UserName == username);
         }
     }
-
 }

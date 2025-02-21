@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Box, Button, Flex, useToast } from "@chakra-ui/react";
-import api from "../../../utils/api";
+import api from "../../../config/apiConfig";
 import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
