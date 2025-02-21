@@ -17,7 +17,6 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import moment from 'moment-timezone';
 import api from "config/apiConfig";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
@@ -352,7 +351,7 @@ const CoderDetail = () => {
                             <GridItem>
                                 <VStack align="stretch" ps={20} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
+                                        <strong>Ngày tạo:</strong> {coderDetail.createdAt}
                                     </Text>
                                     <Text fontSize="lg">
                                         <strong>Người tạo:</strong> {coderDetail.createdBy}
@@ -360,7 +359,7 @@ const CoderDetail = () => {
                                     {coderDetail.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật:</strong> {moment.utc(coderDetail.updatedAt).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
+                                                <strong>Ngày cập nhật:</strong> {coderDetail.updatedAt}
                                             </Text>
                                             <Text fontSize="lg">
                                                 <strong>Người cập nhật:</strong> {coderDetail.updatedBy}
