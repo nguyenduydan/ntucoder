@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import moment from 'moment-timezone';
-import api from "utils/api";
+import api from "config/apiConfig";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
@@ -150,7 +150,7 @@ const CoderDetail = () => {
 
             // Gọi API PUT để cập nhật dữ liệu
             try {
-                const response = await api.put(`/coder/update/${id}/`, formData, {
+                await api.put(`/coder/update/${id}/`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
                     },

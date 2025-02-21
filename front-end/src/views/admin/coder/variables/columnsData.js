@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { BiSolidDetail } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 import SwitchField from 'components/fields/SwitchField';
-import api from 'utils/api';
+import api from 'config/apiConfig';
 
 export const columnsData = [
   {

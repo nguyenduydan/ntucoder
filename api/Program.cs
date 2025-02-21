@@ -29,9 +29,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
     mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
 
+
 builder.Services.AddScoped<ICoderRepo, CoderRepo>();
 builder.Services.AddScoped<ICoderService, CoderService>();
+builder.Services.AddScoped<IRoleRepo, RoleRepo>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IMinioService, MinioService>();
+
 
 var app = builder.Build();
 
