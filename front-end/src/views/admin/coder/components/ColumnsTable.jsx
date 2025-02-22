@@ -13,9 +13,9 @@ import {
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
-
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
+
 
 export default function ColumnTable({ tableData, loading, onSort, sortField, ascending }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
@@ -47,9 +47,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
         mx="15px"
       >
         <Table variant="simple" borderRadius={'full'} color="gray.500" colorScheme="facebook" mb="12px" mt="5px">
-          <Thead
-
-          >
+          <Thead>
             <Tr>
               {columnsData.map((column) => (
                 <Th

@@ -1,17 +1,16 @@
-import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
-import { Box, Button, Flex, useToast } from "@chakra-ui/react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Box, Button, Flex, useToast} from "@chakra-ui/react";
 import api from "../../../config/apiConfig";
 import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { MdAdd } from "react-icons/md";
 import { useDisclosure } from "@chakra-ui/react";
+import ProgressBar from "components/loading/loadingBar";
 import CreateCoder from "views/admin/coder/components/Create";
-import { debounce } from "lodash";
-import ProgressBar from 'components/loading/loadingBar';
-
+import SearchInput from 'components/fields/searchInput';
 export default function CoderIndex() {
-  // Biến cho dữ liệu bảng
+  //Biến cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState("coderName");
@@ -21,17 +20,15 @@ export default function CoderIndex() {
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
-  // Toast và modal
+  // Toast and modal
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // Ref cho sentinel (dùng cho infinite scroll)
-  const sentinelRef = useRef(null);
 
-  // Định nghĩa fetchData với useCallback
+  // Gọi API lấy danh sách dữ liệu
   const fetchData = useCallback(async () => {
-    setLoading(true);
+      setLoading(true);
     try {
-      const response = await api.get("/coder/getlist", {
+      const response = await api.get('/coder/getlist', {
         params: {
           Page: currentPage,
           PageSize: pageSize,
@@ -39,18 +36,15 @@ export default function CoderIndex() {
           sortField: sortField,
         },
       });
-      const newData = Array.isArray(response.data.data)
+      const dataWithStatus = Array.isArray(response.data.data)
         ? response.data.data.map((item) => ({
             ...item,
             status: true,
           }))
         : [];
-      // Nếu đang load trang 1 thì reset, ngược lại thêm dữ liệu mới vào mảng đã có
-      setTableData((prevData) =>
-        currentPage === 1 ? newData : [...prevData, ...newData]
-      );
-      setTotalPages(response.data.totalPages || 0);
-      setTotalRows(response.data.totalCount || 0);
+      setTableData(dataWithStatus);
+      setTotalPages(response.data.totalPages || 0); // Mặc định là 0 nếu không có
+      setTotalRows (response.data.totalCount || 0);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
@@ -65,44 +59,10 @@ export default function CoderIndex() {
     } finally {
       setLoading(false);
     }
-  }, [sortField, ascending, currentPage, pageSize, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortField, ascending,currentPage, pageSize]);
 
-  // Tạo phiên bản debounce của fetchData bằng useMemo
-  const debouncedFetchData = useMemo(() => debounce(fetchData, 500), [fetchData]);
-
-  // Gọi debouncedFetchData mỗi khi các dependencies thay đổi
-  useEffect(() => {
-    debouncedFetchData();
-    return () => {
-      debouncedFetchData.cancel();
-    };
-  }, [debouncedFetchData]);
-
-  // Sử dụng Intersection Observer cho Infinite Scrolling
-  useEffect(() => {
-    const currentSentinel = sentinelRef.current;
-    if (!currentSentinel) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading && currentPage < totalPages) {
-          setCurrentPage((prev) => prev + 1);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 1.0,
-      }
-    );
-    observer.observe(currentSentinel);
-    return () => {
-      if (currentSentinel) {
-        observer.unobserve(currentSentinel);
-      }
-    };
-  }, [loading, currentPage, totalPages]);
-
-  // Sắp xếp dữ liệu: reset trang và dữ liệu khi thay đổi sắp xếp
+  // Sắp xếp dữ liệu
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -110,17 +70,17 @@ export default function CoderIndex() {
       setSortField(field);
       setAscending(true);
     }
-    setCurrentPage(1);
-    setTableData([]);
   };
 
-  // Thay đổi trang thủ công
+  // Fetch data khi currentPage hoặc pageSize thay đổi
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Thay đổi trang hiện tại
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      if (newPage === 1) {
-        setTableData([]);
-      }
     }
   };
 
@@ -129,15 +89,17 @@ export default function CoderIndex() {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
       setPageSize(newPageSize);
-      setCurrentPage(1);
-      setTableData([]);
+      setCurrentPage(1); // Quay về trang 1 khi thay đổi số lượng phần tử
     }
   };
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Flex mb="8px" justifyContent="end" align="end" px="25px">
+        <Flex mb="8px" justifyContent="space-between" align="end" px="25px">
+          <Box >
+            <SearchInput placeholder="Tìm kiếm..."/>
+          </Box>
           <Button
             variant="solid"
             size="lg"
@@ -153,37 +115,15 @@ export default function CoderIndex() {
             _active={{
               transform: "scale(0.90)",
             }}
-            onClick={onOpen}
+            onClick={onOpen} // Mở modal khi nhấn nút
           >
             Thêm <MdAdd size="25" />
           </Button>
         </Flex>
-
         {/* Hiển thị modal CreateCoder */}
-        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={debouncedFetchData} />
+        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={fetchData} />
 
-        <ColumnsTable
-          tableData={tableData}
-          loading={loading}
-          onSort={handleSort}
-          sortField={sortField}
-          ascending={ascending}
-        />
-
-        {/* Sentinel element cho Infinite Scrolling */}
-        <div ref={sentinelRef} />
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalRows={totalRows}
-          onPageChange={handlePageChange}
-          pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
-        />
-
-        {/* Hiển thị Loading Bar*/}
-        {loading && (
+        {loading ? (
           <Box
             w="100%"
             py="20px"
@@ -193,7 +133,25 @@ export default function CoderIndex() {
           >
             <ProgressBar />
           </Box>
+        ): (
+          <ColumnsTable
+            tableData={tableData}
+            loading={loading}
+            onSort={handleSort}
+            sortField={sortField}
+            ascending={ascending}
+          />
         )}
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalRows = {totalRows}
+          onPageChange={handlePageChange}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+        />
+
       </Box>
     </ScrollToTop>
   );

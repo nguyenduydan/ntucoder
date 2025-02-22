@@ -163,10 +163,26 @@ export default function Dashboard(props) {
               >
                 <Routes>
                   {getRoutes(routes)}
-                  <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="/admin/coder" element={<CoderIndex />} />
-                  <Route path="/admin/coder/create" element={<CoderCreate />} />
-                  <Route path="/admin/coder/detail/:id" element={<CoderDetail />} />
+                  <Route
+                    key="dashboard"
+                    path="/"
+                    element={<Navigate to="/admin/dashboard" replace />}
+                  />
+                  <Route
+                    key="coder-index"
+                    path="/admin/coder"
+                    element={<CoderIndex />}
+                  />
+                  <Route
+                    key="coder-create"
+                    path="/admin/coder/create"
+                    element={<CoderCreate />}
+                  />
+                  <Route
+                    key="coder-detail"
+                    path="/admin/coder/detail/:id"
+                    element={<CoderDetail />}
+                  />
                 </Routes>
               </Box>
             ) : null}
