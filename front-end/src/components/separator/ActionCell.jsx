@@ -1,91 +1,149 @@
 // ActionCell.jsx
 import React, { useState } from "react";
-import { Flex, Button, useToast } from "@chakra-ui/react";
+import {
+  Flex,
+  Button,
+  useToast,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Text,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { BiSolidDetail } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
 import api from "config/apiConfig";
 
-const ActionCell = ({ row, actionsConfig }) => {
+const ActionCell = ({
+  row,
+  deleteEndpoint,      // Prop để thay đổi endpoint API
+  deleteSuccessToast = {},
+  deleteErrorToast = {},
+  detailPath,          // Đường dẫn chi tiết tùy chỉnh
+}) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [loading, setLoading] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
 
-  const handleAction = async (action) => {
-    setLoading((prev) => ({ ...prev, [action.key]: true }));
-    try {
-      // Nếu có callback tùy chỉnh, ưu tiên sử dụng
-      if (action.onAction && typeof action.onAction === "function") {
-        await action.onAction(row, navigate, toast);
-      } else if (action.endpoint && action.method) {
-        // Nếu có endpoint và method, thực hiện gọi API
-        const endpoint =
-          typeof action.endpoint === "function"
-            ? action.endpoint(row)
-            : action.endpoint;
-        let response;
-        switch (action.method.toUpperCase()) {
-          case "DELETE":
-            response = await api.delete(endpoint);
-            break;
-          case "PUT":
-            response = await api.put(endpoint, action.payload);
-            break;
-          case "POST":
-            response = await api.post(endpoint, action.payload);
-            break;
-          // Các phương thức khác nếu cần
-          default:
-            throw new Error("Phương thức API không được hỗ trợ");
-        }
-        if (response && response.status === 200) {
-          toast({
-            title: `${action.label} thành công!`,
-            description: action.successMessage || "",
-            status: "success",
-            duration: 2000,
-            isClosable: true,
-            position: "top",
-            variant: "left-accent",
-          });
-          if (action.onSuccess) {
-            action.onSuccess();
-          }
-        } else {
-          throw new Error("Có lỗi xảy ra");
-        }
-      }
-    } catch (error) {
+  const coderID = row?.original?.coderID || row?.coderID;
+
+  const handleDetailClick = () => {
+    if (coderID) {
+      const path = detailPath ? `${detailPath}/${coderID}` : `/admin/coder/detail/${coderID}`;
+      navigate(path);
+    } else {
       toast({
         title: "Lỗi",
-        description: error.message || "Có lỗi xảy ra khi thực hiện hành động.",
+        description: "Không tìm thấy ID của người dùng.",
         status: "error",
         duration: 2000,
         isClosable: true,
         position: "top",
         variant: "left-accent",
       });
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    try {
+      setLoading(true);
+      // Xây dựng endpoint dựa trên prop deleteEndpoint
+      const endpoint =
+        deleteEndpoint
+          ? typeof deleteEndpoint === "function"
+            ? deleteEndpoint(row)
+            : deleteEndpoint
+          : `/coder/delete/${coderID}`;
+      const response = await api.delete(endpoint);
+      if (response.status === 200) {
+        toast({
+          title: "Xóa thành công!",
+          description: "Người dùng đã bị xóa.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          position: "top",
+          variant: "left-accent",
+          ...deleteSuccessToast,
+        });
+        onClose();
+        window.location.reload(); // Reload lại trang
+      } else {
+        throw new Error("Có lỗi xảy ra khi xóa");
+      }
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description:
+          error.message || "Có lỗi xảy ra khi thực hiện hành động.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+        ...deleteErrorToast,
+      });
     } finally {
-      setLoading((prev) => ({ ...prev, [action.key]: false }));
+      setLoading(false);
     }
   };
 
   return (
     <Flex gap={4} justify="left" align="center">
-      {actionsConfig.map((action) => (
-        <Button
-          key={action.key}
-          variant="solid"
-          size="xs"
-          colorScheme={action.colorScheme || "gray"}
-          borderRadius="md"
-          minW="auto"
-          _active={{ transform: "scale(0.90)" }}
-          onClick={() => handleAction(action)}
-          isLoading={loading[action.key]}
-          loadingText={action.loadingText || "Đang xử lý..."}
-        >
-          {action.icon ? action.icon : action.label}
-        </Button>
-      ))}
+      <Button
+        variant="solid"
+        size="xs"
+        colorScheme="facebook"
+        borderRadius="md"
+        minW="auto"
+        _active={{ transform: "scale(0.90)" }}
+        onClick={handleDetailClick}
+      >
+        <BiSolidDetail size="13" />
+      </Button>
+      <Button
+        variant="solid"
+        size="xs"
+        colorScheme="red"
+        borderRadius="md"
+        minW="auto"
+        _active={{ transform: "scale(0.90)" }}
+        onClick={onOpen}
+      >
+        <MdDelete size="13" />
+      </Button>
+      {/* Modal xác nhận xóa */}
+      {isOpen && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay bg="none" backdropFilter="auto" backdropBlur="4px" />
+          <ModalContent>
+            <ModalHeader>Xác nhận xóa</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Bạn có chắc chắn muốn xóa hay không?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="gray" mr={3} onClick={onClose}>
+                Hủy
+              </Button>
+              <Button
+                colorScheme="red"
+                isLoading={loading}
+                loadingText="Đang xóa..."
+                onClick={handleDeleteClick}
+              >
+                Xóa
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </Flex>
   );
 };
