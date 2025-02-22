@@ -37,7 +37,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
 
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
-    //const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
+    const boxColor = colorMode === 'light' ? 'gray.100' : 'whiteAlpha.100';
 
 
     // Reset lại input khi modal mở
@@ -61,7 +61,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
             // eslint-disable-next-line
-            const response = await api.post("/coder/create", {
+            await api.post("/coder/create", {
                 userName,
                 coderName,
                 coderEmail,
@@ -119,6 +119,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                             <FormControl isInvalid={errors.coderName} mb={4}>
                                 <FormLabel fontWeight="bold">Họ và tên<Text as="span" color="red.500"> *</Text></FormLabel>
                                 <Input
+                                    variant={'flushed'}
+                                    borderBottomWidth={2}
+                                    paddingLeft={2}
+                                    bg={boxColor}
                                     placeholder="Nhập họ và tên"
                                     value={coderName}
                                     onChange={(e) => setCoderName(e.target.value)}
@@ -130,10 +134,15 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                             <FormControl isInvalid={errors.userName} mb={4}>
                                 <FormLabel fontWeight="bold">Tên đăng nhập<Text as="span" color="red.500"> *</Text></FormLabel>
                                 <Input
+                                    variant={'flushed'}
+                                    borderBottomWidth={2}
+                                    paddingLeft={2}
+                                    bg={boxColor}
                                     placeholder="Nhập tên đăng nhập"
                                     value={userName}
                                     onChange={(e) => setUserName(e.target.value)}
                                     textColor={textColor}
+
                                 />
                                 <FormErrorMessage>{errors.userName}</FormErrorMessage>
                             </FormControl>
@@ -144,6 +153,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                                 </FormLabel>
                                 <InputGroup>
                                     <Input
+                                        variant={'flushed'}
+                                        borderBottomWidth={2}
+                                        paddingLeft={2}
+                                        bg={boxColor}
                                         type={showPassword ? "text" : "password"} // Chuyển đổi giữa text và password
                                         placeholder="Nhập mật khẩu"
                                         value={password}
@@ -167,6 +180,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                             <FormControl isInvalid={errors.coderEmail} mb={4}>
                                 <FormLabel fontWeight="bold">Email<Text as="span" color="red.500"> *</Text></FormLabel>
                                 <Input
+                                    variant={'flushed'}
+                                    borderBottomWidth={2}
+                                    paddingLeft={2}
+                                    bg={boxColor}
                                     type="email"
                                     placeholder="Nhập email"
                                     value={coderEmail}
@@ -179,6 +196,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                             <FormControl isInvalid={errors.phoneNumber} mb={4}>
                                 <FormLabel fontWeight="bold">Số điện thoại</FormLabel>
                                 <Input
+                                    variant={'flushed'}
+                                    borderBottomWidth={2}
+                                    paddingLeft={2}
+                                    bg={boxColor}
                                     type="tel"
                                     placeholder="Nhập số điện thoại"
                                     value={phoneNumber}

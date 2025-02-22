@@ -123,7 +123,7 @@ export default function CoderIndex() {
         {/* Hiển thị modal CreateCoder */}
         <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={fetchData} />
 
-        {loading ? (
+        {loading && (
           <Box
             w="100%"
             py="20px"
@@ -133,7 +133,7 @@ export default function CoderIndex() {
           >
             <ProgressBar />
           </Box>
-        ): (
+        )}
           <ColumnsTable
             tableData={tableData}
             loading={loading}
@@ -141,7 +141,7 @@ export default function CoderIndex() {
             sortField={sortField}
             ascending={ascending}
           />
-        )}
+
 
         <Pagination
           currentPage={currentPage}
