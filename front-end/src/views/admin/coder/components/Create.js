@@ -157,7 +157,6 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                                     value={userName}
                                     onChange={(e) => setUserName(e.target.value)}
                                     textColor={textColor}
-
                                 />
                                 <FormErrorMessage>{errors.userName}</FormErrorMessage>
                             </FormControl>
