@@ -180,6 +180,7 @@ export default function CoderIndex() {
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
+          fetchData={refreshTable}
         />
         <Pagination
           currentPage={currentPage}

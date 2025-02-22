@@ -44,6 +44,7 @@ export const columnsData = [
         title: "Xóa thất bại!",
         description: "Vui lòng thử lại sau.",
       }}
+      fetchData={props.fetchData} // fetchData là hàm lấy dữ liệu mới
     />
   }
 ];

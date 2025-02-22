@@ -25,6 +25,7 @@ const ActionCell = ({
   deleteSuccessToast = {},
   deleteErrorToast = {},
   detailPath,          // Đường dẫn chi tiết tùy chỉnh
+  fetchData,
 }) => {
   const navigate = useNavigate();
   const toast = useToast();
@@ -73,9 +74,18 @@ const ActionCell = ({
           ...deleteSuccessToast,
         });
         onClose();
-        window.location.reload(); // Reload lại trang
+        if (fetchData) await fetchData(); // Gọi hàm fetchData để tải lại dữ liệu
       } else {
-        throw new Error("Có lỗi xảy ra khi xóa");
+        toast({
+        title: "Lỗi",
+        description:"Có lỗi xảy ra khi thực hiện hành động.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+        ...deleteErrorToast,
+      });
       }
     } catch (error) {
       toast({
