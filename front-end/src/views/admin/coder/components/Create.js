@@ -3,7 +3,6 @@ import {
     Button,
     FormControl,
     FormLabel,
-    Input,
     Text,
     useToast,
     FormErrorMessage,
@@ -22,6 +21,7 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import FlushedInput from "../../../../components/fields/InputField";
 import api from "../../../../config/apiConfig";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
@@ -56,12 +56,11 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const handleClickReveal = () => {
         setShowPassword(!showPassword);
     };
-
     const handleSubmit = async () => {
-        setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
+        setLoading(true); // Bật trạng thái loading khi gửi yêu cầu
         try {
-            // eslint-disable-next-line
-            await api.post("/coder/create", {
+            // Gửi yêu cầu tạo mới người dùng
+            const response = await api.post("/coder/create", {
                 userName,
                 coderName,
                 coderEmail,
@@ -69,20 +68,39 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                 password,
             });
 
-            toast({
-                title: "Thêm mới thành công!",
-                status: "success",
-                duration: 2000,
-                isClosable: true,
-                position: "top",
-                variant: "left-accent",
-            });
+            try {
+                if (response.status !== 200) {
+                    // Hiển thị thông báo thành công
+                    toast({
+                        title: "Thêm mới thành công!",
+                        status: "success",
+                        duration: 2000,
+                        isClosable: true,
+                        position: "top",
+                        variant: "left-accent",
+                    });
 
-            await fetchData();
-            setErrors({});
-            onClose(); // Đóng modal sau khi tạo thành công
+                    // Gọi lại hàm fetchData để cập nhật dữ liệu bảng
+                    await fetchData();
+                    // Reset các lỗi nếu có và đóng modal
+                    setErrors({});
+                    onClose();
+                }
+            } catch (error) {
+                // Hiển thị thông báo lỗi chung nếu không có lỗi chi tiết
+                toast({
+                    title: "Đã xảy ra lỗi.",
+                    description: error.message || "Có lỗi xảy ra khi tạo người dùng.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "left-accent",
+                });
+            }
         } catch (error) {
             if (error.response && error.response.data.errors) {
+                // Xử lý lỗi trả về dưới dạng mảng các thông báo lỗi
                 const errorMap = error.response.data.errors.reduce((acc, err) => {
                     if (err.includes("Tên đăng nhập")) acc.userName = err;
                     if (err.includes("Họ và tên")) acc.coderName = err;
@@ -93,8 +111,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                 }, {});
                 setErrors(errorMap);
             } else {
+                // Hiển thị thông báo lỗi chung nếu không có lỗi chi tiết
                 toast({
                     title: "Đã xảy ra lỗi.",
+                    description: error.message || "Có lỗi xảy ra khi tạo người dùng.",
                     status: "error",
                     duration: 2000,
                     isClosable: true,
@@ -103,9 +123,10 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                 });
             }
         } finally {
-            setLoading(false); // Tắt trạng thái loading khi hoàn thành
+            setLoading(false); // Tắt trạng thái loading sau khi hoàn thành
         }
     };
+
 
     return (
         <Modal size={'4xl'} isOpen={isOpen} onClose={onClose}>
@@ -118,10 +139,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                         <GridItem>
                             <FormControl isInvalid={errors.coderName} mb={4}>
                                 <FormLabel fontWeight="bold">Họ và tên<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <Input
-                                    variant={'flushed'}
-                                    borderBottomWidth={2}
-                                    paddingLeft={2}
+                                <FlushedInput
                                     bg={boxColor}
                                     placeholder="Nhập họ và tên"
                                     value={coderName}
@@ -133,10 +151,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
 
                             <FormControl isInvalid={errors.userName} mb={4}>
                                 <FormLabel fontWeight="bold">Tên đăng nhập<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <Input
-                                    variant={'flushed'}
-                                    borderBottomWidth={2}
-                                    paddingLeft={2}
+                                <FlushedInput
                                     bg={boxColor}
                                     placeholder="Nhập tên đăng nhập"
                                     value={userName}
@@ -152,16 +167,14 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                                     Mật khẩu<Text as="span" color="red.500"> *</Text>
                                 </FormLabel>
                                 <InputGroup>
-                                    <Input
-                                        variant={'flushed'}
-                                        borderBottomWidth={2}
-                                        paddingLeft={2}
+                                    <FlushedInput
                                         bg={boxColor}
                                         type={showPassword ? "text" : "password"} // Chuyển đổi giữa text và password
                                         placeholder="Nhập mật khẩu"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         textColor={textColor}
+                                        w="100%"
                                     />
                                     <InputRightElement>
                                         <IconButton
@@ -179,10 +192,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                         <GridItem>
                             <FormControl isInvalid={errors.coderEmail} mb={4}>
                                 <FormLabel fontWeight="bold">Email<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <Input
-                                    variant={'flushed'}
-                                    borderBottomWidth={2}
-                                    paddingLeft={2}
+                                <FlushedInput
                                     bg={boxColor}
                                     type="email"
                                     placeholder="Nhập email"
@@ -195,10 +205,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
 
                             <FormControl isInvalid={errors.phoneNumber} mb={4}>
                                 <FormLabel fontWeight="bold">Số điện thoại</FormLabel>
-                                <Input
-                                    variant={'flushed'}
-                                    borderBottomWidth={2}
-                                    paddingLeft={2}
+                                <FlushedInput
                                     bg={boxColor}
                                     type="tel"
                                     placeholder="Nhập số điện thoại"

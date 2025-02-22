@@ -1,45 +1,61 @@
-// Chakra imports
+import React from "react";
 import {
-  Flex,
-  FormLabel,
+  Box,
   Input,
-  Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-// Custom components
-import React from "react";
 
-export default function Default(props) {
-  const { id, label, extra, placeholder, type, mb, ...rest } = props;
-  // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+export default function FlushedInput(props) {
+  const {
+    id,
+    label,
+    extra,
+    placeholder,
+    type,
+    mb,
+    value,
+    onChange,
+    boxColor,
+    textColor,
+    ...rest
+  } = props;
+
+  // Sử dụng giá trị mặc định nếu textColor không được truyền
+  const defaultTextColor = useColorModeValue("secondaryGray.900", "white");
 
   return (
-    <Flex direction='column' mb={mb ? mb : "30px"}>
-      <FormLabel
-        display='flex'
-        ms='10px'
-        htmlFor={id}
-        fontSize='sm'
-        color={textColorPrimary}
-        fontWeight='bold'
-        _hover={{ cursor: "pointer" }}>
-        {label}
-        <Text fontSize='sm' fontWeight='400' ms='2px'>
-          {extra}
-        </Text>
-      </FormLabel>
+    <Box position="relative" w={"100%"} role="group">
       <Input
         {...rest}
         type={type}
         id={id}
-        fontWeight='500'
-        variant='main'
+        variant="flushed"
+        paddingLeft={2}
         placeholder={placeholder}
-        _placeholder={{ fontWeight: "400", color: "secondaryGray.600" }}
-        h='44px'
-        maxh='44px'
+        onChange={onChange}
+        value={value}
+        textColor={defaultTextColor}
+        borderBottomWidth={2}
+        borderColor="gray.300"
+        _focus={{
+          borderColor: "transparent",
+          boxShadow: "none",
+        }}
       />
-    </Flex>
+      <Box
+        position="absolute"
+        bottom={0}
+        left="50%"
+        height="2px"
+        width="0"
+        bg="#3965FF"
+        transition="width 0.3s ease, left 0.3s ease"
+        _groupFocusWithin={{
+          width: "100%",
+          left: 0,
+        }}
+      />
+    </Box>
   );
+
 }
