@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
-import ProgressBar from 'components/loading/loadingBar';
+
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
 
@@ -37,19 +37,6 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
 
   return (
     <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'scroll', lg: 'hidden' }} overflowY="hidden">
-      {/* Hiển thị Loading Bar ngoài bảng */}
-      {loading && (
-        <Box
-          w="100%"
-          py="20px"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <ProgressBar />
-        </Box>
-      )}
-
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
