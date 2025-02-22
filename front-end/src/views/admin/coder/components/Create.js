@@ -81,7 +81,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                     });
 
                     // Gọi lại hàm fetchData để cập nhật dữ liệu bảng
-                    await fetchData();
+                    if (fetchData) await fetchData();
                     // Reset các lỗi nếu có và đóng modal
                     setErrors({});
                     onClose();

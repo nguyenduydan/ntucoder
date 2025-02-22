@@ -68,6 +68,15 @@ export default function CoderIndex() {
     [pageSize, ascending, sortField, toast]
   );
 
+  const refreshTable = async () => {
+    setPrefetchCache({});
+    setCurrentPage(1);
+    const data = await fetchPage(1);
+    setTableData(data);
+    // Có thể prefetch thêm 2 trang sau nếu cần
+    if (totalPages > 1) fetchPage(2);
+    if (totalPages > 2) fetchPage(3);
+  };
   // Khi component mount hoặc tiêu chí thay đổi, load trang 1 và 2 cùng lúc
   useEffect(() => {
     // Reset cache khi tiêu chí thay đổi
@@ -152,7 +161,7 @@ export default function CoderIndex() {
           </Button>
         </Flex>
         {/* Modal CreateCoder */}
-        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={fetchPage} />
+        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         {/* Hiển thị loading bar nếu cần */}
         {loading && (
           <Box
