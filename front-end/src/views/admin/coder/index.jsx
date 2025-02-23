@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, Button, Flex, useToast } from "@chakra-ui/react";
 import api from "../../../config/apiConfig";
 import ColumnsTable from "views/admin/coder/components/ColumnsTable";
@@ -14,7 +14,7 @@ export default function CoderIndex() {
   // State cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [prefetchCache, setPrefetchCache] = useState({}); // Cache dữ liệu theo page
+  const [prefetchCache, setPrefetchCache] = useState({});
 
   // Các state khác
   const [sortField, setSortField] = useState("coderName");
@@ -26,7 +26,9 @@ export default function CoderIndex() {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Hàm fetchPage: lấy dữ liệu cho 1 trang cụ thể và cập nhật cache
+  // Sử dụng useRef để theo dõi lỗi, tránh hiển thị toast nhiều lần
+  const errorShown = useRef(false);
+
   const fetchPage = useCallback(
     async (page) => {
       setLoading(true);
@@ -42,24 +44,30 @@ export default function CoderIndex() {
         const dataWithStatus = Array.isArray(response.data.data)
           ? response.data.data.map((item) => ({ ...item, status: true }))
           : [];
-        // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1 (hoặc có thể từ response đầu tiên)
+        // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
         if (page === 1) {
           setTotalPages(response.data.totalPages || 0);
           setTotalRows(response.data.totalCount || 0);
         }
+        // Reset error flag khi fetch thành công
+        errorShown.current = false;
         setPrefetchCache((prev) => ({ ...prev, [page]: dataWithStatus }));
         return dataWithStatus;
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast({
-          title: "Lỗi khi tải dữ liệu",
-          description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-          position: "top",
-          variant: "left-accent",
-        });
+        // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
+        if (!errorShown.current) {
+          errorShown.current = true;
+          toast({
+            title: "Lỗi khi tải dữ liệu",
+            description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+            variant: "left-accent",
+          });
+        }
         return [];
       } finally {
         setLoading(false);
@@ -73,13 +81,12 @@ export default function CoderIndex() {
     setCurrentPage(1);
     const data = await fetchPage(1);
     setTableData(data);
-    // Có thể prefetch thêm 2 trang sau nếu cần
     if (totalPages > 1) fetchPage(2);
     if (totalPages > 2) fetchPage(3);
   };
+
   // Khi component mount hoặc tiêu chí thay đổi, load trang 1 và 2 cùng lúc
   useEffect(() => {
-    // Reset cache khi tiêu chí thay đổi
     setPrefetchCache({});
     setCurrentPage(1);
     fetchPage(1);
@@ -91,11 +98,9 @@ export default function CoderIndex() {
     if (prefetchCache[currentPage]) {
       setTableData(prefetchCache[currentPage]);
     } else {
-      fetchPage(currentPage).then((data) => {
-        setTableData(data);
-      });
+      fetchPage(currentPage).then((data) => setTableData(data));
     }
-   // Prefetch trang tiếp theo (currentPage+1)
+    // Prefetch trang tiếp theo (currentPage+1)
     if (currentPage < totalPages && !prefetchCache[currentPage + 1]) {
       fetchPage(currentPage + 1);
     }

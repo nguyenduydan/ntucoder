@@ -1,17 +1,21 @@
 import React from 'react';
-import { Spinner, Center, Text, useColorMode } from '@chakra-ui/react';
+import { Image, Flex, Text, useColorMode } from '@chakra-ui/react';
+import loadingGif from '../../assets/img/loading.gif';
+const Loading = ({
+    message = "Đang tải dữ liệu...",
+    gifUrl = loadingGif,
+}) => {
+    const { colorMode } = useColorMode();
+    const textColor = colorMode === 'light' ? 'black' : 'white';
 
-
-const Loading = ({ message = "Đang tải dữ liệu..." }) => {
-    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
-    const textColor = colorMode === 'light' ? 'black' : 'white'; // Đổi màu text
     return (
-        <Center>
-            <Spinner size="xl" color="teal.500" />
-            <Text mt={4} ml={2} fontSize="lg" color={textColor}>
+        <Flex direction="column" justify="center" align="center" height="100vh">
+            <Image src={gifUrl} alt="Loading..." />
+            <Text mt={4} fontSize="lg" fontWeight={"bold"} color={textColor}>
                 {message}
             </Text>
-        </Center>
+        </Flex>
     );
 };
+
 export default Loading;
