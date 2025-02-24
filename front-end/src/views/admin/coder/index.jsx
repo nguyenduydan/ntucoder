@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Box, Button, Flex, useToast } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import api from "../../../config/apiConfig";
 import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
-import { MdAdd } from "react-icons/md";
 import { useDisclosure } from "@chakra-ui/react";
 import ProgressBar from "components/loading/loadingBar";
 import CreateCoder from "views/admin/coder/components/Create";
-import SearchInput from "components/fields/searchInput";
+import Toolbar from "components/menu/ToolBar";
 
 export default function CoderIndex() {
   // State cho dữ liệu bảng
@@ -143,28 +142,7 @@ export default function CoderIndex() {
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Flex mb="8px" justifyContent="space-between" align="end" px="25px">
-          <Box>
-            <SearchInput placeholder="Tìm kiếm..." />
-          </Box>
-          <Button
-            variant="solid"
-            size="lg"
-            colorScheme="blackAlpha"
-            bgGradient="linear(to-l, green.500, green.300)"
-            borderRadius="xl"
-            boxShadow="lg"
-            transition="all 0.3s ease-in-out"
-            _hover={{
-              bgGradient: "linear(to-r, green.500, green.300)",
-              color: "white",
-            }}
-            _active={{ transform: "scale(0.90)" }}
-            onClick={onOpen}
-          >
-            Thêm <MdAdd size="25" />
-          </Button>
-        </Flex>
+        <Toolbar onAdd={onOpen} />
         {/* Modal CreateCoder */}
         <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         {/* Hiển thị loading bar nếu cần */}

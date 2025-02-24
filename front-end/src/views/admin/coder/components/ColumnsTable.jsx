@@ -40,6 +40,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
+
         overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
         borderColor={borderColor}
         borderRadius="md"
@@ -75,9 +76,9 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
           </Thead>
           <Tbody >
             {!loading && tableData.length === 0 && (
-              <Tr>
-                <Td colSpan={columnsData.length} textAlign="center">
-                  <Text>Không có dữ liệu</Text>
+              <Tr >
+                <Td h="40vh" colSpan={columnsData.length} textAlign="center">
+                  <Text fontSize="20px">Không có dữ liệu, vui lòng thử lại.</Text>
                 </Td>
               </Tr>
             )}
@@ -95,6 +96,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                     width={column.width || 'auto'}
                     borderColor="transparent"
                     padding="10px 15px"
+
                   >
                     {column.Cell ? (
                       column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })

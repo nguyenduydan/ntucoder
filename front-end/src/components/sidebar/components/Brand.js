@@ -1,7 +1,7 @@
 import React from "react";
 
 // Chakra imports
-import { Flex, useColorModeValue } from "@chakra-ui/react";
+import { Flex, useColorModeValue, Link } from "@chakra-ui/react";
 
 // Custom components
 import { NTULogo } from "components/icons/Icons";
@@ -13,7 +13,9 @@ export function SidebarBrand() {
 
   return (
     <Flex align='center' direction='column'>
-      <NTULogo h='26px' w='175px' my='32px' color={logoColor} />
+      <Link href="/admin/dashboard">
+        <NTULogo h='26px' w='175px' my='20px' color={logoColor} />
+      </Link>
       <HSeparator mb='20px' />
     </Flex>
   );
