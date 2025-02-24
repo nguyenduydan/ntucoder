@@ -9,6 +9,7 @@ import {
     TagLabel,
     TagCloseButton,
     IconButton,
+    Tooltip,
 } from "@chakra-ui/react";
 import { MdAdd, MdClear } from "react-icons/md";
 import SearchInput from "components/fields/searchInput";
@@ -98,15 +99,16 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
                         </option>
                     </Select>
                     {selectedFilters.length > 0 && (
-                        <IconButton
-                            aria-label="Xóa toàn bộ filter"
-                            icon={<MdClear />}
-                            onClick={clearAllFilters}
-                            variant="ghost"
-                            color="red"
-                            size="sm"
-                            fontSize={20}
-                        />
+                        <Tooltip label="Xóa toàn bộ filter" hasArrow>
+                            <IconButton
+                                icon={<MdClear />}
+                                onClick={clearAllFilters}
+                                variant="ghost"
+                                color="red"
+                                size="sm"
+                                fontSize={20}
+                            />
+                        </Tooltip>
                     )}
                     {selectedFilters.length > 0 && (
                         <Flex wrap="wrap" gap={2} >
