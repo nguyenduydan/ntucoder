@@ -40,7 +40,6 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
-
         overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
         borderColor={borderColor}
         borderRadius="md"
