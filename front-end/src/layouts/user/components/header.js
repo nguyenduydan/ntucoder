@@ -18,11 +18,12 @@ import {
     FormLabel,
     InputRightElement,
     IconButton,
+    Text
 } from "@chakra-ui/react";
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { LockIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import FlushedInput from "../../../components/fields/InputField";
-
+import { FaGoogle } from "react-icons/fa";
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -65,6 +66,7 @@ const Header = () => {
                         bg={loginBtn}
                         color={textBtn}
                         _hover={{ bg: 'navy.400', transform: 'scale(1.05)' }}
+                        leftIcon={<LockIcon mb={1} />}
                     >
                         Đăng nhập
                     </Button>
@@ -110,11 +112,32 @@ const Header = () => {
                                             <FlushedInput type="password" placeholder="Nhập lại mật khẩu" />
                                         </FormControl>
                                     )}
-                                    <Button colorScheme="blue" width="full" mt={4}>
+                                    <Button colorScheme="blue" width="full" mt={4} fontSize={18}>
                                         {isLogin ? "Đăng nhập" : "Đăng ký"}
                                     </Button>
                                     <Button variant="link" mt={5} onClick={handleToggle}>
                                         {isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}
+                                    </Button>
+                                    <Box
+                                        align="center"
+                                        h='2px'
+                                        my={5}
+                                        borderBottomWidth='2px'
+                                        borderColor='black'
+                                        borderRadius={"md"}
+                                    ></Box>
+                                    {/* nút đang nhập google */}
+                                    <Button
+                                        rightIcon={<FaGoogle />}
+                                        colorScheme="red"
+                                        variant="outline"
+                                        onClick={() => {
+                                            // Xử lý đăng nhập Google
+                                            console.log("Đăng nhập với Google");
+                                        }}
+                                        fontSize={18}
+                                    >
+                                        Đăng nhập với Google
                                     </Button>
                                 </Flex>
                             </ModalBody>

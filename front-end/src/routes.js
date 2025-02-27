@@ -48,13 +48,12 @@ const routes = [
     ]
   },
   // Auth Routes
-  {
-    name: 'Sign In',
-    layout: '/auth',
-    path: '/sign-in',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
-    component: <SignInCentered />,
-  },
+  // {
+  //   name: 'Sign In',
+  //   layout: '/auth',
+  //   path: '/sign-in',
+  //   component: <SignInCentered />,
+  // },
 
   // User Routes
   {
@@ -68,28 +67,24 @@ const routes = [
     name: 'BÀI TẬP',
     layout: '/user',
     path: '/problem',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
   },
   {
     name: 'KỲ THI',
     layout: '/user',
     path: '/ky-thi',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
   },
   {
     name: 'HỎI & ĐÁP',
     layout: '/user',
     path: '/hoi-dap',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
   },
   {
     name: 'BẢNG CHẤM ĐIỂM',
     layout: '/user',
     path: '/bang-cham-diem',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
   },
   {
@@ -103,7 +98,6 @@ const routes = [
     name: 'CHAT BOX',
     layout: '/user',
     path: '/chatbox',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
   },
 ];
