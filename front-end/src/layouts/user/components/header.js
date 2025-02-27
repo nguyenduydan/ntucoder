@@ -1,5 +1,4 @@
-import { Box, Flex, Spacer, Link, Input, IconButton } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { Box, Flex, Spacer, Link } from "@chakra-ui/react";
 
 const Header = () => {
     return (
@@ -10,14 +9,12 @@ const Header = () => {
                 </Box>
                 <Spacer />
                 <Flex gap={4}>
-                    <Link href="#" color="white">
+                    <Link href="#" color="black">
                         Đăng nhập
                     </Link>
-                    <Link href="#" color="white">
+                    <Link href="#" color="black">
                         Đăng ký
                     </Link>
-                    <Input placeholder="Tìm kiếm..." size="sm" width="150px" bg="white" />
-                    <IconButton icon={<SearchIcon />} size="sm" aria-label="Search" />
                 </Flex>
             </Flex>
         </Box>

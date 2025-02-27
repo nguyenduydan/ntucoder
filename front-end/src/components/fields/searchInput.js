@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 
-const SearchInput = ({ placeholder = "Search...", onSearch }) => {
+const SearchInput = ({ placeholder = "Search...", onSearch, }) => {
     const [value, setValue] = useState("");
     const { colorMode } = useColorMode();
     const textColor = colorMode === "light" ? "black" : "white";
