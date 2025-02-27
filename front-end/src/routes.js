@@ -58,19 +58,54 @@ const routes = [
 
   // User Routes
   {
-    name: 'Home',
+    name: 'TRANG CHỦ',
     layout: '/user',
     path: '/',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <Home />,
   },
   {
-    name: 'Problem',
+    name: 'BÀI TẬP',
     layout: '/user',
     path: '/problem',
     icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <Problem />,
-  }
+  },
+  {
+    name: 'KỲ THI',
+    layout: '/user',
+    path: '/ky-thi',
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    component: <Problem />,
+  },
+  {
+    name: 'HỎI & ĐÁP',
+    layout: '/user',
+    path: '/hoi-dap',
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    component: <Problem />,
+  },
+  {
+    name: 'BẢNG CHẤM ĐIỂM',
+    layout: '/user',
+    path: '/bang-cham-diem',
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    component: <Problem />,
+  },
+  {
+    name: 'BÀI VIẾT',
+    layout: '/user',
+    path: '/bai-viet',
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    component: <Problem />,
+  },
+  {
+    name: 'CHAT BOX',
+    layout: '/user',
+    path: '/chatbox',
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    component: <Problem />,
+  },
 ];
 
 export default routes;

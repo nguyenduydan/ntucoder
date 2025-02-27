@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useColorModeValue } from '@chakra-ui/react';
 import routes from 'routes.js';
 
 // Import layouts
@@ -12,6 +13,9 @@ import Problem from 'views/user/Problem';
 
 export default function Home(props) {
     const { ...rest } = props;
+    // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
+    const bg = useColorModeValue("white", "navy.800");
+    const textColor = useColorModeValue("black", "white");
 
     // Kiểm tra nếu không đang ở trang full-screen maps
     const getRoute = () => window.location.pathname !== '/user/full-screen-maps';
@@ -40,7 +44,7 @@ export default function Home(props) {
         });
 
     return (
-        <Box bg="gray.300">
+        <Box bg={bg} color={textColor}>
             <Header />
             <Navbar routes={userRoutes} {...rest} />
             <Box
@@ -49,7 +53,8 @@ export default function Home(props) {
                 overflow="auto"
                 position="relative"
                 maxHeight="100%"
-                bg="white"
+                bg={bg}
+                color={textColor}
                 w={{ lg: "calc(100% - 560px)", md: "100%" }}
                 mx={{ lg: "auto", md: "0" }}
                 transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"

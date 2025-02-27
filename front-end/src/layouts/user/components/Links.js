@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { HStack, Box, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
@@ -8,14 +8,14 @@ const MotionBox = motion(Box);
 
 export default function Links({ routes }) {
   // Định nghĩa màu cho active/inactive link
-  const activeColor = useColorModeValue("Black", "White");
-  const inactiveColor = useColorModeValue("White", "gray.300");
-  const activeBg = useColorModeValue("White", "gray.300");
+  const activeColor = useColorModeValue("Black", "Black");
+  const inactiveColor = useColorModeValue("White", "gray.600");
+  const activeBg = useColorModeValue("White", "White");
 
   // Dùng useLocation nếu cần kiểm tra active path theo cách thủ công
-  const location = useLocation();
-  const activeRoute = (routePath) =>
-    location.pathname.toLowerCase().includes(routePath.toLowerCase());
+  // const location = useLocation();
+  // const activeRoute = (routePath) =>
+  //   location.pathname.toLowerCase().includes(routePath.toLowerCase());
 
   return (
     <HStack spacing={3} position="relative">
@@ -29,7 +29,7 @@ export default function Links({ routes }) {
           >
             {({ isActive }) => (
               <MotionBox
-                px={5}
+                px={2}
                 py={2}
                 borderRadius="md"
                 position="relative"
@@ -37,7 +37,7 @@ export default function Links({ routes }) {
                 transition={{ type: "spring", stiffness: 500, damping: 50 }}
               >
                 {/* Nếu link đang active (hoặc activeRoute trả về true) thì render background highlight */}
-                {(isActive || activeRoute(route.path)) && (
+                {(isActive) && (
                   <MotionBox
                     layoutId="activeBackground"
                     position="absolute"

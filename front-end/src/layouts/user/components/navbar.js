@@ -10,8 +10,7 @@ import {
     DrawerOverlay,
     DrawerContent,
     DrawerBody,
-    Stack,
-    Image,
+    Stack, Image
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
@@ -36,15 +35,14 @@ function Navbar(props) {
     const textColor = useColorModeValue("white", "black");
 
     return (
-        <Box bg={bg} color={textColor} px={4} py={2}>
+        <Box bg={bg} color={textColor} px={20} py={2}>
             <Flex align="center" justify="space-evenly">
                 {/* Brand */}
                 <Box fontSize="xl" fontWeight="bold">
                     <Image src={NTULogo} h="40px" />
                 </Box>
-
                 {/* Desktop Navigation Links */}
-                <Flex display={{ base: "none", md: "flex" }} gap={3}>
+                <Flex display={{ base: "none", md: "flex" }} gap={0}>
                     <Links routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", md: "block" }}>
