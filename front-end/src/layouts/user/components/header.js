@@ -18,7 +18,6 @@ import {
     FormLabel,
     InputRightElement,
     IconButton,
-    Text
 } from "@chakra-ui/react";
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import { LockIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -33,6 +32,7 @@ const Header = () => {
     const textBtn = useColorModeValue('white', 'black');
     // State
     const [password, setPassword] = useState("");
+    const [repassword, setRepassword] = useState("");
     const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -56,7 +56,7 @@ const Header = () => {
             mx={{ lg: "auto", md: "0" }}
         >
             <Flex align="center" justify="space-between">
-                <Box fontWeight="bold" fontFamily="revert-layer" fontSize="25px" color={navbarIcon}>
+                <Box fontWeight="bold" fontFamily="revert-layer" textTransform="uppercase" fontSize="25px" color={navbarIcon}>
                     Nha Trang University
                 </Box>
                 <Flex gap={4} alignItems="center" justify="flex-end" minW="300px">
@@ -67,17 +67,18 @@ const Header = () => {
                         color={textBtn}
                         _hover={{ bg: 'navy.400', transform: 'scale(1.05)' }}
                         leftIcon={<LockIcon mb={1} />}
+                        textTransform="uppercase"
                     >
                         Đăng nhập
                     </Button>
-                    <Button href="#" onClick={() => { setIsLogin(false); onOpen(); }} color={textColor}>
+                    <Button href="#" textTransform="uppercase" onClick={() => { setIsLogin(false); onOpen(); }} color={textColor}>
                         Đăng ký
                     </Button>
 
                     <Modal isOpen={isOpen} onClose={onClose}>
                         <ModalOverlay />
                         <ModalContent>
-                            <ModalHeader textAlign="center" textDecor="Highlight" >{isLogin ? "Đăng nhập" : "Đăng ký"}</ModalHeader>
+                            <ModalHeader textTransform="uppercase" textAlign="center" >{isLogin ? "Đăng nhập" : "Đăng ký"}</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
                                 <Flex direction="column" px="10px" py="15px">
@@ -109,7 +110,16 @@ const Header = () => {
                                     {!isLogin && (
                                         <FormControl mt={4}>
                                             <FormLabel>Xác nhận mật khẩu</FormLabel>
-                                            <FlushedInput type="password" placeholder="Nhập lại mật khẩu" />
+                                            <InputGroup>
+                                                <FlushedInput
+                                                    type={showPassword ? "text" : "password"} // Chuyển đổi giữa text và password
+                                                    placeholder="Xác nhận mật khẩu"
+                                                    value={repassword}
+                                                    onChange={(e) => setRepassword(e.target.value)}
+                                                    textColor={textColor}
+                                                    w="100%"
+                                                />
+                                            </InputGroup>
                                         </FormControl>
                                     )}
                                     <Button colorScheme="blue" width="full" mt={4} fontSize={18}>
