@@ -67,7 +67,7 @@ export default function Home(props) {
                         mx="auto"
                         p={{ base: '20px', md: '30px' }}
                         pe="20px"
-                        minH="90vh"
+                        minH="200vh"
                         pt="50px"
                         w="100%"
                     >

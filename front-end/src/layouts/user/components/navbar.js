@@ -35,7 +35,16 @@ function Navbar(props) {
     const textColor = useColorModeValue("white", "black");
 
     return (
-        <Box bg={bg} color={textColor} px={20} py={2}>
+        <Box position="sticky"
+            top="0" // đặt khoảng cách bằng chiều cao của header
+            left="0"
+            right="0"
+            bg={bg}
+            color={textColor}
+            px={20}
+            py={2}
+            zIndex='2'
+        >
             <Flex align="center" justify="space-evenly">
                 {/* Brand */}
                 <Box fontSize="xl" fontWeight="bold">
