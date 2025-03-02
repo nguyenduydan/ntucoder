@@ -55,8 +55,21 @@ const Header = () => {
             w={{ lg: "calc(100% - 560px)", md: "100%" }}
             mx={{ lg: "auto", md: "0" }}
         >
-            <Flex align="center" justify="space-between">
-                <Box fontWeight="bold" fontFamily="revert-layer" textTransform="uppercase" fontSize="25px" color={navbarIcon}>
+            <Box display="flex"
+                align="center"
+                justifyContent="space-between"
+                flexDirection={{ base: "column", md: "row" }}
+                px={4}
+                py={2}>
+                <Box
+                    fontWeight="bold"
+                    textAlign="center"
+                    fontFamily="revert-layer"
+                    display={{ base: "none", lg: "block" }}
+                    textTransform="uppercase"
+                    fontSize='25px'
+                    color={navbarIcon}
+                    mb={{ base: 2, md: 0 }}>
                     Nha Trang University
                 </Box>
                 <Flex gap={4} alignItems="center" justify="flex-end" minW="300px">
@@ -172,8 +185,8 @@ const Header = () => {
                         />
                     </Button>
                 </Flex>
-            </Flex>
-        </Box>
+            </Box>
+        </Box >
     );
 };
 
