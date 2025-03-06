@@ -10,12 +10,13 @@ import {
   Thead,
   Tr,
   Flex,
+  Skeleton
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
-import Loading from 'components/loading/loadingSpinner'
+
 
 export default function ColumnTable({ tableData, loading, onSort, sortField, ascending, fetchData }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
@@ -73,16 +74,31 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
               ))}
             </Tr>
           </Thead>
-          <Tbody >
+          <Tbody>
             {loading ? (
-              // Hiển thị spinner khi đang tải dữ liệu
+              // Khi loading, hiển thị 5 skeleton rows
+              Array.from({ length: 8 }).map((_, idx) => (
+                <Tr key={`skeleton-${idx}`}>
+                  {columnsData.map((column) => (
+                    <Td
+                      key={column.Header}
+                      fontSize={{ sm: '16px' }}
+                      width={column.width || 'auto'}
+                      borderColor="transparent"
+                      padding="10px 15px"
+                    >
+                      <Skeleton height="20px" />
+                    </Td>
+                  ))}
+                </Tr>
+              ))
+            ) : tableData.length === 0 ? (
               <Tr>
-                <Td colSpan={columnsData.length} textAlign="center" py={10}>
-                  <Loading />
+                <Td h="40vh" colSpan={columnsData.length} textAlign="center">
+                  <Text fontSize="20px">Không có dữ liệu, vui lòng thử lại.</Text>
                 </Td>
               </Tr>
-            ) : tableData.length > 0 ? (
-              // Hiển thị dữ liệu nếu không loading và tableData có phần tử
+            ) : (
               tableData.map((row, index) => (
                 <Tr
                   _hover={{
@@ -107,15 +123,9 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                   ))}
                 </Tr>
               ))
-            ) : (
-              // Hiển thị thông báo nếu không có dữ liệu
-              <Tr >
-                <Td h='40vh' colSpan={columnsData.length} textAlign="center">
-                  <Text fontSize="20px">Không có dữ liệu, vui lòng thử lại.</Text>
-                </Td>
-              </Tr>
             )}
           </Tbody>
+
         </Table>
       </Box>
     </Card>

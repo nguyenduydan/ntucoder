@@ -11,7 +11,9 @@ import api from "./apiConfig";
  * @param {string} params.sortField - Trường sắp xếp.
  * @returns {Promise<Object>} - Chứa data, totalPages và totalCount.
  */
-export const getList = async ({ page, pageSize, ascending, sortField }) => {
+
+export const getList = async ({ page, pageSize, ascending, sortField, totalCount }) => {
+    const dynamicTimeout = (totalCount - pageSize + 1) * 1000;
     try {
         const response = await api.get("/coder", {
             params: {
@@ -20,6 +22,7 @@ export const getList = async ({ page, pageSize, ascending, sortField }) => {
                 ascending,
                 sortField,
             },
+            timeout: dynamicTimeout
         });
         const dataWithStatus = Array.isArray(response.data.data)
             ? response.data.data.map(item => ({ ...item, status: true }))
@@ -91,12 +94,22 @@ export const update = async (id, updateData) => {
 /**
  * Xóa coder theo id.
  *
- * @param {string|number} id - ID của coder cần xóa.
+ * @param {Object} params - Các tham số cần thiết.
+ * @param {string|number} params.id - ID của coder cần xóa.
+ * @param {string|function} [params.deleteEndpoint] - Endpoint tùy chỉnh. Nếu là function, nó sẽ được gọi với tham số row.
+ * @param {Object} [params.row] - Dữ liệu row, được truyền vào nếu deleteEndpoint là function.
  * @returns {Promise<Object>} - Kết quả xóa.
  */
-export const deleteCoder = async (id) => {
+export const deleteCoder = async ({ id, deleteEndpoint, row }) => {
+    // Xây dựng endpoint dựa trên deleteEndpoint nếu có
+    const endpoint = deleteEndpoint
+        ? typeof deleteEndpoint === 'function'
+            ? deleteEndpoint(row)
+            : deleteEndpoint
+        : `/coder/${id}`; // Mặc định là /coder/:id (RESTful)
+
     try {
-        const response = await api.delete(`/coder/${id}`);
+        const response = await api.delete(endpoint);
         return response.data;
     } catch (error) {
         console.error("Error deleting coder:", error);

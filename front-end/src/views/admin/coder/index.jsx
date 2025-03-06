@@ -16,10 +16,10 @@ export default function CoderIndex() {
   const [prefetchCache, setPrefetchCache] = useState({});
 
   // Các state khác
-  const [sortField, setSortField] = useState("coderName");
+  const [sortField, setSortField] = useState("userName");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
   const toast = useToast();
@@ -40,7 +40,7 @@ export default function CoderIndex() {
         });
         // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
         if (page === 1) {
-         setTotalPages(totalPagesResp);
+          setTotalPages(totalPagesResp);
           setTotalRows(totalCount);
         }
         // Reset error flag khi fetch thành công

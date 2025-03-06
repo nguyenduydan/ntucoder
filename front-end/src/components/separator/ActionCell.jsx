@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { BiSolidDetail } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import api from "config/apiConfig";
+import { deleteCoder } from "config/coderService";
 
 const ActionCell = ({
   row,
@@ -41,7 +41,7 @@ const ActionCell = ({
     } else {
       toast({
         title: "Lỗi",
-        description: "Không tìm thấy ID của người dùng.",
+        description: "Không tìm thấy ID",
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -52,57 +52,45 @@ const ActionCell = ({
   };
 
   const handleDeleteClick = async () => {
-    try {
-      setLoading(true);
-      // Xây dựng endpoint dựa trên prop deleteEndpoint
-      const endpoint =
-        deleteEndpoint
-          ? typeof deleteEndpoint === "function"
-            ? deleteEndpoint(row)
-            : deleteEndpoint
-          : `/coder/delete/${coderID}`;
-      const response = await api.delete(endpoint);
-      if (response.status === 200) {
-        toast({
-          title: "Xóa thành công!",
-          description: "Người dùng đã bị xóa.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-          position: "top",
-          variant: "left-accent",
-          ...deleteSuccessToast,
-        });
-        onClose();
-        if (fetchData) await fetchData(); // Gọi hàm fetchData để tải lại dữ liệu
-      } else {
-        toast({
-        title: "Lỗi",
-        description:"Có lỗi xảy ra khi thực hiện hành động.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-        position: "top",
-        variant: "left-accent",
-        ...deleteErrorToast,
-      });
-      }
-    } catch (error) {
-      toast({
-        title: "Lỗi",
-        description:
-          error.message || "Có lỗi xảy ra khi thực hiện hành động.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-        position: "top",
-        variant: "left-accent",
-        ...deleteErrorToast,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    // Gọi hàm deleteCoder từ service với các tham số cần thiết
+    await deleteCoder({ id: coderID, deleteEndpoint, row });
+
+    // Nếu thành công, hiển thị thông báo thành công
+    toast({
+      title: "Xóa thành công!",
+      description: "Người dùng đã bị xóa.",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+      position: "top",
+      variant: "left-accent",
+      ...deleteSuccessToast,
+    });
+
+    onClose();
+    if (fetchData) await fetchData(); // Gọi lại hàm fetchData để tải lại dữ liệu
+  } catch (error) {
+    // Hiển thị thông báo lỗi
+    toast({
+      title: "Lỗi",
+      description:
+        error.response?.data?.message ||
+        error.message ||
+        "Có lỗi xảy ra khi thực hiện hành động.",
+      status: "error",
+      duration: 2000,
+      isClosable: true,
+      position: "top",
+      variant: "left-accent",
+      ...deleteErrorToast,
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Flex gap={4} justify="left" align="center">

@@ -74,7 +74,6 @@ export default function Pagination({
                         },
                     }}
                 >
-                    <option value={1}>1 dòng</option>
                     <option value={5}>5 dòng</option>
                     <option value={10}>10 dòng</option>
                     <option value={20}>20 dòng</option>

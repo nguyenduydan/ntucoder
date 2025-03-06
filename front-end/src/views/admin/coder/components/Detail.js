@@ -14,6 +14,7 @@ import {
     IconButton,
     useToast,
     Select,
+    Skeleton,
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
@@ -22,7 +23,6 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-import api from "config/apiConfig";
 
 const genderMapping = {
     0: "Nam",
@@ -39,6 +39,7 @@ const CoderDetail = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const [loading, setLoading] = useState(false);
+    const [avatarLoaded, setAvatarLoaded] = useState(false);
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
@@ -93,11 +94,8 @@ const CoderDetail = () => {
                 formData.append("AvatarFile", file);
 
                 try {
-                    await api.put(`/coder/update/${id}/`, formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
-                        },
-                    });
+                    // update image
+                    await update(id, formData);
 
                     toast({
                         title: "Cập nhật avatar thành công!",
@@ -150,11 +148,7 @@ const CoderDetail = () => {
 
             // Gọi API PUT để cập nhật dữ liệu
             try {
-                await api.put(`/coder/update/${id}/`, formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
-                    },
-                });
+                await update(id, formData);
             } catch (error) {
                 console.error("Đã xảy ra lỗi khi cập nhật", error);
             }
@@ -226,20 +220,25 @@ const CoderDetail = () => {
                     <VStack spacing={6} align="stretch">
                         {/* Avatar Section */}
                         <Flex direction="column" align="center">
-                            <Image
-                                src={editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png"}
-                                alt="Coder Avatar"
+                            <Skeleton
+                                isLoaded={avatarLoaded}
                                 borderRadius="full"
                                 boxSize="200px"
-                                objectFit="cover"
                                 mb={4}
-                                transition="all 0.2s ease-in-out"
-                                _hover={{
-                                    transform: "scale(1.05)",
-                                }}
-                                onClick={() => document.getElementById("avatarInput").click()}
-                                cursor="pointer"
-                            />
+                            >
+                                <Image
+                                    src={editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png"}
+                                    alt="Coder Avatar"
+                                    borderRadius="full"
+                                    boxSize="200px"
+                                    objectFit="cover"
+                                    transition="all 0.2s ease-in-out"
+                                    _hover={{ transform: 'scale(1.05)' }}
+                                    onClick={() => document.getElementById('avatarInput').click()}
+                                    onLoad={() => setAvatarLoaded(true)}
+                                    cursor="pointer"
+                                />
+                            </Skeleton>
                             <Input
                                 id="avatarInput"
                                 type="file"

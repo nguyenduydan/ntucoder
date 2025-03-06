@@ -20,7 +20,7 @@ export default function Main() {
     // Giả lập quá trình tải (ví dụ 1 giây)
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
