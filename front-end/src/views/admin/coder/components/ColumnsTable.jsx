@@ -10,7 +10,8 @@ import {
   Thead,
   Tr,
   Flex,
-  Skeleton
+  Skeleton,
+  Hide
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
@@ -37,7 +38,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
   };
 
   return (
-    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX={{ sm: 'hidden', lg: 'hidden' }} overflowY="hidden">
+    <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX="hidden" overflowY="hidden">
       <Box
         maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
