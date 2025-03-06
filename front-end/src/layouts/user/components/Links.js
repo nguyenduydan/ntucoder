@@ -18,7 +18,7 @@ export default function Links({ routes, direction }) {
   //   location.pathname.toLowerCase().includes(routePath.toLowerCase());
 
   return (
-    <Flex direction={direction} spacing={3} position="relative">
+    <Flex direction={direction} spacing={3} gap={2} position="relative">
       {routes &&
         routes.length > 0 &&
         routes.map((route, index) => (

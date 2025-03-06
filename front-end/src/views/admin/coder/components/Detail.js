@@ -187,13 +187,14 @@ const CoderDetail = () => {
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
                 <Box
                     bg={boxColor}
-                    p="6"
+                    p={{ base: "4", md: "6" }}  // Padding responsive
                     borderRadius="lg"
                     boxShadow="lg"
                     maxW="1000px"
+                    w="100%"
                     mx="auto"
                 >
-                    <Flex justifyContent="end" align="end" px="25px">
+                    <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
                         <Link>
                             <Button
                                 onClick={() => navigate(`/admin/coder`)}
@@ -213,11 +214,11 @@ const CoderDetail = () => {
                                     transform: "scale(0.90)",
                                 }}
                             >
-                                <MdOutlineArrowBack />Quay lại
+                                <MdOutlineArrowBack /> Quay lại
                             </Button>
                         </Link>
                     </Flex>
-                    <VStack spacing={6} align="stretch">
+                    <VStack spacing={6} align="stretch" mt={4}>
                         {/* Avatar Section */}
                         <Flex direction="column" align="center">
                             <Skeleton
@@ -233,8 +234,8 @@ const CoderDetail = () => {
                                     boxSize="200px"
                                     objectFit="cover"
                                     transition="all 0.2s ease-in-out"
-                                    _hover={{ transform: 'scale(1.05)' }}
-                                    onClick={() => document.getElementById('avatarInput').click()}
+                                    _hover={{ transform: "scale(1.05)" }}
+                                    onClick={() => document.getElementById("avatarInput").click()}
                                     onLoad={() => setAvatarLoaded(true)}
                                     cursor="pointer"
                                 />
@@ -243,14 +244,15 @@ const CoderDetail = () => {
                                 id="avatarInput"
                                 type="file"
                                 onChange={handleAvatarChange}
-                                style={{ display: "none" }}
+                                display="none"
                             />
                         </Flex>
                         <Divider />
-                        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                        {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
                             {/* Left Column */}
-                            <GridItem >
-                                <VStack align="stretch" ps={20} spacing={4}>
+                            <GridItem>
+                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Flex align="center">
                                         <Text fontSize="lg">
                                             <strong>Tên đăng nhập:</strong> {coderDetail.userName || "Chưa có thông tin"}
@@ -260,20 +262,24 @@ const CoderDetail = () => {
                                     {["coderName", "coderEmail", "phoneNumber"].map((field) => (
                                         <Flex key={field} align="center">
                                             {editField === field ? (
-                                                <Input textColor={textColor}
+                                                <Input
+                                                    textColor={textColor}
                                                     value={editableValues[field] || ""}
                                                     onChange={(e) => handleInputChange(field, e.target.value)}
                                                     placeholder={`Chỉnh sửa ${field}`}
                                                     onBlur={() => setEditField(null)}
-                                                    autoFocus // Tự động focus vào ô input khi chuyển sang chế độ chỉnh sửa
+                                                    autoFocus
                                                 />
                                             ) : (
                                                 <Text fontSize="lg" textColor={textColor}>
-                                                    <strong>{field === "coderName"
-                                                        ? "Họ và tên"
-                                                        : field === "coderEmail"
-                                                            ? "Email"
-                                                            : "Số điện thoại"}:</strong>{" "}
+                                                    <strong>
+                                                        {field === "coderName"
+                                                            ? "Họ và tên"
+                                                            : field === "coderEmail"
+                                                                ? "Email"
+                                                                : "Số điện thoại"}
+                                                        :
+                                                    </strong>{" "}
                                                     {coderDetail[field] || "Chưa có thông tin"}
                                                 </Text>
                                             )}
@@ -297,7 +303,7 @@ const CoderDetail = () => {
                                                 autoFocus
                                                 onChange={(e) => handleInputChange("gender", e.target.value)}
                                                 placeholder="Chọn giới tính"
-                                                width="50%"
+                                                width={{ base: "100%", md: "50%" }}
                                             >
                                                 <option value="0">Nam</option>
                                                 <option value="1">Nữ</option>
@@ -346,12 +352,11 @@ const CoderDetail = () => {
                                 </VStack>
                             </GridItem>
 
-
                             {/* Right Column */}
                             <GridItem>
-                                <VStack align="stretch" ps={20} spacing={4}>
+                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo:</strong> {coderDetail.createdAt}
+                                        <strong>Ngày tạo:</strong>{coderDetail.createdAt}
                                     </Text>
                                     <Text fontSize="lg">
                                         <strong>Người tạo:</strong> {coderDetail.createdBy}
@@ -359,7 +364,7 @@ const CoderDetail = () => {
                                     {coderDetail.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật:</strong> {coderDetail.updatedAt}
+                                                <strong>Ngày cập nhật:</strong>{coderDetail.updatedAt}
                                             </Text>
                                             <Text fontSize="lg">
                                                 <strong>Người cập nhật:</strong> {coderDetail.updatedBy}
@@ -388,7 +393,7 @@ const CoderDetail = () => {
                                 transform: "scale(0.90)",
                             }}
                             onClick={handleSave}
-                            isLoading={loading}  // Hiển thị trạng thái loading
+                            isLoading={loading}
                             loadingText="Đang lưu..."
                             disabled={editField === null}
                         >
@@ -398,6 +403,7 @@ const CoderDetail = () => {
                 </Box>
             </Box>
         </ScrollToTop>
+
     );
 };
 

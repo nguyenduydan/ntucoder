@@ -57,7 +57,7 @@ const Header = () => {
         >
             <Box display="flex"
                 align="center"
-                justifyContent="space-between"
+                justifyContent={{ base: "center", md: "space-between" }}
                 flexDirection={{ base: "column", md: "row" }}
                 px={4}
                 py={2}>

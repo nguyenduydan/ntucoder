@@ -41,17 +41,17 @@ function Navbar(props) {
             right="0"
             bg={bg}
             color={textColor}
-            px={{ base: '10px', md: '20px' }}
+            px={{ base: '10px', md: '100px' }}
             py={2}
             zIndex='2'
         >
-            <Flex align="center" justify={{ base: "space-between", md: "space-evenly" }}>
+            <Flex align="center" gap={0} justify={{ base: "space-between", md: "space-evenly" }}>
                 {/* Brand */}
                 <Box fontSize="xl" fontWeight="bold">
                     <Image src={NTULogo} h="40px" />
                 </Box>
                 {/* Desktop Navigation Links */}
-                <Flex display={{ base: "none", md: "flex" }} gap={0}>
+                <Flex display={{ base: "none", md: "flex" }} gap={1}>
                     <Links direction="row" routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", md: "block" }}>
