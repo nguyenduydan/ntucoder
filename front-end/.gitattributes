@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+
+# Có thể tùy chỉnh cho từng loại file
+*.sh text eol=lf
+*.bat text eol=crlf

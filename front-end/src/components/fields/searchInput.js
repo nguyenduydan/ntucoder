@@ -7,20 +7,42 @@ import {
     IconButton,
     Box,
     useColorMode,
+    List,
+    ListItem,
 } from "@chakra-ui/react";
 import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 
-const SearchInput = ({ placeholder = "Search...", onSearch, }) => {
+const SearchInput = ({
+    placeholder = "Search...",
+    onSearch,
+    onQuickSearch,
+    suggestions = [],
+    width = "300px",
+    variant = "outline",
+    borderRadius = "30px",
+    bgColor,
+    textColor,
+    border = "none",
+    boxShadow = "lg"
+}) => {
     const [value, setValue] = useState("");
+    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const { colorMode } = useColorMode();
-    const textColor = colorMode === "light" ? "black" : "white";
-    const backgroundColor = colorMode === "light" ? "gray.100" : "whiteAlpha.300";
+    const defaultTextColor = textColor || (colorMode === "light" ? "black" : "white");
+    const defaultBackgroundColor = bgColor || (colorMode === "light" ? "gray.100" : "black");
     const iconColor = colorMode === "light" ? "black" : "whiteAlpha.700";
-
-    // Tạo ref cho input để có thể focus khi bấm phím tắt
     const inputRef = useRef();
 
-    const handleChange = (e) => setValue(e.target.value);
+    const handleChange = (e) => {
+        const inputValue = e.target.value;
+        setValue(inputValue);
+        if (onQuickSearch) {
+            onQuickSearch(inputValue);
+        }
+        setFilteredSuggestions(
+            suggestions.filter((s) => s.toLowerCase().includes(inputValue.toLowerCase()))
+        );
+    };
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter" && onSearch) {
@@ -30,13 +52,18 @@ const SearchInput = ({ placeholder = "Search...", onSearch, }) => {
 
     const handleClear = () => {
         setValue("");
+        setFilteredSuggestions([]);
         if (onSearch) onSearch("");
     };
 
-    // Lắng nghe phím tắt: Window (hoặc Ctrl) + K để focus vào input
+    const handleSuggestionClick = (suggestion) => {
+        setValue(suggestion);
+        setFilteredSuggestions([]);
+        if (onSearch) onSearch(suggestion);
+    };
+
     useEffect(() => {
         const handleKeyDown = (e) => {
-            // Vì Windows key thường không thể truy cập được, ta dùng metaKey (Cmd trên Mac) hoặc ctrlKey
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
                 e.preventDefault();
                 inputRef.current && inputRef.current.focus();
@@ -48,22 +75,22 @@ const SearchInput = ({ placeholder = "Search...", onSearch, }) => {
     }, []);
 
     return (
-        <Box>
+        <Box position="relative">
             <InputGroup>
                 <InputLeftElement pointerEvents="none">
-                    <SearchIcon color={textColor} />
+                    <SearchIcon color={defaultTextColor} />
                 </InputLeftElement>
                 <Input
                     ref={inputRef}
-                    minW="300px"
-                    variant="outline"
-                    borderRadius="30px"
+                    minW={width}
+                    variant={variant}
+                    borderRadius={borderRadius}
                     placeholder={placeholder}
                     value={value}
-                    textColor={textColor}
-                    bg={backgroundColor}
-                    border="none"
-                    boxShadow="lg"
+                    textColor={defaultTextColor}
+                    bg={defaultBackgroundColor}
+                    border={border}
+                    boxShadow={boxShadow}
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
                 />
@@ -84,7 +111,29 @@ const SearchInput = ({ placeholder = "Search...", onSearch, }) => {
                     </InputRightElement>
                 )}
             </InputGroup>
-
+            {filteredSuggestions.length > 0 && (
+                <List
+                    position="absolute"
+                    bg={defaultBackgroundColor}
+                    mt={2}
+                    width={width}
+                    borderRadius="md"
+                    boxShadow="md"
+                    zIndex={1000}
+                >
+                    {filteredSuggestions.map((suggestion, index) => (
+                        <ListItem
+                            key={index}
+                            padding={2}
+                            cursor="pointer"
+                            _hover={{ bg: "gray.200" }}
+                            onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                            {suggestion}
+                        </ListItem>
+                    ))}
+                </List>
+            )}
         </Box>
     );
 };

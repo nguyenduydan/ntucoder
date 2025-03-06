@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
-import api from "../../../config/apiConfig";
 import ColumnsTable from "views/admin/coder/components/ColumnsTable";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
@@ -8,6 +7,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import ProgressBar from "components/loading/loadingBar";
 import CreateCoder from "views/admin/coder/components/Create";
 import Toolbar from "components/menu/ToolBar";
+import {getList} from "config/coderService"
 
 export default function CoderIndex() {
   // State cho dữ liệu bảng
@@ -32,26 +32,21 @@ export default function CoderIndex() {
     async (page) => {
       setLoading(true);
       try {
-        const response = await api.get("/coder/getlist", {
-          params: {
-            Page: page,
-            PageSize: pageSize,
-            ascending: ascending,
-            sortField: sortField,
-          },
+        const { data, totalPages: totalPagesResp, totalCount } = await getList({
+          page,
+          pageSize,
+          ascending,
+          sortField,
         });
-        const dataWithStatus = Array.isArray(response.data.data)
-          ? response.data.data.map((item) => ({ ...item, status: true }))
-          : [];
         // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
         if (page === 1) {
-          setTotalPages(response.data.totalPages || 0);
-          setTotalRows(response.data.totalCount || 0);
+         setTotalPages(totalPagesResp);
+          setTotalRows(totalCount);
         }
         // Reset error flag khi fetch thành công
         errorShown.current = false;
-        setPrefetchCache((prev) => ({ ...prev, [page]: dataWithStatus }));
-        return dataWithStatus;
+        setPrefetchCache(prev => ({ ...prev, [page]: data }));
+        return data;
       } catch (error) {
         console.error("Error fetching data:", error);
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
@@ -142,7 +137,7 @@ export default function CoderIndex() {
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} />
+        <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
         <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         {/* Hiển thị loading bar nếu cần */}

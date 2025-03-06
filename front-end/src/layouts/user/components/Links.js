@@ -1,12 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { HStack, Box, Text, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Box, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 // Tạo MotionBox từ Box của Chakra UI
 const MotionBox = motion(Box);
 
-export default function Links({ routes }) {
+export default function Links({ routes, direction }) {
   // Định nghĩa màu cho active/inactive link
   const activeColor = useColorModeValue("Black", "Black");
   const inactiveColor = useColorModeValue("White", "gray.600");
@@ -18,7 +18,7 @@ export default function Links({ routes }) {
   //   location.pathname.toLowerCase().includes(routePath.toLowerCase());
 
   return (
-    <HStack spacing={3} position="relative">
+    <Flex direction={direction} spacing={3} position="relative">
       {routes &&
         routes.length > 0 &&
         routes.map((route, index) => (
@@ -60,6 +60,6 @@ export default function Links({ routes }) {
             )}
           </NavLink>
         ))}
-    </HStack>
+    </Flex>
   );
 }

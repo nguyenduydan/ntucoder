@@ -17,11 +17,12 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import api from "config/apiConfig";
+import { getById, update } from "config/coderService";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
+import api from "config/apiConfig";
 
 const genderMapping = {
     0: "Nam",
@@ -45,9 +46,9 @@ const CoderDetail = () => {
     useEffect(() => {
         const fetchCoderDetail = async () => {
             try {
-                const response = await api.get(`/coder/detail/${id}`);
-                setCoderDetail(response.data);
-                setEditableValues(response.data);
+                const data = await getById(id);
+                setCoderDetail(data);
+                setEditableValues(data);
             } catch (error) {
                 toast({
                     title: "Đã xảy ra lỗi.",

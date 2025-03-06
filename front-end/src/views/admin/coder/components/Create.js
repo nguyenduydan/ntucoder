@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import FlushedInput from "../../../../components/fields/InputField";
-import api from "../../../../config/apiConfig";
+import { create } from "../../../../config/coderService";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [userName, setUserName] = useState("");
@@ -60,44 +60,28 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
         setLoading(true); // Bật trạng thái loading khi gửi yêu cầu
         try {
             // Gửi yêu cầu tạo mới người dùng
-            const response = await api.post("/coder/create", {
+            const data = {
                 userName,
                 coderName,
                 coderEmail,
                 phoneNumber,
                 password,
+            };
+
+            await create(data); // Gọi service
+            // Hiển thị thông báo thành công
+            toast({
+                title: 'Thêm mới thành công!',
+                status: 'success',
+                duration: 2000,
+                isClosable: true,
+                position: 'top',
+                variant: 'left-accent',
             });
 
-            try {
-                if (response.status !== 200) {
-                    // Hiển thị thông báo thành công
-                    toast({
-                        title: "Thêm mới thành công!",
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top",
-                        variant: "left-accent",
-                    });
-
-                    // Gọi lại hàm fetchData để cập nhật dữ liệu bảng
-                    if (fetchData) await fetchData();
-                    // Reset các lỗi nếu có và đóng modal
-                    setErrors({});
-                    onClose();
-                }
-            } catch (error) {
-                // Hiển thị thông báo lỗi chung nếu không có lỗi chi tiết
-                toast({
-                    title: "Đã xảy ra lỗi.",
-                    description: error.message || "Có lỗi xảy ra khi tạo người dùng.",
-                    status: "error",
-                    duration: 2000,
-                    isClosable: true,
-                    position: "top",
-                    variant: "left-accent",
-                });
-            }
+            if (fetchData) await fetchData(); // Cập nhật dữ liệu
+            setErrors({});
+            onClose(); // Đóng modal
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 // Xử lý lỗi trả về dưới dạng mảng các thông báo lỗi

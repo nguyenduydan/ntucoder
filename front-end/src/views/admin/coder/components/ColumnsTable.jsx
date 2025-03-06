@@ -15,7 +15,7 @@ import * as React from 'react';
 import Card from 'components/card/Card';
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
-
+import Loading from 'components/loading/loadingSpinner'
 
 export default function ColumnTable({ tableData, loading, onSort, sortField, ascending, fetchData }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
@@ -74,38 +74,47 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
             </Tr>
           </Thead>
           <Tbody >
-            {!loading && tableData.length === 0 && (
+            {loading ? (
+              // Hiển thị spinner khi đang tải dữ liệu
+              <Tr>
+                <Td colSpan={columnsData.length} textAlign="center" py={10}>
+                  <Loading />
+                </Td>
+              </Tr>
+            ) : tableData.length > 0 ? (
+              // Hiển thị dữ liệu nếu không loading và tableData có phần tử
+              tableData.map((row, index) => (
+                <Tr
+                  _hover={{
+                    bg: colorMode === 'dark' ? 'gray.500' : 'gray.200',
+                  }}
+                  key={index}
+                >
+                  {columnsData.map((column) => (
+                    <Td
+                      key={column.Header}
+                      fontSize={{ sm: '16px' }}
+                      width={column.width || 'auto'}
+                      borderColor="transparent"
+                      padding="10px 15px"
+                    >
+                      {column.Cell ? (
+                        column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
+                      ) : (
+                        <Text color={textColor}>{row[column.accessor] || 'N/A'}</Text>
+                      )}
+                    </Td>
+                  ))}
+                </Tr>
+              ))
+            ) : (
+              // Hiển thị thông báo nếu không có dữ liệu
               <Tr >
-                <Td h="40vh" colSpan={columnsData.length} textAlign="center">
+                <Td h='40vh' colSpan={columnsData.length} textAlign="center">
                   <Text fontSize="20px">Không có dữ liệu, vui lòng thử lại.</Text>
                 </Td>
               </Tr>
             )}
-            {!loading && tableData.length > 0 && tableData.map((row, index) => (
-              <Tr
-                _hover={{
-                  bg: colorMode === 'dark' ? 'gray.500' : 'gray.200', // Chọn màu nền khác nhau cho chế độ sáng và tối
-                }}
-                key={index}
-              >
-                {columnsData.map((column) => (
-                  <Td
-                    key={column.Header}
-                    fontSize={{ sm: '16px' }}
-                    width={column.width || 'auto'}
-                    borderColor="transparent"
-                    padding="10px 15px"
-
-                  >
-                    {column.Cell ? (
-                      column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
-                    ) : (
-                      <Text color={textColor}>{row[column.accessor] || 'N/A'}</Text>
-                    )}
-                  </Td>
-                ))}
-              </Tr>
-            ))}
           </Tbody>
         </Table>
       </Box>

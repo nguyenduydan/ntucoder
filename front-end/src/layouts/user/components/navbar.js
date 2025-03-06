@@ -41,18 +41,18 @@ function Navbar(props) {
             right="0"
             bg={bg}
             color={textColor}
-            px={20}
+            px={{ base: '10px', md: '20px' }}
             py={2}
             zIndex='2'
         >
-            <Flex align="center" justify="space-evenly">
+            <Flex align="center" justify={{ base: "space-between", md: "space-evenly" }}>
                 {/* Brand */}
                 <Box fontSize="xl" fontWeight="bold">
                     <Image src={NTULogo} h="40px" />
                 </Box>
                 {/* Desktop Navigation Links */}
                 <Flex display={{ base: "none", md: "flex" }} gap={0}>
-                    <Links routes={routes} />
+                    <Links direction="row" routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", md: "block" }}>
                     <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" />
@@ -76,6 +76,8 @@ function Navbar(props) {
                         <DrawerCloseButton
                             zIndex="3"
                             onClick={onClose}
+                            color='red'
+                            bg='white'
                             _focus={{ boxShadow: "none" }}
                             _hover={{ boxShadow: "none" }}
                         />
@@ -86,9 +88,9 @@ function Navbar(props) {
                                 renderThumbVertical={renderThumb}
                                 renderView={renderView}
                             >
-                                <Stack spacing={3} p={3}>
-                                    <Links routes={routes} />
-                                    <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" />
+                                <Stack spacing={3} p={3} my='30px'>
+                                    <Links direction={"column"} routes={routes} />
+                                    <SearchInput width="100px" placeholder="Tìm kiếm... (Ctrl+K)" />
                                 </Stack>
                             </Scrollbars>
                         </DrawerBody>

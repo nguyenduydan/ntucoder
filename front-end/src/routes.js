@@ -16,7 +16,7 @@ import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
 
 // Auth Imports
-import SignInCentered from 'views/auth/signIn';
+//import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
 
 const routes = [
