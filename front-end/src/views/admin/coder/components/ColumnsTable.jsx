@@ -11,7 +11,6 @@ import {
   Tr,
   Flex,
   Skeleton,
-  Hide
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
@@ -86,7 +85,7 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                       fontSize={{ sm: '16px' }}
                       width={column.width || 'auto'}
                       borderColor="transparent"
-                      padding="10px 15px"
+                      padding="12px 15px"
                     >
                       <Skeleton height="20px" />
                     </Td>
@@ -113,7 +112,6 @@ export default function ColumnTable({ tableData, loading, onSort, sortField, asc
                       fontSize={{ sm: '16px' }}
                       width={column.width || 'auto'}
                       borderColor="transparent"
-                      padding="10px 15px"
                     >
                       {column.Cell ? (
                         column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })

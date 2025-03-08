@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250127133912_updatedb")]
-    partial class updatedb
+    [Migration("20250307124437_update_db")]
+    partial class update_db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,7 +44,8 @@ namespace api.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ReceiveEmail")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("RoleID")
                         .HasColumnType("int");
@@ -55,39 +56,14 @@ namespace api.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("AccountID");
 
                     b.HasIndex("RoleID");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.Announcement", b =>
-                {
-                    b.Property<int>("AnnouncementID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnnouncementID"));
-
-                    b.Property<string>("AnnounceContent")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("AnnounceTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("ContestID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AnnouncementID");
-
-                    b.HasIndex("ContestID");
-
-                    b.ToTable("Announcements");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -99,7 +75,7 @@ namespace api.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BlogID"));
 
                     b.Property<DateTime>("BlogDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("CoderID")
                         .HasColumnType("int");
@@ -116,8 +92,8 @@ namespace api.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.HasKey("BlogID");
 
@@ -136,8 +112,8 @@ namespace api.Migrations
 
                     b.Property<string>("CatName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<int>("CatOrder")
                         .HasColumnType("int");
@@ -153,19 +129,20 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Avatar")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("CoderEmail")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("CoderName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
                     b.Property<string>("CreatedBy")
@@ -173,8 +150,7 @@ namespace api.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("Gender")
                         .HasColumnType("int");
@@ -210,7 +186,7 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CommentTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -234,164 +210,154 @@ namespace api.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CompilerID"));
 
                     b.Property<string>("CompilerExtension")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("CompilerName")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("CompilerOption")
                         .HasColumnType("int");
 
                     b.Property<string>("CompilerPath")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.HasKey("CompilerID");
 
                     b.ToTable("Compilers");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.Contest", b =>
+            modelBuilder.Entity("api.Models.ERD.Course", b =>
                 {
-                    b.Property<int>("ContestID")
+                    b.Property<int>("CourseID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ContestID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CourseID"));
 
-                    b.Property<int>("CoderID")
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("ContestDescription")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ContestName")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("FailedPenalty")
-                        .HasColumnType("longtext");
+                    b.HasKey("CourseID");
 
-                    b.Property<int?>("FrozenTime")
-                        .HasColumnType("int");
+                    b.HasIndex("CreatedBy");
 
-                    b.Property<int>("Published")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RankingFinished")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("RuleType")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("ContestID");
-
-                    b.HasIndex("CoderID");
-
-                    b.ToTable("Contest");
+                    b.ToTable("Cousres");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.Favourite", b =>
+            modelBuilder.Entity("api.Models.ERD.Enrollment", b =>
                 {
-                    b.Property<int>("CoderID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("CoderID", "ProblemID");
-
-                    b.HasIndex("ProblemID");
-
-                    b.ToTable("Favorites");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.HasProblem", b =>
-                {
-                    b.Property<int>("HasProblemID")
+                    b.Property<int>("EnrollmentID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HasProblemID"));
-
-                    b.Property<int>("ContestID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Point")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("HasProblemID");
-
-                    b.HasIndex("ContestID");
-
-                    b.HasIndex("ProblemID");
-
-                    b.ToTable("HasProblems");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.Participation", b =>
-                {
-                    b.Property<int>("ParticipationID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ParticipationID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EnrollmentID"));
 
                     b.Property<int>("CoderID")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContestID")
+                    b.Property<int>("CourseID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PointScore")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Rank")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RegisterMAC")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("RegisterTime")
+                    b.Property<DateTime>("EnrolledAt")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("SolvedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TimeScore")
-                        .HasColumnType("int");
-
-                    b.HasKey("ParticipationID");
+                    b.HasKey("EnrollmentID");
 
                     b.HasIndex("CoderID");
 
-                    b.HasIndex("ContestID");
+                    b.HasIndex("CourseID");
 
-                    b.ToTable("Participations");
+                    b.ToTable("Enrollment");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Lesson", b =>
+                {
+                    b.Property<int>("LessonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("LessonID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("LessonContent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LessonTitle")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TopicID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("LessonID");
+
+                    b.HasIndex("TopicID");
+
+                    b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.LessonSubmission", b =>
+                {
+                    b.Property<int>("LessonSubmissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("LessonSubmissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Feedback")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("LessonID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("SubmissionID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("LessonSubmissionID");
+
+                    b.HasIndex("LessonID");
+
+                    b.HasIndex("SubmissionID");
+
+                    b.ToTable("LessonSubmissions");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
@@ -410,7 +376,8 @@ namespace api.Migrations
 
                     b.Property<string>("ProblemCode")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("ProblemContent")
                         .IsRequired()
@@ -421,11 +388,13 @@ namespace api.Migrations
 
                     b.Property<string>("ProblemName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Published")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("TestCode")
                         .IsRequired()
@@ -435,12 +404,12 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TestProgCompile")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("TestType")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<float?>("TimeLimit")
                         .HasColumnType("float");
@@ -463,8 +432,8 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.HasKey("ProblemID", "CategoryID");
 
@@ -483,7 +452,8 @@ namespace api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("RoleID");
 
@@ -536,6 +506,9 @@ namespace api.Migrations
                     b.Property<int>("CompilerID")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
                     b.Property<string>("MaxMemorySize")
                         .HasColumnType("longtext");
 
@@ -552,12 +525,6 @@ namespace api.Migrations
                     b.Property<int>("SubmissionStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubmitLineCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SubmitMinute")
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("SubmitTime")
                         .HasColumnType("datetime");
 
@@ -570,6 +537,9 @@ namespace api.Migrations
                     b.Property<int?>("TestRunCount")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime");
+
                     b.HasKey("SubmissionID");
 
                     b.HasIndex("CoderID");
@@ -578,47 +548,7 @@ namespace api.Migrations
 
                     b.HasIndex("ProblemID");
 
-                    b.HasIndex("TakePartID");
-
                     b.ToTable("Submissions");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.TakePart", b =>
-                {
-                    b.Property<int>("TakePartID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TakePartID"));
-
-                    b.Property<int?>("FrozenTimeSol")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MaxPoint")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipationID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PointWon")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProblemID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SubmissionCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TimeSolved")
-                        .HasColumnType("int");
-
-                    b.HasKey("TakePartID");
-
-                    b.HasIndex("ParticipationID");
-
-                    b.HasIndex("ProblemID");
-
-                    b.ToTable("TakeParts");
                 });
 
             modelBuilder.Entity("api.Models.ERD.TestCase", b =>
@@ -697,6 +627,39 @@ namespace api.Migrations
                     b.ToTable("TestRuns");
                 });
 
+            modelBuilder.Entity("api.Models.ERD.Topic", b =>
+                {
+                    b.Property<int>("TopicID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TopicID"));
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("TopicDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TopicName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("TopicID");
+
+                    b.HasIndex("CourseID");
+
+                    b.ToTable("Topics");
+                });
+
             modelBuilder.Entity("api.Models.ERD.Account", b =>
                 {
                     b.HasOne("api.Models.ERD.Role", "Role")
@@ -706,17 +669,6 @@ namespace api.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.Announcement", b =>
-                {
-                    b.HasOne("api.Models.ERD.Contest", "Contest")
-                        .WithMany("Announcements")
-                        .HasForeignKey("ContestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contest");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -760,72 +712,64 @@ namespace api.Migrations
                     b.Navigation("Coder");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.Contest", b =>
+            modelBuilder.Entity("api.Models.ERD.Course", b =>
+                {
+                    b.HasOne("api.Models.ERD.Account", "Creator")
+                        .WithMany("Courses")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Enrollment", b =>
                 {
                     b.HasOne("api.Models.ERD.Coder", "Coder")
-                        .WithMany("Contests")
+                        .WithMany("Enrollments")
                         .HasForeignKey("CoderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Coder");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.Favourite", b =>
-                {
-                    b.HasOne("api.Models.ERD.Coder", "Coder")
-                        .WithMany("Favourites")
-                        .HasForeignKey("CoderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.ERD.Problem", "Problem")
-                        .WithMany("Favourites")
-                        .HasForeignKey("ProblemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coder");
-
-                    b.Navigation("Problem");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.HasProblem", b =>
-                {
-                    b.HasOne("api.Models.ERD.Contest", "Contest")
-                        .WithMany("HasProblems")
-                        .HasForeignKey("ContestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.ERD.Problem", "Problem")
-                        .WithMany("HasProblems")
-                        .HasForeignKey("ProblemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contest");
-
-                    b.Navigation("Problem");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.Participation", b =>
-                {
-                    b.HasOne("api.Models.ERD.Coder", "Coder")
-                        .WithMany("Participations")
-                        .HasForeignKey("CoderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.ERD.Contest", "Contest")
-                        .WithMany("Participations")
-                        .HasForeignKey("ContestID")
+                    b.HasOne("api.Models.ERD.Course", "Course")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Coder");
 
-                    b.Navigation("Contest");
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Lesson", b =>
+                {
+                    b.HasOne("api.Models.ERD.Topic", "Topic")
+                        .WithMany("Lessons")
+                        .HasForeignKey("TopicID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.LessonSubmission", b =>
+                {
+                    b.HasOne("api.Models.ERD.Lesson", "Lesson")
+                        .WithMany("LessonSubmissions")
+                        .HasForeignKey("LessonID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Models.ERD.Submission", "Submission")
+                        .WithMany("LessonSubmissions")
+                        .HasForeignKey("SubmissionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+
+                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
@@ -833,13 +777,13 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Coder", "Coder")
                         .WithMany("Problems")
                         .HasForeignKey("CoderID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("api.Models.ERD.Compiler", "Compiler")
                         .WithMany("Problems")
                         .HasForeignKey("TestCompilerID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Coder");
@@ -896,45 +840,18 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Compiler", "Compiler")
                         .WithMany("Submissions")
                         .HasForeignKey("CompilerID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("api.Models.ERD.Problem", "Problem")
                         .WithMany("Submissions")
                         .HasForeignKey("ProblemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.ERD.TakePart", "TakePart")
-                        .WithMany("Submissions")
-                        .HasForeignKey("TakePartID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Coder");
 
                     b.Navigation("Compiler");
-
-                    b.Navigation("Problem");
-
-                    b.Navigation("TakePart");
-                });
-
-            modelBuilder.Entity("api.Models.ERD.TakePart", b =>
-                {
-                    b.HasOne("api.Models.ERD.Participation", "Participation")
-                        .WithMany("TakeParts")
-                        .HasForeignKey("ParticipationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.ERD.Problem", "Problem")
-                        .WithMany("TakeParts")
-                        .HasForeignKey("ProblemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Participation");
 
                     b.Navigation("Problem");
                 });
@@ -969,10 +886,23 @@ namespace api.Migrations
                     b.Navigation("TestCase");
                 });
 
+            modelBuilder.Entity("api.Models.ERD.Topic", b =>
+                {
+                    b.HasOne("api.Models.ERD.Course", "Course")
+                        .WithMany("Topics")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("api.Models.ERD.Account", b =>
                 {
                     b.Navigation("Coder")
                         .IsRequired();
+
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -991,11 +921,7 @@ namespace api.Migrations
 
                     b.Navigation("Comments");
 
-                    b.Navigation("Contests");
-
-                    b.Navigation("Favourites");
-
-                    b.Navigation("Participations");
+                    b.Navigation("Enrollments");
 
                     b.Navigation("Problems");
 
@@ -1011,33 +937,25 @@ namespace api.Migrations
                     b.Navigation("Submissions");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.Contest", b =>
+            modelBuilder.Entity("api.Models.ERD.Course", b =>
                 {
-                    b.Navigation("Announcements");
+                    b.Navigation("Enrollments");
 
-                    b.Navigation("HasProblems");
-
-                    b.Navigation("Participations");
+                    b.Navigation("Topics");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.Participation", b =>
+            modelBuilder.Entity("api.Models.ERD.Lesson", b =>
                 {
-                    b.Navigation("TakeParts");
+                    b.Navigation("LessonSubmissions");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
                 {
-                    b.Navigation("Favourites");
-
-                    b.Navigation("HasProblems");
-
                     b.Navigation("ProblemCategories");
 
                     b.Navigation("Solveds");
 
                     b.Navigation("Submissions");
-
-                    b.Navigation("TakeParts");
 
                     b.Navigation("TestCases");
                 });
@@ -1049,17 +967,19 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ERD.Submission", b =>
                 {
-                    b.Navigation("TestRuns");
-                });
+                    b.Navigation("LessonSubmissions");
 
-            modelBuilder.Entity("api.Models.ERD.TakePart", b =>
-                {
-                    b.Navigation("Submissions");
+                    b.Navigation("TestRuns");
                 });
 
             modelBuilder.Entity("api.Models.ERD.TestCase", b =>
                 {
                     b.Navigation("TestRuns");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Topic", b =>
+                {
+                    b.Navigation("Lessons");
                 });
 #pragma warning restore 612, 618
         }

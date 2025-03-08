@@ -356,18 +356,18 @@ const CoderDetail = () => {
                             <GridItem>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo:</strong>{coderDetail.createdAt}
+                                        <strong>Ngày tạo: </strong>{coderDetail.createdAt}
                                     </Text>
                                     <Text fontSize="lg">
-                                        <strong>Người tạo:</strong> {coderDetail.createdBy}
+                                        <strong>Người tạo: </strong> {coderDetail.createdBy}
                                     </Text>
                                     {coderDetail.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật:</strong>{coderDetail.updatedAt}
+                                                <strong>Ngày cập nhật: </strong>{coderDetail.updatedAt}
                                             </Text>
                                             <Text fontSize="lg">
-                                                <strong>Người cập nhật:</strong> {coderDetail.updatedBy}
+                                                <strong>Người cập nhật: </strong> {coderDetail.updatedBy}
                                             </Text>
                                         </>
                                     )}

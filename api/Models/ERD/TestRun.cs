@@ -5,13 +5,8 @@ namespace api.Models.ERD
 {
     public class TestRun
     {
-        [Key]
         public int TestRunID { get; set; }
-        [Required]
-        [ForeignKey("Submission")]
         public int SubmissionID { get; set; }
-        [Required]
-        [ForeignKey("TestCase")]
         public int TestCaseID { get; set; }
         public int TimeDuration { get; set; }
         public int MemorySize { get; set; }

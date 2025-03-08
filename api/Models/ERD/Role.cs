@@ -6,15 +6,8 @@ namespace api.Models.ERD
 {
     public class Role
     {
-        public Role()
-        {
-            Accounts = new HashSet<Account>();
-        }
-        [Key]
         public int RoleID { get; set; }
-        [Required]
         public string Name { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<Account> Accounts { get; set; }
+        public virtual ICollection<Account> Accounts { get; set; } = new HashSet<Account>();
     }
 }
