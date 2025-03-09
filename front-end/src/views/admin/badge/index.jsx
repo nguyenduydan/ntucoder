@@ -6,9 +6,9 @@ import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
 import ProgressBar from "components/loading/loadingBar";
-import CreateCoder from "views/admin/coder/components/Create";
+import CreateBadge from "views/admin/badge/components/Create";
 import Toolbar from "components/menu/ToolBar";
-import {getList} from "config/coderService"
+import {getList} from "config/badgeService"
 
 export default function CoderIndex() {
   // State cho dữ liệu bảng
@@ -17,7 +17,7 @@ export default function CoderIndex() {
   const [prefetchCache, setPrefetchCache] = useState({});
 
   // Các state khác
-  const [sortField, setSortField] = useState("userName");
+  const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -140,7 +140,7 @@ export default function CoderIndex() {
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
-        <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+        <CreateBadge isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         {/* Hiển thị loading bar nếu cần */}
         {loading && (
           <Box

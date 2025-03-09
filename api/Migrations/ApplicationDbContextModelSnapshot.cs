@@ -88,7 +88,7 @@ namespace api.Migrations
 
                     b.HasKey("BadgeID");
 
-                    b.ToTable("Badge");
+                    b.ToTable("Badges");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -540,7 +540,7 @@ namespace api.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.ToTable("Review");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Role", b =>

@@ -76,7 +76,7 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
           <Tbody>
             {loading ? (
               // Khi loading, hiển thị 5 skeleton rows
-              Array.from({ length: 8 }).map((_, idx) => (
+              Array.from({ length: 5 }).map((_, idx) => (
                 <Tr key={`skeleton-${idx}`}>
                   {columnsData.map((column) => (
                     <Td

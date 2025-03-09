@@ -39,22 +39,6 @@ export const getList = async ({ page, pageSize, ascending, sortField, totalCount
 };
 
 /**
- * Lấy thông tin badge theo id.
- *
- * @param {string|number} id - ID của badge.
- * @returns {Promise<Object>} - Dữ liệu của badge.
- */
-export const getById = async (id) => {
-    try {
-        const response = await api.get(`/badge/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching badge by id:", error);
-        throw error;
-    }
-};
-
-/**
  * Gửi yêu cầu tạo mới người dùng (badge).
  *
  * @param {Object} badgeData - Dữ liệu người dùng cần tạo.
@@ -69,28 +53,6 @@ export const create = async (badgeData) => {
         throw error;
     }
 };
-
-/**
- * Cập nhật thông tin badge.
- *
- * @param {string|number} id - ID của badge cần cập nhật.
- * @param {Object} updateData - Dữ liệu cập nhật.
- * @returns {Promise<Object>} - Dữ liệu của badge sau khi cập nhật.
- */
-export const update = async (id, updateData) => {
-    try {
-        const response = await api.put(`/badge/${id}/`, updateData, {
-            headers: {
-                "Content-Type": "multipart/form-data",  // Đảm bảo gửi dưới dạng form-data
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Error updating badge:", error);
-        throw error;
-    }
-};
-
 /**
  * Xóa badge theo id.
  *
@@ -100,19 +62,19 @@ export const update = async (id, updateData) => {
  * @param {Object} [params.row] - Dữ liệu row, được truyền vào nếu deleteEndpoint là function.
  * @returns {Promise<Object>} - Kết quả xóa.
  */
-export const deletebadge = async ({ id, deleteEndpoint, row }) => {
-    // Xây dựng endpoint dựa trên deleteEndpoint nếu có
-    const endpoint = deleteEndpoint
-        ? typeof deleteEndpoint === 'function'
-            ? deleteEndpoint(row)
-            : deleteEndpoint
-        : `/badge/${id}`; // Mặc định là /badge/:id (RESTful)
+export const deletebadge = async ({ id }) => {
+    if (!id) {
+        console.error("LỖI: ID không hợp lệ!", id);
+        return;
+    }
+
+    const endpoint = `/badge/${id}`;
 
     try {
         const response = await api.delete(endpoint);
         return response.data;
     } catch (error) {
-        console.error("Error deleting badge:", error);
+        console.error("Error deleting badge:", error.response?.data || error.message);
         throw error;
     }
 };

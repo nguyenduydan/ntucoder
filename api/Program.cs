@@ -32,10 +32,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //Repository
 builder.Services.AddScoped<CoderRepository>();
 builder.Services.AddScoped<RoleRepository>();
+builder.Services.AddScoped<BadgeRepository>();
 //Service
 builder.Services.AddScoped<CoderService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<MinioService>();
+builder.Services.AddScoped<BadgeService>();
 
 
 var app = builder.Build();

@@ -1,6 +1,8 @@
 // columnsData.jsx
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
+import { Box } from "@chakra-ui/react";
+import { deletebadge } from "config/badgeService";
 
 export const columnsData = [
   {
@@ -10,29 +12,49 @@ export const columnsData = [
   },
   {
     Header: "Tên nhãn",
-    accessor: "userName",
+    accessor: "name",
   },
   {
     Header: "Mô tả",
-    accessor: "Description",
+    accessor: "description",
   },
    {
-    Header: "Màu",
-    accessor: "Color",
+    Header: "Mã màu",
+    accessor: "color",
   },
+  {
+  Header: "Review",
+  accessor: "color",
+  Cell: ({ value }) => (
+    <Box
+      w="40px"
+      h="20px"
+      bg={value}
+      border="none"
+      borderColor="gray.300"
+      borderRadius="md"
+    />
+  ),
+},
+
   {
     Header: "Hành động",
     accessor: "action",
-    Cell: (props) => <ActionCell {...props}
-      deleteSuccessToast={{
-        title: "Đã xóa!",
-        description: "Người dùng đã được xóa thành công.",
-      }}
-      deleteErrorToast={{
-        title: "Xóa thất bại!",
-        description: "Vui lòng thử lại sau.",
-      }}
-      fetchData={props.fetchData} // fetchData là hàm lấy dữ liệu mới
-    />
+    Cell: (props) => (
+      <ActionCell
+        {...props}
+        deleteFunction={deletebadge}
+        idData = "badgeID"
+        deleteSuccessToast={{
+          title: "Đã xóa!",
+          description: "Nhãn đã được xóa thành công.",
+        }}
+        deleteErrorToast={{
+          title: "Xóa thất bại!",
+          description: "Vui lòng thử lại sau.",
+        }}
+        fetchData={props.fetchData}
+      />
+    ),
   }
 ];

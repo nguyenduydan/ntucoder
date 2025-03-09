@@ -100,19 +100,19 @@ export const update = async (id, updateData) => {
  * @param {Object} [params.row] - Dữ liệu row, được truyền vào nếu deleteEndpoint là function.
  * @returns {Promise<Object>} - Kết quả xóa.
  */
-export const deleteCoder = async ({ id, deleteEndpoint, row }) => {
-    // Xây dựng endpoint dựa trên deleteEndpoint nếu có
-    const endpoint = deleteEndpoint
-        ? typeof deleteEndpoint === 'function'
-            ? deleteEndpoint(row)
-            : deleteEndpoint
-        : `/coder/${id}`; // Mặc định là /coder/:id (RESTful)
+export const deleteCoder = async ({ id }) => {
+    if (!id) {
+        console.error("LỖI: ID không hợp lệ!", id);
+        return;
+    }
+
+    const endpoint = `/coder/${id}`;
 
     try {
         const response = await api.delete(endpoint);
         return response.data;
     } catch (error) {
-        console.error("Error deleting coder:", error);
+        console.error("Error deleting:", error.response?.data || error.message);
         throw error;
     }
 };

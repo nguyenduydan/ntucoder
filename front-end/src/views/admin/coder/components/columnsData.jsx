@@ -2,6 +2,7 @@
 import React from "react";
 import SwitchField from "components/fields/SwitchField";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
+import { deleteCoder } from "config/coderService";
 
 export const columnsData = [
   {
@@ -36,6 +37,8 @@ export const columnsData = [
     Header: "Hành động",
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
+      deleteFunction={deleteCoder}
+      idData = "badgeID"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Người dùng đã được xóa thành công.",

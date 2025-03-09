@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250309105606_updatedb")]
-    partial class updatedb
+    [Migration("20250309152752_createDB")]
+    partial class createDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,7 +91,7 @@ namespace api.Migrations
 
                     b.HasKey("BadgeID");
 
-                    b.ToTable("Badge");
+                    b.ToTable("Badges");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -543,7 +543,7 @@ namespace api.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.ToTable("Review");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Role", b =>

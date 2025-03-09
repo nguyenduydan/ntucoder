@@ -17,11 +17,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { BiSolidDetail } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import { deleteCoder } from "config/coderService";
 
 const ActionCell = ({
   row,
-  deleteEndpoint,      // Prop để thay đổi endpoint API
+  idData,
+  deleteFunction,
   deleteSuccessToast = {},
   deleteErrorToast = {},
   detailPath,          // Đường dẫn chi tiết tùy chỉnh
@@ -32,11 +32,11 @@ const ActionCell = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
 
-  const coderID = row?.original?.coderID || row?.coderID;
+  const id = row?.original?.[idData] || row?.[idData];
 
   const handleDetailClick = () => {
-    if (coderID) {
-      const path = detailPath ? `${detailPath}/${coderID}` : `/admin/coder/detail/${coderID}`;
+    if (id) {
+      const path = detailPath ? `${detailPath}/${id}` : `/admin/coder/detail/${id}`;
       navigate(path);
     } else {
       toast({
@@ -54,8 +54,8 @@ const ActionCell = ({
   const handleDeleteClick = async () => {
   setLoading(true);
   try {
-    // Gọi hàm deleteCoder từ service với các tham số cần thiết
-    await deleteCoder({ id: coderID, deleteEndpoint, row });
+
+    await deleteFunction({ id });
 
     // Nếu thành công, hiển thị thông báo thành công
     toast({
@@ -107,6 +107,7 @@ const ActionCell = ({
           <BiSolidDetail size="13" />
         </Button>
       )}
+
       <Button
         variant="solid"
         size="xs"

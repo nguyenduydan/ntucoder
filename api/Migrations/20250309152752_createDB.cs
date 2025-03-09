@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class updatedb : Migration
+    public partial class createDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Badge",
+                name: "Badges",
                 columns: table => new
                 {
                     BadgeID = table.Column<int>(type: "int", nullable: false)
@@ -32,7 +32,7 @@ namespace api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Badge", x => x.BadgeID);
+                    table.PrimaryKey("PK_Badges", x => x.BadgeID);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -208,9 +208,9 @@ namespace api.Migrations
                 {
                     table.PrimaryKey("PK_Cousres", x => x.CourseID);
                     table.ForeignKey(
-                        name: "FK_Cousres_Badge_BadgeID",
+                        name: "FK_Cousres_Badges_BadgeID",
                         column: x => x.BadgeID,
-                        principalTable: "Badge",
+                        principalTable: "Badges",
                         principalColumn: "BadgeID",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
@@ -332,7 +332,7 @@ namespace api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Review",
+                name: "Reviews",
                 columns: table => new
                 {
                     ReviewID = table.Column<int>(type: "int", nullable: false)
@@ -346,15 +346,15 @@ namespace api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Review", x => x.ReviewID);
+                    table.PrimaryKey("PK_Reviews", x => x.ReviewID);
                     table.ForeignKey(
-                        name: "FK_Review_Coders_CoderID",
+                        name: "FK_Reviews_Coders_CoderID",
                         column: x => x.CoderID,
                         principalTable: "Coders",
                         principalColumn: "CoderID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Review_Cousres_CourseID",
+                        name: "FK_Reviews_Cousres_CourseID",
                         column: x => x.CourseID,
                         principalTable: "Cousres",
                         principalColumn: "CourseID",
@@ -699,13 +699,13 @@ namespace api.Migrations
                 column: "TestCompilerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Review_CoderID",
-                table: "Review",
+                name: "IX_Reviews_CoderID",
+                table: "Reviews",
                 column: "CoderID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Review_CourseID",
-                table: "Review",
+                name: "IX_Reviews_CourseID",
+                table: "Reviews",
                 column: "CourseID");
 
             migrationBuilder.CreateIndex(
@@ -765,7 +765,7 @@ namespace api.Migrations
                 name: "ProblemCategories");
 
             migrationBuilder.DropTable(
-                name: "Review");
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Solved");
@@ -801,7 +801,7 @@ namespace api.Migrations
                 name: "Compilers");
 
             migrationBuilder.DropTable(
-                name: "Badge");
+                name: "Badges");
 
             migrationBuilder.DropTable(
                 name: "Coders");
