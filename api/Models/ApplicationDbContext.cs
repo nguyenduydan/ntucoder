@@ -23,6 +23,8 @@ namespace api.Models
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<LessonSubmission> LessonSubmissions { get; set; }
+        public DbSet <Review> Reviews { get; set; }
+        public DbSet <Badge> Badges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,10 +58,6 @@ namespace api.Models
                       .HasForeignKey<Coder>(c => c.CoderID)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(a => a.Courses)
-                      .WithOne(c => c.Creator)
-                      .HasForeignKey(c => c.CreatedBy)
-                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Blog>(entity =>
@@ -131,12 +129,11 @@ namespace api.Models
 
                 entity.Property(c => c.CreatedBy)
                       .HasMaxLength(100);
+                      
 
                 entity.Property(c => c.UpdatedAt)
+                      .HasDefaultValue(null)
                       .HasColumnType("datetime");
-
-                entity.Property(c => c.UpdatedBy)
-                      .HasMaxLength(100);
 
                 // FK - One-to-One
                 entity.HasOne(c => c.Account)
@@ -169,6 +166,15 @@ namespace api.Models
                       .WithOne(e => e.Coder)
                       .HasForeignKey(e => e.CoderID)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(c => c.Courses)
+                      .WithOne(c => c.Creator)
+                      .HasForeignKey(c => c.CoderID)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(c => c.Reviews)
+                     .WithOne(r => r.Coder)
+                     .HasForeignKey(r => r.CoderID)
+                     .OnDelete(DeleteBehavior.Cascade);
             });
 
 
@@ -186,6 +192,11 @@ namespace api.Models
                 entity.HasOne(c => c.Blog)
                       .WithMany(b => b.Comments)
                       .HasForeignKey(c => c.BlogID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(c => c.Course)
+                      .WithMany(crs => crs.Comments)
+                      .HasForeignKey(c => c.CourseID)
                       .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(c => c.Coder)
@@ -231,16 +242,55 @@ namespace api.Models
                       .IsRequired()
                       .HasMaxLength(255);
 
-                entity.Property(c => c.Description);
+                entity.Property(c => c.Description)
+                      .HasColumnType("text");
 
                 entity.Property(c => c.CreatedAt)
+                      .IsRequired()
                       .HasColumnType("datetime");
 
+                entity.Property(c => c.UpdatedAt)
+                      .IsRequired()
+                      .HasColumnType("datetime");
+
+                entity.Property(c => c.Status)
+                      .IsRequired()
+                      .HasMaxLength(3);
+
+                entity.Property(c => c.Fee)
+                      .IsRequired()
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(c => c.OriginalFee)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(c => c.DiscountPercent)
+                      .HasColumnType("int");
+
+                entity.Property(c => c.Rating)
+                      .IsRequired()
+                      .HasDefaultValue(0);
+
+                entity.Property(c => c.TotalReviews)
+                      .IsRequired()
+                      .HasDefaultValue(0);
+
                 entity.HasOne(c => c.Creator)
-                      .WithMany(a => a.Courses)
-                      .HasForeignKey(c => c.CreatedBy)
+                      .WithMany(coder => coder.Courses)
+                      .HasForeignKey(c => c.CoderID)
                       .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.Badge)
+                      .WithMany()
+                      .HasForeignKey(c => c.BadgeID)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(c => c.Reviews)
+                      .WithOne(r => r.Course)
+                      .HasForeignKey(r => r.CourseID)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
+
 
             modelBuilder.Entity<Enrollment>(entity =>
             {
@@ -266,6 +316,9 @@ namespace api.Models
 
                 entity.Property(e => e.CreatedAt)
                      .HasColumnType("datetime");
+                entity.Property(e => e.Status)
+                      .IsRequired()
+                      .HasMaxLength(3);
 
                 entity.HasOne(e => e.Topic)
                       .WithMany(t => t.Lessons)
@@ -524,6 +577,10 @@ namespace api.Models
                 entity.Property(t => t.UpdatedAt)
                       .HasColumnType("datetime");
 
+                entity.Property(t => t.Status)
+                      .IsRequired()
+                      .HasMaxLength(3);
+
                 entity.HasOne(t => t.Course)
                       .WithMany(c => c.Topics)
                       .HasForeignKey(t => t.CourseID)
@@ -535,6 +592,50 @@ namespace api.Models
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<Badge>(entity =>
+            {
+                entity.HasKey(b => b.BadgeID);
+
+                entity.Property(b => b.Name)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(b => b.Description)
+                      .HasMaxLength(255);
+
+                entity.Property(b => b.Color)
+                      .HasMaxLength(7)
+                      .HasDefaultValue("#FFD700"); // Mặc định là màu vàng
+
+                entity.HasMany(b => b.Courses)
+                      .WithOne(c => c.Badge)
+                      .HasForeignKey(c => c.BadgeID)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(r => r.ReviewID);
+
+                entity.Property(r => r.Rating)
+                      .IsRequired();
+
+                entity.Property(r => r.Content)
+                      .HasMaxLength(1000);
+
+                entity.Property(r => r.CreatedAt)
+                      .HasColumnType("datetime");
+
+                entity.HasOne(r => r.Course)
+                      .WithMany(c => c.Reviews)
+                      .HasForeignKey(r => r.CourseID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(r => r.Coder)
+                      .WithMany(c => c.Reviews)
+                      .HasForeignKey(r => r.CoderID)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
         }
 

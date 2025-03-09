@@ -5,11 +5,11 @@ using api.Models.ERD;
 
 namespace api.Infrashtructure.Repositories
 {
-    public class RoleRepo: IRoleRepo
+    public class RoleRepository
     {
         private readonly ApplicationDbContext _context;
         
-        public RoleRepo (ApplicationDbContext context)
+        public RoleRepository (ApplicationDbContext context)
         {
             _context = context;
         }

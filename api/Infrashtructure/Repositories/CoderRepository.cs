@@ -9,12 +9,12 @@ using api.Infrashtructure.Services;
 
 namespace api.Infrashtructure.Repositories
 {
-    public class CoderRepo : ICoderRepo
+    public class CoderRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMinioService _minioService;
+        private readonly MinioService _minioService;
 
-        public CoderRepo(ApplicationDbContext context, IMinioService minioService)
+        public CoderRepository(ApplicationDbContext context, MinioService minioService)
         {
             _context = context;
             _minioService = minioService;

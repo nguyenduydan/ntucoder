@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
 import ColumnsTable from "components/separator/ColumnsTable";
-import {columnsData} from "views/admin/coder/components/columnsData"
+import {columnsData} from "views/admin/badge/components/columnsData"
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";

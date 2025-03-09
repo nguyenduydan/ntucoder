@@ -9,12 +9,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class update_db : Migration
+    public partial class updatedb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Badge",
+                columns: table => new
+                {
+                    BadgeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Color = table.Column<string>(type: "varchar(7)", maxLength: 7, nullable: true, defaultValue: "#FFD700")
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Badge", x => x.BadgeID);
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -119,7 +138,7 @@ namespace api.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Gender = table.Column<int>(type: "int", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -131,32 +150,6 @@ namespace api.Migrations
                         principalTable: "Accounts",
                         principalColumn: "AccountID",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Cousres",
-                columns: table => new
-                {
-                    CourseID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CourseName = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cousres", x => x.CourseID);
-                    table.ForeignKey(
-                        name: "FK_Cousres_Accounts_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Accounts",
-                        principalColumn: "AccountID",
-                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -184,6 +177,48 @@ namespace api.Migrations
                         principalTable: "Coders",
                         principalColumn: "CoderID",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Cousres",
+                columns: table => new
+                {
+                    CourseID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CourseName = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CoderID = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Status = table.Column<int>(type: "int", maxLength: 3, nullable: false),
+                    Fee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OriginalFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DiscountPercent = table.Column<int>(type: "int", nullable: true),
+                    Rating = table.Column<double>(type: "double", nullable: false, defaultValue: 0.0),
+                    TotalReviews = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    IsCombo = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    BadgeID = table.Column<int>(type: "int", nullable: true),
+                    ImageUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cousres", x => x.CourseID);
+                    table.ForeignKey(
+                        name: "FK_Cousres_Badge_BadgeID",
+                        column: x => x.BadgeID,
+                        principalTable: "Badge",
+                        principalColumn: "BadgeID",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Cousres_Coders_CoderID",
+                        column: x => x.CoderID,
+                        principalTable: "Coders",
+                        principalColumn: "CoderID",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -232,6 +267,43 @@ namespace api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CoderID = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CommentTime = table.Column<DateTime>(type: "datetime", nullable: false),
+                    BlogID = table.Column<int>(type: "int", nullable: true),
+                    CourseID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentID);
+                    table.ForeignKey(
+                        name: "FK_Comments_Blogs_BlogID",
+                        column: x => x.BlogID,
+                        principalTable: "Blogs",
+                        principalColumn: "BlogID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Coders_CoderID",
+                        column: x => x.CoderID,
+                        principalTable: "Coders",
+                        principalColumn: "CoderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Cousres_CourseID",
+                        column: x => x.CourseID,
+                        principalTable: "Cousres",
+                        principalColumn: "CourseID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Enrollment",
                 columns: table => new
                 {
@@ -260,6 +332,37 @@ namespace api.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Review",
+                columns: table => new
+                {
+                    ReviewID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CourseID = table.Column<int>(type: "int", nullable: false),
+                    CoderID = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Review", x => x.ReviewID);
+                    table.ForeignKey(
+                        name: "FK_Review_Coders_CoderID",
+                        column: x => x.CoderID,
+                        principalTable: "Coders",
+                        principalColumn: "CoderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Review_Cousres_CourseID",
+                        column: x => x.CourseID,
+                        principalTable: "Cousres",
+                        principalColumn: "CourseID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Topics",
                 columns: table => new
                 {
@@ -271,7 +374,8 @@ namespace api.Migrations
                     TopicDescription = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Status = table.Column<int>(type: "int", maxLength: 3, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -281,36 +385,6 @@ namespace api.Migrations
                         column: x => x.CourseID,
                         principalTable: "Cousres",
                         principalColumn: "CourseID",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Comments",
-                columns: table => new
-                {
-                    CommentID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    BlogID = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CoderID = table.Column<int>(type: "int", nullable: false),
-                    CommentTime = table.Column<DateTime>(type: "datetime", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Comments", x => x.CommentID);
-                    table.ForeignKey(
-                        name: "FK_Comments_Blogs_BlogID",
-                        column: x => x.BlogID,
-                        principalTable: "Blogs",
-                        principalColumn: "BlogID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Comments_Coders_CoderID",
-                        column: x => x.CoderID,
-                        principalTable: "Coders",
-                        principalColumn: "CoderID",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -457,7 +531,8 @@ namespace api.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Order = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<int>(type: "int", maxLength: 3, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -569,9 +644,19 @@ namespace api.Migrations
                 column: "CoderID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cousres_CreatedBy",
+                name: "IX_Comments_CourseID",
+                table: "Comments",
+                column: "CourseID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cousres_BadgeID",
                 table: "Cousres",
-                column: "CreatedBy");
+                column: "BadgeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cousres_CoderID",
+                table: "Cousres",
+                column: "CoderID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_CoderID",
@@ -612,6 +697,16 @@ namespace api.Migrations
                 name: "IX_Problems_TestCompilerID",
                 table: "Problems",
                 column: "TestCompilerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Review_CoderID",
+                table: "Review",
+                column: "CoderID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Review_CourseID",
+                table: "Review",
+                column: "CourseID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Solved_ProblemID",
@@ -670,6 +765,9 @@ namespace api.Migrations
                 name: "ProblemCategories");
 
             migrationBuilder.DropTable(
+                name: "Review");
+
+            migrationBuilder.DropTable(
                 name: "Solved");
 
             migrationBuilder.DropTable(
@@ -700,10 +798,13 @@ namespace api.Migrations
                 name: "Cousres");
 
             migrationBuilder.DropTable(
-                name: "Coders");
+                name: "Compilers");
 
             migrationBuilder.DropTable(
-                name: "Compilers");
+                name: "Badge");
+
+            migrationBuilder.DropTable(
+                name: "Coders");
 
             migrationBuilder.DropTable(
                 name: "Accounts");

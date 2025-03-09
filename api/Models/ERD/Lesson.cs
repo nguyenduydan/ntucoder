@@ -9,7 +9,7 @@
         public int Order { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
+        public int Status { get; set; }
         public virtual Topic Topic { get; set; }
         public virtual ICollection<LessonSubmission> LessonSubmissions { get; set; } = new HashSet<LessonSubmission>();
     }

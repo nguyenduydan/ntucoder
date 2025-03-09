@@ -13,7 +13,5 @@ namespace api.Models.ERD
         public int RoleID { get; set; }
         public virtual Role Role { get; set; }
         public virtual Coder Coder { get; set; }
-        // Một tài khoản có thể tạo nhiều khóa học
-        public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
     }
 }

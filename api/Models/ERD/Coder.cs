@@ -38,5 +38,7 @@ namespace api.Models.ERD
         public virtual ICollection<Solved> Solveds { get; set; } = new HashSet<Solved>();
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new HashSet<Enrollment>();
         public virtual ICollection<Problem> Problems { get; set; } = new HashSet<Problem>();
+        public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
+        public virtual ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
     }
 }

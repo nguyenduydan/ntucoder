@@ -94,17 +94,19 @@ const ActionCell = ({
 
   return (
     <Flex gap={4} justify="left" align="center">
-      <Button
-        variant="solid"
-        size="xs"
-        colorScheme="facebook"
-        borderRadius="md"
-        minW="auto"
-        _active={{ transform: "scale(0.90)" }}
-        onClick={handleDetailClick}
-      >
-        <BiSolidDetail size="13" />
-      </Button>
+     {detailPath && (
+        <Button
+          variant="solid"
+          size="xs"
+          colorScheme="facebook"
+          borderRadius="md"
+          minW="auto"
+          _active={{ transform: "scale(0.90)" }}
+          onClick={handleDetailClick}
+        >
+          <BiSolidDetail size="13" />
+        </Button>
+      )}
       <Button
         variant="solid"
         size="xs"

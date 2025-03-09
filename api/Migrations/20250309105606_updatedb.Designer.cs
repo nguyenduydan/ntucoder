@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250307124437_update_db")]
-    partial class update_db
+    [Migration("20250309105606_updatedb")]
+    partial class updatedb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,6 +64,34 @@ namespace api.Migrations
                     b.HasIndex("RoleID");
 
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Badge", b =>
+                {
+                    b.Property<int>("BadgeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BadgeID"));
+
+                    b.Property<string>("Color")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(7)
+                        .HasColumnType("varchar(7)")
+                        .HasDefaultValue("#FFD700");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("BadgeID");
+
+                    b.ToTable("Badge");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Blog", b =>
@@ -163,8 +191,7 @@ namespace api.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("CoderID");
 
@@ -179,7 +206,7 @@ namespace api.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CommentID"));
 
-                    b.Property<int>("BlogID")
+                    b.Property<int?>("BlogID")
                         .HasColumnType("int");
 
                     b.Property<int>("CoderID")
@@ -192,11 +219,16 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("CourseID")
+                        .HasColumnType("int");
+
                     b.HasKey("CommentID");
 
                     b.HasIndex("BlogID");
 
                     b.HasIndex("CoderID");
+
+                    b.HasIndex("CourseID");
 
                     b.ToTable("Comments");
                 });
@@ -239,6 +271,12 @@ namespace api.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CourseID"));
 
+                    b.Property<int?>("BadgeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CoderID")
+                        .HasColumnType("int");
+
                     b.Property<string>("CourseName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -247,19 +285,47 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("DiscountPercent")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsCombo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<decimal?>("OriginalFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<double>("Rating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<int>("Status")
+                        .HasMaxLength(3)
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalReviews")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.HasKey("CourseID");
 
-                    b.HasIndex("CreatedBy");
+                    b.HasIndex("BadgeID");
+
+                    b.HasIndex("CoderID");
 
                     b.ToTable("Cousres");
                 });
@@ -310,6 +376,10 @@ namespace api.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasMaxLength(3)
                         .HasColumnType("int");
 
                     b.Property<int>("TopicID")
@@ -440,6 +510,40 @@ namespace api.Migrations
                     b.HasIndex("CategoryID");
 
                     b.ToTable("ProblemCategories");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Review", b =>
+                {
+                    b.Property<int>("ReviewID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ReviewID"));
+
+                    b.Property<int>("CoderID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReviewID");
+
+                    b.HasIndex("CoderID");
+
+                    b.HasIndex("CourseID");
+
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Role", b =>
@@ -641,6 +745,10 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
+                    b.Property<int>("Status")
+                        .HasMaxLength(3)
+                        .HasColumnType("int");
+
                     b.Property<string>("TopicDescription")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -698,8 +806,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Blog", "Blog")
                         .WithMany("Comments")
                         .HasForeignKey("BlogID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("api.Models.ERD.Coder", "Coder")
                         .WithMany("Comments")
@@ -707,18 +814,32 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("api.Models.ERD.Course", "Course")
+                        .WithMany("Comments")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.Navigation("Blog");
 
                     b.Navigation("Coder");
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Course", b =>
                 {
-                    b.HasOne("api.Models.ERD.Account", "Creator")
+                    b.HasOne("api.Models.ERD.Badge", "Badge")
                         .WithMany("Courses")
-                        .HasForeignKey("CreatedBy")
+                        .HasForeignKey("BadgeID")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("api.Models.ERD.Coder", "Creator")
+                        .WithMany("Courses")
+                        .HasForeignKey("CoderID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Badge");
 
                     b.Navigation("Creator");
                 });
@@ -808,6 +929,25 @@ namespace api.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Problem");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Review", b =>
+                {
+                    b.HasOne("api.Models.ERD.Coder", "Coder")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CoderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Models.ERD.Course", "Course")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coder");
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Solved", b =>
@@ -901,7 +1041,10 @@ namespace api.Migrations
                 {
                     b.Navigation("Coder")
                         .IsRequired();
+                });
 
+            modelBuilder.Entity("api.Models.ERD.Badge", b =>
+                {
                     b.Navigation("Courses");
                 });
 
@@ -921,9 +1064,13 @@ namespace api.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Courses");
+
                     b.Navigation("Enrollments");
 
                     b.Navigation("Problems");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("Solveds");
 
@@ -939,7 +1086,11 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ERD.Course", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("Topics");
                 });

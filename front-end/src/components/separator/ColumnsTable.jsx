@@ -1,4 +1,3 @@
-import { columnsData } from '../variables/columnsData';
 import {
   useColorMode,
   Box,
@@ -18,7 +17,7 @@ import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
 
 
-export default function ColumnTable({ tableData, loading, onSort, sortField, ascending, fetchData }) {
+export default function ColumnTable({columnsData, tableData, loading, onSort, sortField, ascending, fetchData }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
   const textColor = colorMode === 'light' ? 'black' : 'white'; // Đổi màu text
   const borderColor = colorMode === 'light' ? 'gray.200' : 'whiteAlpha.300';

@@ -10,9 +10,9 @@ namespace api.Controllers
     [ApiController]
     public class CoderController : ControllerBase
     {
-        private readonly ICoderService _coderService;
+        private readonly CoderService _coderService;
 
-        public CoderController(ICoderService coderService)
+        public CoderController(CoderService coderService)
         {
             _coderService = coderService;
         }

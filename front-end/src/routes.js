@@ -7,10 +7,11 @@ import {
 } from 'react-icons/md';
 
 // Admin Imports
-import MainDashboard from 'views/admin/default';
+// import MainDashboard from 'views/admin/default';
 import CoderTable from 'views/admin/coder/index';
 import CoderCreate from 'views/admin/coder/components/Create';
 import CoderDetail from 'views/admin/coder/components/Detail';
+import BadgeTable from 'views/admin/badge/index';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -18,16 +19,17 @@ import Problem from 'views/user/Problem';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
+import { FaBookAtlas, FaBookmark } from "react-icons/fa6";
 
 const routes = [
   // Admin Routes
-  {
-    name: 'Main Dashboard',
-    layout: '/admin',
-    path: '/dashboard',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-    component: <MainDashboard />,
-  },
+  // {
+  //   name: 'Main Dashboard',
+  //   layout: '/admin',
+  //   path: '/dashboard',
+  //   icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+  //   component: <MainDashboard />,
+  // },
   {
     name: 'Người dùng',
     layout: '/admin',
@@ -45,6 +47,39 @@ const routes = [
         path: 'detail/:id',
         component: <CoderDetail />,
       }
+    ]
+  },
+  {
+    name: 'Khóa học',
+    layout: '/admin',
+    icon: <Icon as={FaBookAtlas} width="20px" height="20px" color="inherit" />,
+    path: '/course',
+    component: <CoderTable />,
+    item: [
+      {
+        name: 'Thêm mới khóa học',
+        path: 'create',
+        component: <CoderCreate />,
+      },
+      {
+        name: 'Chi tiết khóa học',
+        path: 'detail/:id',
+        component: <CoderDetail />,
+      }
+    ]
+  },
+  {
+    name: 'Nhãn',
+    layout: '/admin',
+    icon: <Icon as={FaBookmark} width="20px" height="20px" color="inherit" />,
+    path: '/badge',
+    component: <BadgeTable />,
+    item: [
+      {
+        name: 'Thêm mới nhãn',
+        path: 'create',
+        component: <CoderCreate />,
+      },
     ]
   },
   // Auth Routes
