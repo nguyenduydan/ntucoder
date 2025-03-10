@@ -1,6 +1,7 @@
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
 using api.Models;
+using api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,11 +34,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<CoderRepository>();
 builder.Services.AddScoped<RoleRepository>();
 builder.Services.AddScoped<BadgeRepository>();
+builder.Services.AddScoped<CourseCategoryRepository>();
+builder.Services.AddScoped<CourseRepository>();
 //Service
 builder.Services.AddScoped<CoderService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<MinioService>();
 builder.Services.AddScoped<BadgeService>();
+builder.Services.AddScoped<CourseCategoryService>();
+builder.Services.AddScoped<CourseService>();
 
 
 var app = builder.Build();

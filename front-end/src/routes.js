@@ -7,11 +7,14 @@ import {
 } from 'react-icons/md';
 
 // Admin Imports
-// import MainDashboard from 'views/admin/default';
+import MainDashboard from 'views/admin/dashboard';
 import CoderTable from 'views/admin/coder/index';
 import CoderCreate from 'views/admin/coder/components/Create';
 import CoderDetail from 'views/admin/coder/components/Detail';
 import BadgeTable from 'views/admin/badge/index';
+import CourseCategoryTable from 'views/admin/categorycourse/index';
+import CourseTable from 'views/admin/course/index';
+import CourseDetail from 'views/admin/course/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -22,14 +25,14 @@ import { PersonIcon } from 'components/icons/Icons';
 import { FaBookAtlas, FaBookmark } from "react-icons/fa6";
 
 const routes = [
-  // Admin Routes
-  // {
-  //   name: 'Main Dashboard',
-  //   layout: '/admin',
-  //   path: '/dashboard',
-  //   icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-  //   component: <MainDashboard />,
-  // },
+  //Admin Routes
+  {
+    name: 'Main Dashboard',
+    layout: '/admin',
+    path: '/dashboard',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    component: <MainDashboard />,
+  },
   {
     name: 'Người dùng',
     layout: '/admin',
@@ -38,11 +41,6 @@ const routes = [
     component: <CoderTable />,
     item: [
       {
-        name: 'Thêm mới người dùng',
-        path: 'create',
-        component: <CoderCreate />,
-      },
-      {
         name: 'Chi tiết người dùng',
         path: 'detail/:id',
         component: <CoderDetail />,
@@ -50,21 +48,23 @@ const routes = [
     ]
   },
   {
+    name: 'Loại khóa học',
+    layout: '/admin',
+    icon: <Icon as={FaBookmark} width="20px" height="20px" color="inherit" />,
+    path: '/category-course',
+    component: <CourseCategoryTable />,
+  },
+  {
     name: 'Khóa học',
     layout: '/admin',
     icon: <Icon as={FaBookAtlas} width="20px" height="20px" color="inherit" />,
     path: '/course',
-    component: <CoderTable />,
+    component: <CourseTable />,
     item: [
-      {
-        name: 'Thêm mới khóa học',
-        path: 'create',
-        component: <CoderCreate />,
-      },
       {
         name: 'Chi tiết khóa học',
         path: 'detail/:id',
-        component: <CoderDetail />,
+        component: <CourseDetail />,
       }
     ]
   },
@@ -82,6 +82,7 @@ const routes = [
       },
     ]
   },
+
   // Auth Routes
   // {
   //   name: 'Sign In',

@@ -9,7 +9,8 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public int Status { get; set; }
-
+        public int CourseCategoryID { get; set; }
+        public virtual CourseCategory CourseCategory { get; set; }
         // Giá học phí
         public decimal Fee { get; set; }
         public decimal? OriginalFee { get; set; }

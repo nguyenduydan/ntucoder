@@ -36,7 +36,8 @@ const ActionCell = ({
 
   const handleDetailClick = () => {
     if (id) {
-      const path = detailPath ? `${detailPath}/${id}` : `/admin/coder/detail/${id}`;
+      const basePath = detailPath.startsWith('/admin') ? detailPath : `/admin/${detailPath}`;
+      const path = `${basePath}/detail/${id}`;
       navigate(path);
     } else {
       toast({

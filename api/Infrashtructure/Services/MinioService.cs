@@ -33,6 +33,28 @@ namespace api.Infrashtructure.Services
                 // Tạo bucket nếu chưa tồn tại
                 var makeBucketArgs = new MakeBucketArgs().WithBucket(bucketName);
                 await _minioClient.MakeBucketAsync(makeBucketArgs);
+
+                // Đặt quyền public cho bucket
+                var policyJson = $@"
+                {{
+                    ""Version"": ""2012-10-17"",
+                    ""Statement"": [
+                        {{
+                            ""Effect"": ""Allow"",
+                            ""Principal"": ""*"",
+                            ""Action"": [
+                                ""s3:GetObject""
+                            ],
+                            ""Resource"": ""arn:aws:s3:::{bucketName}/*""
+                        }}
+                    ]
+                }}";
+
+                var setPolicyArgs = new SetPolicyArgs()
+                    .WithBucket(bucketName)
+                    .WithPolicy(policyJson);
+
+                await _minioClient.SetPolicyAsync(setPolicyArgs);
             }
 
             // Tải tệp lên MinIO

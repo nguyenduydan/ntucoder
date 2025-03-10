@@ -19,12 +19,13 @@ namespace api.Models
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
         public DbSet<TestRun> TestRuns { get; set; }
-        public DbSet<Course> Cousres { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<LessonSubmission> LessonSubmissions { get; set; }
         public DbSet <Review> Reviews { get; set; }
         public DbSet <Badge> Badges { get; set; }
+        public DbSet <CourseCategory> CourseCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -288,6 +289,10 @@ namespace api.Models
                 entity.HasMany(c => c.Reviews)
                       .WithOne(r => r.Course)
                       .HasForeignKey(r => r.CourseID)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(c => c.CourseCategory)
+                      .WithMany(cc => cc.Courses)
+                      .HasForeignKey(c => c.CourseCategoryID)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -634,6 +639,23 @@ namespace api.Models
                 entity.HasOne(r => r.Coder)
                       .WithMany(c => c.Reviews)
                       .HasForeignKey(r => r.CoderID)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CourseCategory>(entity =>
+            {
+                entity.HasKey(cc => cc.CourseCategoryID); 
+
+                entity.Property(cc => cc.Name)
+                      .IsRequired()
+                      .HasMaxLength(255); 
+
+                entity.Property(cc => cc.Order)
+                      .IsRequired();
+
+                entity.HasMany(cc => cc.Courses)
+                      .WithOne(c => c.CourseCategory)
+                      .HasForeignKey(c => c.CourseCategoryID)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 

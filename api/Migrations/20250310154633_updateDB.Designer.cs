@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250309152752_createDB")]
-    partial class createDB
+    [Migration("20250310154633_updateDB")]
+    partial class updateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,6 +277,9 @@ namespace api.Migrations
                     b.Property<int>("CoderID")
                         .HasColumnType("int");
 
+                    b.Property<int>("CourseCategoryID")
+                        .HasColumnType("int");
+
                     b.Property<string>("CourseName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -327,7 +330,30 @@ namespace api.Migrations
 
                     b.HasIndex("CoderID");
 
-                    b.ToTable("Cousres");
+                    b.HasIndex("CourseCategoryID");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.CourseCategory", b =>
+                {
+                    b.Property<int>("CourseCategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CourseCategoryID"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("CourseCategoryID");
+
+                    b.ToTable("CourseCategories");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Enrollment", b =>
@@ -839,7 +865,15 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("api.Models.ERD.CourseCategory", "CourseCategory")
+                        .WithMany("Courses")
+                        .HasForeignKey("CourseCategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Badge");
+
+                    b.Navigation("CourseCategory");
 
                     b.Navigation("Creator");
                 });
@@ -1093,6 +1127,11 @@ namespace api.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.CourseCategory", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Lesson", b =>

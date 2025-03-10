@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
-import ColumnsTable from "components/separator/ColumnsTable";
-import {columnsData} from "views/admin/badge/components/columnsData"
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
 import ProgressBar from "components/loading/loadingBar";
-import CreateBadge from "views/admin/badge/components/Create";
+
 import Toolbar from "components/menu/ToolBar";
-import {getListBagde} from "config/badgeService"
+import ColumnsTable from "components/separator/ColumnsTable";
+// import data
+import {getList} from "config/courseCategoryService"
+import {columnsData} from "views/admin/categorycourse/components/columnsData"
+import Create from "views/admin/categorycourse/components/Create";
 
 export default function CoderIndex() {
   // State cho dữ liệu bảng
@@ -33,7 +35,7 @@ export default function CoderIndex() {
     async (page) => {
       setLoading(true);
       try {
-        const { data, totalPages: totalPagesResp, totalCount } = await getListBagde({
+        const { data, totalPages: totalPagesResp, totalCount } = await getList({
           page,
           pageSize,
           ascending,
@@ -140,7 +142,7 @@ export default function CoderIndex() {
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
-        <CreateBadge isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         {/* Hiển thị loading bar nếu cần */}
         {loading && (
           <Box

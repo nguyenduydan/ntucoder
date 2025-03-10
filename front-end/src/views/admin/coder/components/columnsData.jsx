@@ -38,7 +38,8 @@ export const columnsData = [
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
       deleteFunction={deleteCoder}
-      idData = "badgeID"
+      idData = "coderID"
+      detailPath = "coder"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Người dùng đã được xóa thành công.",
