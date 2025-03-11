@@ -25,7 +25,7 @@ export const getList = async ({ page, pageSize, ascending, sortField, totalCount
             timeout: dynamicTimeout
         });
         const dataWithStatus = Array.isArray(response.data.data)
-            ? response.data.data.map(item => ({ ...item, status: true }))
+            ? response.data.data.map(item => ({ ...item, status: item.status })) // Giữ nguyên giá trị từ BE
             : [];
         return {
             data: dataWithStatus,
@@ -90,6 +90,31 @@ export const update = async (id, updateData) => {
         throw error;
     }
 };
+
+export const updateStatus = async (id, newStatus) => {
+    try {
+        // 1. Lấy dữ liệu hiện tại của khóa học
+        const currentDataResponse = await api.get(`/Course/${id}`);
+        const currentData = currentDataResponse.data;
+
+        // 2. Cập nhật trạng thái mới
+        const updatedData = { ...currentData, status: newStatus };
+
+        // 3. Gửi toàn bộ dữ liệu lên server
+        const response = await api.put(`/Course/${id}/`, updatedData, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi cập nhật trạng thái khóa học:", error);
+        throw error;
+    }
+};
+
+
 
 /**
  * Xóa Course theo id.

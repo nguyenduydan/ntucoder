@@ -79,16 +79,13 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         }
     };
 
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         setCourse((prev) => ({
             ...prev,
-            [name]: name === "status" ? Number(value) : value, // Ép kiểu số cho status
+            [name]: name === "status" ? parseInt(value, 10) : value,
         }));
     };
-
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -123,6 +120,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 duration: 2000,
                 isClosable: true,
                 position: 'top',
+                variant: "left-accent",
             });
             if (fetchData) await fetchData();
             onClose();
@@ -134,6 +132,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 duration: 2000,
                 isClosable: true,
                 position: "top",
+                variant: "left-accent",
             });
         } finally {
             setLoading(false);
@@ -195,8 +194,8 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                                 <FormLabel fontWeight="bold">Trạng thái</FormLabel>
                                 <Select bg={boxColor} name="status" value={course.status} onChange={handleChange} textColor={textColor}>
                                     <option key="default" value="">Chọn trạng thái</option>
-                                    <option key="online" value="0" >Online</option>
-                                    <option key="offline" value="1" >Offline</option>
+                                    <option key="online" value="0">Online</option>
+                                    <option key="offline" value="1">Offline</option>
                                 </Select>
                             </FormControl>
                             {imagePreview && (

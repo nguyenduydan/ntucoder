@@ -48,6 +48,7 @@ export default function CoderIndex() {
         }
         // Reset error flag khi fetch thành công
         errorShown.current = false;
+
         setPrefetchCache(prev => ({ ...prev, [page]: data }));
         return data;
       } catch (error) {
@@ -136,6 +137,7 @@ export default function CoderIndex() {
       setPrefetchCache({});
     }
   };
+  console.log("Data trước khi truyền vào bảng:", tableData);
 
   return (
     <ScrollToTop>
