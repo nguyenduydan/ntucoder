@@ -25,7 +25,7 @@ export const getList = async ({ page, pageSize, ascending, sortField, totalCount
             timeout: dynamicTimeout
         });
         const dataWithStatus = Array.isArray(response.data.data)
-            ? response.data.data.map(item => ({ ...item, status: item.status })) // Giữ nguyên giá trị từ BE
+            ? response.data.data.map(item => ({ ...item, status: item.status }))
             : [];
         return {
             data: dataWithStatus,

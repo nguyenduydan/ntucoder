@@ -76,9 +76,9 @@ namespace api.Infrashtructure.Repositories
                 Avatar = coder.Avatar,
                 Description = coder.Description,
                 Gender = coder.Gender,
-                CreatedAt = coder.CreatedAt.ToString(),
+                CreatedAt = coder.CreatedAt,
                 CreatedBy = coder.CreatedBy,
-                UpdatedAt = coder.UpdatedAt.ToString(),
+                UpdatedAt = coder.UpdatedAt,
                 UpdatedBy = coder.UpdatedBy
             };
         }
@@ -167,7 +167,7 @@ namespace api.Infrashtructure.Repositories
                 }
             }
 
-            existing.UpdatedAt = DateTime.UtcNow;
+            existing.UpdatedAt = DateTime.Now;
             //existing.UpdatedBy = "admin";
 
             await _context.SaveChangesAsync();
@@ -180,7 +180,7 @@ namespace api.Infrashtructure.Repositories
                 Description = existing.Description,
                 Gender = existing.Gender,
                 PhoneNumber = existing.PhoneNumber,
-                UpdatedAt = existing.UpdatedAt.ToString(),
+                UpdatedAt = existing.UpdatedAt,
                 UpdatedBy = existing.UpdatedBy
             };
         }

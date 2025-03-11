@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     Box,
     Text,
@@ -23,7 +23,12 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-
+import moment from "moment";
+import "moment/locale/vi";
+const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
+};
 const genderMapping = {
     0: "Nam",
     1: "Nữ",
@@ -44,28 +49,28 @@ const CoderDetail = () => {
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
-    useEffect(() => {
-        const fetchCoderDetail = async () => {
-            try {
-                const data = await getById(id);
-                setCoderDetail(data);
-                setEditableValues(data);
-            } catch (error) {
-                toast({
-                    title: "Đã xảy ra lỗi.",
-                    status: "error",
-                    duration: 2000,
-                    isClosable: true,
-                    position: "top",
-                    variant: "left-accent",
-                });
-            }
-        };
+    const fetchCoderDetail = useCallback(async () => {
+        try {
+            const data = await getById(id);
+            setCoderDetail(data);
+            setEditableValues(data);
+        } catch (error) {
+            toast({
+                title: "Đã xảy ra lỗi.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+                variant: "left-accent",
+            });
+        }
+    }, [id, toast]);
 
+    useEffect(() => {
         if (id) {
             fetchCoderDetail();
         }
-    }, [id, toast]);
+    }, [id, fetchCoderDetail]);
 
     const handleEdit = (field) => {
         setEditField(field);
@@ -152,7 +157,7 @@ const CoderDetail = () => {
             } catch (error) {
                 console.error("Đã xảy ra lỗi khi cập nhật", error);
             }
-
+            await fetchCoderDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -356,7 +361,7 @@ const CoderDetail = () => {
                             <GridItem>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{coderDetail.createdAt}
+                                        <strong>Ngày tạo: </strong>{formatDate(coderDetail.createdAt)}
                                     </Text>
                                     <Text fontSize="lg">
                                         <strong>Người tạo: </strong> {coderDetail.createdBy}
@@ -364,7 +369,7 @@ const CoderDetail = () => {
                                     {coderDetail.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{coderDetail.updatedAt}
+                                                <strong>Ngày cập nhật: </strong>{formatDate(coderDetail.updatedAt)}
                                             </Text>
                                             <Text fontSize="lg">
                                                 <strong>Người cập nhật: </strong> {coderDetail.updatedBy}

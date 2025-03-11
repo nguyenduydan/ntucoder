@@ -38,7 +38,7 @@ namespace api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CourseDetailDTO courseDto)
+        public async Task<IActionResult> Update(int id, [FromForm] CourseDetailDTO courseDto)
         {
             var result = await _courseService.UpdateCourseAsync(id, courseDto);
             return Ok(result);

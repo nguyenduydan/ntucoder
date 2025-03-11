@@ -1,5 +1,6 @@
 ﻿using AddressManagementSystem.Infrashtructure.Helpers;
 using api.DTOs;
+using api.Infrashtructure.Services;
 using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,13 @@ namespace api.Infrashtructure.Repositories
     public class CourseRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly MinioService _minioService;
 
-        public CourseRepository(ApplicationDbContext context)
+
+        public CourseRepository(ApplicationDbContext context, MinioService minioService)
         {
             _context = context;
+            _minioService = minioService;
         }
         public async Task<PagedResponse<CourseDTO>> GetAllCoursesAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
@@ -74,21 +78,31 @@ namespace api.Infrashtructure.Repositories
             {
                 throw new InvalidOperationException("Tên khóa học đã tồn tại.");
             }
+            // Nếu có file Avatar mới thì xử lý upload.
+            if (dto.ImageFile != null)
+            {
+                using (var stream = dto.ImageFile.OpenReadStream())
+                {
+                    var fileName = $"imgCourse/{dto.CourseID+"_"+dto.CoderID}.jpg"; // Đặt tên file theo ID
+                    var bucketName = "ntucoder"; // Tên bucket MinIO
 
+                    // Upload file lên MinIO
+                    var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
+                    dto.ImageUrl = fileUrl;
+                }
+            }
             var newCourse = new Course
             {
                 CourseName = dto.CourseName,
                 Description = dto.Description,
                 CoderID = dto.CoderID,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
                 Status = dto.Status,
                 CourseCategoryID = dto.CourseCategoryID,
-                Fee = dto.Fee,
+                Fee = dto.Fee.Value,
                 OriginalFee = dto.OriginalFee,
-                DiscountPercent = dto.OriginalFee > 0
-                    ? (int)Math.Round(((dto.OriginalFee.Value - dto.Fee) / dto.OriginalFee.Value) * 100)
-                    : 0,
+                DiscountPercent = dto.DiscountPercent,
                 IsCombo = dto.IsCombo,
                 BadgeID = dto.BadgeID,
                 ImageUrl = dto.ImageUrl
@@ -103,6 +117,9 @@ namespace api.Infrashtructure.Repositories
         public async Task<CourseDetailDTO> UpdateCourseAsync(int id, CourseDetailDTO dto)
         {
             var existingCourse = await _context.Courses
+                .Include(c => c.Creator)
+                .Include(c => c.CourseCategory)
+                .Include(c => c.Badge)
                 .Include(c => c.Topics)
                 .Include(c => c.Enrollments)
                 .FirstOrDefaultAsync(c => c.CourseID == id);
@@ -112,22 +129,45 @@ namespace api.Infrashtructure.Repositories
                 throw new KeyNotFoundException($"Khóa học với ID {id} không tồn tại.");
             }
 
-            existingCourse.CourseName = dto.CourseName;
-            existingCourse.Description = dto.Description;
-            existingCourse.CoderID = dto.CoderID;
-            existingCourse.UpdatedAt = DateTime.UtcNow;
+            // Cập nhật chỉ khi có dữ liệu mới
+            if (!string.IsNullOrEmpty(dto.CourseName)) existingCourse.CourseName = dto.CourseName;
+            if (!string.IsNullOrEmpty(dto.Description)) existingCourse.Description = dto.Description;
             existingCourse.Status = dto.Status;
-            existingCourse.CourseCategoryID = dto.CourseCategoryID;
-            existingCourse.Fee = dto.Fee;
-            existingCourse.OriginalFee = dto.OriginalFee;
-            existingCourse.IsCombo = dto.IsCombo;
-            existingCourse.BadgeID = dto.BadgeID;
-            existingCourse.ImageUrl = dto.ImageUrl;
+            if (dto.OriginalFee.HasValue) existingCourse.OriginalFee = dto.OriginalFee.Value;
+            if (dto.Fee.HasValue) existingCourse.Fee = dto.Fee.Value;
+            if (dto.BadgeID.HasValue) existingCourse.BadgeID = dto.BadgeID.Value;
+            if (dto.IsCombo) existingCourse.IsCombo = dto.IsCombo;
 
-            // Tính lại DiscountPercent tự động
-            existingCourse.DiscountPercent = existingCourse.OriginalFee > 0
-                ? (int)Math.Round(((existingCourse.OriginalFee.Value - existingCourse.Fee) / existingCourse.OriginalFee.Value) * 100)
-                : 0;
+            existingCourse.UpdatedAt = DateTime.Now; // Cập nhật thời gian chỉnh sửa
+
+            // Xử lý cập nhật danh mục khóa học (CourseCategoryID)
+            if (dto.CourseCategoryID != 0)
+            {
+                var categoryExists = await _context.CourseCategories.AnyAsync(c => c.CourseCategoryID == dto.CourseCategoryID);
+                if (!categoryExists) throw new Exception("CourseCategoryID không hợp lệ.");
+                existingCourse.CourseCategoryID = dto.CourseCategoryID;
+            }
+
+            // Xử lý cập nhật ảnh nếu có
+            if (dto.ImageFile != null)
+            {
+                using (var stream = dto.ImageFile.OpenReadStream())
+                {
+                    var fileName = $"imgCourse/{existingCourse.CourseID + "_" + existingCourse.CoderID}.jpg";
+                    var bucketName = "ntucoder";
+
+                    var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
+                    existingCourse.ImageUrl = fileUrl;
+                }
+            }
+
+            // Cập nhật DiscountPercent nếu có thay đổi về Fee hoặc OriginalFee
+            if (dto.Fee.HasValue || dto.OriginalFee.HasValue)
+            {
+                existingCourse.DiscountPercent = existingCourse.OriginalFee > 0
+                    ? (int)Math.Round(((existingCourse.OriginalFee.Value - existingCourse.Fee) / existingCourse.OriginalFee.Value) * 100)
+                    : 0;
+            }
 
             _context.Courses.Update(existingCourse);
             await _context.SaveChangesAsync();
@@ -144,25 +184,26 @@ namespace api.Infrashtructure.Repositories
                 CourseCategoryID = existingCourse.CourseCategoryID,
                 Fee = existingCourse.Fee,
                 OriginalFee = existingCourse.OriginalFee,
-                DiscountPercent = existingCourse.DiscountPercent,
                 IsCombo = existingCourse.IsCombo,
                 BadgeID = existingCourse.BadgeID,
                 ImageUrl = existingCourse.ImageUrl,
                 Rating = dto.Rating,
                 TotalReviews = dto.TotalReviews,
-                Topics = dto.Topics,
-                Enrollments = dto.Enrollments,
-                Comments = dto.Comments,
-                Reviews = dto.Reviews
             };
         }
+
+
+
 
         public async Task<CourseDetailDTO> GetCourseByIdAsync(int id)
         {
             var course = await _context.Courses
-                .Include(c => c.Topics)
-                .Include(c => c.Enrollments)
-                .FirstOrDefaultAsync(c => c.CourseID == id);
+                  .Include(c => c.Creator)
+                  .Include(c => c.CourseCategory)
+                  .Include(c => c.Badge)
+                  .Include(c => c.Topics)
+                  .Include(c => c.Enrollments)
+                  .FirstOrDefaultAsync(c => c.CourseID == id);
 
             if (course == null)
             {
@@ -174,17 +215,18 @@ namespace api.Infrashtructure.Repositories
                 CourseID = course.CourseID,
                 CourseName = course.CourseName,
                 Description = course.Description,
-                CreatorName = "Tên người tạo", // Thay thế bằng truy vấn thực tế nếu có
-                CreatedAt = course.CreatedAt,
-                UpdatedAt = course.UpdatedAt,
+                CreatorName = course.Creator.CoderName,
                 Status = course.Status,
                 CourseCategoryID = course.CourseCategoryID,
+                CourseCategoryName = course.CourseCategory.Name,
                 Fee = course.Fee,
                 OriginalFee = course.OriginalFee,
-                DiscountPercent = course.DiscountPercent,
                 IsCombo = course.IsCombo,
                 BadgeID = course.BadgeID,
+                BadgeName = course.Badge.Name,
                 ImageUrl = course.ImageUrl,
+                CreatedAt = course.CreatedAt,
+                UpdatedAt = course.UpdatedAt,
                 Rating = 0, // Có thể cần lấy từ bảng khác nếu có
                 TotalReviews = 0, // Có thể cần lấy từ bảng khác nếu có
                 Topics = course.Topics.Select(t => new TopicDTO
@@ -198,8 +240,8 @@ namespace api.Infrashtructure.Repositories
                     CoderID = e.CoderID,
                     EnrolledAt = e.EnrolledAt
                 }).ToList(),
-                Comments = new List<CommentDTO>(), // Thêm truy vấn nếu có bảng bình luận
-                Reviews = new List<ReviewDTO>() // Thêm truy vấn nếu có bảng đánh giá
+                Comments = new List<CommentDTO>(),
+                Reviews = new List<ReviewDTO>() 
             };
         }
 

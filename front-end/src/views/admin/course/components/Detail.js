@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     Box,
     Text,
@@ -18,21 +18,33 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { getById, update } from "config/coderService";
+import { getById, update } from "config/courseService";
+import { getList } from "config/courseCategoryService";
+import { getListBagde } from "config/badgeService";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
+import moment from "moment";
+import "moment/locale/vi";
 
-const genderMapping = {
-    0: "Nam",
-    1: "Nữ",
-    2: "Khác",
+const formatCurrency = (amount) => {
+    return amount
+        ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
+        : "0 VND";
 };
 
-const CoderDetail = () => {
+const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
+};
+
+
+const CourseDetail = () => {
     const { id } = useParams();
-    const [coderDetail, setCoderDetail] = useState(null);
+    const [courseCategories, setCourseCategories] = useState([]);
+    const [badge, setBadge] = useState([]);
+    const [course, setCourseDetail] = useState(null);
     const [editField, setEditField] = useState(null);
     const [editableValues, setEditableValues] = useState({});
     const [avatarFile, setAvatarFile] = useState(null);
@@ -44,28 +56,42 @@ const CoderDetail = () => {
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
-    useEffect(() => {
-        const fetchCoderDetail = async () => {
-            try {
-                const data = await getById(id);
-                setCoderDetail(data);
-                setEditableValues(data);
-            } catch (error) {
-                toast({
-                    title: "Đã xảy ra lỗi.",
-                    status: "error",
-                    duration: 2000,
-                    isClosable: true,
-                    position: "top",
-                    variant: "left-accent",
-                });
-            }
-        };
 
-        if (id) {
-            fetchCoderDetail();
+    const fetchCourseDetail = useCallback(async () => {
+        try {
+            const data = await getById(id);
+            setCourseDetail(data);
+            setEditableValues(data);
+        } catch (error) {
+            toast({
+                title: "Đã xảy ra lỗi.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+                variant: "left-accent",
+            });
         }
     }, [id, toast]);
+
+    const fetchCategories = async () => {
+        try {
+            const data = await getList({ page: 1, pageSize: 10 });
+            const badge = await getListBagde({ page: 1, pageSize: 10 });
+            setCourseCategories(data.data);
+            setBadge(badge.data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục khóa học:", error);
+            setCourseCategories([]);
+        }
+    };
+    useEffect(() => {
+        if (id) {
+            fetchCourseDetail();
+            fetchCategories();
+        }
+    }, [id, fetchCourseDetail]);
+
 
     const handleEdit = (field) => {
         setEditField(field);
@@ -74,15 +100,15 @@ const CoderDetail = () => {
     const handleInputChange = (field, value) => {
         setEditableValues((prev) => {
             const updatedValues = { ...prev, [field]: value };
-            setCoderDetail((prevCoderDetail) => ({
-                ...prevCoderDetail,
+            setCourseDetail((prevCourseDetail) => ({
+                ...prevCourseDetail,
                 [field]: value,
             }));
             return updatedValues;
         });
     };
 
-    const handleAvatarChange = async (e) => {
+    const handleImgChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -90,13 +116,17 @@ const CoderDetail = () => {
                 setEditableValues((prev) => ({ ...prev, avatar: reader.result }));
 
                 const formData = new FormData();
-                formData.append("CoderID", id);
-                formData.append("AvatarFile", file);
+                formData.append("CourseID", id);
+                formData.append("ImageFile", file);
+
+                // ✅ Thêm CourseName nếu có
+                if (editableValues.courseName) {
+                    formData.append("CourseName", editableValues.courseName);
+                }
 
                 try {
-                    // update image
                     await update(id, formData);
-
+                    await fetchCourseDetail();
                     toast({
                         title: "Cập nhật avatar thành công!",
                         status: "success",
@@ -122,6 +152,7 @@ const CoderDetail = () => {
         }
     };
 
+
     const handleSave = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
@@ -129,30 +160,26 @@ const CoderDetail = () => {
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
-                // Kiểm tra để tránh đính kèm CoderID trong formData
-                if (field !== "CoderID") {
+                // Kiểm tra để tránh đính kèm CourseID trong formData
+                if (field !== "CourseID") {
                     formData.append(field, editableValues[field]);
                 }
             });
 
             // Nếu có file avatar, đính kèm vào formData
             if (avatarFile) {
-                formData.append("AvatarFile", avatarFile);
+                formData.append("ImageFile", avatarFile);
             }
 
-            // Cập nhật coderDetail sau khi chỉnh sửa
-            setCoderDetail((prev) => ({
+            // Cập nhật CourseDetail sau khi chỉnh sửa
+            setCourseDetail((prev) => ({
                 ...prev,
                 ...editableValues,
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            try {
-                await update(id, formData);
-            } catch (error) {
-                console.error("Đã xảy ra lỗi khi cập nhật", error);
-            }
-
+            await update(id, formData);
+            await fetchCourseDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -177,7 +204,7 @@ const CoderDetail = () => {
         }
     };
 
-    if (!coderDetail) {
+    if (!course) {
         return (
             <ProgressBar />
         );
@@ -223,15 +250,17 @@ const CoderDetail = () => {
                         <Flex direction="column" align="center">
                             <Skeleton
                                 isLoaded={avatarLoaded}
-                                borderRadius="full"
-                                boxSize="200px"
+                                borderRadius="md"
+                                w="50%"
+                                h="150px"
                                 mb={4}
                             >
                                 <Image
-                                    src={editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png"}
-                                    alt="Coder Avatar"
-                                    borderRadius="full"
-                                    boxSize="200px"
+                                    src={editableValues.imageUrl || course.imageUrl || "/avatarSimmmple.png"}
+                                    alt="Course Avatar"
+                                    w="100%"
+                                    h="150px"
+                                    borderRadius="md"
                                     objectFit="cover"
                                     transition="all 0.2s ease-in-out"
                                     _hover={{ transform: "scale(1.05)" }}
@@ -243,7 +272,7 @@ const CoderDetail = () => {
                             <Input
                                 id="avatarInput"
                                 type="file"
-                                onChange={handleAvatarChange}
+                                onChange={handleImgChange}
                                 display="none"
                             />
                         </Flex>
@@ -251,15 +280,12 @@ const CoderDetail = () => {
                         {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
                         <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
                             {/* Left Column */}
-                            <GridItem>
-                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-                                    <Flex align="center">
-                                        <Text fontSize="lg">
-                                            <strong>Tên đăng nhập:</strong> {coderDetail.userName || "Chưa có thông tin"}
-                                        </Text>
-                                    </Flex>
 
-                                    {["coderName", "coderEmail", "phoneNumber"].map((field) => (
+                            <GridItem borderRightWidth={2}>
+                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khóa học</Text>
+                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
+
+                                    {["courseName", "fee", "originalFee"].map((field) => (
                                         <Flex key={field} align="center">
                                             {editField === field ? (
                                                 <Input
@@ -273,14 +299,15 @@ const CoderDetail = () => {
                                             ) : (
                                                 <Text fontSize="lg" textColor={textColor}>
                                                     <strong>
-                                                        {field === "coderName"
-                                                            ? "Họ và tên"
-                                                            : field === "coderEmail"
-                                                                ? "Email"
-                                                                : "Số điện thoại"}
-                                                        :
+                                                        {field === "courseName"
+                                                            ? "Tên khóa học"
+                                                            : field === "fee"
+                                                                ? "Giá tiền"
+                                                                : "Giá tiền gốc"}:
                                                     </strong>{" "}
-                                                    {coderDetail[field] || "Chưa có thông tin"}
+                                                    {field === "fee" || field === "originalFee"
+                                                        ? formatCurrency(course[field])
+                                                        : course[field] || "Chưa có thông tin"}
                                                 </Text>
                                             )}
                                             <IconButton
@@ -293,25 +320,61 @@ const CoderDetail = () => {
                                             />
                                         </Flex>
                                     ))}
-
-                                    {/* Gender field */}
+                                    <Text fontSize="lg">
+                                        <strong>Phần trăm giảm: </strong><Text as={'span'} fontWeight={'bold'} color={'red'} >{course.discountPercent} %</Text>
+                                    </Text>
+                                    {/* Chọn loại khóa học field */}
                                     <Flex align="center">
-                                        {editField === "gender" ? (
+                                        {editField === "courseCategory" ? (
                                             <Select
-                                                value={editableValues.gender || ""}
+                                                value={editableValues.courseCategoryID || ""}
                                                 onBlur={() => setEditField(null)}
                                                 autoFocus
-                                                onChange={(e) => handleInputChange("gender", e.target.value)}
-                                                placeholder="Chọn giới tính"
+                                                onChange={(e) => handleInputChange("courseCategoryID", e.target.value)}
+                                                placeholder="Chọn loại khóa học"
                                                 width={{ base: "100%", md: "50%" }}
                                             >
-                                                <option value="0">Nam</option>
-                                                <option value="1">Nữ</option>
-                                                <option value="2">Khác</option>
+                                                {courseCategories.map((category) => (
+                                                    <option key={category.courseCategoryID} value={category.courseCategoryID}>
+                                                        {category.name}
+                                                    </option>
+                                                ))}
                                             </Select>
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Giới tính:</strong> {genderMapping[coderDetail.gender] || "Khác"}
+                                                <strong>Loại khóa học:</strong> {courseCategories.find(c => c.courseCategoryID === Number(course.courseCategoryID))?.name || "Chưa chọn"}
+                                            </Text>
+
+                                        )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit("courseCategory")}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+                                    {/* Chọn badge field */}
+                                    <Flex align="center">
+                                        {editField === "badge" ? (
+                                            <Select
+                                                value={editableValues.badgeID || ""}
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
+                                                onChange={(e) => handleInputChange("badgeID", e.target.value)}
+                                                placeholder="Chọn nhãn"
+                                                width={{ base: "100%", md: "50%" }}
+                                            >
+                                                {badge.map((badge) => (
+                                                    <option key={badge.badgeID} value={badge.badgeID}>
+                                                        {badge.name}
+                                                    </option>
+                                                ))}
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Nhãn:</strong> {badge.find(c => c.badgeID === Number(course.badgeID))?.name || "Chưa chọn"}
                                             </Text>
                                         )}
                                         <IconButton
@@ -319,7 +382,7 @@ const CoderDetail = () => {
                                             icon={<MdEdit />}
                                             ml={2}
                                             size="sm"
-                                            onClick={() => handleEdit("gender")}
+                                            onClick={() => handleEdit("badge")}
                                             cursor="pointer"
                                         />
                                     </Flex>
@@ -337,7 +400,7 @@ const CoderDetail = () => {
                                             />
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Mô tả:</strong> {coderDetail.description || "Chưa có thông tin"}
+                                                <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
                                             </Text>
                                         )}
                                         <IconButton
@@ -354,20 +417,21 @@ const CoderDetail = () => {
 
                             {/* Right Column */}
                             <GridItem>
+                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{coderDetail.createdAt}
+                                        <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
                                     </Text>
                                     <Text fontSize="lg">
-                                        <strong>Người tạo: </strong> {coderDetail.createdBy}
+                                        <strong>Người tạo: </strong> {course.creatorName}
                                     </Text>
-                                    {coderDetail.updatedAt && (
+                                    {course.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{coderDetail.updatedAt}
+                                                <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
                                             </Text>
                                             <Text fontSize="lg">
-                                                <strong>Người cập nhật: </strong> {coderDetail.updatedBy}
+                                                <strong>Người cập nhật: </strong> {course.creatorName}
                                             </Text>
                                         </>
                                     )}
@@ -407,4 +471,4 @@ const CoderDetail = () => {
     );
 };
 
-export default CoderDetail;
+export default CourseDetail;
