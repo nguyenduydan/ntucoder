@@ -1,33 +1,21 @@
-﻿using api.Infrashtructure.Helpers;
-using api.DTOs;
+﻿using api.DTOs;
+using api.Infrashtructure.Helpers;
+using api.Infrashtructure.Services;
 using api.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class CourseController : ControllerBase
+    [Route("api/[controller]")]
+    public class LessonController : ControllerBase
     {
-        private readonly CourseService _courseService;
+        private readonly LessonService _lessonService;
 
-        public CourseController(CourseService courseService)
+        public LessonController(LessonService lessonService)
         {
-            _courseService = courseService;
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
-        {
-            try
-            {
-                var result = await _courseService.SearchCoursesAsync(keyword, page, pageSize);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
-            }
+            _lessonService = lessonService;
         }
 
         [HttpGet]
@@ -35,7 +23,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _courseService.GetAllCoursesAsync(query, sortField, ascending);
+                var result = await _lessonService.GetListAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -49,10 +37,10 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _courseService.GetCourseByIdAsync(id);
+                var result = await _lessonService.GetByIdAsync(id);
                 if (result == null)
                 {
-                    return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });
+                    return NotFound(new { message = $"Không tìm thấy bài học với ID {id}" });
                 }
                 return Ok(result);
             }
@@ -63,17 +51,17 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CourseCreateDTO courseDto)
+        public async Task<IActionResult> Create([FromBody] LessonDTO dto)
         {
-            if (courseDto == null)
+            if (dto == null)
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ." });
             }
 
             try
             {
-                var result = await _courseService.CreateCourseAsync(courseDto);
-                return CreatedAtAction(nameof(GetById), new { id = result.CourseID }, result);
+                var result = await _lessonService.CreateAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id = result.LessonID }, result);
             }
             catch (InvalidOperationException ex)
             {
@@ -86,21 +74,21 @@ namespace api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromForm] CourseDetailDTO courseDto)
+        public async Task<IActionResult> Update(int id, [FromForm] LessonDetailDTO dto)
         {
-            if (courseDto == null)
+            if (dto == null)
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ." });
             }
 
             try
             {
-                var result = await _courseService.UpdateCourseAsync(id, courseDto);
+                var result = await _lessonService.UpdateAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
             {
-                return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });
+                return NotFound(new { message = $"Không tìm thấy bài học với ID {id}" });
             }
             catch (InvalidOperationException ex)
             {
@@ -117,12 +105,12 @@ namespace api.Controllers
         {
             try
             {
-                await _courseService.DeleteCourseAsync(id);
+                await _lessonService.DeleteAsync(id);
                 return NoContent();
             }
             catch (KeyNotFoundException)
             {
-                return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });
+                return NotFound(new { message = $"Không tìm thấy bài học với ID {id}" });
             }
             catch (Exception ex)
             {

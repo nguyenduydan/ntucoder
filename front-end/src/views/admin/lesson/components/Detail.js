@@ -9,24 +9,23 @@ import {
     GridItem,
     Link,
     Button,
-    Image,
     Input,
     IconButton,
     useToast,
     Select,
-    Skeleton,
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { getById, update } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
 import moment from "moment";
 import "moment/locale/vi";
+//import API
+import { getById, update } from "config/lessonService";
+import { getList } from "config/topicService";
+
 
 const formatCurrency = (amount) => {
     return amount
@@ -40,29 +39,27 @@ const formatDate = (dateString) => {
 };
 
 
-const CourseDetail = () => {
+const LessonDetail = () => {
     const { id } = useParams();
-    const [courseCategories, setCourseCategories] = useState([]);
-    const [badge, setBadge] = useState([]);
-    const [course, setCourseDetail] = useState(null);
+    const [topic, setTopic] = useState([]);
+    const [lesson, setLessonDetail] = useState(null);
     const [editField, setEditField] = useState(null);
     const [editableValues, setEditableValues] = useState({});
-    const [avatarFile, setAvatarFile] = useState(null);
     const navigate = useNavigate();
     const toast = useToast();
     const [loading, setLoading] = useState(false);
-    const [avatarLoaded, setAvatarLoaded] = useState(false);
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
 
-    const fetchCourseDetail = useCallback(async () => {
+    const fetchLessonDetail = useCallback(async () => {
         try {
             const data = await getById(id);
-            setCourseDetail(data);
+            setLessonDetail(data);
             setEditableValues(data);
         } catch (error) {
+            console.log("Lỗi:", error);
             toast({
                 title: "Đã xảy ra lỗi.",
                 status: "error",
@@ -74,24 +71,21 @@ const CourseDetail = () => {
         }
     }, [id, toast]);
 
-    const fetchCategories = async () => {
+    const fetchCourse = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            const badge = await getListBagde({ page: 1, pageSize: 10 });
-            setCourseCategories(data.data);
-            setBadge(badge.data);
+            const topic = await getList({ page: 1, pageSize: 10 });
+            setTopic(topic.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
-            setCourseCategories([]);
-            setBadge([]);
+            setTopic([]);
         }
     };
     useEffect(() => {
         if (id) {
-            fetchCourseDetail();
-            fetchCategories();
+            fetchLessonDetail();
+            fetchCourse();
         }
-    }, [id, fetchCourseDetail]);
+    }, [id, fetchLessonDetail]);
 
 
     const handleEdit = (field) => {
@@ -101,56 +95,12 @@ const CourseDetail = () => {
     const handleInputChange = (field, value) => {
         setEditableValues((prev) => {
             const updatedValues = { ...prev, [field]: value };
-            setCourseDetail((prevCourseDetail) => ({
-                ...prevCourseDetail,
+            setLessonDetail((prevLessonDetail) => ({
+                ...prevLessonDetail,
                 [field]: value,
             }));
             return updatedValues;
         });
-    };
-
-    const handleImgChange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                setEditableValues((prev) => ({ ...prev, avatar: reader.result }));
-
-                const formData = new FormData();
-                formData.append("CourseID", id);
-                formData.append("ImageFile", file);
-
-                // ✅ Thêm CourseName nếu có
-                if (editableValues.courseName) {
-                    formData.append("CourseName", editableValues.courseName);
-                }
-
-                try {
-                    await update(id, formData);
-                    await fetchCourseDetail();
-                    toast({
-                        title: "Cập nhật avatar thành công!",
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top",
-                        variant: "left-accent",
-                    });
-                } catch (error) {
-                    console.error("Đã xảy ra lỗi khi cập nhật avatar", error);
-                    toast({
-                        title: "Đã xảy ra lỗi khi cập nhật avatar.",
-                        status: "error",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top",
-                        variant: "left-accent",
-                    });
-                }
-            };
-            reader.readAsDataURL(file);
-            setAvatarFile(file);
-        }
     };
 
 
@@ -161,26 +111,21 @@ const CourseDetail = () => {
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
-                // Kiểm tra để tránh đính kèm CourseID trong formData
-                if (field !== "CourseID") {
+                // Kiểm tra để tránh đính kèm LessonID trong formData
+                if (field !== "LessonID") {
                     formData.append(field, editableValues[field]);
                 }
             });
 
-            // Nếu có file avatar, đính kèm vào formData
-            if (avatarFile) {
-                formData.append("ImageFile", avatarFile);
-            }
-
-            // Cập nhật CourseDetail sau khi chỉnh sửa
-            setCourseDetail((prev) => ({
+            // Cập nhật LessonDetail sau khi chỉnh sửa
+            setLessonDetail((prev) => ({
                 ...prev,
                 ...editableValues,
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
             await update(id, formData);
-            await fetchCourseDetail();
+            await fetchLessonDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -205,7 +150,7 @@ const CourseDetail = () => {
         }
     };
 
-    if (!course) {
+    if (!lesson) {
         return (
             <ProgressBar />
         );
@@ -225,7 +170,7 @@ const CourseDetail = () => {
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
                         <Link>
                             <Button
-                                onClick={() => navigate(`/admin/course`)}
+                                onClick={() => navigate(`/admin/lesson`)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="messenger"
@@ -247,46 +192,14 @@ const CourseDetail = () => {
                         </Link>
                     </Flex>
                     <VStack spacing={6} align="stretch" mt={4}>
-                        {/* Avatar Section */}
-                        <Flex direction="column" align="center">
-                            <Skeleton
-                                isLoaded={avatarLoaded}
-                                borderRadius="md"
-                                w="50%"
-                                h="150px"
-                                mb={4}
-                            >
-                                <Image
-                                    src={editableValues.imageUrl || course.imageUrl || "/avatarSimmmple.png"}
-                                    alt="Course Avatar"
-                                    w="100%"
-                                    h="150px"
-                                    borderRadius="md"
-                                    objectFit="cover"
-                                    transition="all 0.2s ease-in-out"
-                                    _hover={{ transform: "scale(1.05)" }}
-                                    onClick={() => document.getElementById("avatarInput").click()}
-                                    onLoad={() => setAvatarLoaded(true)}
-                                    cursor="pointer"
-                                />
-                            </Skeleton>
-                            <Input
-                                id="avatarInput"
-                                type="file"
-                                onChange={handleImgChange}
-                                display="none"
-                            />
-                        </Flex>
                         <Divider />
                         {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
                         <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
                             {/* Left Column */}
-
                             <GridItem borderRightWidth={2}>
-                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khóa học</Text>
+                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin bài học</Text>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-
-                                    {["courseName", "fee", "originalFee"].map((field) => (
+                                    {["lessonTitle"].map((field) => (
                                         <Flex key={field} align="center">
                                             {editField === field ? (
                                                 <Input
@@ -300,15 +213,15 @@ const CourseDetail = () => {
                                             ) : (
                                                 <Text fontSize="lg" textColor={textColor}>
                                                     <strong>
-                                                        {field === "courseName"
-                                                            ? "Tên khóa học"
+                                                        {field === "lessonTitle"
+                                                            ? "Tên bài học"
                                                             : field === "fee"
                                                                 ? "Giá tiền"
                                                                 : "Giá tiền gốc"}:
                                                     </strong>{" "}
                                                     {field === "fee" || field === "originalFee"
-                                                        ? formatCurrency(course[field])
-                                                        : course[field] || "Chưa có thông tin"}
+                                                        ? formatCurrency(lesson[field])
+                                                        : lesson[field] || "Chưa có thông tin"}
                                                 </Text>
                                             )}
                                             <IconButton
@@ -321,29 +234,26 @@ const CourseDetail = () => {
                                             />
                                         </Flex>
                                     ))}
-                                    <Text fontSize="lg">
-                                        <strong>Phần trăm giảm: </strong><Text as={'span'} fontWeight={'bold'} color={'red'} >{course.discountPercent} %</Text>
-                                    </Text>
-                                    {/* Chọn loại khóa học field */}
+
                                     <Flex align="center">
-                                        {editField === "courseCategory" ? (
+                                        {editField === "topic" ? (
                                             <Select
-                                                value={editableValues.courseCategoryID || ""}
+                                                value={editableValues.topicID || ""}
                                                 onBlur={() => setEditField(null)}
                                                 autoFocus
-                                                onChange={(e) => handleInputChange("courseCategoryID", e.target.value)}
-                                                placeholder="Chọn loại khóa học"
+                                                onChange={(e) => handleInputChange("topicID", e.target.value)}
+                                                placeholder="Chọn chủ đề"
                                                 width={{ base: "100%", md: "50%" }}
                                             >
-                                                {courseCategories.map((category) => (
-                                                    <option key={category.courseCategoryID} value={category.courseCategoryID}>
-                                                        {category.name}
+                                                {topic.map((topic) => (
+                                                    <option key={topic.topicID} value={topic.topicID}>
+                                                        {topic.topicName}
                                                     </option>
                                                 ))}
                                             </Select>
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Loại khóa học:</strong> {courseCategories.find(c => c.courseCategoryID === Number(course.courseCategoryID))?.name || "Chưa chọn"}
+                                                <strong>Chọn khóa học:</strong> {topic.find(c => c.topicID === Number(topic.topicID))?.topicName || "Chưa chọn"}
                                             </Text>
 
                                         )}
@@ -352,48 +262,16 @@ const CourseDetail = () => {
                                             icon={<MdEdit />}
                                             ml={2}
                                             size="sm"
-                                            onClick={() => handleEdit("courseCategory")}
+                                            onClick={() => handleEdit("topic")}
                                             cursor="pointer"
                                         />
                                     </Flex>
-                                    {/* Chọn badge field */}
-                                    <Flex align="center">
-                                        {editField === "badge" ? (
-                                            <Select
-                                                value={editableValues.badgeID || ""}
-                                                onBlur={() => setEditField(null)}
-                                                autoFocus
-                                                onChange={(e) => handleInputChange("badgeID", e.target.value)}
-                                                placeholder="Chọn nhãn"
-                                                width={{ base: "100%", md: "50%" }}
-                                            >
-                                                {badge.map((badge) => (
-                                                    <option key={badge.badgeID} value={badge.badgeID}>
-                                                        {badge.name}
-                                                    </option>
-                                                ))}
-                                            </Select>
-                                        ) : (
-                                            <Text fontSize="lg">
-                                                <strong>Nhãn:</strong> {badge.find(c => c.badgeID === Number(course.badgeID))?.name || "Chưa chọn"}
-                                            </Text>
-                                        )}
-                                        <IconButton
-                                            aria-label="Edit"
-                                            icon={<MdEdit />}
-                                            ml={2}
-                                            size="sm"
-                                            onClick={() => handleEdit("badge")}
-                                            cursor="pointer"
-                                        />
-                                    </Flex>
-
                                     {/* Description field */}
                                     <Flex align="center">
-                                        {editField === "description" ? (
+                                        {editField === "topicDescription" ? (
                                             <Input
-                                                value={editableValues.description || ""}
-                                                onChange={(e) => handleInputChange("description", e.target.value)}
+                                                value={editableValues.topicDescription || ""}
+                                                onChange={(e) => handleInputChange("topicDescription", e.target.value)}
                                                 placeholder="Chỉnh sửa mô tả"
                                                 onBlur={() => setEditField(null)}
                                                 autoFocus
@@ -401,7 +279,7 @@ const CourseDetail = () => {
                                             />
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
+                                                <strong>Mô tả:</strong> {topic.topicDescription || "Chưa có thông tin"}
                                             </Text>
                                         )}
                                         <IconButton
@@ -409,7 +287,7 @@ const CourseDetail = () => {
                                             icon={<MdEdit />}
                                             ml={2}
                                             size="sm"
-                                            onClick={() => handleEdit("description")}
+                                            onClick={() => handleEdit("topicDescription")}
                                             cursor="pointer"
                                         />
                                     </Flex>
@@ -421,18 +299,12 @@ const CourseDetail = () => {
                                 <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
+                                        <strong>Ngày tạo: </strong>{formatDate(lesson.createdAt)}
                                     </Text>
-                                    <Text fontSize="lg">
-                                        <strong>Người tạo: </strong> {course.creatorName}
-                                    </Text>
-                                    {course.updatedAt && (
+                                    {lesson.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
-                                            </Text>
-                                            <Text fontSize="lg">
-                                                <strong>Người cập nhật: </strong> {course.creatorName}
+                                                <strong>Ngày cập nhật: </strong>{formatDate(lesson.updatedAt)}
                                             </Text>
                                         </>
                                     )}
@@ -472,4 +344,4 @@ const CourseDetail = () => {
     );
 };
 
-export default CourseDetail;
+export default LessonDetail;

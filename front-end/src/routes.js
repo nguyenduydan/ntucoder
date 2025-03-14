@@ -17,6 +17,8 @@ import CourseTable from 'views/admin/course/index';
 import CourseDetail from 'views/admin/course/components/Detail';
 import TopicTable from 'views/admin/topic/index';
 import TopicDetail from 'views/admin/topic/components/Detail';
+import LessonTable from 'views/admin/lesson/index';
+import LessonDetail from 'views/admin/lesson/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -24,7 +26,7 @@ import Problem from 'views/user/Problem';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
-import { FaBookAtlas, FaBookmark, FaBookOpen } from "react-icons/fa6";
+import { FaBookAtlas, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
 
 const routes = [
   //Admin Routes
@@ -36,23 +38,9 @@ const routes = [
     component: <MainDashboard />,
   },
   {
-    name: 'Người dùng',
-    layout: '/admin',
-    icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
-    path: '/coder',
-    component: <CoderTable />,
-    item: [
-      {
-        name: 'Chi tiết người dùng',
-        path: 'detail/:id',
-        component: <CoderDetail />,
-      }
-    ]
-  },
-  {
     name: 'Loại khóa học',
     layout: '/admin',
-    icon: <Icon as={FaBookmark} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={FaBookBookmark} width="20px" height="20px" color="inherit" />,
     path: '/category-course',
     component: <CourseCategoryTable />,
   },
@@ -70,6 +58,7 @@ const routes = [
       }
     ]
   },
+
   {
     name: 'Chủ đề',
     layout: '/admin',
@@ -81,6 +70,20 @@ const routes = [
         name: 'Chi tiết chủ đề',
         path: 'detail/:id',
         component: <TopicDetail />,
+      }
+    ]
+  },
+  {
+    name: 'Bài học',
+    layout: '/admin',
+    icon: <Icon as={FaBook} width="20px" height="20px" color="inherit" />,
+    path: '/lesson',
+    component: <LessonTable />,
+    item: [
+      {
+        name: 'Chi tiết bài học',
+        path: 'detail/:id',
+        component: <LessonDetail />,
       }
     ]
   },
@@ -98,7 +101,20 @@ const routes = [
       },
     ]
   },
-
+  {
+    name: 'Người dùng',
+    layout: '/admin',
+    icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
+    path: '/coder',
+    component: <CoderTable />,
+    item: [
+      {
+        name: 'Chi tiết người dùng',
+        path: 'detail/:id',
+        component: <CoderDetail />,
+      }
+    ]
+  },
   // Auth Routes
   // {
   //   name: 'Sign In',

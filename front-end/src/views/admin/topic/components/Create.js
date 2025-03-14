@@ -17,11 +17,11 @@ import {
     useColorMode,
     Textarea
 } from "@chakra-ui/react";
-import FlushedInput from "../../../../components/fields/InputField";
-import { create } from "../../../../config/topicService";
-import { getList } from "../../../../config/courseService";
+import FlushedInput from "components/fields/InputField";
+import { create } from "config/topicService";
+import { getList } from "config/courseService";
 
-export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
+export default function CreateTopicModal({ isOpen, onClose, fetchData }) {
     const [topic, setTopic] = useState({
         courseID: '',
         courseName: '',

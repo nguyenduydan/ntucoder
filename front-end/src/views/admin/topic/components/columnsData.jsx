@@ -35,7 +35,6 @@ export const columnsData = [
         const newStatus = status === 0 ? 1 : 0;
         setStatus(newStatus);
         try {
-          console.log('New status',newStatus);
           await updateStatus(topicId, newStatus);
           toast({
             title: "Cập nhật thành công",
@@ -63,13 +62,13 @@ export const columnsData = [
 
       return (
         <Badge
-          bg={status === 0 ? "green.400" : "red.400"}
+          bg={status === 1 ? "green.400" : "red.400"}
           fontSize="sm"
           textColor="white"
           cursor="pointer"
           onClick={handleClick}
         >
-          {status === 0 ? "Online" : "Offline"}
+          {status === 1 ? "Online" : "Offline"}
         </Badge>
       );
     }

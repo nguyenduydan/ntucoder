@@ -1,7 +1,7 @@
 // columnsData.jsx
 import React,{useState} from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteCourse,updateStatus } from "config/courseService";
+import { deleteLesson,updateStatus } from "config/lessonService";
 import { Badge,useToast } from "@chakra-ui/react";
 
 export const columnsData = [
@@ -11,24 +11,16 @@ export const columnsData = [
     Cell: ({ rowIndex }) => rowIndex + 1,
   },
   {
-    Header: "Tên khóa học",
-    accessor: "courseName",
+    Header: "Tên bài học",
+    accessor: "lessonTitle"
   },
   {
-    Header: "Loại khóa học",
-    accessor: "courseCategoryName",
+    Header: "Nội dung",
+    accessor: "lessonContent",
   },
   {
-    Header: "Giá hiện tại",
-    accessor: "fee",
-  },
-  {
-    Header: "Giá gốc",
-    accessor: "originalFee",
-  },
-  {
-    Header: "Nhãn",
-    accessor: "badgeName",
+    Header: "Cấp",
+    accessor: "order",
   },
 
   {
@@ -36,14 +28,14 @@ export const columnsData = [
     accessor: "status",
     Cell: ({ row }) => {
       const [status, setStatus] = useState(row?.status);
-      const courseId = row?.courseID; // Đảm bảo lấy ID đúng
+      const lessonID = row?.lessonID; // Đảm bảo lấy ID đúng
       const toast = useToast(); // Sử dụng useToast
 
       const handleClick = async () => {
         const newStatus = status === 0 ? 1 : 0;
         setStatus(newStatus);
         try {
-          await updateStatus(courseId, newStatus);
+          await updateStatus(lessonID, newStatus);
           toast({
             title: "Cập nhật thành công",
             description: `Cập nhật trạng thái thành công`,
@@ -86,9 +78,9 @@ export const columnsData = [
     Header: "Hành động",
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
-      deleteFunction={deleteCourse}
-      idData = "courseID"
-      detailPath = "course"
+      deleteFunction={deleteLesson}
+      idData = "lessonID"
+      detailPath = "lesson"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Khóa học đã được xóa thành công.",

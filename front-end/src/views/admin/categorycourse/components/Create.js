@@ -16,8 +16,8 @@ import {
     useColorMode,
     Select
 } from "@chakra-ui/react";
-import FlushedInput from "../../../../components/fields/InputField";
-import { create } from "../../../../config/courseCategoryService";
+import FlushedInput from "components/fields/InputField";
+import { create } from "config/courseCategoryService";
 
 export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }) {
     const [name, setName] = useState("");

@@ -20,10 +20,10 @@ import {
     Input,
     Image,
 } from "@chakra-ui/react";
-import FlushedInput from "../../../../components/fields/InputField";
-import { create } from "../../../../config/courseService";
-import { getList } from "../../../../config/courseCategoryService";
-import { getListBagde } from "../../../../config/badgeService";
+import FlushedInput from "components/fields/InputField";
+import { create } from "config/courseService";
+import { getList } from "config/courseCategoryService";
+import { getListBagde } from "config/badgeService";
 
 export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     const [course, setCourse] = useState({

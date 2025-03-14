@@ -137,6 +137,7 @@ namespace api.Infrashtructure.Repositories
         {
             var existingTopic = await _context.Topics
                 .Include(t => t.Course)
+                .Include(t => t.Lessons)
                 .FirstOrDefaultAsync(t => t.TopicID == id);
             if (existingTopic == null)
             {
@@ -149,12 +150,28 @@ namespace api.Infrashtructure.Repositories
             existingTopic.Status = dto.Status;
             existingTopic.UpdatedAt = DateTime.Now;
 
-            //if(dto.CourseID != 0)
-            //{
-            //    var courseExist = await _context.Courses.AnyAsync(c => c.CourseID == dto.CourseID);
-            //    if (courseExist) throw new Exception("CourseID không hợp lệ");
-            //    existingTopic.CourseID = dto.CourseID;
-            //}
+            if (dto.CourseID != 0)
+            {
+                var courseExist = await _context.Courses.AnyAsync(c => c.CourseID == dto.CourseID);
+                if (!courseExist) throw new Exception("CourseID không hợp lệ");
+                existingTopic.CourseID = dto.CourseID;
+            }
+
+            if (dto.Lessons != null && dto.Lessons.Any())
+            {
+                existingTopic.Lessons = dto.Lessons.Select(l => new Lesson
+                {
+                    LessonID = l.LessonID,
+                    TopicID = existingTopic.TopicID,
+                    LessonTitle = l.LessonTitle,
+                    LessonContent = l.LessonContent,
+                    Order = l.Order,
+                    CreatedAt = l.CreatedAt,
+                    UpdatedAt = l.UpdatedAt,
+                    Status = l.Status
+                }).ToList();
+            }
+
 
             _context.Topics.Update(existingTopic);
             await _context.SaveChangesAsync();
@@ -163,10 +180,11 @@ namespace api.Infrashtructure.Repositories
                 TopicID = existingTopic.TopicID,
                 TopicName = existingTopic.TopicName,
                 CourseID = existingTopic.CourseID,
-                CourseName = dto.CourseName,
+                CourseName = existingTopic.Course?.CourseName ?? dto.CourseName,
                 TopicDescription = existingTopic.TopicDescription,
                 CreatedAt = existingTopic.CreatedAt,
                 UpdatedAt = existingTopic.UpdatedAt,
+                Status = existingTopic.Status,
             };
         }
 

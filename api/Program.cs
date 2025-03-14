@@ -37,6 +37,7 @@ builder.Services.AddScoped<BadgeRepository>();
 builder.Services.AddScoped<CourseCategoryRepository>();
 builder.Services.AddScoped<CourseRepository>();
 builder.Services.AddScoped<TopicRepository>();
+builder.Services.AddScoped<LessonRepository>();
 //Service
 builder.Services.AddScoped<CoderService>();
 builder.Services.AddScoped<RoleService>();
@@ -45,6 +46,7 @@ builder.Services.AddScoped<BadgeService>();
 builder.Services.AddScoped<CourseCategoryService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<TopicService>();
+builder.Services.AddScoped<LessonService>();
 
 
 var app = builder.Build();

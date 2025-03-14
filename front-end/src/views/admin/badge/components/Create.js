@@ -18,8 +18,8 @@ import {
     Grid,
     Input
 } from "@chakra-ui/react";
-import FlushedInput from "../../../../components/fields/InputField";
-import { create } from "../../../../config/badgeService";
+import FlushedInput from "components/fields/InputField";
+import { create } from "config/badgeService";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [name, setName] = useState("");

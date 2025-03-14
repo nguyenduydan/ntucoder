@@ -62,7 +62,7 @@ namespace api.Infrashtructure.Repositories
                 "status" => ascending ? query.OrderBy(c => c.Status) : query.OrderByDescending(c => c.Status),
                 "fee" => ascending ? query.OrderBy(c => c.Fee) : query.OrderByDescending(c => c.Fee),
                 "iscombo" => ascending ? query.OrderBy(c => c.IsCombo) : query.OrderByDescending(c => c.IsCombo),
-                _ => query.OrderBy(c => c.CourseID) // Mặc định sắp xếp theo CourseID nếu không có trường hợp nào khớp
+                _ => query.OrderBy(c => c.CourseID) 
             };
         }
         public async Task<CourseCreateDTO> CreateCourseAsync(CourseCreateDTO dto)

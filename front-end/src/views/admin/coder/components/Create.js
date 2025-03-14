@@ -21,8 +21,8 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import FlushedInput from "../../../../components/fields/InputField";
-import { create } from "../../../../config/coderService";
+import FlushedInput from "components/fields/InputField";
+import { create } from "config/coderService";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [userName, setUserName] = useState("");
