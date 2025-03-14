@@ -1,9 +1,11 @@
-﻿using AddressManagementSystem.Infrashtructure.Helpers;
+﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
 using api.Infrashtructure.Services;
 using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
+using api.Infrastructure.Helpers;
+using System.Net;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -264,10 +266,33 @@ namespace api.Infrashtructure.Repositories
 
             _context.Courses.Remove(course);
             await _context.SaveChangesAsync();
-
             return true;
         }
 
+        public async Task<PagedResponse<CourseDTO>> SearchCourseAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Courses.AsNoTracking()
+                .Include(c => c.CourseCategory)
+                .Include(c => c.Creator)
+                .Include(c => c.Badge).Select(c => new CourseDTO
+            {
+                CourseID = c.CourseID,
+                CourseName = c.CourseName,
+                CoderID = c.CoderID,
+                Status = c.Status,
+                CourseCategoryID = c.CourseCategoryID,
+                CourseCategoryName = c.CourseCategory.Name,
+                Fee = c.Fee,
+                OriginalFee = c.OriginalFee,
+                IsCombo = c.IsCombo,
+                BadgeID = c.BadgeID,
+                BadgeName = c.Badge != null ? c.Badge.Name : null,
+            });
+
+            query = SearchHelper<CourseDTO>.ApplySearch(query, keyword, a => a.CourseName);
+
+            return await PagedResponse<CourseDTO>.CreateAsync(query, page, pageSize);
+        }
 
     }
 }

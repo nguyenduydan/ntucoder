@@ -8,9 +8,9 @@ import ProgressBar from "components/loading/loadingBar";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import {getList} from "config/courseService"
-import {columnsData} from "views/admin/course/components/columnsData"
-import Create from "views/admin/course/components/Create";
+import {getList} from "config/topicService"
+import {columnsData} from "views/admin/topic/components/columnsData"
+import Create from "views/admin/topic/components/Create";
 
 export default function CoderIndex() {
   // State cho dữ liệu bảng

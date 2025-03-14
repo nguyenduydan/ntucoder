@@ -109,7 +109,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     };
 
     const handleSubmit = async () => {
-        console.log("Data: ", course);
         if (!validate()) return;
         setLoading(true);
         try {
@@ -194,8 +193,8 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                                 <FormLabel fontWeight="bold">Trạng thái</FormLabel>
                                 <Select bg={boxColor} name="status" value={course.status} onChange={handleChange} textColor={textColor}>
                                     <option key="default" value="">Chọn trạng thái</option>
-                                    <option key="online" value="0">Online</option>
-                                    <option key="offline" value="1">Offline</option>
+                                    <option key="online" value="1">Online</option>
+                                    <option key="offline" value="0">Offline</option>
                                 </Select>
                             </FormControl>
                             {imagePreview && (

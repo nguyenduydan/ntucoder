@@ -1,6 +1,7 @@
-﻿using AddressManagementSystem.Infrashtructure.Helpers;
+﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
 using api.Infrashtructure.Repositories;
+using api.Models.ERD;
 
 namespace api.Services
 {
@@ -56,6 +57,11 @@ namespace api.Services
             }
 
             return await _courseRepository.DeleteAsync(id);
+        }
+
+        public async Task<PagedResponse<CourseDTO>> SearchCoursesAsync(string? keyword, int page, int pageSize)
+        {
+            return await _courseRepository.SearchCourseAsync(keyword, page, pageSize);
         }
     }
 }

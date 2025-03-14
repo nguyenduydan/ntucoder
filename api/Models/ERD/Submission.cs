@@ -31,6 +31,5 @@ namespace api.Models.ERD
         public virtual Compiler Compiler { get; set; }
         public virtual Problem Problem { get; set; }
         public virtual ICollection<TestRun> TestRuns { get; set; } = new HashSet<TestRun>();
-        public virtual ICollection<LessonSubmission> LessonSubmissions { get; set; } = new HashSet<LessonSubmission>();
     }
 }

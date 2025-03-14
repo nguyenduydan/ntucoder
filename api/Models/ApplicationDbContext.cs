@@ -22,7 +22,7 @@ namespace api.Models
         public DbSet<Course> Courses { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<LessonSubmission> LessonSubmissions { get; set; }
+        public DbSet<LessonProblem> LessonProblems { get; set; }
         public DbSet <Review> Reviews { get; set; }
         public DbSet <Badge> Badges { get; set; }
         public DbSet <CourseCategory> CourseCategories { get; set; }
@@ -320,7 +320,7 @@ namespace api.Models
                 entity.HasKey(e => e.LessonID);
 
                 entity.Property(e => e.CreatedAt)
-                     .HasColumnType("datetime");
+                      .HasColumnType("datetime");
                 entity.Property(e => e.Status)
                       .IsRequired()
                       .HasMaxLength(3);
@@ -329,27 +329,26 @@ namespace api.Models
                       .WithMany(t => t.Lessons)
                       .HasForeignKey(e => e.TopicID)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(e => e.LessonProblems)
+                      .WithOne(lp => lp.Lesson)
+                      .HasForeignKey(lp => lp.LessonID)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<LessonSubmission>(entity =>
+            modelBuilder.Entity<LessonProblem>(entity =>
             {
-                entity.HasKey(e => e.LessonSubmissionID);
+                entity.HasKey(e => e.ID);
 
-                entity.Property(e => e.CreatedAt)
-                     .HasColumnType("datetime");
-
-                entity.Property(e => e.Score)
-                      .HasColumnType("decimal(5,2)") // Giới hạn số thập phân
-                      .IsRequired();
 
                 entity.HasOne(e => e.Lesson)
-                      .WithMany(l => l.LessonSubmissions)
+                      .WithMany(l => l.LessonProblems)
                       .HasForeignKey(e => e.LessonID)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(e => e.Submission)
-                      .WithMany(s => s.LessonSubmissions)
-                      .HasForeignKey(e => e.SubmissionID)
+                entity.HasOne(e => e.Problem)
+                      .WithMany(p => p.LessonProblems)
+                      .HasForeignKey(e => e.ProblemID)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -393,6 +392,12 @@ namespace api.Models
                       .WithMany(c => c.Problems)
                       .HasForeignKey(e => e.TestCompilerID)
                       .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(e => e.LessonProblems)
+                      .WithOne(lp => lp.Problem)
+                      .HasForeignKey(lp => lp.ProblemID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
             });
 
             modelBuilder.Entity<ProblemCategory>(entity =>
@@ -502,10 +507,6 @@ namespace api.Models
                       .HasForeignKey(tr => tr.SubmissionID)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(s => s.LessonSubmissions)
-                      .WithOne(ls => ls.Submission)
-                      .HasForeignKey(ls => ls.SubmissionID)
-                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<TestCase>(entity =>

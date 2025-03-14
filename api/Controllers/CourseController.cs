@@ -1,4 +1,4 @@
-﻿using AddressManagementSystem.Infrashtructure.Helpers;
+﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +15,12 @@ namespace api.Controllers
         {
             _courseService = courseService;
         }
-
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            var result = await _courseService.SearchCoursesAsync(keyword, page, pageSize);
+            return Ok(result);
+        }
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
         {

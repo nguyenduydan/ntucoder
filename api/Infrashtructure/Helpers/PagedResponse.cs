@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace AddressManagementSystem.Infrashtructure.Helpers
+namespace api.Infrashtructure.Helpers
 {
     public class PagedResponse<T>
     {

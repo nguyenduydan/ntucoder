@@ -15,6 +15,8 @@ import BadgeTable from 'views/admin/badge/index';
 import CourseCategoryTable from 'views/admin/categorycourse/index';
 import CourseTable from 'views/admin/course/index';
 import CourseDetail from 'views/admin/course/components/Detail';
+import TopicTable from 'views/admin/topic/index';
+import TopicDetail from 'views/admin/topic/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -22,7 +24,7 @@ import Problem from 'views/user/Problem';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
-import { FaBookAtlas, FaBookmark } from "react-icons/fa6";
+import { FaBookAtlas, FaBookmark, FaBookOpen } from "react-icons/fa6";
 
 const routes = [
   //Admin Routes
@@ -65,6 +67,20 @@ const routes = [
         name: 'Chi tiết khóa học',
         path: 'detail/:id',
         component: <CourseDetail />,
+      }
+    ]
+  },
+  {
+    name: 'Chủ đề',
+    layout: '/admin',
+    icon: <Icon as={FaBookOpen} width="20px" height="20px" color="inherit" />,
+    path: '/topic',
+    component: <TopicTable />,
+    item: [
+      {
+        name: 'Chi tiết chủ đề',
+        path: 'detail/:id',
+        component: <TopicDetail />,
       }
     ]
   },

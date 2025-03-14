@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250310154633_updateDB")]
-    partial class updateDB
+    [Migration("20250312011337_updatedb")]
+    partial class updatedb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -421,39 +421,27 @@ namespace api.Migrations
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.LessonSubmission", b =>
+            modelBuilder.Entity("api.Models.ERD.LessonProblem", b =>
                 {
-                    b.Property<int>("LessonSubmissionID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("LessonSubmissionID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Feedback")
-                        .HasColumnType("longtext");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("LessonID")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Score")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("SubmissionID")
+                    b.Property<int>("ProblemID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("LessonSubmissionID");
+                    b.HasKey("ID");
 
                     b.HasIndex("LessonID");
 
-                    b.HasIndex("SubmissionID");
+                    b.HasIndex("ProblemID");
 
-                    b.ToTable("LessonSubmissions");
+                    b.ToTable("LessonProblems");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
@@ -908,23 +896,23 @@ namespace api.Migrations
                     b.Navigation("Topic");
                 });
 
-            modelBuilder.Entity("api.Models.ERD.LessonSubmission", b =>
+            modelBuilder.Entity("api.Models.ERD.LessonProblem", b =>
                 {
                     b.HasOne("api.Models.ERD.Lesson", "Lesson")
-                        .WithMany("LessonSubmissions")
+                        .WithMany("LessonProblems")
                         .HasForeignKey("LessonID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Models.ERD.Submission", "Submission")
-                        .WithMany("LessonSubmissions")
-                        .HasForeignKey("SubmissionID")
+                    b.HasOne("api.Models.ERD.Problem", "Problem")
+                        .WithMany("LessonProblems")
+                        .HasForeignKey("ProblemID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Lesson");
 
-                    b.Navigation("Submission");
+                    b.Navigation("Problem");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
@@ -1136,11 +1124,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ERD.Lesson", b =>
                 {
-                    b.Navigation("LessonSubmissions");
+                    b.Navigation("LessonProblems");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
                 {
+                    b.Navigation("LessonProblems");
+
                     b.Navigation("ProblemCategories");
 
                     b.Navigation("Solveds");
@@ -1157,8 +1147,6 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ERD.Submission", b =>
                 {
-                    b.Navigation("LessonSubmissions");
-
                     b.Navigation("TestRuns");
                 });
 

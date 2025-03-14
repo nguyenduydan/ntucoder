@@ -1,7 +1,7 @@
 // columnsData.jsx
 import React,{useState} from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteCourse,updateStatus } from "config/courseService";
+import { deleteTopic,updateStatus } from "config/topicService";
 import { Badge,useToast } from "@chakra-ui/react";
 
 export const columnsData = [
@@ -11,24 +11,16 @@ export const columnsData = [
     Cell: ({ rowIndex }) => rowIndex + 1,
   },
   {
+    Header: "Tên chủ đề",
+    accessor: "topicName"
+  },
+  {
     Header: "Tên khóa học",
     accessor: "courseName",
   },
   {
-    Header: "Loại khóa học",
-    accessor: "courseCategoryName",
-  },
-  {
-    Header: "Giá hiện tại",
-    accessor: "fee",
-  },
-  {
-    Header: "Giá gốc",
-    accessor: "originalFee",
-  },
-  {
-    Header: "Nhãn",
-    accessor: "badgeName",
+    Header: "Mô tả",
+    accessor: "topicDescription",
   },
 
   {
@@ -36,7 +28,7 @@ export const columnsData = [
     accessor: "status",
     Cell: ({ row }) => {
       const [status, setStatus] = useState(row?.status);
-      const courseId = row?.courseID; // Đảm bảo lấy ID đúng
+      const topicId = row?.topicID; // Đảm bảo lấy ID đúng
       const toast = useToast(); // Sử dụng useToast
 
       const handleClick = async () => {
@@ -44,7 +36,7 @@ export const columnsData = [
         setStatus(newStatus);
         try {
           console.log('New status',newStatus);
-          await updateStatus(courseId, newStatus);
+          await updateStatus(topicId, newStatus);
           toast({
             title: "Cập nhật thành công",
             description: `Cập nhật trạng thái thành công`,
@@ -71,13 +63,13 @@ export const columnsData = [
 
       return (
         <Badge
-          bg={status === 1 ? "green.400" : "red.400"}
+          bg={status === 0 ? "green.400" : "red.400"}
           fontSize="sm"
           textColor="white"
           cursor="pointer"
           onClick={handleClick}
         >
-          {status === 1 ? "Online" : "Offline"}
+          {status === 0 ? "Online" : "Offline"}
         </Badge>
       );
     }
@@ -87,9 +79,9 @@ export const columnsData = [
     Header: "Hành động",
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
-      deleteFunction={deleteCourse}
-      idData = "courseID"
-      detailPath = "course"
+      deleteFunction={deleteTopic}
+      idData = "topicID"
+      detailPath = "topic"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Khóa học đã được xóa thành công.",
