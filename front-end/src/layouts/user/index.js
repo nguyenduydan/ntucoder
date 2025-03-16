@@ -10,6 +10,7 @@ import Navbar from 'layouts/user/components/navbar';
 
 import { Box } from '@chakra-ui/react';
 import Problem from 'views/user/Problem';
+import Course from 'views/user/Course';
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -78,6 +79,11 @@ export default function Home(props) {
                                 key="home"
                                 path="/"
                                 element={<Navigate to="/" replace />}
+                            />
+                            <Route
+                                key="course"
+                                path="/course"
+                                element={<Course />}
                             />
                             <Route
                                 key="problem"
