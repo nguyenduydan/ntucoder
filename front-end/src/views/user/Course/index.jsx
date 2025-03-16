@@ -32,7 +32,7 @@ const CourseCard = ({ course }) => {
     const bgCard = useColorModeValue("white", "navy.900");
 
     return (
-        <Box minW={{md:"40vh", base:"100%"}} _hover={{ transform: "scale(1.02)" }} transition="all .2s ease-in-out"
+        <Box minW={{md:"20vh", base:"100%"}} _hover={{ transform: "scale(1.02)" }} transition="all .2s ease-in-out"
          borderWidth="1px" bg={bgCard} borderRadius="lg" overflow="hidden" boxShadow="md">
             <Image src={course.imageUrl || "/avatarSimmmple.png"} alt={course.title} objectFit="cover" h="160px" w="full" />
             <Box p="4">
