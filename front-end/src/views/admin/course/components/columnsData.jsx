@@ -21,11 +21,14 @@ export const columnsData = [
   {
     Header: "Giá hiện tại",
     accessor: "fee",
+    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
   },
   {
     Header: "Giá gốc",
     accessor: "originalFee",
+    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
   },
+
   {
     Header: "Nhãn",
     accessor: "badgeName",

@@ -59,8 +59,7 @@ const Header = () => {
                 align="center"
                 justifyContent={{ base: "center", md: "space-between" }}
                 flexDirection={{ base: "column", md: "row" }}
-                px={4}
-                py={2}>
+                px={4}>
                 <Box
                     fontWeight="bold"
                     textAlign="center"
@@ -76,15 +75,14 @@ const Header = () => {
                     <Button
                         onClick={onOpen}
                         variant='solid'
-                        bg={loginBtn}
-                        color={textBtn}
-                        _hover={{ bg: 'navy.400', transform: 'scale(1.05)' }}
-                        leftIcon={<LockIcon mb={1} />}
+                        textColor={textColor}
                         textTransform="uppercase"
                     >
                         Đăng nhập
                     </Button>
-                    <Button href="#" textTransform="uppercase" onClick={() => { setIsLogin(false); onOpen(); }} color={textColor}>
+                    <Button href="#" textTransform="uppercase" leftIcon={<LockIcon mb={1} />} onClick={() => { setIsLogin(false); onOpen(); }} bg={loginBtn}
+                        color={textBtn}
+                        _hover={{ bg: 'navy.400', transform: 'scale(1.05)' }}>
                         Đăng ký
                     </Button>
 

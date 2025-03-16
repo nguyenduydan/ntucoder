@@ -32,6 +32,7 @@ namespace api.Infrashtructure.Repositories
                     CourseID = c.CourseID,
                     CourseName = c.CourseName,
                     CoderID = c.CoderID,
+                    CreatorName = c.Creator.CoderName,
                     Status = c.Status,
                     CourseCategoryID = c.CourseCategoryID,
                     CourseCategoryName = c.CourseCategory.Name,
@@ -39,7 +40,9 @@ namespace api.Infrashtructure.Repositories
                     OriginalFee = c.OriginalFee,
                     IsCombo = c.IsCombo,
                     BadgeID = c.BadgeID,
+                    ImageUrl = c.ImageUrl,
                     BadgeName = c.Badge != null ? c.Badge.Name : null,
+                    BadgeColor = c.Badge.Color
                 });
 
             queryData = ApplySorting(queryData, sortField, ascending);

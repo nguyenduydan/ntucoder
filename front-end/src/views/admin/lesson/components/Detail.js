@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
     Box,
     Text,
@@ -22,6 +22,8 @@ import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
 import moment from "moment";
 import "moment/locale/vi";
+import JoditEditor from "jodit-react";
+import DOMPurify from "dompurify";
 //import API
 import { getById, update } from "config/lessonService";
 import { getList } from "config/topicService";
@@ -41,6 +43,7 @@ const formatDate = (dateString) => {
 
 const LessonDetail = () => {
     const { id } = useParams();
+    const editor = useRef(null);
     const [topic, setTopic] = useState([]);
     const [lesson, setLessonDetail] = useState(null);
     const [editField, setEditField] = useState(null);
@@ -71,10 +74,10 @@ const LessonDetail = () => {
         }
     }, [id, toast]);
 
-    const fetchCourse = async () => {
+    const fetchTopic = async () => {
         try {
-            const topic = await getList({ page: 1, pageSize: 10 });
-            setTopic(topic.data);
+            const topicData = await getList({ page: 1, pageSize: 10 });
+            setTopic(topicData.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
             setTopic([]);
@@ -83,7 +86,7 @@ const LessonDetail = () => {
     useEffect(() => {
         if (id) {
             fetchLessonDetail();
-            fetchCourse();
+            fetchTopic();
         }
     }, [id, fetchLessonDetail]);
 
@@ -253,9 +256,8 @@ const LessonDetail = () => {
                                             </Select>
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Chọn khóa học:</strong> {topic.find(c => c.topicID === Number(topic.topicID))?.topicName || "Chưa chọn"}
+                                                <strong>Chọn chủ đề:</strong> {topic.find(c => c.topicID === Number(editableValues.topicID))?.topicName || "Chưa chọn"}
                                             </Text>
-
                                         )}
                                         <IconButton
                                             aria-label="Edit"
@@ -263,31 +265,6 @@ const LessonDetail = () => {
                                             ml={2}
                                             size="sm"
                                             onClick={() => handleEdit("topic")}
-                                            cursor="pointer"
-                                        />
-                                    </Flex>
-                                    {/* Description field */}
-                                    <Flex align="center">
-                                        {editField === "topicDescription" ? (
-                                            <Input
-                                                value={editableValues.topicDescription || ""}
-                                                onChange={(e) => handleInputChange("topicDescription", e.target.value)}
-                                                placeholder="Chỉnh sửa mô tả"
-                                                onBlur={() => setEditField(null)}
-                                                autoFocus
-                                                textColor={textColor}
-                                            />
-                                        ) : (
-                                            <Text fontSize="lg">
-                                                <strong>Mô tả:</strong> {topic.topicDescription || "Chưa có thông tin"}
-                                            </Text>
-                                        )}
-                                        <IconButton
-                                            aria-label="Edit"
-                                            icon={<MdEdit />}
-                                            ml={2}
-                                            size="sm"
-                                            onClick={() => handleEdit("topicDescription")}
                                             cursor="pointer"
                                         />
                                     </Flex>
@@ -311,6 +288,39 @@ const LessonDetail = () => {
                                 </VStack>
                             </GridItem>
                         </Grid>
+                        {/* Đặt lessonContent vào một Box riêng biệt */}
+                        <Box width="100%" borderTopWidth={2} pt={5} px={5}>
+                            <Flex align="center">
+                                {editField === "lessonContent" ? (
+                                    <Box width="100%">
+                                        <JoditEditor
+                                            textColor={textColor}
+                                            key={lesson.lessonID}
+                                            ref={editor}
+                                            value={editableValues.lessonContent || ""}
+                                            onChange={(newContent) => handleInputChange("lessonContent", newContent)}
+                                            onBlur={() => setEditField(null)}
+                                            autoFocus
+                                        />
+                                    </Box>
+                                ) : (
+                                    <Box width="max-content">
+                                        <Text fontSize="lg">
+                                            <strong>Nội dung bài học:</strong>
+                                            <Box dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.lessonContent || "Chưa có thông tin") }} />
+                                        </Text>
+                                    </Box>
+                                )}
+                                <IconButton
+                                    aria-label="Edit"
+                                    icon={<MdEdit />}
+                                    ml={2}
+                                    size="sm"
+                                    onClick={() => handleEdit("lessonContent")}
+                                    cursor="pointer"
+                                />
+                            </Flex>
+                        </Box>
                     </VStack>
                     <Flex justifyContent="flex-end" mt={6}>
                         <Button

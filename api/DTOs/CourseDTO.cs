@@ -5,6 +5,7 @@
         public int CourseID { get; set; }
         public string CourseName { get; set; } = string.Empty;
         public int CoderID { get; set; } = 1;
+        public string CreatorName { get; set; } = string.Empty;
         public int CourseCategoryID { get; set; }
         public string CourseCategoryName { get; set; } = string.Empty;
         public decimal? Fee { get; set; }
@@ -12,6 +13,7 @@
         public bool IsCombo { get; set; }
         public int? BadgeID { get; set; }
         public string BadgeName { get; set; } = string.Empty; // Tránh lỗi null
+        public string? BadgeColor {  get; set; }
         public IFormFile? ImageFile { get; set; }
         public string? ImageUrl { get; set; }
         public int Status { get; set; }
@@ -32,7 +34,6 @@
     public class CourseDetailDTO : CourseDTO
     {
         public string? Description { get; set; }
-        public string CreatorName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public double Rating { get; set; }

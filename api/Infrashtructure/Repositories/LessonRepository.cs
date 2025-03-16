@@ -68,6 +68,7 @@ namespace api.Infrashtructure.Repositories
 
             return new LessonDetailDTO
             {
+                LessonID = lesson.LessonID,
                 TopicID = lesson.TopicID,
                 TopicName = lesson.Topic.TopicName,
                 LessonTitle = lesson.LessonTitle,

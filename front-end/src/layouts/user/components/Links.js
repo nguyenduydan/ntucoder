@@ -8,8 +8,8 @@ const MotionBox = motion(Box);
 
 export default function Links({ routes, direction }) {
   // Định nghĩa màu cho active/inactive link
-  const activeColor = useColorModeValue("Black", "Black");
-  const inactiveColor = useColorModeValue("White", "gray.600");
+  const activeColor = useColorModeValue("Black", "Blue");
+  const inactiveColor = useColorModeValue("White", "gray.700");
   const activeBg = useColorModeValue("White", "White");
 
   // Dùng useLocation nếu cần kiểm tra active path theo cách thủ công
@@ -18,7 +18,7 @@ export default function Links({ routes, direction }) {
   //   location.pathname.toLowerCase().includes(routePath.toLowerCase());
 
   return (
-    <Flex direction={direction} spacing={3} gap={2} position="relative">
+    <Flex direction={direction} spacing={2} gap={2} position="relative">
       {routes &&
         routes.length > 0 &&
         routes.map((route, index) => (
@@ -30,7 +30,7 @@ export default function Links({ routes, direction }) {
             {({ isActive }) => (
               <MotionBox
                 px={2}
-                py={2}
+                py={1}
                 borderRadius="md"
                 position="relative"
                 layout
@@ -52,6 +52,10 @@ export default function Links({ routes, direction }) {
                 <Text
                   position="relative" fontWeight={"bold"}
                   fontSize={16} color={isActive ? activeColor : inactiveColor}
+                  py={1}
+                  px={2}
+
+                  _hover={{ textColor: "blue" }}
                   transition="all 0.2s ease-in-out"
                 >
                   {route.name}

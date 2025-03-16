@@ -102,8 +102,8 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         let newErrors = {};
         if (!course.courseName) newErrors.courseName = "Tên khóa học không được bỏ trống";
         if (!course.courseCategoryID) newErrors.courseCategoryID = "Vui lòng chọn danh mục khóa học";
-        if (!course.fee || isNaN(course.fee) || course.fee < 0) newErrors.fee = "Học phí phải là số dương";
-        if (!course.originalFee || isNaN(course.originalFee) || course.originalFee < 0) newErrors.originalFee = "Học phí gốc phải là số dương";
+        if (!course.fee || course.fee < 0) newErrors.fee = "Học phí phải là số dương";
+        if (!course.originalFee || course.originalFee < 0) newErrors.originalFee = "Học phí gốc phải là số dương";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };

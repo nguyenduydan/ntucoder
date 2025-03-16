@@ -10,8 +10,15 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
 //import routes
 import CoderIndex from 'views/admin/coder';
-import CoderCreate from 'views/admin/coder/components/Create';
 import CoderDetail from 'views/admin/coder/components/Detail';
+import CourseCategoryIndex from 'views/admin/categorycourse/index';
+import CourseIndex from 'views/admin/course/index';
+import CourseDetail from 'views/admin/course/components/Detail';
+import TopicIndex from 'views/admin/topic/index';
+import TopicDetail from 'views/admin/topic/components/Detail';
+import LessonIndex from 'views/admin/lesson/index';
+import LessonDetail from 'views/admin/lesson/components/Detail';
+
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -174,15 +181,24 @@ export default function Dashboard(props) {
                     element={<CoderIndex />}
                   />
                   <Route
-                    key="coder-create"
-                    path="/admin/coder/create"
-                    element={<CoderCreate />}
-                  />
-                  <Route
                     key="coder-detail"
                     path="/admin/coder/detail/:id"
                     element={<CoderDetail />}
                   />
+                  {/* Quản lý danh mục khóa học */}
+                  <Route key="course-category" path="/admin/categorycourse" element={<CourseCategoryIndex />} />
+
+                  {/* Quản lý khóa học */}
+                  <Route key="course-index" path="/admin/course" element={<CourseIndex />} />
+                  <Route key="course-detail" path="/admin/course/detail/:id" element={<CourseDetail />} />
+
+                  {/* Quản lý chủ đề (topic) */}
+                  <Route key="topic-index" path="/admin/topic" element={<TopicIndex />} />
+                  <Route key="topic-detail" path="/admin/topic/detail/:id" element={<TopicDetail />} />
+
+                  {/* Quản lý bài học (lesson) */}
+                  <Route key="lesson-index" path="/admin/lesson" element={<LessonIndex />} />
+                  <Route key="lesson-detail" path="/admin/lesson/detail/:id" element={<LessonDetail />} />
                 </Routes>
               </Box>
             ) : null}

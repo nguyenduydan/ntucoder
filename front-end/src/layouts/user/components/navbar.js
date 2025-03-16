@@ -31,7 +31,7 @@ function Navbar(props) {
     const btnRef = React.useRef();
 
     // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
-    const bg = useColorModeValue("blue.400", "blue.200");
+    const bg = useColorModeValue("blue.300", "blue.200");
     const textColor = useColorModeValue("white", "black");
 
     return (
@@ -41,17 +41,17 @@ function Navbar(props) {
             right="0"
             bg={bg}
             color={textColor}
-            px={{ base: '10px', md: '100px' }}
-            py={2}
+            px={{ base: '10px', md: '15px' }}
+            py={3}
             zIndex='2'
         >
             <Flex align="center" gap={0} justify={{ base: "space-between", md: "space-evenly" }}>
-                {/* Brand */}
-                <Box fontSize="xl" fontWeight="bold">
-                    <Image src={NTULogo} h="40px" />
-                </Box>
                 {/* Desktop Navigation Links */}
                 <Flex display={{ base: "none", md: "flex" }} gap={1}>
+                    {/* Brand */}
+                    <Box fontSize="xl" fontWeight="bold" mr={10}>
+                        <Image src={NTULogo} h="40px" />
+                    </Box>
                     <Links direction="row" routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", md: "block" }}>

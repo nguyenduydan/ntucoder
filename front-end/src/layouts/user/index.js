@@ -14,7 +14,7 @@ import Problem from 'views/user/Problem';
 export default function Home(props) {
     const { ...rest } = props;
     // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
-    const bg = useColorModeValue("white", "navy.800");
+    const bg = useColorModeValue("gray.200", "navy.800");
     const textColor = useColorModeValue("black", "white");
 
     // Kiểm tra nếu không đang ở trang full-screen maps
@@ -67,7 +67,7 @@ export default function Home(props) {
                         mx="auto"
                         p={{ base: '20px', md: '30px' }}
                         pe="20px"
-                        minH="200vh"
+                        minH="60vh"
                         pt="50px"
                         w="100%"
                     >
