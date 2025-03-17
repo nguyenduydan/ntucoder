@@ -139,7 +139,7 @@ const routes = [
     item: [
       {
         name: 'Chi tiết khóa học',
-        path: 'detail/:id',
+        path: ":slug-:id",
         component: <CourseDetailUser />,
       }
     ]

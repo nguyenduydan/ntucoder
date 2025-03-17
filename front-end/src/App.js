@@ -8,14 +8,14 @@ import initialTheme from "./theme/theme"; //  { themeGreen }
 import { useState, useEffect } from "react";
 import Loading from "./components/loading/loadingSpinner";
 import { motion, AnimatePresence } from "framer-motion";
-
+import useTitle from "./components/fixedPlugin/UseTitle";
 const MotionFlex = motion(Flex);
 
 export default function Main() {
   // State theme và trạng thái loading
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
   const [isLoading, setIsLoading] = useState(true);
-
+  useTitle();
   useEffect(() => {
     // Giả lập quá trình tải (ví dụ 1 giây)
     const timer = setTimeout(() => {

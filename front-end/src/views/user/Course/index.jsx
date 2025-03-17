@@ -6,6 +6,7 @@ import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
 import ScrollToTop from "components/scroll/ScrollToTop";
 
+
 export default function Course() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
