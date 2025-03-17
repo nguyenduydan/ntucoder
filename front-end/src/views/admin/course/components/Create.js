@@ -36,7 +36,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         badgeID: "",
         status: 0,
         description: "",
-        imageUrl: "",
+        imageFile: null,
     });
     const [courseCategories, setCourseCategories] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
@@ -54,13 +54,13 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 coderID: "1",
                 courseName: "",
                 courseCategoryID: "",
-                fee: "",
-                originalFee: "",
+                fee: 0,
+                originalFee: 0,
                 isCombo: false,
                 badgeID: "",
                 status: 0,
                 description: "",
-                imageUrl: "",
+                imageFile: null,
             });
             setErrors({});
             fetchCategories(); // Gọi hàm lấy danh mục khóa học khi modal mở
@@ -90,6 +90,11 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
+            setCourse((prev) => ({
+                ...prev,
+                imageFile: file, // Lưu file ảnh vào state
+            }));
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
@@ -102,8 +107,8 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         let newErrors = {};
         if (!course.courseName) newErrors.courseName = "Tên khóa học không được bỏ trống";
         if (!course.courseCategoryID) newErrors.courseCategoryID = "Vui lòng chọn danh mục khóa học";
-        if (!course.fee || course.fee < 0) newErrors.fee = "Học phí phải là số dương";
-        if (!course.originalFee || course.originalFee < 0) newErrors.originalFee = "Học phí gốc phải là số dương";
+        if (course.fee < 0) newErrors.fee = "Học phí phải là số dương";
+        if (course.originalFee < 0) newErrors.originalFee = "Học phí gốc phải là số dương";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -111,8 +116,28 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     const handleSubmit = async () => {
         if (!validate()) return;
         setLoading(true);
+
+        // Tạo FormData để gửi dữ liệu
+        const formData = new FormData();
+        formData.append("coderID", course.coderID);
+        formData.append("courseName", course.courseName);
+        formData.append("courseCategoryID", course.courseCategoryID);
+        formData.append("fee", course.fee);
+        formData.append("originalFee", course.originalFee);
+        formData.append("isCombo", course.isCombo);
+        formData.append("badgeID", course.badgeID);
+        formData.append("status", course.status);
+        formData.append("description", course.description);
+
+        // Nếu có file ảnh, thêm vào FormData
+        if (course.imageFile) {
+            formData.append("imageFile", course.imageFile);
+        }
+
         try {
-            await create(course);
+            console.log("API: ", formData);
+            await create(formData); // Gửi FormData lên backend
+
             toast({
                 title: 'Thêm mới khóa học thành công!',
                 status: 'success',
@@ -121,6 +146,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 position: 'top',
                 variant: "left-accent",
             });
+
             if (fetchData) await fetchData();
             onClose();
         } catch (error) {
@@ -137,6 +163,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
             setLoading(false);
         }
     };
+
 
     return (
         <Modal size={'4xl'} isOpen={isOpen} onClose={onClose}>
@@ -165,7 +192,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                             <FormControl mb={4}>
                                 <FormLabel fontWeight="bold">Ảnh khóa học</FormLabel>
                                 <Input type="file" accept="image/*" onChange={handleImageChange} />
-
                             </FormControl>
                         </GridItem>
                         <GridItem>

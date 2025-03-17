@@ -62,7 +62,13 @@ export const getById = async (id) => {
  */
 export const create = async (CourseData) => {
     try {
-        const response = await api.post('/Course', CourseData);
+        const response = await api.post('/Course', CourseData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
         return response.data;
     } catch (error) {
         console.error('Error creating Course:', error);

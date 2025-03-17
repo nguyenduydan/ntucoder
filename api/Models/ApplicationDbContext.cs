@@ -284,7 +284,7 @@ namespace api.Models
                 entity.HasOne(c => c.Badge)
                       .WithMany()
                       .HasForeignKey(c => c.BadgeID)
-                      .OnDelete(DeleteBehavior.SetNull);
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(c => c.Reviews)
                       .WithOne(r => r.Course)

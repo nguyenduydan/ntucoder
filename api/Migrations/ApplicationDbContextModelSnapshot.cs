@@ -286,7 +286,6 @@ namespace api.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int?>("DiscountPercent")
@@ -391,7 +390,6 @@ namespace api.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("LessonContent")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("LessonTitle")
@@ -761,7 +759,6 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TopicDescription")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("TopicName")

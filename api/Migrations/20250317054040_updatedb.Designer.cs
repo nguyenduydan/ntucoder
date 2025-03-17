@@ -12,7 +12,7 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250312011337_updatedb")]
+    [Migration("20250317054040_updatedb")]
     partial class updatedb
     {
         /// <inheritdoc />
@@ -289,7 +289,6 @@ namespace api.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int?>("DiscountPercent")
@@ -394,7 +393,6 @@ namespace api.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("LessonContent")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("LessonTitle")
@@ -764,7 +762,6 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TopicDescription")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("TopicName")

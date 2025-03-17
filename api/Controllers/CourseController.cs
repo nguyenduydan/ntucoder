@@ -63,7 +63,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CourseCreateDTO courseDto)
+        public async Task<IActionResult> Create([FromForm] CourseCreateDTO courseDto)
         {
             if (courseDto == null)
             {

@@ -16,17 +16,19 @@ import {
     Select,
     Skeleton,
     useColorMode,
+    List, ListItem
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { getById, update } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
 import moment from "moment";
 import "moment/locale/vi";
+//import api
+import { getById, update } from "config/courseService";
+import { getList } from "config/courseCategoryService";
+import { getListBagde } from "config/badgeService";
 
 const formatCurrency = (amount) => {
     return amount
@@ -212,27 +214,242 @@ const CourseDetail = () => {
     }
     return (
         <ScrollToTop>
-            <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
-                <Box
-                    bg={boxColor}
-                    p={{ base: "4", md: "6" }}  // Padding responsive
-                    borderRadius="lg"
-                    boxShadow="lg"
-                    maxW="1000px"
-                    w="100%"
-                    mx="auto"
-                >
-                    <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
-                        <Link>
+            <Flex direction={{ base: "column", md: "row" }} justify="center" alignItems="center">
+                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="10px">
+                    <Box
+                        bg={boxColor}
+                        p={{ base: "4", md: "6" }}  // Padding responsive
+                        borderRadius="lg"
+                        boxShadow="lg"
+                        w={{ base: "100%", md: "100vh" }}
+                        maxW="500vh"
+                        mx="auto"
+                    >
+                        <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
+                            <Link>
+                                <Button
+                                    onClick={() => navigate(`/admin/course`)}
+                                    variant="solid"
+                                    size="lg"
+                                    colorScheme="messenger"
+                                    borderRadius="xl"
+                                    px={5}
+                                    boxShadow="lg"
+                                    bgGradient="linear(to-l, messenger.500, navy.300)"
+                                    transition="all 0.2s ease-in-out"
+                                    _hover={{
+                                        color: "white",
+                                        transform: "scale(1.05)",
+                                    }}
+                                    _active={{
+                                        transform: "scale(0.90)",
+                                    }}
+                                >
+                                    <MdOutlineArrowBack /> Quay lại
+                                </Button>
+                            </Link>
+                        </Flex>
+                        <VStack spacing={6} align="stretch" mt={4}>
+                            {/* Avatar Section */}
+                            <Flex direction="column" align="center">
+                                <Skeleton
+                                    isLoaded={avatarLoaded}
+                                    borderRadius="md"
+                                    w="50%"
+                                    h="150px"
+                                    mb={4}
+                                >
+                                    <Image
+                                        src={editableValues.imageUrl || course.imageUrl || "/avatarSimmmple.png"}
+                                        alt="Course Avatar"
+                                        w="100%"
+                                        h="150px"
+                                        borderRadius="md"
+                                        objectFit="cover"
+                                        transition="all 0.2s ease-in-out"
+                                        _hover={{ transform: "scale(1.05)" }}
+                                        onClick={() => document.getElementById("avatarInput").click()}
+                                        onLoad={() => setAvatarLoaded(true)}
+                                        cursor="pointer"
+                                    />
+                                </Skeleton>
+                                <Input
+                                    id="avatarInput"
+                                    type="file"
+                                    onChange={handleImgChange}
+                                    display="none"
+                                />
+                            </Flex>
+                            <Divider />
+                            {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
+                            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
+                                {/* Left Column */}
+                                <GridItem borderRightWidth={2}>
+                                    <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khóa học</Text>
+                                    <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
+                                        {["courseName", "fee", "originalFee"].map((field) => (
+                                            <Flex key={field} align="center">
+                                                {editField === field ? (
+                                                    <Input
+                                                        textColor={textColor}
+                                                        value={editableValues[field] || ""}
+                                                        onChange={(e) => handleInputChange(field, e.target.value)}
+                                                        placeholder={`Chỉnh sửa ${field}`}
+                                                        onBlur={() => setEditField(null)}
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    <Text fontSize="lg" textColor={textColor}>
+                                                        <strong>
+                                                            {field === "courseName"
+                                                                ? "Tên khóa học"
+                                                                : field === "fee"
+                                                                    ? "Giá tiền"
+                                                                    : "Giá tiền gốc"}:
+                                                        </strong>{" "}
+                                                        {field === "fee" || field === "originalFee"
+                                                            ? formatCurrency(course[field])
+                                                            : course[field] || "Chưa có thông tin"}
+                                                    </Text>
+                                                )}
+                                                <IconButton
+                                                    aria-label="Edit"
+                                                    icon={<MdEdit />}
+                                                    ml={2}
+                                                    size="sm"
+                                                    onClick={() => handleEdit(field)}
+                                                    cursor="pointer"
+                                                />
+                                            </Flex>
+                                        ))}
+                                        <Text fontSize="lg">
+                                            <strong>Phần trăm giảm: </strong><Text as={'span'} fontWeight={'bold'} color={'red'} >{course.discountPercent} %</Text>
+                                        </Text>
+                                        {/* Chọn loại khóa học field */}
+                                        <Flex align="center">
+                                            {editField === "courseCategory" ? (
+                                                <Select
+                                                    value={editableValues.courseCategoryID || ""}
+                                                    onBlur={() => setEditField(null)}
+                                                    autoFocus
+                                                    onChange={(e) => handleInputChange("courseCategoryID", e.target.value)}
+                                                    placeholder="Chọn loại khóa học"
+                                                    width={{ base: "100%", md: "50%" }}
+                                                >
+                                                    {courseCategories.map((category) => (
+                                                        <option key={category.courseCategoryID} value={category.courseCategoryID}>
+                                                            {category.name}
+                                                        </option>
+                                                    ))}
+                                                </Select>
+                                            ) : (
+                                                <Text fontSize="lg">
+                                                    <strong>Loại khóa học:</strong> {courseCategories.find(c => c.courseCategoryID === Number(course.courseCategoryID))?.name || "Chưa chọn"}
+                                                </Text>
+
+                                            )}
+                                            <IconButton
+                                                aria-label="Edit"
+                                                icon={<MdEdit />}
+                                                ml={2}
+                                                size="sm"
+                                                onClick={() => handleEdit("courseCategory")}
+                                                cursor="pointer"
+                                            />
+                                        </Flex>
+                                        {/* Chọn badge field */}
+                                        <Flex align="center">
+                                            {editField === "badge" ? (
+                                                <Select
+                                                    value={editableValues.badgeID || ""}
+                                                    onBlur={() => setEditField(null)}
+                                                    autoFocus
+                                                    onChange={(e) => handleInputChange("badgeID", e.target.value)}
+                                                    placeholder="Chọn nhãn"
+                                                    width={{ base: "100%", md: "50%" }}
+                                                >
+                                                    {badge.map((badge) => (
+                                                        <option key={badge.badgeID} value={badge.badgeID}>
+                                                            {badge.name}
+                                                        </option>
+                                                    ))}
+                                                </Select>
+                                            ) : (
+                                                <Text fontSize="lg">
+                                                    <strong>Nhãn:</strong> {badge.find(c => c.badgeID === Number(course.badgeID))?.name || "Chưa chọn"}
+                                                </Text>
+                                            )}
+                                            <IconButton
+                                                aria-label="Edit"
+                                                icon={<MdEdit />}
+                                                ml={2}
+                                                size="sm"
+                                                onClick={() => handleEdit("badge")}
+                                                cursor="pointer"
+                                            />
+                                        </Flex>
+
+                                        {/* Description field */}
+                                        <Flex align="center">
+                                            {editField === "description" ? (
+                                                <Input
+                                                    value={editableValues.description || ""}
+                                                    onChange={(e) => handleInputChange("description", e.target.value)}
+                                                    placeholder="Chỉnh sửa mô tả"
+                                                    onBlur={() => setEditField(null)}
+                                                    autoFocus
+                                                    textColor={textColor}
+                                                />
+                                            ) : (
+                                                <Text fontSize="lg">
+                                                    <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
+                                                </Text>
+                                            )}
+                                            <IconButton
+                                                aria-label="Edit"
+                                                icon={<MdEdit />}
+                                                ml={2}
+                                                size="sm"
+                                                onClick={() => handleEdit("description")}
+                                                cursor="pointer"
+                                            />
+                                        </Flex>
+                                    </VStack>
+                                </GridItem>
+
+                                {/* Right Column */}
+                                <GridItem>
+                                    <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
+                                    <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
+                                        <Text fontSize="lg">
+                                            <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
+                                        </Text>
+                                        <Text fontSize="lg">
+                                            <strong>Người tạo: </strong> {course.creatorName}
+                                        </Text>
+                                        {course.updatedAt && (
+                                            <>
+                                                <Text fontSize="lg">
+                                                    <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
+                                                </Text>
+                                                <Text fontSize="lg">
+                                                    <strong>Người cập nhật: </strong> {course.creatorName}
+                                                </Text>
+                                            </>
+                                        )}
+                                    </VStack>
+                                </GridItem>
+                            </Grid>
+                        </VStack>
+                        <Flex justifyContent="flex-end" mt={6}>
                             <Button
-                                onClick={() => navigate(`/admin/course`)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="messenger"
                                 borderRadius="xl"
-                                px={5}
+                                px={10}
                                 boxShadow="lg"
-                                bgGradient="linear(to-l, messenger.500, navy.300)"
+                                bgGradient="linear(to-l, green.500, green.300)"
                                 transition="all 0.2s ease-in-out"
                                 _hover={{
                                     color: "white",
@@ -241,232 +458,38 @@ const CourseDetail = () => {
                                 _active={{
                                     transform: "scale(0.90)",
                                 }}
+                                onClick={handleSave}
+                                isLoading={loading}
+                                loadingText="Đang lưu..."
+                                disabled={editField === null}
                             >
-                                <MdOutlineArrowBack /> Quay lại
+                                Lưu
                             </Button>
-                        </Link>
-                    </Flex>
-                    <VStack spacing={6} align="stretch" mt={4}>
-                        {/* Avatar Section */}
-                        <Flex direction="column" align="center">
-                            <Skeleton
-                                isLoaded={avatarLoaded}
-                                borderRadius="md"
-                                w="50%"
-                                h="150px"
-                                mb={4}
-                            >
-                                <Image
-                                    src={editableValues.imageUrl || course.imageUrl || "/avatarSimmmple.png"}
-                                    alt="Course Avatar"
-                                    w="100%"
-                                    h="150px"
-                                    borderRadius="md"
-                                    objectFit="cover"
-                                    transition="all 0.2s ease-in-out"
-                                    _hover={{ transform: "scale(1.05)" }}
-                                    onClick={() => document.getElementById("avatarInput").click()}
-                                    onLoad={() => setAvatarLoaded(true)}
-                                    cursor="pointer"
-                                />
-                            </Skeleton>
-                            <Input
-                                id="avatarInput"
-                                type="file"
-                                onChange={handleImgChange}
-                                display="none"
-                            />
                         </Flex>
-                        <Divider />
-                        {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
-                            {/* Left Column */}
-
-                            <GridItem borderRightWidth={2}>
-                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khóa học</Text>
-                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-
-                                    {["courseName", "fee", "originalFee"].map((field) => (
-                                        <Flex key={field} align="center">
-                                            {editField === field ? (
-                                                <Input
-                                                    textColor={textColor}
-                                                    value={editableValues[field] || ""}
-                                                    onChange={(e) => handleInputChange(field, e.target.value)}
-                                                    placeholder={`Chỉnh sửa ${field}`}
-                                                    onBlur={() => setEditField(null)}
-                                                    autoFocus
-                                                />
-                                            ) : (
-                                                <Text fontSize="lg" textColor={textColor}>
-                                                    <strong>
-                                                        {field === "courseName"
-                                                            ? "Tên khóa học"
-                                                            : field === "fee"
-                                                                ? "Giá tiền"
-                                                                : "Giá tiền gốc"}:
-                                                    </strong>{" "}
-                                                    {field === "fee" || field === "originalFee"
-                                                        ? formatCurrency(course[field])
-                                                        : course[field] || "Chưa có thông tin"}
-                                                </Text>
-                                            )}
-                                            <IconButton
-                                                aria-label="Edit"
-                                                icon={<MdEdit />}
-                                                ml={2}
-                                                size="sm"
-                                                onClick={() => handleEdit(field)}
-                                                cursor="pointer"
-                                            />
-                                        </Flex>
-                                    ))}
-                                    <Text fontSize="lg">
-                                        <strong>Phần trăm giảm: </strong><Text as={'span'} fontWeight={'bold'} color={'red'} >{course.discountPercent} %</Text>
-                                    </Text>
-                                    {/* Chọn loại khóa học field */}
-                                    <Flex align="center">
-                                        {editField === "courseCategory" ? (
-                                            <Select
-                                                value={editableValues.courseCategoryID || ""}
-                                                onBlur={() => setEditField(null)}
-                                                autoFocus
-                                                onChange={(e) => handleInputChange("courseCategoryID", e.target.value)}
-                                                placeholder="Chọn loại khóa học"
-                                                width={{ base: "100%", md: "50%" }}
-                                            >
-                                                {courseCategories.map((category) => (
-                                                    <option key={category.courseCategoryID} value={category.courseCategoryID}>
-                                                        {category.name}
-                                                    </option>
-                                                ))}
-                                            </Select>
-                                        ) : (
-                                            <Text fontSize="lg">
-                                                <strong>Loại khóa học:</strong> {courseCategories.find(c => c.courseCategoryID === Number(course.courseCategoryID))?.name || "Chưa chọn"}
-                                            </Text>
-
-                                        )}
-                                        <IconButton
-                                            aria-label="Edit"
-                                            icon={<MdEdit />}
-                                            ml={2}
-                                            size="sm"
-                                            onClick={() => handleEdit("courseCategory")}
-                                            cursor="pointer"
-                                        />
-                                    </Flex>
-                                    {/* Chọn badge field */}
-                                    <Flex align="center">
-                                        {editField === "badge" ? (
-                                            <Select
-                                                value={editableValues.badgeID || ""}
-                                                onBlur={() => setEditField(null)}
-                                                autoFocus
-                                                onChange={(e) => handleInputChange("badgeID", e.target.value)}
-                                                placeholder="Chọn nhãn"
-                                                width={{ base: "100%", md: "50%" }}
-                                            >
-                                                {badge.map((badge) => (
-                                                    <option key={badge.badgeID} value={badge.badgeID}>
-                                                        {badge.name}
-                                                    </option>
-                                                ))}
-                                            </Select>
-                                        ) : (
-                                            <Text fontSize="lg">
-                                                <strong>Nhãn:</strong> {badge.find(c => c.badgeID === Number(course.badgeID))?.name || "Chưa chọn"}
-                                            </Text>
-                                        )}
-                                        <IconButton
-                                            aria-label="Edit"
-                                            icon={<MdEdit />}
-                                            ml={2}
-                                            size="sm"
-                                            onClick={() => handleEdit("badge")}
-                                            cursor="pointer"
-                                        />
-                                    </Flex>
-
-                                    {/* Description field */}
-                                    <Flex align="center">
-                                        {editField === "description" ? (
-                                            <Input
-                                                value={editableValues.description || ""}
-                                                onChange={(e) => handleInputChange("description", e.target.value)}
-                                                placeholder="Chỉnh sửa mô tả"
-                                                onBlur={() => setEditField(null)}
-                                                autoFocus
-                                                textColor={textColor}
-                                            />
-                                        ) : (
-                                            <Text fontSize="lg">
-                                                <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
-                                            </Text>
-                                        )}
-                                        <IconButton
-                                            aria-label="Edit"
-                                            icon={<MdEdit />}
-                                            ml={2}
-                                            size="sm"
-                                            onClick={() => handleEdit("description")}
-                                            cursor="pointer"
-                                        />
-                                    </Flex>
-                                </VStack>
-                            </GridItem>
-
-                            {/* Right Column */}
-                            <GridItem>
-                                <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
-                                <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-                                    <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
-                                    </Text>
-                                    <Text fontSize="lg">
-                                        <strong>Người tạo: </strong> {course.creatorName}
-                                    </Text>
-                                    {course.updatedAt && (
-                                        <>
-                                            <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
-                                            </Text>
-                                            <Text fontSize="lg">
-                                                <strong>Người cập nhật: </strong> {course.creatorName}
-                                            </Text>
-                                        </>
-                                    )}
-                                </VStack>
-                            </GridItem>
-                        </Grid>
-                    </VStack>
-                    <Flex justifyContent="flex-end" mt={6}>
-                        <Button
-                            variant="solid"
-                            size="lg"
-                            colorScheme="messenger"
-                            borderRadius="xl"
-                            px={10}
-                            boxShadow="lg"
-                            bgGradient="linear(to-l, green.500, green.300)"
-                            transition="all 0.2s ease-in-out"
-                            _hover={{
-                                color: "white",
-                                transform: "scale(1.05)",
-                            }}
-                            _active={{
-                                transform: "scale(0.90)",
-                            }}
-                            onClick={handleSave}
-                            isLoading={loading}
-                            loadingText="Đang lưu..."
-                            disabled={editField === null}
-                        >
-                            Lưu
-                        </Button>
-                    </Flex>
+                    </Box>
                 </Box>
-            </Box>
+                {/* Thông tin danh sách topic */}
+                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
+                    <Box
+                        bg={boxColor}
+                        p={{ base: "4", md: "6" }}  // Padding responsive
+                        borderRadius="lg"
+                        boxShadow="lg"
+                        w={{ base: "100%", md: "50vh" }}
+                        maxH="60vh"
+                        mx="auto"
+                    >
+                        <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Danh sách chủ đề</Text>
+                        <List spacing={3}>
+                            {course.topics.map((topic, index) => (
+                                <ListItem key={topic.topicID} p={2} bg="gray.100" borderRadius="md">
+                                    <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                </Box>
+            </Flex>
         </ScrollToTop>
 
     );
