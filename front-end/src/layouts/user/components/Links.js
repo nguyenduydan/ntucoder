@@ -3,22 +3,15 @@ import { NavLink } from "react-router-dom";
 import { Flex, Box, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
-// Tạo MotionBox từ Box của Chakra UI
+// MotionBox cho hiệu ứng di chuyển đường line
 const MotionBox = motion(Box);
 
 export default function Links({ routes, direction }) {
-  // Định nghĩa màu cho active/inactive link
-  const activeColor = useColorModeValue("Black", "Blue");
-  const inactiveColor = useColorModeValue("White", "gray.700");
-  const activeBg = useColorModeValue("White", "White");
-
-  // Dùng useLocation nếu cần kiểm tra active path theo cách thủ công
-  // const location = useLocation();
-  // const activeRoute = (routePath) =>
-  //   location.pathname.toLowerCase().includes(routePath.toLowerCase());
+  const activeColor = useColorModeValue("blue.500", "blue.300");
+  const inactiveColor = useColorModeValue("gray.800", "gray.500");
 
   return (
-    <Flex direction={direction} spacing={2} gap={2} position="relative">
+    <Flex direction={direction} spacing={2} gap={4} alignItems="center" position="relative">
       {routes &&
         routes.length > 0 &&
         routes.map((route, index) => (
@@ -28,39 +21,34 @@ export default function Links({ routes, direction }) {
             style={{ textDecoration: "none", position: "relative" }}
           >
             {({ isActive }) => (
-              <MotionBox
-                px={2}
-                py={1}
-                borderRadius="md"
-                position="relative"
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 50 }}
-              >
-                {/* Nếu link đang active (hoặc activeRoute trả về true) thì render background highlight */}
-                {(isActive) && (
-                  <MotionBox
-                    layoutId="activeBackground"
-                    position="absolute"
-                    top={0}
-                    left={0}
-                    right={0}
-                    bottom={0}
-                    bg={activeBg}
-                    borderRadius="md"
-                  />
-                )}
+              <Box position="relative" textAlign="center">
                 <Text
-                  position="relative" fontWeight={"bold"}
-                  fontSize={16} color={isActive ? activeColor : inactiveColor}
+                  fontWeight="bold"
+                  fontSize={16}
+                  color={isActive ? activeColor : inactiveColor}
                   py={1}
                   px={2}
-
-                  _hover={{ textColor: "blue" }}
+                  _hover={{ color: activeColor }}
                   transition="all 0.2s ease-in-out"
                 >
                   {route.name}
                 </Text>
-              </MotionBox>
+                {/* Đường line dưới chữ, TRƯỢT qua lại thay vì dãn rộng */}
+                {isActive && (
+                  <MotionBox
+                    layoutId="underline"
+                    position="absolute"
+                    bottom="-2px"
+                    left="0"
+                    transform="translateX(-50%)"
+                    width="100%" // Giữ đúng kích thước chữ
+                    height="2px"
+                    bg={activeColor}
+                    borderRadius="full"
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </Box>
             )}
           </NavLink>
         ))}

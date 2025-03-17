@@ -1,40 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Progress, VStack } from '@chakra-ui/react';
+import React, { useState, useEffect } from "react";
+import { Box, Progress } from "@chakra-ui/react";
 
-const ProgressBar = () => {
+const ProgressBar = ({ isLoading, minLoadingTime = 1000, onComplete }) => {
     const [progress, setProgress] = useState(0);
+    const [startTime, setStartTime] = useState(null);
 
-    // Hàm giả lập tiến trình tải
     useEffect(() => {
-        if (progress === 100) return;
+        if (isLoading) {
+            setProgress(0);
+            setStartTime(performance.now());
 
-        const interval = setInterval(() => {
-            setProgress((prev) => {
-                if (prev < 100) {
-                    return Math.min(prev + 1, 100);
-                }
-                clearInterval(interval);
-                return prev;
-            });
-        }, 5); // Tốc độ tăng tiến trình
+            const interval = setInterval(() => {
+                setProgress((prev) => (prev < 90 ? prev + 5 : prev)); // Tăng dần đến 90%
+            }, 100);
 
-        return () => clearInterval(interval);
-    }, [progress]);
+            return () => clearInterval(interval);
+        }
+    }, [isLoading]);
 
-    return (
-        <VStack>
-            <Box position="fixed" top={0} left={0} width="100%" zIndex="9999">
-                <Progress
-                    value={progress}
-                    size="sm"
-                    colorScheme="blue"  // Màu của indicator
-                    width="100%"
-                    borderRadius="0"
-                    height="4px"
-                />
-            </Box>
-        </VStack>
-    );
+    useEffect(() => {
+        if (!isLoading && startTime) {
+            const elapsedTime = performance.now() - startTime;
+            const remainingTime = Math.max(minLoadingTime - elapsedTime, 0);
+
+            setTimeout(() => {
+                setProgress(100);
+                setTimeout(() => {
+                    setProgress(0);
+                    if (onComplete) onComplete(); // Gọi callback khi hoàn thành
+                }, 300);
+            }, remainingTime);
+        }
+    }, [isLoading, startTime, minLoadingTime, onComplete]);
+
+    return isLoading || progress > 0 ? (
+        <Box position="fixed" top={0} left={0} width="100%" zIndex="9999">
+            <Progress value={progress} size="sm" colorScheme="blue" width="100%" height="4px" />
+        </Box>
+    ) : null;
 };
 
 export default ProgressBar;

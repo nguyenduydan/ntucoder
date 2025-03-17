@@ -232,8 +232,8 @@ namespace api.Infrashtructure.Repositories
                 ImageUrl = course.ImageUrl,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt,
-                Rating = 0, // Có thể cần lấy từ bảng khác nếu có
-                TotalReviews = 0, // Có thể cần lấy từ bảng khác nếu có
+                Rating = 0, 
+                TotalReviews = 0, 
                 Topics = course.Topics.Select(t => new TopicDTO
                 {
                     TopicID = t.TopicID,

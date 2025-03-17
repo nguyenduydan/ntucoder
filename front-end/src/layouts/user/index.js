@@ -4,13 +4,13 @@ import { useColorModeValue } from '@chakra-ui/react';
 import routes from 'routes.js';
 
 // Import layouts
-import Header from 'layouts/user/components/header';
 import Footer from 'layouts/user/components/footer';
 import Navbar from 'layouts/user/components/navbar';
 
 import { Box } from '@chakra-ui/react';
 import Problem from 'views/user/Problem';
 import Course from 'views/user/Course';
+import CourseDetail from 'views/user/Course/components/CourseDetail';
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -46,7 +46,6 @@ export default function Home(props) {
 
     return (
         <Box bg={bg} color={textColor}>
-            <Header />
             <Navbar routes={userRoutes} {...rest} />
             <Box
                 minHeight="60vh"
@@ -84,6 +83,11 @@ export default function Home(props) {
                                 key="course"
                                 path="/course"
                                 element={<Course />}
+                            />
+                            <Route
+                                key="course"
+                                path="/course/:slug"
+                                element={<CourseDetail />}
                             />
                             <Route
                                 key="problem"

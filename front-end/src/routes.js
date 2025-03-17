@@ -22,6 +22,7 @@ import LessonDetail from 'views/admin/lesson/components/Detail';
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
 import Course from 'views/user/Course';
+import CourseDetailUser from 'views/user/Course/components/CourseDetail';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
@@ -135,6 +136,13 @@ const routes = [
     layout: '/user',
     path: '/course',
     component: <Course />,
+    item: [
+      {
+        name: 'Chi tiết khóa học',
+        path: 'detail/:id',
+        component: <CourseDetailUser />,
+      }
+    ]
   },
   {
     name: 'BÀI TẬP',

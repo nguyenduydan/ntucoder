@@ -23,6 +23,7 @@ import {
 } from "components/scrollbar/Scrollbar";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import NTULogo from "assets/img/ntu-coders.png";
+import Auth from "./auth";
 
 function Navbar(props) {
     const { routes } = props;
@@ -31,8 +32,8 @@ function Navbar(props) {
     const btnRef = React.useRef();
 
     // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
-    const bg = useColorModeValue("blue.300", "blue.200");
-    const textColor = useColorModeValue("white", "black");
+    const bg = useColorModeValue("white", "blue.200");
+    const textColor = useColorModeValue("black", "white");
 
     return (
         <Box position="sticky"
@@ -42,10 +43,11 @@ function Navbar(props) {
             bg={bg}
             color={textColor}
             px={{ base: '10px', md: '15px' }}
-            py={3}
+            py={4}
             zIndex='2'
+            boxShadow="lg"
         >
-            <Flex align="center" gap={0} justify={{ base: "space-between", md: "space-evenly" }}>
+            <Flex align="center" gap={0} justify="space-between" >
                 {/* Desktop Navigation Links */}
                 <Flex display={{ base: "none", md: "flex" }} gap={1}>
                     {/* Brand */}
@@ -54,8 +56,9 @@ function Navbar(props) {
                     </Box>
                     <Links direction="row" routes={routes} />
                 </Flex>
-                <Box display={{ base: "none", md: "block" }}>
+                <Box display={{ base: "none", md: "flex" }} gap={5}>
                     <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" />
+                    <Auth />
                 </Box>
                 {/* Mobile Hamburger Menu */}
                 <IconButton
