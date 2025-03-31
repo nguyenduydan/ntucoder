@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Text, Spinner, useToast } from "@chakra-ui/react";
+import { Box, Text, Spinner, useToast,Flex, Image } from "@chakra-ui/react";
 import { getById } from "config/lessonService";
-
+import NodataPng from "assets/img/nodata.png";
 import ScrollToTop from "components/scroll/ScrollToTop";
 
 export default function Lesson() {
@@ -14,6 +14,7 @@ export default function Lesson() {
     useEffect(() => {
         const fetchLesson = async () => {
             setLoading(true);
+
             try {
                 // Lấy lessonId từ slugId ("bai1phucngu-4" -> lấy số 4)
                 const lessonId = slugId.split("-").pop();
@@ -29,7 +30,10 @@ export default function Lesson() {
                     position: "top-right",
                 });
             }
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false);
+            }, 2000); // Giả lập thời gian tải dữ liệu
+
         };
 
         fetchLesson();
@@ -39,14 +43,30 @@ export default function Lesson() {
         <ScrollToTop>
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="6">
                 {loading ? (
-                    <Spinner size="xl" />
+                     <Flex justify="center" align="center" height="50vh">
+                       <Spinner
+                        thickness='4px'
+                        speed='0.3s'
+                        emptyColor='gray.200'
+                        color='blue.500'
+                        size='xl'
+                        />
+                    </Flex>
                 ) : lesson ? (
                     <>
                         <Text fontSize="2xl" fontWeight="bold" mb="4">{lesson.lessonTitle}</Text>
                         <Text fontSize="md" color="gray.600">{lesson.lessonContent}</Text>
                     </>
                 ) : (
-                    <Text fontSize="md" color="gray.500">Không tìm thấy bài học.</Text>
+                    <Flex justify="center" align="center" height="70vh">
+                        <Image
+                            src={NodataPng}
+                            alt="Không có dữ liệu"
+                            h="50%"
+                            objectFit="fill"
+                            backgroundColor="transparent"
+                        />
+                    </Flex>
                 )}
             </Box>
         </ScrollToTop>

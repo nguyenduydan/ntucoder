@@ -6,3 +6,16 @@ body {
 option {
   color: black;
 }
+
+/* Tăng chiều cao thanh tiến trình */
+#nprogress .bar {
+  height: 6px !important;
+  /* Độ dày thanh */
+  background: #0099ff !important;
+  /* Bo góc */
+  box-shadow: 0 0 30px #00eaff;
+  /* Hiệu ứng phát sáng */
+}
+#nprogress .spinner {
+  display: none !important;
+}

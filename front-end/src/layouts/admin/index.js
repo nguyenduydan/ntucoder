@@ -6,18 +6,11 @@ import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
-import { useEffect } from "react";
-import { animateProgress } from "utils/utils";
-import ProgressBar from 'components/loading/loadingBar';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
-  const location = useLocation();
-  const [progress, setProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(true); // Kiểm soát hiển thị nội dung
-
   const { ...rest } = props;
   // states and functions
   const [fixed] = useState(false);
@@ -119,81 +112,66 @@ export default function Dashboard(props) {
   const { onOpen } = useDisclosure();
   document.documentElement.dir = 'ltr';
 
-  useEffect(() => {
-    setProgress(0);
-    setIsLoading(true); // Bắt đầu loading, ẩn nội dung cũ
-
-    animateProgress(setProgress, 800).then(() => {
-      setProgress(100);
-      setTimeout(() => setIsLoading(false), 100); // Đợi 200ms trước khi hiển thị trang mới
-    });
-
-  }, [location]);
-
   return (
     <Box>
-      <ProgressBar progress={progress} />
-      {/* Ẩn toàn bộ nội dung khi đang loading */}
-      {!isLoading && (
-        <Box>
-          <SidebarContext.Provider
-            value={{
-              toggleSidebar,
-              setToggleSidebar,
-            }}
+      <Box>
+        <SidebarContext.Provider
+          value={{
+            toggleSidebar,
+            setToggleSidebar,
+          }}
+        >
+          <Sidebar routes={routes} display="none" {...rest} />
+          <Box
+            float="right"
+            minHeight="100vh"
+            height="100%"
+            overflow="auto"
+            position="relative"
+            maxHeight="100%"
+            w={{ base: "100%", xl: "calc( 100% - 290px )" }}
+            maxWidth={{ base: "100%", xl: "calc( 100% - 290px )" }}
+            transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+            transitionDuration=".2s, .2s, .35s"
+            transitionProperty="top, bottom, width"
+            transitionTimingFunction="linear, linear, ease"
           >
-            <Sidebar routes={routes} display="none" {...rest} />
-            <Box
-              float="right"
-              minHeight="100vh"
-              height="100%"
-              overflow="auto"
-              position="relative"
-              maxHeight="100%"
-              w={{ base: "100%", xl: "calc( 100% - 290px )" }}
-              maxWidth={{ base: "100%", xl: "calc( 100% - 290px )" }}
-              transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-              transitionDuration=".2s, .2s, .35s"
-              transitionProperty="top, bottom, width"
-              transitionTimingFunction="linear, linear, ease"
-            >
-              <Portal>
-                <Box>
-                  <Navbar
-                    onOpen={onOpen}
-                    logoText={"NTU"}
-                    brandText={getActiveRoute(routes)}
-                    secondary={getActiveNavbar(routes)}
-                    message={getActiveNavbarText(routes)}
-                    fixed={fixed}
-                    {...rest}
-                  />
-                </Box>
-              </Portal>
-
-              {getRoute() ? (
-                <Box
-                  mx="auto"
-                  p={{ base: "20px", md: "30px" }}
-                  pe="20px"
-                  minH="90vh"
-                  pt="50px"
-                >
-                  <Routes>
-                    {getRoutes(routes)}
-                    {routes.map((route, index) => (
-                      <Route key={index} path={route.path} element={route.element} />
-                    ))}
-                  </Routes>
-                </Box>
-              ) : null}
+            <Portal>
               <Box>
-                <Footer />
+                <Navbar
+                  onOpen={onOpen}
+                  logoText={"NTU"}
+                  brandText={getActiveRoute(routes)}
+                  secondary={getActiveNavbar(routes)}
+                  message={getActiveNavbarText(routes)}
+                  fixed={fixed}
+                  {...rest}
+                />
               </Box>
+            </Portal>
+
+            {getRoute() ? (
+              <Box
+                mx="auto"
+                p={{ base: "20px", md: "30px" }}
+                pe="20px"
+                minH="90vh"
+                pt="50px"
+              >
+                <Routes>
+                  {getRoutes(routes)}
+                  {routes.map((route, index) => (
+                    <Route key={index} path={route.path} element={route.element} />
+                  ))}
+                </Routes>
+              </Box>
+            ) : null}
+            <Box>
+              <Footer />
             </Box>
-          </SidebarContext.Provider>
-        </Box>
-      )}
+          </Box>
+        </SidebarContext.Provider>
+      </Box>
     </Box>
   );
 }

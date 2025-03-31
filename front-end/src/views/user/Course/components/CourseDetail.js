@@ -9,9 +9,10 @@ import ScrollToTop from "components/scroll/ScrollToTop";
 import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/fa";
 import { getById } from "config/courseService";
 import { getLessons } from "config/topicService";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
-import ProgressBar from "components/loading/loadingBar";
-import { formatCurrency, toSlug, animateProgress } from "utils/utils";
+import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+import { formatCurrency, toSlug } from "utils/utils";
 
 const CourseDetail = () => {
     const { slugId } = useParams();
@@ -22,7 +23,6 @@ const CourseDetail = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const location = useLocation();
-    const [progress, setProgress] = useState(false);
 
     useEffect(() => {
         if (isNaN(courseID)) {
@@ -86,15 +86,15 @@ const CourseDetail = () => {
     }, [courseID, toast, navigate]);
 
 
-    const handleNavigate = async (lesson, setProgress) => {
+    const handleNavigate = (lesson) => {
         if (!lesson || !lesson.lessonTitle || !lesson.lessonID) return;
 
-        setProgress(0); // Reset thanh loading
+        NProgress.start(); // Bắt đầu thanh tiến trình
 
-        // Gọi hàm animateProgress để cập nhật progress và chờ hoàn thành
-        await animateProgress(setProgress, 500);
-
-        navigate(`${location.pathname}/${toSlug(lesson.lessonTitle)}-${lesson.lessonID}`);
+        setTimeout(() => {
+            navigate(`${location.pathname}/${toSlug(lesson.lessonTitle)}-${lesson.lessonID}`);
+            NProgress.done();
+        }, 300);
     };
 
 
@@ -102,6 +102,9 @@ const CourseDetail = () => {
     return (
         <ScrollToTop>
             <Box p={6} maxW="100%" mx="auto">
+                <Button leftIcon={<ArrowBackIcon />} mb={2} colorScheme='blue' variant='ghost' onClick={() => navigate(-1)}>
+                    Trở vể trước
+                </Button>
                 <Flex direction={{ base: "column", md: "row" }} gap={5}>
                     {/* Left Content */}
                     <Box flex={3} minH={570} overflowY="auto" position="static">
@@ -233,10 +236,9 @@ const CourseDetail = () => {
                                                                                     {topic.lessons?.map((lesson) => (
                                                                                         <ListItem
                                                                                             cursor={"pointer"}
-                                                                                            onClick={() => handleNavigate(lesson, setProgress)}
+                                                                                            onClick={() => handleNavigate(lesson)}
                                                                                             key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="md" p={2}
                                                                                         >
-                                                                                            {progress && <ProgressBar progress={progress} />}
                                                                                             <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
                                                                                         </ListItem>
                                                                                     ))}

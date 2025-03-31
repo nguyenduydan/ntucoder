@@ -4,6 +4,8 @@ import { StarIcon } from "@chakra-ui/icons";
 import { darken, lighten } from "@chakra-ui/theme-tools";
 import { useNavigate } from "react-router-dom";
 import { toSlug, getLuminance, formatCurrency } from "utils/utils";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 
 const getTextColor = (bgColor) => getLuminance(bgColor) > 0.5 ? darken(bgColor, 30) : lighten(bgColor, 50);
 
@@ -12,11 +14,19 @@ const CourseCard = ({ course }) => {
     const bgCard = useColorModeValue("white", "navy.900");
     const navigate = useNavigate();
 
+    const handleNagvigate = () => {
+        NProgress.start();
+        setTimeout(() => {
+            navigate(`/course/${toSlug(course.courseName)}-${course.courseID}`);
+            NProgress.done();
+        }, 100);
+    };
+
     return (
         <Box minW={{ md: "20vh", base: "100%" }} borderWidth="1px" bg={bgCard}
             _hover={{ transform: "scale(1.02)", cursor: "pointer" }} transition="all .2s ease-in-out"
             borderRadius="lg" overflow="hidden" boxShadow="md"
-            onClick={() => navigate(`/course/${toSlug(course.courseName)}-${course.courseID}`)}
+            onClick={handleNagvigate}
         >
             <Image src={course.imageUrl || "/avatarSimmmple.png"} alt={course.title} objectFit="cover" h="160px" w="full" />
             <Box p="4">

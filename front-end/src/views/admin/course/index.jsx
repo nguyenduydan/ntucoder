@@ -3,7 +3,9 @@ import { Box, useToast } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-
+//import nProgress from "nprogress";
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
@@ -11,14 +13,15 @@ import {getList} from "config/courseService"
 import {columnsData} from "views/admin/course/components/columnsData"
 import Create from "views/admin/course/components/Create";
 
-export default function CoderIndex() {
+export default function CourseIndex() {
   // State cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prefetchCache, setPrefetchCache] = useState({});
+
+  // Các state khác
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
-  // Các state khác
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
@@ -29,51 +32,51 @@ export default function CoderIndex() {
   // Sử dụng useRef để theo dõi lỗi, tránh hiển thị toast nhiều lần
   const errorShown = useRef(false);
 
-  const fetchPage = useCallback(async (page) => {
-    if (prefetchCache[page]) {
-      setTableData(prefetchCache[page]); // Hiển thị dữ liệu cũ ngay lập tức
-    }
-    setLoading(true);
-    try {
-      const { data, totalPages: totalPagesResp, totalCount } = await getList({
-        page,
-        pageSize,
-        ascending,
-        sortField,
-      });
-
-      if (page === 1) {
-        setTotalPages(totalPagesResp);
-        setTotalRows(totalCount);
-      }
-
-      errorShown.current = false;
-
-      setPrefetchCache((prev) => ({ ...prev, [page]: data }));
-
-      // Chỉ cập nhật khi dữ liệu được tải xong
-      if (page === currentPage) {
-        setTableData(data);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      if (!errorShown.current) {
-        errorShown.current = true;
-        toast({
-          title: "Lỗi khi tải dữ liệu",
-          description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-          position: "top",
-          variant: "left-accent",
+  const fetchPage = useCallback(
+    async (page) => {
+      setLoading(true);
+      nProgress.start();
+      try {
+        const { data, totalPages: totalPagesResp, totalCount } = await getList({
+          page,
+          pageSize,
+          ascending,
+          sortField,
         });
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [pageSize, ascending, sortField, currentPage, toast,prefetchCache]);
+        // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
+        if (page === 1) {
+          setTotalPages(totalPagesResp);
+          setTotalRows(totalCount);
+        }
+        // Reset error flag khi fetch thành công
+        errorShown.current = false;
 
+        setPrefetchCache(prev => ({ ...prev, [page]: data }));
+        return data;
+      } catch (error) {
+        nProgress.done();
+        console.error("Error fetching data:", error);
+        // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
+        if (!errorShown.current) {
+          errorShown.current = true;
+          toast({
+            title: "Lỗi khi tải dữ liệu",
+            description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+            variant: "left-accent",
+          });
+        }
+        return [];
+      } finally {
+        setLoading(false);
+        nProgress.done();
+      }
+    },
+    [pageSize, ascending, sortField, toast]
+  );
 
   const refreshTable = async () => {
     setPrefetchCache({});
@@ -92,21 +95,22 @@ export default function CoderIndex() {
     fetchPage(2);
   }, [fetchPage]);
 
+  // Khi currentPage thay đổi: nếu dữ liệu đã có trong cache thì cập nhật tableData, nếu không thì fetch
   useEffect(() => {
     if (prefetchCache[currentPage]) {
       setTableData(prefetchCache[currentPage]);
     } else {
-      fetchPage(currentPage);
+      fetchPage(currentPage).then((data) => setTableData(data));
     }
-
+    // Prefetch trang tiếp theo (currentPage+1)
     if (currentPage < totalPages && !prefetchCache[currentPage + 1]) {
       fetchPage(currentPage + 1);
     }
+    // Prefetch trang sau đó (currentPage+2)
     if (currentPage + 1 < totalPages && !prefetchCache[currentPage + 2]) {
       fetchPage(currentPage + 2);
     }
   }, [currentPage, prefetchCache, fetchPage, totalPages]);
-
 
   // Sắp xếp dữ liệu
   const handleSort = (field) => {
@@ -144,7 +148,6 @@ export default function CoderIndex() {
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
-
         <ColumnsTable
           columnsData ={columnsData}
           tableData={tableData}

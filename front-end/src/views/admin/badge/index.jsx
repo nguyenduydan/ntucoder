@@ -5,7 +5,8 @@ import {columnsData} from "views/admin/badge/components/columnsData"
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-import ProgressBar from "components/loading/loadingBar";
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
 import CreateBadge from "views/admin/badge/components/Create";
 import Toolbar from "components/menu/ToolBar";
 import {getListBagde} from "config/badgeService"
@@ -32,6 +33,7 @@ export default function CoderIndex() {
   const fetchPage = useCallback(
     async (page) => {
       setLoading(true);
+      nProgress.start();
       try {
         const { data, totalPages: totalPagesResp, totalCount } = await getListBagde({
           page,
@@ -49,6 +51,7 @@ export default function CoderIndex() {
         setPrefetchCache(prev => ({ ...prev, [page]: data }));
         return data;
       } catch (error) {
+        nProgress.done();
         console.error("Error fetching data:", error);
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
@@ -65,6 +68,7 @@ export default function CoderIndex() {
         }
         return [];
       } finally {
+        nProgress.done();
         setLoading(false);
       }
     },
@@ -141,18 +145,6 @@ export default function CoderIndex() {
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
         <CreateBadge isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
-        {/* Hiển thị loading bar nếu cần */}
-        {loading && (
-          <Box
-            w="100%"
-            py="20px"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <ProgressBar />
-          </Box>
-        )}
         <ColumnsTable
           columnsData ={columnsData}
           tableData={tableData}

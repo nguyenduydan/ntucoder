@@ -3,8 +3,8 @@ import { Box, useToast } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-import ProgressBar from "components/loading/loadingBar";
-
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
@@ -33,6 +33,7 @@ export default function CoderIndex() {
 
   const fetchPage = useCallback(
     async (page) => {
+      nProgress.start();
       setLoading(true);
       try {
         const { data, totalPages: totalPagesResp, totalCount } = await getList({
@@ -51,6 +52,7 @@ export default function CoderIndex() {
         setPrefetchCache(prev => ({ ...prev, [page]: data }));
         return data;
       } catch (error) {
+        nProgress.done();
         console.error("Error fetching data:", error);
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
@@ -67,6 +69,7 @@ export default function CoderIndex() {
         }
         return [];
       } finally {
+         nProgress.done();
         setLoading(false);
       }
     },
@@ -143,18 +146,6 @@ export default function CoderIndex() {
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
-        {/* Hiển thị loading bar nếu cần */}
-        {loading && (
-          <Box
-            w="100%"
-            py="20px"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <ProgressBar />
-          </Box>
-        )}
         <ColumnsTable
           columnsData ={columnsData}
           tableData={tableData}

@@ -10,12 +10,13 @@ import {
   Tr,
   Flex,
   Skeleton,
+  Image,
 } from '@chakra-ui/react';
 import * as React from 'react';
 import Card from 'components/card/Card';
 import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
-
+import NodataPng from "assets/img/nodata.png";
 
 export default function ColumnTable({columnsData, tableData, loading, onSort, sortField, ascending, fetchData }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
@@ -75,17 +76,10 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
           </Thead>
           <Tbody>
             {loading ? (
-              // Khi loading, hiển thị 5 skeleton rows
               Array.from({ length: 5 }).map((_, idx) => (
                 <Tr key={`skeleton-${idx}`}>
                   {columnsData.map((column) => (
-                    <Td
-                      key={column.Header}
-                      fontSize={{ sm: '16px' }}
-                      width={column.width || 'auto'}
-                      borderColor="transparent"
-                      padding="12px 15px"
-                    >
+                    <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent" padding="12px 15px">
                       <Skeleton height="20px" />
                     </Td>
                   ))}
@@ -94,24 +88,25 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
             ) : tableData.length === 0 ? (
               <Tr>
                 <Td h="40vh" colSpan={columnsData.length} textAlign="center">
-                  <Text fontSize="20px">Không có dữ liệu, vui lòng thử lại.</Text>
+                  <Flex justify="center" align="center" height="100%">
+                    <Image
+                        src={NodataPng}
+                        alt="Không có dữ liệu"
+                        h="50%"
+                        objectFit="fill"
+                        backgroundColor="transparent"
+                    />
+                    </Flex>
                 </Td>
               </Tr>
             ) : (
               tableData.map((row, index) => (
                 <Tr
-                  _hover={{
-                    bg: colorMode === 'dark' ? 'gray.500' : 'gray.200',
-                  }}
+                  _hover={{ bg: colorMode === 'dark' ? 'gray.500' : 'gray.200' }}
                   key={index}
                 >
                   {columnsData.map((column) => (
-                    <Td
-                      key={column.Header}
-                      fontSize={{ sm: '16px' }}
-                      width={column.width || 'auto'}
-                      borderColor="transparent"
-                    >
+                    <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent">
                       {column.Cell ? (
                         column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
                       ) : (
@@ -123,7 +118,6 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
               ))
             )}
           </Tbody>
-
         </Table>
       </Box>
     </Card>

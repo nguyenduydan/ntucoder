@@ -3,8 +3,8 @@ import { Box, useToast } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-import ProgressBar from "components/loading/loadingBar";
-
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
@@ -33,6 +33,7 @@ export default function CoderIndex() {
 
   const fetchPage = useCallback(
     async (page) => {
+      nProgress.start();
       setLoading(true);
       try {
         const { data, totalPages: totalPagesResp, totalCount } = await getList({
@@ -50,8 +51,10 @@ export default function CoderIndex() {
         errorShown.current = false;
 
         setPrefetchCache(prev => ({ ...prev, [page]: data }));
+
         return data;
       } catch (error) {
+        nProgress.done();
         console.error("Error fetching data:", error);
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
@@ -68,6 +71,7 @@ export default function CoderIndex() {
         }
         return [];
       } finally {
+        nProgress.done();
         setLoading(false);
       }
     },
@@ -83,15 +87,13 @@ export default function CoderIndex() {
     if (totalPages > 2) fetchPage(3);
   };
 
-  // Khi component mount hoặc tiêu chí thay đổi, load trang 1 và 2 cùng lúc
   useEffect(() => {
     setPrefetchCache({});
     setCurrentPage(1);
     fetchPage(1);
-    fetchPage(2);
+    fetchPage(2); // Prefetch trang sau
   }, [fetchPage]);
 
-  // Khi currentPage thay đổi: nếu dữ liệu đã có trong cache thì cập nhật tableData, nếu không thì fetch
   useEffect(() => {
     if (prefetchCache[currentPage]) {
       setTableData(prefetchCache[currentPage]);
@@ -108,7 +110,7 @@ export default function CoderIndex() {
     }
   }, [currentPage, prefetchCache, fetchPage, totalPages]);
 
-  // Sắp xếp dữ liệu
+
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -116,19 +118,16 @@ export default function CoderIndex() {
       setSortField(field);
       setAscending(true);
     }
-    // Khi thay đổi sắp xếp, reset currentPage và cache
     setCurrentPage(1);
     setPrefetchCache({});
   };
 
-  // Thay đổi trang hiện tại
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Thay đổi số lượng phần tử trên mỗi trang
   const handlePageSizeChange = (value) => {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
@@ -144,18 +143,6 @@ export default function CoderIndex() {
         <Toolbar onAdd={onOpen} onSearch />
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
-        {/* Hiển thị loading bar nếu cần */}
-        {loading && (
-          <Box
-            w="100%"
-            py="20px"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <ProgressBar />
-          </Box>
-        )}
         <ColumnsTable
           columnsData ={columnsData}
           tableData={tableData}
