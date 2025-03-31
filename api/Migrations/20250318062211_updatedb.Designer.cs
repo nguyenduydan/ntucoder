@@ -12,7 +12,7 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250317054040_updatedb")]
+    [Migration("20250318062211_updatedb")]
     partial class updatedb
     {
         /// <inheritdoc />
@@ -378,7 +378,7 @@ namespace api.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.ToTable("Enrollment");
+                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Lesson", b =>

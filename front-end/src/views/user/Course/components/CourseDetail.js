@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
     Tabs, TabList, List, ListItem, TabPanels, Tab, TabPanel, useToast,
-    VStack, HStack, Skeleton, SkeletonText,
+    VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel
 } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/fa";
 import { getById } from "config/courseService";
-const formatCurrency = (amount) => amount ?
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount) : "0 VND";
+import { getLessons } from "config/topicService";
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import ProgressBar from "components/loading/loadingBar";
+import { formatCurrency, toSlug, animateProgress } from "utils/utils";
 
 const CourseDetail = () => {
-    const { slug } = useParams();
-    const courseID = parseInt(slug.split("-").pop(), 10);
+    const { slugId } = useParams();
+    const parts = slugId ? slugId.split("-") : [];
+    const courseID = parts.length > 0 ? parseInt(parts.pop(), 10) : NaN; // Lấy phần cuối làm ID
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const toast = useToast();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [progress, setProgress] = useState(false);
 
     useEffect(() => {
         if (isNaN(courseID)) {
@@ -28,14 +34,14 @@ const CourseDetail = () => {
                 isClosable: true,
             });
             setLoading(false);
+            navigate("/course");
             return;
         }
 
         const fetchCourse = async () => {
             try {
                 const response = await getById(courseID);
-                console.log(response);
-                setCourse(response && Object.keys(response).length > 0 ? response : null);
+
                 if (!response || Object.keys(response).length === 0) {
                     toast({
                         title: "Cảnh báo",
@@ -44,7 +50,24 @@ const CourseDetail = () => {
                         duration: 3000,
                         isClosable: true,
                     });
+                    setCourse(null);
+                    return;
                 }
+
+                const topics = response.topics || [];
+
+                const topicsWithLessons = await Promise.all(
+                    topics.map(async (topic) => {
+                        try {
+                            const topicData = await getLessons(topic.topicID);
+                            return { ...topic, lessons: topicData.lessons || [] };
+                        } catch (error) {
+                            return { ...topic, lessons: [] };
+                        }
+                    })
+                );
+
+                setCourse({ ...response, topics: topicsWithLessons });
             } catch (error) {
                 toast({
                     title: "Lỗi",
@@ -60,7 +83,21 @@ const CourseDetail = () => {
         };
 
         fetchCourse();
-    }, [courseID, toast]);
+    }, [courseID, toast, navigate]);
+
+
+    const handleNavigate = async (lesson, setProgress) => {
+        if (!lesson || !lesson.lessonTitle || !lesson.lessonID) return;
+
+        setProgress(0); // Reset thanh loading
+
+        // Gọi hàm animateProgress để cập nhật progress và chờ hoàn thành
+        await animateProgress(setProgress, 500);
+
+        navigate(`${location.pathname}/${toSlug(lesson.lessonTitle)}-${lesson.lessonID}`);
+    };
+
+
 
     return (
         <ScrollToTop>
@@ -172,21 +209,52 @@ const CourseDetail = () => {
                                     {loading ? (
                                         <SkeletonText noOfLines={5} spacing={4} />
                                     ) : (
-                                        <List spacing={3}>
-                                            {course?.topics?.map((topic, index) => (
-                                                <ListItem
-                                                    key={topic.topicID}
-                                                    bg="gray.100"
-                                                    borderRadius="md"
-                                                    p={3}
-                                                    transition="all 0.3s"
-                                                    _hover={{ bg: "gray.300", transform: "scale(1.02)" }}
-                                                >
-                                                    <Text fontSize="lg">
-                                                        <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
-                                                    </Text>
-                                                </ListItem>
-                                            ))}
+                                        <List spacing={0}>
+                                            {Array.isArray(course?.topics) && course.topics.length > 0 ? (
+                                                course.topics.map((topic, index) => (
+                                                    <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md" p={2}>
+                                                        <Accordion allowToggle mt={2}>
+                                                            <AccordionItem key={topic?.topicID} border="none">
+                                                                {({ isExpanded }) => (
+                                                                    <>
+                                                                        <h2>
+                                                                            <AccordionButton _expanded={{ bg: "gray.200" }}>
+                                                                                <Box flex="1" textAlign="left">
+                                                                                    <Text fontSize="lg">
+                                                                                        <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
+                                                                                    </Text>
+                                                                                </Box>
+                                                                                {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
+                                                                            </AccordionButton>
+                                                                        </h2>
+                                                                        <AccordionPanel pb={4}>
+                                                                            {topic.lessons?.length ? (
+                                                                                <List spacing={2}>
+                                                                                    {topic.lessons?.map((lesson) => (
+                                                                                        <ListItem
+                                                                                            cursor={"pointer"}
+                                                                                            onClick={() => handleNavigate(lesson, setProgress)}
+                                                                                            key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="md" p={2}
+                                                                                        >
+                                                                                            {progress && <ProgressBar progress={progress} />}
+                                                                                            <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                        </ListItem>
+                                                                                    ))}
+                                                                                </List>
+                                                                            ) : (
+                                                                                <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>
+                                                                            )}
+
+                                                                        </AccordionPanel>
+                                                                    </>
+                                                                )}
+                                                            </AccordionItem>
+                                                        </Accordion>
+                                                    </ListItem>
+                                                ))
+                                            ) : (
+                                                <Text fontSize="md" color="gray.500">Không có chủ đề nào.</Text>
+                                            )}
                                         </List>
                                     )}
                                 </TabPanel>

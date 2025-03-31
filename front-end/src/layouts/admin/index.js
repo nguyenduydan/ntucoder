@@ -6,22 +6,18 @@ import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
-//import routes
-import CoderIndex from 'views/admin/coder';
-import CoderDetail from 'views/admin/coder/components/Detail';
-import CourseCategoryIndex from 'views/admin/categorycourse/index';
-import CourseIndex from 'views/admin/course/index';
-import CourseDetail from 'views/admin/course/components/Detail';
-import TopicIndex from 'views/admin/topic/index';
-import TopicDetail from 'views/admin/topic/components/Detail';
-import LessonIndex from 'views/admin/lesson/index';
-import LessonDetail from 'views/admin/lesson/components/Detail';
-
+import { useEffect } from "react";
+import { animateProgress } from "utils/utils";
+import ProgressBar from 'components/loading/loadingBar';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
+  const location = useLocation();
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true); // Kiểm soát hiển thị nội dung
+
   const { ...rest } = props;
   // states and functions
   const [fixed] = useState(false);
@@ -122,92 +118,82 @@ export default function Dashboard(props) {
   document.documentElement.dir = 'ltr';
   const { onOpen } = useDisclosure();
   document.documentElement.dir = 'ltr';
+
+  useEffect(() => {
+    setProgress(0);
+    setIsLoading(true); // Bắt đầu loading, ẩn nội dung cũ
+
+    animateProgress(setProgress, 800).then(() => {
+      setProgress(100);
+      setTimeout(() => setIsLoading(false), 100); // Đợi 200ms trước khi hiển thị trang mới
+    });
+
+  }, [location]);
+
   return (
     <Box>
-      <Box>
-        <SidebarContext.Provider
-          value={{
-            toggleSidebar,
-            setToggleSidebar,
-          }}
-        >
-          <Sidebar routes={routes} display="none" {...rest} />
-          <Box
-            float="right"
-            minHeight="100vh"
-            height="100%"
-            overflow="auto"
-            position="relative"
-            maxHeight="100%"
-            w={{ base: '100%', xl: 'calc( 100% - 290px )' }}
-            maxWidth={{ base: '100%', xl: 'calc( 100% - 290px )' }}
-            transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-            transitionDuration=".2s, .2s, .35s"
-            transitionProperty="top, bottom, width"
-            transitionTimingFunction="linear, linear, ease"
+      <ProgressBar progress={progress} />
+      {/* Ẩn toàn bộ nội dung khi đang loading */}
+      {!isLoading && (
+        <Box>
+          <SidebarContext.Provider
+            value={{
+              toggleSidebar,
+              setToggleSidebar,
+            }}
           >
-            <Portal>
+            <Sidebar routes={routes} display="none" {...rest} />
+            <Box
+              float="right"
+              minHeight="100vh"
+              height="100%"
+              overflow="auto"
+              position="relative"
+              maxHeight="100%"
+              w={{ base: "100%", xl: "calc( 100% - 290px )" }}
+              maxWidth={{ base: "100%", xl: "calc( 100% - 290px )" }}
+              transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+              transitionDuration=".2s, .2s, .35s"
+              transitionProperty="top, bottom, width"
+              transitionTimingFunction="linear, linear, ease"
+            >
+              <Portal>
+                <Box>
+                  <Navbar
+                    onOpen={onOpen}
+                    logoText={"NTU"}
+                    brandText={getActiveRoute(routes)}
+                    secondary={getActiveNavbar(routes)}
+                    message={getActiveNavbarText(routes)}
+                    fixed={fixed}
+                    {...rest}
+                  />
+                </Box>
+              </Portal>
+
+              {getRoute() ? (
+                <Box
+                  mx="auto"
+                  p={{ base: "20px", md: "30px" }}
+                  pe="20px"
+                  minH="90vh"
+                  pt="50px"
+                >
+                  <Routes>
+                    {getRoutes(routes)}
+                    {routes.map((route, index) => (
+                      <Route key={index} path={route.path} element={route.element} />
+                    ))}
+                  </Routes>
+                </Box>
+              ) : null}
               <Box>
-                <Navbar
-                  onOpen={onOpen}
-                  logoText={'NTU'}
-                  brandText={getActiveRoute(routes)}
-                  secondary={getActiveNavbar(routes)}
-                  message={getActiveNavbarText(routes)}
-                  fixed={fixed}
-                  {...rest}
-                />
+                <Footer />
               </Box>
-            </Portal>
-
-            {getRoute() ? (
-              <Box
-                mx="auto"
-                p={{ base: '20px', md: '30px' }}
-                pe="20px"
-                minH="90vh"
-                pt="50px"
-              >
-                <Routes>
-                  {getRoutes(routes)}
-                  <Route
-                    key="dashboard"
-                    path="/"
-                    element={<Navigate to="/admin/dashboard" replace />}
-                  />
-                  <Route
-                    key="coder-index"
-                    path="/admin/coder"
-                    element={<CoderIndex />}
-                  />
-                  <Route
-                    key="coder-detail"
-                    path="/admin/coder/detail/:id"
-                    element={<CoderDetail />}
-                  />
-                  {/* Quản lý danh mục khóa học */}
-                  <Route key="course-category" path="/admin/categorycourse" element={<CourseCategoryIndex />} />
-
-                  {/* Quản lý khóa học */}
-                  <Route key="course-index" path="/admin/course" element={<CourseIndex />} />
-                  <Route key="course-detail" path="/admin/course/detail/:id" element={<CourseDetail />} />
-
-                  {/* Quản lý chủ đề (topic) */}
-                  <Route key="topic-index" path="/admin/topic" element={<TopicIndex />} />
-                  <Route key="topic-detail" path="/admin/topic/detail/:id" element={<TopicDetail />} />
-
-                  {/* Quản lý bài học (lesson) */}
-                  <Route key="lesson-index" path="/admin/lesson" element={<LessonIndex />} />
-                  <Route key="lesson-detail" path="/admin/lesson/detail/:id" element={<LessonDetail />} />
-                </Routes>
-              </Box>
-            ) : null}
-            <Box>
-              <Footer />
             </Box>
-          </Box>
-        </SidebarContext.Provider>
-      </Box>
+          </SidebarContext.Provider>
+        </Box>
+      )}
     </Box>
   );
 }

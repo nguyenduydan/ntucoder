@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Box,
     Flex,
@@ -10,12 +10,13 @@ import {
     DrawerOverlay,
     DrawerContent,
     DrawerBody,
-    Stack, Image
+    Stack,
+    Image
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import Links from "./Links"; // Import Links component
-import SearchInput from "../../../components/fields/searchInput"; // Import SearchInput component
+import Links from "./Links";
+import SearchInput from "../../../components/fields/searchInput";
 import {
     renderThumb,
     renderTrack,
@@ -24,34 +25,40 @@ import {
 import { Scrollbars } from "react-custom-scrollbars-2";
 import NTULogo from "assets/img/ntu-coders.png";
 import Auth from "./auth";
+import { useNavigate } from "react-router-dom";
+import LoadingBar from "components/loading/loadingBar";
 
 function Navbar(props) {
     const { routes } = props;
-    // Sử dụng useDisclosure để quản lý trạng thái mở/đóng của mobile menu
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
-    // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
+    const handleNavigate = (path) => {
+        setLoading(true);
+        navigate(path);
+        setLoading(false);
+    };
+
     const bg = useColorModeValue("white", "blue.200");
     const textColor = useColorModeValue("black", "white");
 
     return (
-        <Box position="sticky"
-            top="0" // đặt khoảng cách bằng chiều cao của header
-            left="0"
-            right="0"
-            bg={bg}
-            color={textColor}
-            px={{ base: '10px', md: '15px' }}
-            py={4}
-            zIndex='2'
-            boxShadow="lg"
-        >
-            <Flex align="center" gap={0} justify="space-between" >
+        <Box position="sticky" top="0" left="0" right="0" bg={bg} color={textColor} px={{ base: '10px', md: '15px' }} py={4} zIndex='2' boxShadow="lg">
+            {/* Hiển thị LoadingBar */}
+            {loading && <LoadingBar />}
+            <Flex align="center" gap={0} justify="space-between">
                 {/* Desktop Navigation Links */}
                 <Flex display={{ base: "none", md: "flex" }} gap={1}>
                     {/* Brand */}
-                    <Box fontSize="xl" fontWeight="bold" mr={10}>
+                    <Box
+                        fontSize="xl"
+                        fontWeight="bold"
+                        mr={10}
+                        cursor="pointer"
+                        onClick={() => handleNavigate("/")}
+                    >
                         <Image src={NTULogo} h="40px" />
                     </Box>
                     <Links direction="row" routes={routes} />
@@ -79,8 +86,8 @@ function Navbar(props) {
                         <DrawerCloseButton
                             zIndex="3"
                             onClick={onClose}
-                            color='red'
-                            bg='white'
+                            color="red"
+                            bg="white"
                             _focus={{ boxShadow: "none" }}
                             _hover={{ boxShadow: "none" }}
                         />
@@ -91,8 +98,8 @@ function Navbar(props) {
                                 renderThumbVertical={renderThumb}
                                 renderView={renderView}
                             >
-                                <Stack spacing={3} p={3} my='30px'>
-                                    <Links direction={"column"} routes={routes} />
+                                <Stack spacing={3} p={3} my="30px">
+                                    <Links direction="column" routes={routes} />
                                     <SearchInput width="100px" placeholder="Tìm kiếm... (Ctrl+K)" />
                                 </Stack>
                             </Scrollbars>

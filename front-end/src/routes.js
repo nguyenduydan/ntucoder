@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Icon } from '@chakra-ui/react';
 import {
   MdHome,
@@ -23,10 +21,13 @@ import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
 import Course from 'views/user/Course';
 import CourseDetailUser from 'views/user/Course/components/CourseDetail';
+import CourseCreateUser from 'views/user/Course/components/CreateCourse';
+import Lesson from 'views/user/Lesson';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
 import { FaBookAtlas, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
+
 
 const routes = [
   //Admin Routes
@@ -139,8 +140,18 @@ const routes = [
     item: [
       {
         name: 'Chi tiết khóa học',
-        path: ":slug-:id",
+        path: ":slugId",
         component: <CourseDetailUser />,
+      },
+      {
+        name: 'Tạo khóa học',
+        path: "create",
+        component: <CourseCreateUser />,
+      },
+      {
+        name: 'chi tiết bài học',
+        path: ":slugId/:slugId",
+        component: <Lesson />,
       }
     ]
   },

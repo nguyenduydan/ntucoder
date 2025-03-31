@@ -23,23 +23,14 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-import moment from "moment";
+
 import "moment/locale/vi";
 //import api
 import { getById, update } from "config/courseService";
 import { getList } from "config/courseCategoryService";
 import { getListBagde } from "config/badgeService";
+import { formatDate, formatCurrency } from "utils/utils";
 
-const formatCurrency = (amount) => {
-    return amount
-        ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
-        : "0 VND";
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
-};
 
 
 const CourseDetail = () => {

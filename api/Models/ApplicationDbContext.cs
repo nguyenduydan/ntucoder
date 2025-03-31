@@ -26,6 +26,7 @@ namespace api.Models
         public DbSet <Review> Reviews { get; set; }
         public DbSet <Badge> Badges { get; set; }
         public DbSet <CourseCategory> CourseCategories { get; set; }
+        public DbSet <Enrollment> Enrollments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

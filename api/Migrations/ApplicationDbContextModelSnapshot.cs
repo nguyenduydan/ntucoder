@@ -375,7 +375,7 @@ namespace api.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.ToTable("Enrollment");
+                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Lesson", b =>

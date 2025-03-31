@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useColorModeValue } from '@chakra-ui/react';
 import routes from 'routes.js';
 
@@ -8,9 +8,6 @@ import Footer from 'layouts/user/components/footer';
 import Navbar from 'layouts/user/components/navbar';
 
 import { Box } from '@chakra-ui/react';
-import Problem from 'views/user/Problem';
-import Course from 'views/user/Course';
-import CourseDetail from 'views/user/Course/components/CourseDetail';
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -25,24 +22,21 @@ export default function Home(props) {
     const userRoutes = routes.filter((route) => route.layout === '/user');
 
     // Hàm sinh các Route từ mảng userRoutes
-    const getRoutes = (routesArray) =>
-        routesArray.map((route, key) => {
-            // Nếu route có layout là /user thì trả về một Route
+    const getRoutes = (routes) => {
+        return routes.map((route, key) => {
             if (route.layout === '/user') {
                 return (
-                    <Route
-                        key={key}
-                        path={route.path}
-                        element={route.component}
-                    />
+                    <>
+                        <Route path={`${route.path}`} element={route.component} key={key} />
+                        {route.item && route.item.map((subRoute, subKey) => (
+                            <Route key={subKey} path={`${route.path}/${subRoute.path}`} element={subRoute.component} />
+                        ))}
+                    </>
                 );
-            }
-            // Nếu có thuộc tính collapse (nếu có nested routes) thì xử lý đệ quy
-            if (route.collapse && route.items) {
-                return getRoutes(route.items);
             }
             return null;
         });
+    };
 
     return (
         <Box bg={bg} color={textColor}>
@@ -73,28 +67,12 @@ export default function Home(props) {
                     >
                         <Routes>
                             {getRoutes(userRoutes)}
-                            {/* Ví dụ: Nếu muốn chuyển hướng mặc định */}
-                            <Route
-                                key="home"
-                                path="/"
-                                element={<Navigate to="/" replace />}
-                            />
-                            <Route
-                                key="course"
-                                path="/course"
-                                element={<Course />}
-                            />
-                            <Route
-                                key="course"
-                                path="/course/:slug"
-                                element={<CourseDetail />}
-                            />
-                            <Route
-                                key="problem"
-                                path="/problem"
-                                element={<Problem />}
-                            />
+                            {routes.map((route, index) => (
+                                <Route key={index} path={route.path} element={route.element} />
+                            ))}
                         </Routes>
+
+
                     </Box>
                 )}
             </Box>

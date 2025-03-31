@@ -9,7 +9,6 @@ const MotionBox = motion(Box);
 export default function Links({ routes, direction }) {
   const activeColor = useColorModeValue("blue.500", "blue.300");
   const inactiveColor = useColorModeValue("gray.800", "gray.500");
-
   return (
     <Flex direction={direction} spacing={2} gap={4} alignItems="center" position="relative">
       {routes &&
@@ -40,11 +39,11 @@ export default function Links({ routes, direction }) {
                     position="absolute"
                     bottom="-2px"
                     left="0"
-                    transform="translateX(-50%)"
-                    width="100%" // Giữ đúng kích thước chữ
-                    height="2px"
+                    width="100%"
+                    height="4px"
                     bg={activeColor}
                     borderRadius="full"
+                    initial={false} // Ngăn Framer Motion xử lý layout sai ban đầu
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}

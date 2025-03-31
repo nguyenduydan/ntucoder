@@ -59,6 +59,7 @@ namespace api.Infrashtructure.Repositories
         {
            var topic = await _context.Topics.AsNoTracking()
                 .Include(t => t.Course)
+                .Include(t => t.Lessons)
                 .FirstOrDefaultAsync(t => t.TopicID == id);
 
             if (topic == null)

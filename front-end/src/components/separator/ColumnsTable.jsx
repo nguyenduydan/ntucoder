@@ -38,7 +38,7 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
   return (
     <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX="hidden" overflowY="hidden">
       <Box
-        maxH="50vh" // Đặt chiều cao tối đa cho container của bảng
+        maxH="45vh" // Đặt chiều cao tối đa cho container của bảng
         maxW="100%"
         overflowY="auto" // Cho phép cuộn dọc khi nội dung vượt quá chiều cao
         borderColor={borderColor}

@@ -3,30 +3,9 @@ import { Box, Text, Image, Badge, Flex, useColorModeValue } from "@chakra-ui/rea
 import { StarIcon } from "@chakra-ui/icons";
 import { darken, lighten } from "@chakra-ui/theme-tools";
 import { useNavigate } from "react-router-dom";
-
-const formatCurrency = (amount) => amount ?
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount) : "0 VND";
-
-const getLuminance = (hex) => {
-    hex = hex.replace(/^#/, "");
-    if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
-    const r = parseInt(hex.substring(0, 2), 16) / 255;
-    const g = parseInt(hex.substring(2, 4), 16) / 255;
-    const b = parseInt(hex.substring(4, 6), 16) / 255;
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-};
+import { toSlug, getLuminance, formatCurrency } from "utils/utils";
 
 const getTextColor = (bgColor) => getLuminance(bgColor) > 0.5 ? darken(bgColor, 30) : lighten(bgColor, 50);
-
-const toSlug = (str) => {
-    return str
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // Xóa dấu tiếng Việt
-        .replace(/[^a-z0-9\s-]/g, "") // Xóa ký tự đặc biệt
-        .trim()
-        .replace(/\s+/g, "-"); // Thay khoảng trắng bằng dấu gạch ngang
-};
 
 const CourseCard = ({ course }) => {
     const textColor = getTextColor(course.badgeColor);

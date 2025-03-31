@@ -23,11 +23,11 @@ export default function Course() {
         } catch (error) {
             toast({
                 title: "Lỗi khi lấy dữ liệu",
-                description: "Không thể tải danh sách khóa học. Vui lòng thử lại sau.",
                 status: "error",
-                duration: 3000,
+                duration: 1000,
                 isClosable: true,
-                position: "top",
+                position: "top-right",
+                variant: "top-accent"
             });
             setLoading(false);
         }
@@ -43,13 +43,13 @@ export default function Course() {
         <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="6">
             <Text fontSize="2xl" fontWeight="bold" mb="4">Danh sách khóa học</Text>
             <Tabs variant="unstyled">
-                <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={10} py={2} px={10}>
-                    <Tab px={2} fontWeight="bold" _selected={{ color: textSelect }}>Tất cả</Tab>
+                <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>
+                    <Tab px={2} _selected={{ color: textSelect, fontWeight:"bold" }}>Tất cả khóa học</Tab>
                     {categories.map((category, index) => (
-                        <Tab px={2} key={index} fontWeight="bold" _selected={{ color: textSelect }}>{category}</Tab>
+                        <Tab px={2} key={index} _selected={{ color: textSelect, fontWeight:"bold" }}>{category}</Tab>
                     ))}
                 </TabList>
-                <TabIndicator mt='-3vh' height='2px' bg='blue.500' borderRadius='1px' />
+                <TabIndicator mt='-3vh' height='2px' bg='blue.500' borderRadius='full' />
                 <TabPanels>
                     <TabPanel>
                         {loading ? <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>

@@ -54,6 +54,17 @@ export const getById = async (id) => {
     }
 };
 
+export const getLessons = async (id) => {
+    try {
+        const response = await api.get(`/Topic/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching Topic lessons:", error);
+        throw error;
+    }
+
+};
+
 /**
  * Gửi yêu cầu tạo mới người dùng (Topic).
  *
