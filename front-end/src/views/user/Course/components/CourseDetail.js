@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
     Tabs, TabList, List, ListItem, TabPanels, Tab, TabPanel, useToast,
@@ -10,9 +10,8 @@ import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/f
 import { getById } from "config/courseService";
 import { getLessons } from "config/topicService";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-import { formatCurrency, toSlug } from "utils/utils";
+import { FaRegFileCode } from "react-icons/fa";
+import { formatCurrency } from "utils/utils";
 
 const CourseDetail = () => {
     const { slugId } = useParams();
@@ -85,23 +84,9 @@ const CourseDetail = () => {
         fetchCourse();
     }, [courseID, toast, navigate]);
 
-
-    const handleNavigate = (lesson) => {
-        if (!lesson || !lesson.lessonTitle || !lesson.lessonID) return;
-
-        NProgress.start(); // Bắt đầu thanh tiến trình
-
-        setTimeout(() => {
-            navigate(`${location.pathname}/${toSlug(lesson.lessonTitle)}-${lesson.lessonID}`);
-            NProgress.done();
-        }, 300);
-    };
-
-
-
     return (
         <ScrollToTop>
-            <Box p={6} maxW="100%" mx="auto">
+            <Box p={6} maxW="100%" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
                 <Button leftIcon={<ArrowBackIcon />} mb={2} colorScheme='blue' variant='ghost' onClick={() => navigate(-1)}>
                     Trở vể trước
                 </Button>
@@ -226,6 +211,9 @@ const CourseDetail = () => {
                                                                                     <Text fontSize="lg">
                                                                                         <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
                                                                                     </Text>
+                                                                                    <Flex alignItems='center' gap={2} fontSize="sm">
+                                                                                        <Text as='span'><FaRegFileCode /></Text>Tổng số bài học: {topic?.lessons?.length || 0}
+                                                                                    </Flex>
                                                                                 </Box>
                                                                                 {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
                                                                             </AccordionButton>
@@ -234,12 +222,16 @@ const CourseDetail = () => {
                                                                             {topic.lessons?.length ? (
                                                                                 <List spacing={2}>
                                                                                     {topic.lessons?.map((lesson) => (
-                                                                                        <ListItem
-                                                                                            cursor={"pointer"}
-                                                                                            onClick={() => handleNavigate(lesson)}
-                                                                                            key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="md" p={2}
-                                                                                        >
-                                                                                            <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                        <ListItem key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="md" p={2}>
+                                                                                            <NavLink
+                                                                                                to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
+                                                                                                style={({ isActive }) => ({
+                                                                                                    textDecoration: 'none',
+                                                                                                    color: isActive ? 'blue.500' : 'inherit', // Thay đổi màu sắc nếu link đang active
+                                                                                                })}
+                                                                                            >
+                                                                                                <Text fontSize="md" cursor="pointer">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                            </NavLink>
                                                                                         </ListItem>
                                                                                     ))}
                                                                                 </List>
@@ -275,8 +267,8 @@ const CourseDetail = () => {
                             w="300px"
                             maxH="max-content"
                             position={{ base: "static", md: "fixed" }}
-                            right="220px"
-                            top="115px"
+                            right="200px"
+                            top="135px"
                             boxShadow="lg"
                         >
                             <Flex mt="1" pb={3} align="center" justify="space-between" borderBottomWidth={2} borderBottomColor="gray.600">

@@ -6,7 +6,6 @@ import routes from 'routes.js';
 // Import layouts
 import Footer from 'layouts/user/components/footer';
 import Navbar from 'layouts/user/components/navbar';
-
 import { Box } from '@chakra-ui/react';
 
 export default function Home(props) {
@@ -49,7 +48,6 @@ export default function Home(props) {
                 maxHeight="100%"
                 bg={bg}
                 color={textColor}
-                w={{ lg: "calc(100% - 360px)", md: "100%" }}
                 mx={{ lg: "auto", md: "0" }}
                 transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
                 transitionDuration=".2s, .2s, .35s"
@@ -58,11 +56,8 @@ export default function Home(props) {
             >
                 {getRoute() && (
                     <Box
-                        mx="auto"
-                        p={{ base: '20px', md: '20px' }}
-                        pe="20px"
+                        mx='auto'
                         minH="60vh"
-                        pt="50px"
                         w="100%"
                     >
                         <Routes>
@@ -71,8 +66,6 @@ export default function Home(props) {
                                 <Route key={index} path={route.path} element={route.element} />
                             ))}
                         </Routes>
-
-
                     </Box>
                 )}
             </Box>

@@ -19,3 +19,18 @@ option {
 #nprogress .spinner {
   display: none !important;
 }
+
+.split-container {
+  display: flex;
+  height: 78vh;
+}
+
+.split-container>div {
+  overflow: auto;
+}
+
+.split-container .gutter {
+  background-color: #ccc;
+  cursor: col-resize;
+  width: 10px;
+}

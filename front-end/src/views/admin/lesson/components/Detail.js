@@ -55,6 +55,21 @@ const LessonDetail = () => {
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
+    const editorConfig = {
+        buttons: [
+            'bold', 'italic', 'underline', 'strikethrough', 'ul', 'ol',
+            'image', 'video', 'link', 'align', 'justify', 'source', 'clean',
+        ],
+        uploader: {
+            insertImageAsBase64URI: true, // Chèn ảnh dưới dạng Base64
+        },
+        // Cấu hình cho phép chèn video
+        video: {
+            // Tùy chỉnh các cài đặt video nếu cần
+            url: true, // Cho phép nhập URL video
+        },
+        // Các tùy chọn khác có thể thêm vào
+    };
 
     const fetchLessonDetail = useCallback(async () => {
         try {
@@ -294,17 +309,15 @@ const LessonDetail = () => {
                                 {editField === "lessonContent" ? (
                                     <Box width="100%">
                                         <JoditEditor
-                                            textColor={textColor}
-                                            key={lesson.lessonID}
                                             ref={editor}
-                                            value={editableValues.lessonContent || ""}
+                                            value={editableValues.lessonContent}
+                                            config={editorConfig}
                                             onChange={(newContent) => handleInputChange("lessonContent", newContent)}
-                                            onBlur={() => setEditField(null)}
                                             autoFocus
                                         />
                                     </Box>
                                 ) : (
-                                    <Box width="max-content">
+                                    <Box width="max-content" overflowY={"auto"} maxHeight="300px">
                                         <Text fontSize="lg">
                                             <strong>Nội dung bài học:</strong>
                                             <Box dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.lessonContent || "Chưa có thông tin") }} />

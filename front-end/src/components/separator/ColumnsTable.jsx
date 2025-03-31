@@ -18,10 +18,12 @@ import { BiSort } from 'react-icons/bi';
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
 import NodataPng from "assets/img/nodata.png";
 
-export default function ColumnTable({columnsData, tableData, loading, onSort, sortField, ascending, fetchData }) {
+export default function ColumnTable({ columnsData, tableData, loading, onSort, sortField, ascending, fetchData }) {
   const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
   const textColor = colorMode === 'light' ? 'black' : 'white'; // Đổi màu text
   const borderColor = colorMode === 'light' ? 'gray.200' : 'whiteAlpha.300';
+
+  const maxLength = 100; // Giới hạn ký tự
 
   const renderSortIcon = (field) => {
     if (sortField !== field) return <BiSort size="20px" />;
@@ -85,37 +87,39 @@ export default function ColumnTable({columnsData, tableData, loading, onSort, so
                   ))}
                 </Tr>
               ))
-            ) : tableData.length === 0 ? (
+            ) : tableData.length > 0 ? ( // Chỉ hiển thị dữ liệu nếu có
+              tableData.map((row, index) => (
+                <Tr _hover={{ bg: colorMode === 'dark' ? 'gray.500' : 'gray.200' }} key={index}>
+                  {columnsData.map((column) => {
+                    const content = row[column.accessor] || 'N/A'; // Lấy giá trị từ row[column.accessor]
+                    const truncatedContent = content.length > maxLength ? content.slice(0, maxLength) + '...' : content; // Cắt chuỗi nếu cần
+
+                    return (
+                      <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent">
+                        {column.Cell ? (
+                          column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
+                        ) : (
+                          <Text color={textColor}>{truncatedContent}</Text>
+                        )}
+                      </Td>
+                    );
+                  })}
+                </Tr>
+              ))
+            ) : (
               <Tr>
                 <Td h="40vh" colSpan={columnsData.length} textAlign="center">
                   <Flex justify="center" align="center" height="100%">
                     <Image
-                        src={NodataPng}
-                        alt="Không có dữ liệu"
-                        h="50%"
-                        objectFit="fill"
-                        backgroundColor="transparent"
+                      src={NodataPng}
+                      alt="Không có dữ liệu"
+                      h="50%"
+                      objectFit="contain"
+                      backgroundColor="transparent"
                     />
-                    </Flex>
+                  </Flex>
                 </Td>
               </Tr>
-            ) : (
-              tableData.map((row, index) => (
-                <Tr
-                  _hover={{ bg: colorMode === 'dark' ? 'gray.500' : 'gray.200' }}
-                  key={index}
-                >
-                  {columnsData.map((column) => (
-                    <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent">
-                      {column.Cell ? (
-                        column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
-                      ) : (
-                        <Text color={textColor}>{row[column.accessor] || 'N/A'}</Text>
-                      )}
-                    </Td>
-                  ))}
-                </Tr>
-              ))
             )}
           </Tbody>
         </Table>

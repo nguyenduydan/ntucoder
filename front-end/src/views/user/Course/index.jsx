@@ -40,7 +40,7 @@ export default function Course() {
 
     return (
         <ScrollToTop>
-        <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="6">
+        <Box pt={{ base: "130px", md: "80px", xl: "80px" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
             <Text fontSize="2xl" fontWeight="bold" mb="4">Danh sách khóa học</Text>
             <Tabs variant="unstyled">
                 <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>
