@@ -82,7 +82,8 @@ namespace api.Infrashtructure.Repositories
                     LessonID = l.LessonID,
                     LessonContent = l.LessonContent,
                     LessonTitle = l.LessonTitle,
-
+                    Status = l.Status,
+                    CreatedAt = l.CreatedAt
                 }).ToList(),
             };
         }

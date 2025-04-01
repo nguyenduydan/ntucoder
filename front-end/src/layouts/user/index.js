@@ -41,7 +41,7 @@ export default function Home(props) {
         <Box bg={bg} color={textColor}>
             <Navbar routes={userRoutes} {...rest} />
             <Box
-                minHeight="60vh"
+                minHeight="85vh"
                 height="100%"
                 overflow="auto"
                 position="relative"

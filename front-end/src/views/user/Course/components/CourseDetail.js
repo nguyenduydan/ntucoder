@@ -59,8 +59,11 @@ const CourseDetail = () => {
                     topics.map(async (topic) => {
                         try {
                             const topicData = await getLessons(topic.topicID);
-                            return { ...topic, lessons: topicData.lessons || [] };
+                            const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
+
+                            return { ...topic, lessons: filteredLessons };
                         } catch (error) {
+                            console.log("Error fetching lessons:", error); // Xử lý lỗi nếu có
                             return { ...topic, lessons: [] };
                         }
                     })
@@ -206,8 +209,8 @@ const CourseDetail = () => {
                                                                 {({ isExpanded }) => (
                                                                     <>
                                                                         <h2>
-                                                                            <AccordionButton _expanded={{ bg: "gray.200" }}>
-                                                                                <Box flex="1" textAlign="left">
+                                                                            <AccordionButton _expanded={{ bg: "gray.200" }} borderRadius="sm">
+                                                                                <Box flex="1" textAlign="left" >
                                                                                     <Text fontSize="lg">
                                                                                         <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
                                                                                     </Text>
@@ -222,7 +225,7 @@ const CourseDetail = () => {
                                                                             {topic.lessons?.length ? (
                                                                                 <List spacing={2}>
                                                                                     {topic.lessons?.map((lesson) => (
-                                                                                        <ListItem key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="md" p={2}>
+                                                                                        <ListItem cursor="pointer" _hover={{ bg: "gray.300", transform: "scale(1.01)" }} transition="all .2s ease-in-out" key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="sm" p={2}>
                                                                                             <NavLink
                                                                                                 to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
                                                                                                 style={({ isActive }) => ({
@@ -230,7 +233,7 @@ const CourseDetail = () => {
                                                                                                     color: isActive ? 'blue.500' : 'inherit', // Thay đổi màu sắc nếu link đang active
                                                                                                 })}
                                                                                             >
-                                                                                                <Text fontSize="md" cursor="pointer">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                                <Text fontSize="md" >📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
                                                                                             </NavLink>
                                                                                         </ListItem>
                                                                                     ))}

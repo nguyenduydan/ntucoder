@@ -9,7 +9,7 @@ option {
 
 /* Tăng chiều cao thanh tiến trình */
 #nprogress .bar {
-  height: 6px !important;
+  height: 4px !important;
   /* Độ dày thanh */
   background: #0099ff !important;
   /* Bo góc */
@@ -23,6 +23,7 @@ option {
 .split-container {
   display: flex;
   height: 78vh;
+  width: 100%;
 }
 
 .split-container>div {
