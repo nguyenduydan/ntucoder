@@ -43,19 +43,23 @@ export default function CourseIndex() {
           ascending,
           sortField,
         });
+
         // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
         if (page === 1) {
           setTotalPages(totalPagesResp);
           setTotalRows(totalCount);
         }
+
         // Reset error flag khi fetch thành công
         errorShown.current = false;
 
-        setPrefetchCache(prev => ({ ...prev, [page]: data }));
+        // Cập nhật cache
+        setPrefetchCache((prev) => ({ ...prev, [page]: data }));
         return data;
       } catch (error) {
-        nProgress.done();
         console.error("Error fetching data:", error);
+        nProgress.done();
+
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
           errorShown.current = true;
@@ -69,6 +73,7 @@ export default function CourseIndex() {
             variant: "left-accent",
           });
         }
+
         return [];
       } finally {
         setLoading(false);
@@ -78,38 +83,50 @@ export default function CourseIndex() {
     [pageSize, ascending, sortField, toast]
   );
 
+  // Refresh table khi cần thiết
   const refreshTable = async () => {
     setPrefetchCache({});
     setCurrentPage(1);
     const data = await fetchPage(1);
     setTableData(data);
-    if (totalPages > 1) fetchPage(2);
-    if (totalPages > 2) fetchPage(3);
   };
 
-  // Khi component mount hoặc tiêu chí thay đổi, load trang 1 và 2 cùng lúc
+  // Khi component mount hoặc tiêu chí thay đổi, chỉ tải trang 1 và 2
   useEffect(() => {
-    setPrefetchCache({});
-    setCurrentPage(1);
-    fetchPage(1);
-    fetchPage(2);
+    const loadData = async () => {
+      setPrefetchCache({});
+      setCurrentPage(1);
+      const data = await fetchPage(1);
+      setTableData(data);
+    };
+
+    loadData();
   }, [fetchPage]);
 
   // Khi currentPage thay đổi: nếu dữ liệu đã có trong cache thì cập nhật tableData, nếu không thì fetch
   useEffect(() => {
-    if (prefetchCache[currentPage]) {
-      setTableData(prefetchCache[currentPage]);
-    } else {
-      fetchPage(currentPage).then((data) => setTableData(data));
-    }
-    // Prefetch trang tiếp theo (currentPage+1)
-    if (currentPage < totalPages && !prefetchCache[currentPage + 1]) {
-      fetchPage(currentPage + 1);
-    }
-    // Prefetch trang sau đó (currentPage+2)
-    if (currentPage + 1 < totalPages && !prefetchCache[currentPage + 2]) {
-      fetchPage(currentPage + 2);
-    }
+    const fetchCurrentPage = async () => {
+      // Nếu dữ liệu cho currentPage đã có trong cache thì chỉ cần sử dụng cache
+      if (prefetchCache[currentPage]) {
+        setTableData(prefetchCache[currentPage]);
+      } else {
+        // Fetch dữ liệu nếu chưa có
+        const data = await fetchPage(currentPage);
+        setTableData(data);
+      }
+
+      // Prefetch trang tiếp theo (currentPage + 1) và trang sau đó (currentPage + 2) nếu cần
+      if (currentPage < totalPages) {
+        if (!prefetchCache[currentPage + 1]) {
+          fetchPage(currentPage + 1);
+        }
+        if (currentPage + 1 < totalPages && !prefetchCache[currentPage + 2]) {
+          fetchPage(currentPage + 2);
+        }
+      }
+    };
+
+    fetchCurrentPage();
   }, [currentPage, prefetchCache, fetchPage, totalPages]);
 
   // Sắp xếp dữ liệu
@@ -137,10 +154,11 @@ export default function CourseIndex() {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
       setPageSize(newPageSize);
-      setCurrentPage(1);
+      setCurrentPage(1); // Reset trang về 1 khi thay đổi pageSize
       setPrefetchCache({});
     }
   };
+
 
   return (
     <ScrollToTop>

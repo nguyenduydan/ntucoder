@@ -196,6 +196,7 @@ const CourseDetail = () => {
                                 <TabPanel>
                                     {loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Text>Giới thiệu nội dung khóa học...</Text>}
                                 </TabPanel>
+                                {/* Nội dung giáo trình */}
                                 <TabPanel>
                                     {loading ? (
                                         <SkeletonText noOfLines={5} spacing={4} />
@@ -203,14 +204,14 @@ const CourseDetail = () => {
                                         <List spacing={0}>
                                             {Array.isArray(course?.topics) && course.topics.length > 0 ? (
                                                 course.topics.map((topic, index) => (
-                                                    <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md" p={2}>
-                                                        <Accordion allowToggle mt={2}>
+                                                    <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md">
+                                                        <Accordion allowToggle>
                                                             <AccordionItem key={topic?.topicID} border="none">
                                                                 {({ isExpanded }) => (
                                                                     <>
                                                                         <h2>
                                                                             <AccordionButton _expanded={{ bg: "gray.200" }} borderRadius="sm">
-                                                                                <Box flex="1" textAlign="left" >
+                                                                                <Box flex="1" textAlign="left" borderBottomWidth={2} borderStyle="dashed" py={2}>
                                                                                     <Text fontSize="lg">
                                                                                         <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
                                                                                     </Text>

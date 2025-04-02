@@ -87,7 +87,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         bg="transparent"
                         color={textColor}
                     />
-                    <List px={4} maxH="50vh" overflowY="auto">
+                    <List ps={4} maxH="50vh" overflowY="auto">
                         {filteredPages.map((page, index) => (
                             <ListItem
                                 key={page.path}  // Sử dụng path làm key

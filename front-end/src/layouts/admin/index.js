@@ -98,19 +98,19 @@ export default function Dashboard(props) {
   const getRoutes = (routes) => {
     return routes.flatMap((route, key) => {
       if (route.layout === '/admin') {
-        let mainRoute = <Route path={route.path} element={route.component} key={key} />;
+        let mainRoute = <Route key={key} path={route.path} element={route.component} />;
 
-        let subRoutes = route.items
-          ? route.items.map((subRoute, subKey) => (
+        let subRoutes = route.item
+          ? route.item.map((subRoute, subKey) => (
             <Route
               key={`${key}-${subKey}`}
-              path={`${route.path}${subRoute.path}`}
+              path={`${route.path}/${subRoute.path}`}
               element={subRoute.component}
             />
           ))
           : [];
 
-        return [mainRoute, ...subRoutes].filter(Boolean);
+        return [mainRoute, ...subRoutes];
       }
       return [];
     });
@@ -165,7 +165,7 @@ export default function Dashboard(props) {
               >
                 <Routes>
                   {getRoutes(routes)}
-                  <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
                 </Routes>
               </Box>
             ) : null}

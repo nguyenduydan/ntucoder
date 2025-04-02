@@ -23,7 +23,7 @@ import ProgressBar from "components/loading/loadingBar";
 import moment from "moment";
 import "moment/locale/vi";
 import JoditEditor from "jodit-react";
-import DOMPurify from "dompurify";
+import sanitizeHtml from "utils/sanitizedHTML";
 //import API
 import { getById, update } from "config/lessonService";
 import { getList } from "config/topicService";
@@ -307,7 +307,7 @@ const LessonDetail = () => {
                         <Box width="100%" borderTopWidth={2} pt={5} px={5}>
                             <Flex align="center">
                                 {editField === "lessonContent" ? (
-                                    <Box width="100%">
+                                    <Box width="100%" overflowY={"auto"} maxHeight="500px">
                                         <JoditEditor
                                             ref={editor}
                                             value={editableValues.lessonContent}
@@ -317,10 +317,10 @@ const LessonDetail = () => {
                                         />
                                     </Box>
                                 ) : (
-                                    <Box width="max-content" overflowY={"auto"} maxHeight="300px">
+                                    <Box width="max-content">
                                         <Text fontSize="lg">
                                             <strong>Nội dung bài học:</strong>
-                                            <Box dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.lessonContent || "Chưa có thông tin") }} />
+                                            <Box overflowY={"auto"} maxHeight="300px" sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(lesson?.lessonContent) }} />
                                         </Text>
                                     </Box>
                                 )}
