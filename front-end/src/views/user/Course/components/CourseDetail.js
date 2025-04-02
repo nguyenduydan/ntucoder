@@ -12,6 +12,7 @@ import { getLessons } from "config/topicService";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "utils/utils";
+import { useTitle } from "utils/TitleContext";
 
 const CourseDetail = () => {
     const { slugId } = useParams();
@@ -86,6 +87,9 @@ const CourseDetail = () => {
 
         fetchCourse();
     }, [courseID, toast, navigate]);
+
+    // Set title for the page
+    useTitle(course?.courseName || "Khóa học");
 
     return (
         <ScrollToTop>

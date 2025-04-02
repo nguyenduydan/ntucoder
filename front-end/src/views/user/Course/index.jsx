@@ -5,9 +5,11 @@ import { getList } from "config/courseService";
 import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
 import ScrollToTop from "components/scroll/ScrollToTop";
+import { useTitle } from "utils/TitleContext";
 
 
 export default function Course() {
+    useTitle("Khóa học");
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const toast = useToast();

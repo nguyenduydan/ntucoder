@@ -13,6 +13,7 @@ export const columnsData = [
   {
     Header: "Tên nhãn",
     accessor: "name",
+    sortable: true,
   },
   {
     Header: "Mô tả",

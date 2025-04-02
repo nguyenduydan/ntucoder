@@ -3,16 +3,17 @@ import { Box, useToast } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-import nProgress from "nprogress";
-import "nprogress/nprogress.css";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
 import {getList} from "config/lessonService"
 import {columnsData} from "views/admin/lesson/components/columnsData"
 import Create from "views/admin/lesson/components/Create";
+import { useTitle } from "utils/TitleContext";
+
 
 export default function CoderIndex() {
+  useTitle("Quản lý bài học");
   // State cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +34,6 @@ export default function CoderIndex() {
 
   const fetchPage = useCallback(
     async (page) => {
-      nProgress.start();
       setLoading(true);
       try {
         const { data, totalPages: totalPagesResp, totalCount } = await getList({
@@ -53,7 +53,6 @@ export default function CoderIndex() {
         setPrefetchCache(prev => ({ ...prev, [page]: data }));
         return data;
       } catch (error) {
-        nProgress.done();
         console.error("Error fetching data:", error);
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
@@ -70,7 +69,6 @@ export default function CoderIndex() {
         }
         return [];
       } finally {
-        nProgress.done();
         setLoading(false);
       }
     },

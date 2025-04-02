@@ -38,6 +38,10 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
     );
   };
 
+  const CustomCell = ({ column, row, index, fetchData }) => {
+    return column.Cell ? column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData }) : row[column.accessor] || 'N/A';
+  };
+
   return (
     <Card flexDirection="column" w="100%" px="0px" boxShadow="lg" overflowX="hidden" overflowY="hidden">
       <Box
@@ -66,11 +70,11 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                     <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
                       {column.Header}
                     </Text>
-                    {(column.accessor === 'userName' || column.accessor === 'coderName') && onSort && (
-                      <Box onClick={() => onSort(column.accessor)} cursor="pointer">
-                        {renderSortIcon(column.accessor)}
-                      </Box>
-                    )}
+                     {column.sortable && sortField && ( // Chỉ hiển thị biểu tượng sắp xếp nếu column có sortable và sortField có giá trị
+                        <Box onClick={() => onSort && onSort(column.accessor)} cursor="pointer">
+                          {renderSortIcon(column.accessor)}
+                        </Box>
+                      )}
                   </Flex>
                 </Th>
               ))}
@@ -97,7 +101,7 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                     return (
                       <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent">
                         {column.Cell ? (
-                          column.Cell({ value: row[column.accessor], rowIndex: index, row, fetchData })
+                          <CustomCell column={column} row={row} index={index} fetchData={fetchData} />
                         ) : (
                           <Text color={textColor}>{truncatedContent}</Text>
                         )}

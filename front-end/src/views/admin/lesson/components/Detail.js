@@ -314,6 +314,7 @@ const LessonDetail = () => {
                                             config={editorConfig}
                                             onChange={(newContent) => handleInputChange("lessonContent", newContent)}
                                             autoFocus
+                                            style={{ width: "100%", minHeight: "300px" }}
                                         />
                                     </Box>
                                 ) : (

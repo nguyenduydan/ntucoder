@@ -13,10 +13,12 @@ export const columnsData = [
   {
     Header: "Tài khoản",
     accessor: "userName",
+    sortable: true,
   },
   {
     Header: "Tên người dùng",
     accessor: "coderName",
+    sortable: true,
   },
   {
     Header: "Email",

@@ -4,8 +4,6 @@ import { StarIcon } from "@chakra-ui/icons";
 import { darken, lighten } from "@chakra-ui/theme-tools";
 import { useNavigate } from "react-router-dom";
 import { toSlug, getLuminance, formatCurrency } from "utils/utils";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
 
 const getTextColor = (bgColor) => getLuminance(bgColor) > 0.5 ? darken(bgColor, 30) : lighten(bgColor, 50);
 
@@ -15,10 +13,8 @@ const CourseCard = ({ course }) => {
     const navigate = useNavigate();
 
     const handleNagvigate = () => {
-        NProgress.start();
         setTimeout(() => {
             navigate(`/course/${toSlug(course.courseName)}-${course.courseID}`);
-            NProgress.done();
         }, 100);
     };
 

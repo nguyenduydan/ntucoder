@@ -19,7 +19,7 @@ export function SearchBar({ onOpen, ...rest }) { // Nhận props onOpen từ cha
         <IconButton
           bg="inherit"
           borderRadius="inherit"
-          _hover="none"
+          _hover={{ background: "transparent" }}
           _active={{ bg: "inherit", transform: "none", borderColor: "transparent" }}
           _focus={{ boxShadow: "none" }}
           icon={<SearchIcon color={searchIconColor} w="15px" h="15px" />}

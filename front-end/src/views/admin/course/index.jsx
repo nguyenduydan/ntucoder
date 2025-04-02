@@ -3,17 +3,16 @@ import { Box, useToast } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
-//import nProgress from "nprogress";
-import nProgress from "nprogress";
-import "nprogress/nprogress.css";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
 import {getList} from "config/courseService"
 import {columnsData} from "views/admin/course/components/columnsData"
 import Create from "views/admin/course/components/Create";
+import { useTitle } from "utils/TitleContext";
 
 export default function CourseIndex() {
+  useTitle("Quản lý khóa học");
   // State cho dữ liệu bảng
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +34,6 @@ export default function CourseIndex() {
   const fetchPage = useCallback(
     async (page) => {
       setLoading(true);
-      nProgress.start();
       try {
         const { data, totalPages: totalPagesResp, totalCount } = await getList({
           page,
@@ -58,7 +56,6 @@ export default function CourseIndex() {
         return data;
       } catch (error) {
         console.error("Error fetching data:", error);
-        nProgress.done();
 
         // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
         if (!errorShown.current) {
@@ -77,7 +74,6 @@ export default function CourseIndex() {
         return [];
       } finally {
         setLoading(false);
-        nProgress.done();
       }
     },
     [pageSize, ascending, sortField, toast]

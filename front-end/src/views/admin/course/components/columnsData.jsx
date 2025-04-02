@@ -13,14 +13,17 @@ export const columnsData = [
   {
     Header: "Tên khóa học",
     accessor: "courseName",
+    sortable: true
   },
   {
     Header: "Loại khóa học",
     accessor: "courseCategoryName",
+    sortable: true,
   },
   {
     Header: "Giá hiện tại",
     accessor: "fee",
+    sortable: true,
     Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
   },
   {

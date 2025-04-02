@@ -12,6 +12,7 @@ export const columnsData = [
   {
     Header: "Tên loại khóa học",
     accessor: "name",
+    sortable: true,
   },
   {
     Header: "Thứ tự",

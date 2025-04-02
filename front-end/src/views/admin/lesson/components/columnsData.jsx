@@ -12,7 +12,8 @@ export const columnsData = [
   },
   {
     Header: "Tên bài học",
-    accessor: "lessonTitle"
+    accessor: "lessonTitle",
+    sortable: true,
   },
   {
     Header: "Nội dung",

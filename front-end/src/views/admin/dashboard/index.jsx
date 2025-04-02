@@ -1,7 +1,8 @@
 import { Box, Text } from "@chakra-ui/react";
+import { useTitle } from "utils/TitleContext";
 
 const MainDashBoard = () => {
-
+    useTitle("Dashboard");
     return (
         <Box mt={20}>
             <Text fontSize={20}>Hello world!</Text>

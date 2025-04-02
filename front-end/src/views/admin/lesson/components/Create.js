@@ -14,7 +14,9 @@ import {
     ModalBody,
     ModalFooter,
     Select,
+    Box,
     useColorMode,
+    Grid,
 } from "@chakra-ui/react";
 import JoditEditor from "jodit-react";
 import FlushedInput from "components/fields/InputField";
@@ -120,63 +122,72 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
     };
 
     return (
-        <Modal size={'2xl'} isOpen={isOpen} onClose={onClose}>
+        <Modal size={'5xl'} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader fontSize={'25px'} textAlign={'center'}>Thêm mới bài học</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl isInvalid={errors.lessonTitle} mb={4}>
-                        <FormLabel fontWeight="bold">Tiêu đề bài học<Text as="span" color="red.500"> *</Text></FormLabel>
-                        <FlushedInput bg={boxColor} placeholder="Nhập tiêu đề bài học" name="lessonTitle" value={lesson.lessonTitle} onChange={handleChange} textColor={textColor} />
-                        <FormErrorMessage>{errors.lessonTitle}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl isInvalid={errors.topicID} mb={4}>
-                        <FormLabel fontWeight="bold">Chọn chủ đề<Text as="span" color="red.500"> *</Text></FormLabel>
-                        <Select bg={boxColor} name="topicID" value={lesson.topicID} onChange={handleChange} textColor={textColor}>
-                            <option key="0" value="">Chọn chủ đề</option>
-                            {topic.map((topic) => (
-                                <option key={topic.topicID} value={topic.topicID}>{topic.topicName}</option>
-                            ))}
-                        </Select>
-                        <FormErrorMessage>{errors.topicID}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl mb={4}>
-                        <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
-                        <JoditEditor
-                            key={lesson.lessonID}
-                            ref={editor}
-                            value={lesson.lessonContent}
-                            onChange={handleEditorChange}
-                            onBlur={(newContent) => handleEditorChange(newContent)}
-                        />
-                    </FormControl>
-                    <FormControl isInvalid={!!errors.order} mb={4}>
-                        <FormLabel fontWeight="bold">
-                            Thứ tự <Text as="span" color="red.500">*</Text>
-                        </FormLabel>
-                        <Select
-                            bg={boxColor}
-                            name="order"
-                            placeholder="Chọn thứ tự"
-                            value={lesson.order}
-                            onChange={handleChange}
-                            textColor={textColor}
-                        >
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                        </Select>
-                        <FormErrorMessage>{errors.order}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl isInvalid={errors.status}>
-                        <FormLabel fontWeight="bold">Trạng thái</FormLabel>
-                        <Select bg={boxColor} name="status" value={lesson.status} onChange={handleChange} textColor={textColor}>
-                            <option key="default" value="">Chọn trạng thái</option>
-                            <option key="online" value="1">Online</option>
-                            <option key="offline" value="0">Offline</option>
-                        </Select>
-                    </FormControl>
+                    <Grid templateColumns="3fr 1fr" gap={4}>
+                        <Box flex={1}>
+                            <FormControl isInvalid={errors.lessonTitle} mb={4}>
+                                <FormLabel fontWeight="bold">Tiêu đề bài học<Text as="span" color="red.500"> *</Text></FormLabel>
+                                <FlushedInput bg={boxColor} placeholder="Nhập tiêu đề bài học" name="lessonTitle" value={lesson.lessonTitle} onChange={handleChange} textColor={textColor} />
+                                <FormErrorMessage>{errors.lessonTitle}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={errors.topicID} mb={4}>
+                                <FormLabel fontWeight="bold">Chọn chủ đề<Text as="span" color="red.500"> *</Text></FormLabel>
+                                <Select bg={boxColor} name="topicID" value={lesson.topicID} onChange={handleChange} textColor={textColor}>
+                                    <option key="0" value="">Chọn chủ đề</option>
+                                    {topic.map((topic) => (
+                                        <option key={topic.topicID} value={topic.topicID}>{topic.topicName}</option>
+                                    ))}
+                                </Select>
+                                <FormErrorMessage>{errors.topicID}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl mb={4}>
+                                <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
+                                <Box maxH="400px" overflowY="auto">
+                                    <JoditEditor
+                                        key={lesson.lessonID}
+                                        ref={editor}
+                                        value={lesson.lessonContent}
+                                        onChange={handleEditorChange}
+                                        onBlur={(newContent) => handleEditorChange(newContent)}
+                                        style={{ width: "100%", minHeight: "300px" }} // Đảm bảo kích thước hợp lý
+                                    />
+                                </Box>
+                            </FormControl>
+                        </Box>
+                        <Box>
+                            <FormControl isInvalid={!!errors.order} mb={4}>
+                                <FormLabel fontWeight="bold">
+                                    Thứ tự <Text as="span" color="red.500">*</Text>
+                                </FormLabel>
+                                <Select
+                                    bg={boxColor}
+                                    name="order"
+                                    placeholder="Chọn thứ tự"
+                                    value={lesson.order}
+                                    onChange={handleChange}
+                                    textColor={textColor}
+                                >
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </Select>
+                                <FormErrorMessage>{errors.order}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={errors.status}>
+                                <FormLabel fontWeight="bold">Trạng thái</FormLabel>
+                                <Select bg={boxColor} name="status" value={lesson.status} onChange={handleChange} textColor={textColor}>
+                                    <option key="default" value="">Chọn trạng thái</option>
+                                    <option key="online" value="1">Online</option>
+                                    <option key="offline" value="0">Offline</option>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Grid>
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="gray" mr={3} onClick={onClose}>Hủy</Button>

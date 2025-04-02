@@ -12,11 +12,13 @@ export const columnsData = [
   },
   {
     Header: "Tên chủ đề",
-    accessor: "topicName"
+    accessor: "topicName",
+    sortable: true,
   },
   {
     Header: "Tên khóa học",
     accessor: "courseName",
+    sortable: true,
   },
   {
     Header: "Mô tả",
