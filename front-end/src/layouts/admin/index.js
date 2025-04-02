@@ -6,12 +6,13 @@ import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes.js';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
   const { ...rest } = props;
+  const { onOpen } = useDisclosure();
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
@@ -93,24 +94,28 @@ export default function Dashboard(props) {
     }
     return activeNavbar;
   };
+
   const getRoutes = (routes) => {
-    return routes.map((route, key) => {
+    return routes.flatMap((route, key) => {
       if (route.layout === '/admin') {
-        return (
-          <>
-            <Route path={`${route.path}`} element={route.component} key={key} />
-            {route.item && route.item.map((subRoute, subKey) => (
-              <Route key={subKey} path={`${route.path}/${subRoute.path}`} element={subRoute.component} />
-            ))}
-          </>
-        );
+        let mainRoute = <Route path={route.path} element={route.component} key={key} />;
+
+        let subRoutes = route.items
+          ? route.items.map((subRoute, subKey) => (
+            <Route
+              key={`${key}-${subKey}`}
+              path={`${route.path}${subRoute.path}`}
+              element={subRoute.component}
+            />
+          ))
+          : [];
+
+        return [mainRoute, ...subRoutes].filter(Boolean);
       }
-      return null;
+      return [];
     });
   };
-  document.documentElement.dir = 'ltr';
-  const { onOpen } = useDisclosure();
-  document.documentElement.dir = 'ltr';
+
 
   return (
     <Box>
@@ -160,9 +165,7 @@ export default function Dashboard(props) {
               >
                 <Routes>
                   {getRoutes(routes)}
-                  {routes.map((route, index) => (
-                    <Route key={index} path={route.path} element={route.element} />
-                  ))}
+                  <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                 </Routes>
               </Box>
             ) : null}

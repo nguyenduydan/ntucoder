@@ -11,9 +11,11 @@ import {
   Text,
   useColorModeValue,
   useColorMode,
+  useDisclosure
 } from '@chakra-ui/react';
 // Custom Components
 import { SearchBar } from 'components/navbar/searchBar/SearchBar';
+import SearchModal from 'components/navbar/searchBar/SearchModal';
 import { SidebarResponsive } from 'components/sidebar/Sidebar';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -24,6 +26,7 @@ import routes from 'routes';
 export default function HeaderLinks(props) {
   const { secondary } = props;
   const { colorMode, toggleColorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // Chakra Color Mode
   const navbarIcon = useColorModeValue('gray.400', 'white');
   let menuBg = useColorModeValue('white', 'navy.800');
@@ -57,7 +60,9 @@ export default function HeaderLinks(props) {
         }}
         me="10px"
         borderRadius="30px"
+        onOpen={onOpen}
       />
+      <SearchModal isOpen={isOpen} onClose={onClose} />
       <SidebarResponsive routes={routes} />
       {/* Notifications */}
       <Menu>
