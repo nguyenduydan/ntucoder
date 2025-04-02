@@ -27,7 +27,7 @@ import sanitizeHtml from "utils/sanitizedHTML";
 //import API
 import { getById, update } from "config/lessonService";
 import { getList } from "config/topicService";
-
+import Editor from "utils/configEditor";
 
 const formatCurrency = (amount) => {
     return amount
@@ -54,22 +54,6 @@ const LessonDetail = () => {
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
-
-    const editorConfig = {
-        buttons: [
-            'bold', 'italic', 'underline', 'strikethrough', 'ul', 'ol',
-            'image', 'video', 'link', 'align', 'justify', 'source', 'clean',
-        ],
-        uploader: {
-            insertImageAsBase64URI: true, // Chèn ảnh dưới dạng Base64
-        },
-        // Cấu hình cho phép chèn video
-        video: {
-            // Tùy chỉnh các cài đặt video nếu cần
-            url: true, // Cho phép nhập URL video
-        },
-        // Các tùy chọn khác có thể thêm vào
-    };
 
     const fetchLessonDetail = useCallback(async () => {
         try {
@@ -311,7 +295,7 @@ const LessonDetail = () => {
                                         <JoditEditor
                                             ref={editor}
                                             value={editableValues.lessonContent}
-                                            config={editorConfig}
+                                            config={Editor}
                                             onChange={(newContent) => handleInputChange("lessonContent", newContent)}
                                             autoFocus
                                             style={{ width: "100%", minHeight: "300px" }}

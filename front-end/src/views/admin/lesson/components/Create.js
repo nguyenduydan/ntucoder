@@ -22,7 +22,7 @@ import JoditEditor from "jodit-react";
 import FlushedInput from "components/fields/InputField";
 import { create } from "config/lessonService";
 import { getList } from "config/topicService";
-
+import Editor from "utils/configEditor";
 
 export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
     const [lesson, setLesson] = useState({
@@ -152,6 +152,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                                         key={lesson.lessonID}
                                         ref={editor}
                                         value={lesson.lessonContent}
+                                        config={Editor}
                                         onChange={handleEditorChange}
                                         onBlur={(newContent) => handleEditorChange(newContent)}
                                         style={{ width: "100%", minHeight: "300px" }} // Đảm bảo kích thước hợp lý

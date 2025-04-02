@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     Box,
     Flex,
@@ -26,19 +26,15 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import NTULogo from "assets/img/ntu-coders.png";
 import Auth from "./auth";
 import { useNavigate } from "react-router-dom";
-import LoadingBar from "components/loading/loadingBar";
 
 function Navbar(props) {
     const { routes } = props;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = React.useRef();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
 
     const handleNavigate = (path) => {
-        setLoading(true);
         navigate(path);
-        setLoading(false);
     };
 
     const bg = useColorModeValue("white", "blue.200");
@@ -47,7 +43,6 @@ function Navbar(props) {
     return (
         <Box position="sticky" top="0" left="0" right="0" bg={bg} color={textColor} px={{ base: '10px', md: '15px' }} py={4} zIndex='2' boxShadow="lg">
             {/* Hiển thị LoadingBar */}
-            {loading && <LoadingBar />}
             <Flex align="center" gap={0} justify="space-between">
                 {/* Desktop Navigation Links */}
                 <Flex display={{ base: "none", md: "flex" }} gap={1}>

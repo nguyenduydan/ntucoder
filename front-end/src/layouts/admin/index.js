@@ -118,8 +118,8 @@ export default function Dashboard(props) {
 
 
   return (
-    <Box>
-      <Box>
+    <Box >
+      <Box >
         <SidebarContext.Provider
           value={{
             toggleSidebar,
@@ -140,6 +140,7 @@ export default function Dashboard(props) {
             transitionDuration=".2s, .2s, .35s"
             transitionProperty="top, bottom, width"
             transitionTimingFunction="linear, linear, ease"
+
           >
             <Portal>
               <Box>
@@ -162,6 +163,7 @@ export default function Dashboard(props) {
                 pe="20px"
                 minH="90vh"
                 pt="50px"
+
               >
                 <Routes>
                   {getRoutes(routes)}

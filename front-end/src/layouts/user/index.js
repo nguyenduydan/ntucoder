@@ -38,14 +38,13 @@ export default function Home(props) {
     };
 
     return (
-        <Box bg={bg} color={textColor}>
+        <Box bg={bg} color={textColor} h="86vh">
             <Navbar routes={userRoutes} {...rest} />
             <Box
-                minHeight="85vh"
                 height="100%"
                 overflow="auto"
-                position="relative"
                 maxHeight="100%"
+                position="relative"
                 bg={bg}
                 color={textColor}
                 mx={{ lg: "auto", md: "0" }}
@@ -57,8 +56,8 @@ export default function Home(props) {
                 {getRoute() && (
                     <Box
                         mx='auto'
-                        minH="60vh"
                         w="100%"
+                        h="100%"
                     >
                         <Routes>
                             {getRoutes(userRoutes)}
@@ -68,6 +67,7 @@ export default function Home(props) {
                         </Routes>
                     </Box>
                 )}
+
             </Box>
             <Footer />
         </Box>

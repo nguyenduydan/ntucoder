@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Spinner, useToast, Flex, Image,Tabs, TabList, Tab, TabPanels, Tooltip,TabPanel,Icon,Badge } from "@chakra-ui/react";
+import { Box, Spinner, useToast, Flex, Image,Tabs, TabList, Tab, TabPanels,
+    Text, Tooltip,TabPanel,Icon,Badge } from "@chakra-ui/react";
 import { getById } from "config/lessonService";
 import NodataPng from "assets/img/nodata.png";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Split from "react-split";
 import LessonHeader from "./components/LessonHeader";
 import LessonContent from "./components/LessonContent";
-import { FaRegFileAlt, FaClock, FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
+import LessonList from "./components/LessonList";
+import Problem from "../Problem/index"
+import { FaRegFileAlt, FaBook , FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
 
 export default function Lesson() {
-    const { slugId } = useParams();
-    const parts = slugId ? slugId.split("-") : [];
-    const lessonId = parts.length > 0 ? parseInt(parts.pop(), 10) : NaN; // Lấy phần cuối làm ID
+    const { lessonId } = useParams();
     const toast = useToast();
     const [lesson, setLesson] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function Lesson() {
         const fetchLesson = async () => {
             setLoading(true);
             try {
-                const response = await getById(lessonId);
+                const response = await getById(lessonId );
 
                     if (response && response.lessonTitle && response.lessonContent) {
                         setLesson(response);
@@ -60,11 +61,11 @@ export default function Lesson() {
 
     return (
         <ScrollToTop>
-            <Box minH="85vh" w='100%'>
+            <Box minH="100%" w='100%'>
                  {lesson ? (
                     <Box>
                         <LessonHeader lesson={lesson} />
-                        <Split className="split-container" sizes={[40, 60]} minSize={0} gutterSize={5}>
+                        <Split className="split-container" sizes={[45, 55]} minSize={0} gutterSize={5}>
                             {/* Sidebar Tabs */}
                             <Box bg="white" minH="100%" maxW="100%">
                                 {loading ? (
@@ -79,7 +80,7 @@ export default function Lesson() {
                                         index={activeTab}
                                         onChange={(index) => setActiveTab(index)}
                                     >
-                                        <Box display="flex" h="100%" overflow="auto" overflowX="hidden">
+                                        <Box display="flex" h="100%" w="100%" overflow="auto" overflowX="hidden">
                                            <TabList bg="blue.600" color="white" display="flex" flexDirection="column" alignItems="center">
                                                 <Tooltip label="Mô tả" placement="right" hasArrow>
                                                     <Tab py={4} _selected={{ bg: "blue.800" }}>
@@ -87,18 +88,16 @@ export default function Lesson() {
                                                     </Tab>
                                                 </Tooltip>
 
-                                                <Tooltip label="Bài học" placement="right" hasArrow>
+                                                <Tooltip label="Bài tập" placement="right" hasArrow>
+                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                        <Icon as={FaBook} boxSize={5} />
+                                                    </Tab>
+                                                </Tooltip>
+                                                <Tooltip label="Giáo trình" placement="right" hasArrow>
                                                     <Tab py={4} _selected={{ bg: "blue.800" }}>
                                                         <Icon as={FaBars} boxSize={5} />
                                                     </Tab>
                                                 </Tooltip>
-
-                                                <Tooltip label="Lịch sử" placement="right" hasArrow>
-                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                        <Icon as={FaClock} boxSize={5} />
-                                                    </Tab>
-                                                </Tooltip>
-
                                                 <Tooltip label="Tin nhắn" placement="right" hasArrow>
                                                     <Tab py={4} _selected={{ bg: "blue.800" }} position="relative">
                                                         <Icon as={FaComments} boxSize={5} />
@@ -113,16 +112,19 @@ export default function Lesson() {
                                                 </Tooltip>
                                             </TabList>
                                             <TabPanels flex="1" display="flex" flexDirection="column">
-                                                <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                    <Box maxWidth="100%">
-                                                    <LessonContent lesson={lesson} />
+                                                <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1" ps={2} pe={0}>
+                                                    <Box maxWidth="100%" >
+                                                        <LessonContent lesson={lesson} />
                                                     </Box>
                                                 </TabPanel>
                                                 <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                    <Box>Danh mục</Box>
+                                                    <Box>Bài tập</Box>
                                                 </TabPanel>
                                                 <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                    <Box>Lịch sử</Box>
+                                                    <Box maxWidth="100%">
+                                                        <Text fontWeight="bold" fontSize="lg"> Giáo Trình</Text>
+                                                        <LessonList/>
+                                                    </Box>
                                                 </TabPanel>
                                                 <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
                                                     <Box>Tin nhắn</Box>
@@ -142,7 +144,7 @@ export default function Lesson() {
                                         <Spinner size="lg" color="white" />
                                     </Flex>
                                 ) : (
-                                    <p>Code editor content here...</p>
+                                   <Problem />
                                 )}
                             </Box>
                         </Split>

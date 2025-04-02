@@ -94,8 +94,13 @@ const CourseDetail = () => {
     return (
         <ScrollToTop>
             <Box p={6} maxW="100%" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
-                <Button leftIcon={<ArrowBackIcon />} mb={2} colorScheme='blue' variant='ghost' onClick={() => navigate(-1)}>
-                    Trở vể trước
+                <Button
+                    leftIcon={<ArrowBackIcon />}
+                    mb={2}
+                    colorScheme='blue' variant='ghost'
+                    onClick={() => navigate('/course')}
+                >
+                    Trở về trước
                 </Button>
                 <Flex direction={{ base: "column", md: "row" }} gap={5}>
                     {/* Left Content */}
@@ -230,17 +235,25 @@ const CourseDetail = () => {
                                                                             {topic.lessons?.length ? (
                                                                                 <List spacing={2}>
                                                                                     {topic.lessons?.map((lesson) => (
-                                                                                        <ListItem cursor="pointer" _hover={{ bg: "gray.300", transform: "scale(1.01)" }} transition="all .2s ease-in-out" key={lesson.lessonID || Math.random()} pl={2} bg="gray.50" borderRadius="sm" p={2}>
-                                                                                            <NavLink
-                                                                                                to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
-                                                                                                style={({ isActive }) => ({
-                                                                                                    textDecoration: 'none',
-                                                                                                    color: isActive ? 'blue.500' : 'inherit', // Thay đổi màu sắc nếu link đang active
-                                                                                                })}
+                                                                                        <NavLink
+                                                                                            to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
+                                                                                            style={({ isActive }) => ({
+                                                                                                textDecoration: 'none',
+                                                                                                color: isActive ? 'blue.500' : 'inherit', // Thay đổi màu sắc nếu link đang active
+                                                                                            })}
+                                                                                        >
+                                                                                            <ListItem
+                                                                                                cursor="pointer"
+                                                                                                _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
+                                                                                                transition="all .2s ease-in-out"
+                                                                                                key={lesson.lessonID || Math.random()}
+                                                                                                pl={2}
+                                                                                                bg="gray.50"
+                                                                                                borderRadius="sm" p={2}
                                                                                             >
                                                                                                 <Text fontSize="md" >📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
-                                                                                            </NavLink>
-                                                                                        </ListItem>
+                                                                                            </ListItem>
+                                                                                        </NavLink>
                                                                                     ))}
                                                                                 </List>
                                                                             ) : (
@@ -317,7 +330,7 @@ const CourseDetail = () => {
                     </Box>
                 </Flex>
             </Box>
-        </ScrollToTop>
+        </ScrollToTop >
     );
 };
 

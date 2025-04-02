@@ -150,7 +150,7 @@ const routes = [
       },
       {
         name: 'chi tiết bài học',
-        path: ":slugId/:slugId",
+        path: ":slugId/:lessonId",
         component: <Lesson />,
       }
     ]
