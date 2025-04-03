@@ -133,9 +133,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         if (course.imageFile) {
             formData.append("imageFile", course.imageFile);
         }
-
         try {
-            console.log("API: ", formData);
             await create(formData); // Gửi FormData lên backend
 
             toast({

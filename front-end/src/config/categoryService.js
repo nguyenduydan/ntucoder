@@ -12,7 +12,7 @@ import api from "./apiConfig";
  * @returns {Promise<Object>} - Chứa data, totalPages và totalCount.
  */
 
-export const getList = async ({ page, pageSize, ascending, sortField, totalCount }) => {
+export const getListCategory = async ({ page, pageSize, ascending, sortField, totalCount }) => {
     const dynamicTimeout = (totalCount - pageSize + 1) * 1000;
     try {
         const response = await api.get("/Category", {

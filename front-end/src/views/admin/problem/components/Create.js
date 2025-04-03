@@ -22,26 +22,28 @@ import {
     Checkbox
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/courseService";
-import { getList } from "config/categoryService";
+import { create } from "config/problemService";
+import { getListCategory } from "config/categoryService";
+import { getList } from "config/compilerService";
 
 export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
     const [problem, setProblem] = useState({
         problemCode: "",
         problemName: "",
+        coderId: 1,
         timeLimit: "1.00",
         memoryLimit: "128",
         testType: "Output Matching",
         testCompilerID: "",
         note: "",
         selectedCategoryIDs: [],
-        errors: {},
-        compilers: [],
         testCode: "",
         problemContent: "",
         problemExplanation: "",
+        published: 0,
     });
     const [categories, setCategories] = useState([]);
+    const [compilers, setCompilers] = useState([]);
     const [errors, setErrors] = useState({});
     const toast = useToast();
     const [loading, setLoading] = useState(false);
@@ -53,6 +55,7 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         if (isOpen) {
             setProblem({
                 problemCode: "",
+                coderId: 1,
                 problemName: "",
                 timeLimit: "1.00",
                 memoryLimit: "128",
@@ -60,21 +63,29 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                 testCompilerID: "",
                 note: "",
                 selectedCategoryIDs: [],
-                errors: {},
-                compilers: [],
                 testCode: "",
                 problemContent: "",
                 problemExplanation: "",
+                published: 0,
             });
             setErrors({});
-            fetchCategories(); // Gọi hàm lấy danh mục khi modal mở
+            fetchList(); // Gọi hàm lấy danh mục khi modal mở
         }
     }, [isOpen]);
 
-    const fetchCategories = async () => {
+    const fetchList = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            setCategories(data.data);
+            const category = await getListCategory({ page: 1, pageSize: 10 });
+            const compiler = await getList({ page: 1, pageSize: 10 });
+            setCategories(category.data);
+            setCompilers(compiler.data);
+
+            if (compiler.data.length > 0) {
+                setProblem(prev => ({
+                    ...prev,
+                    testCompilerID: compiler.data[0].compilerID, // Gán giá trị mặc định
+                }));
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục bài toán:", error);
             setCategories([]);
@@ -82,21 +93,20 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
     };
 
     const handleCategoryChange = (e, categoryID) => {
-        const newCategoryIDs = e.target.checked
-            ? [...problem.selectedCategoryIDs, categoryID]
-            : problem.selectedCategoryIDs.filter(id => id !== categoryID);
-
-        setProblem({
-            ...problem,
-            selectedCategoryIDs: newCategoryIDs
-        });
+        setProblem(prev => ({
+            ...prev,
+            selectedCategoryIDs: e.target.checked
+                ? [...new Set([...prev.selectedCategoryIDs, categoryID])] // Thêm nếu checked
+                : prev.selectedCategoryIDs.filter(id => id !== categoryID), // Xóa nếu uncheck
+        }));
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setProblem((prev) => ({
             ...prev,
-            [name]: name === "status" ? parseInt(value, 10) : value,
+            [name]: name === "published" ? parseInt(value, 10) : value,
         }));
     };
 
@@ -116,22 +126,26 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         if (!validate()) return;
         setLoading(true);
 
-        // Tạo FormData để gửi dữ liệu
-        const formData = new FormData();
-        formData.append("problemCode", problem.problemCode);
-        formData.append("problemName", problem.problemName);
-        formData.append("timeLimit", problem.timeLimit);
-        formData.append("memoryLimit", problem.memoryLimit);
-        formData.append("testType", problem.testType);
-        formData.append("testCompilerID", problem.testCompilerID);
-        formData.append("note", problem.note);
-        formData.append("testCode", problem.testCode);
-        formData.append("problemContent", problem.problemContent);
-        formData.append("problemExplanation", problem.problemExplanation);
+        // Tạo đối tượng dữ liệu
+        const data = {
+            coderId: problem.coderId,
+            problemCode: problem.problemCode,
+            problemName: problem.problemName,
+            timeLimit: problem.timeLimit,
+            memoryLimit: problem.memoryLimit,
+            testType: problem.testType,
+            testCompilerID: problem.testCompilerID,
+            note: problem.note,
+            testCode: problem.testCode,
+            problemContent: problem.problemContent,
+            problemExplanation: problem.problemExplanation,
+            selectedCategoryIDs: problem.selectedCategoryIDs, // Mảng các thể loại đã chọn
+            publish: problem.published,
+        };
 
         try {
-            console.log("API: ", formData);
-            await create(formData); // Gửi FormData lên backend
+            // Gửi yêu cầu POST với JSON
+            await create(data); // Giả sử create là hàm gửi yêu cầu lên server
 
             toast({
                 title: 'Thêm mới bài toán thành công!',
@@ -142,8 +156,9 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                 variant: "left-accent",
             });
 
-            if (fetchData) await fetchData();
-            onClose();
+            if (fetchData) await fetchData(); // Lấy lại dữ liệu sau khi thêm thành công
+
+            onClose(); // Đóng modal
         } catch (error) {
             toast({
                 title: "Đã xảy ra lỗi.",
@@ -155,9 +170,10 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                 variant: "left-accent",
             });
         } finally {
-            setLoading(false);
+            setLoading(false); // Tắt loading khi hoàn thành
         }
     };
+
 
 
     return (
@@ -213,6 +229,16 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                 </SimpleGrid>
                                 <FormErrorMessage>{errors.selectedCategoryIDs}</FormErrorMessage>
                             </FormControl>
+                            <FormControl mb={4}>
+                                <FormLabel fontWeight="bold">Trình biên dịch</FormLabel>
+                                <Select value={problem.testCompilerID} onChange={handleChange}>
+                                    {compilers.map((compiler) => (
+                                        <option key={compiler.compilerID} value={compiler.compilerID}>
+                                            {compiler.compilerName}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             <FormControl isInvalid={errors.problemContent} mb={4}>
                                 <FormLabel fontWeight="bold">Nội dung bài toán</FormLabel>
                                 <Textarea bg={boxColor} placeholder="Nhập nội dung bài toán" name="problemContent" value={problem.problemContent} onChange={handleChange} textColor={textColor} />
@@ -222,6 +248,14 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                 <FormLabel fontWeight="bold">Giải thích bài toán</FormLabel>
                                 <Textarea bg={boxColor} placeholder="Nhập giải thích bài toán" name="problemExplanation" value={problem.problemExplanation} onChange={handleChange} textColor={textColor} />
                                 <FormErrorMessage>{errors.problemExplanation}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl >
+                                <FormLabel fontWeight="bold">Trạng thái</FormLabel>
+                                <Select bg={boxColor} name="published" value={problem.published} onChange={handleChange} textColor={textColor}>
+                                    <option key="default" value="">Chọn trạng thái</option>
+                                    <option key="online" value="1">Online</option>
+                                    <option key="offline" value="0">Offline</option>
+                                </Select>
                             </FormControl>
                         </GridItem>
                     </Grid>

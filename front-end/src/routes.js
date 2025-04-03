@@ -19,6 +19,7 @@ import LessonDetail from 'views/admin/lesson/components/Detail';
 import CategoryTable from 'views/admin/category/index';
 import CompilerTable from 'views/admin/compiler/index';
 import ProblemTable from 'views/admin/problem/index';
+import ProblemDetail from 'views/admin/problem/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -114,7 +115,7 @@ const routes = [
       {
         name: 'Chi tiết bài tập',
         path: 'detail/:id',
-        component: <CoderDetail />,
+        component: <ProblemDetail />,
       }
     ]
   },

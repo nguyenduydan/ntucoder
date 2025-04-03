@@ -94,7 +94,7 @@ export const columnsData = [
     Cell: (props) => <ActionCell {...props}
       deleteFunction={deleteCourse}
       idData = "courseID"
-      detailPath = "courses"
+      detailPath = "course"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Khóa học đã được xóa thành công.",

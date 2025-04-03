@@ -1,7 +1,7 @@
 // columnsData.jsx
 import React,{useState} from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteCourse,updateStatus } from "config/courseService";
+import { deleteProblem,updateStatus } from "config/problemService";
 import { Badge,useToast } from "@chakra-ui/react";
 
 export const columnsData = [
@@ -10,46 +10,44 @@ export const columnsData = [
     accessor: "stt",
     Cell: ({ rowIndex }) => rowIndex + 1,
   },
+   {
+    Header: "Mã bài tập",
+    accessor: "problemCode",
+  },
   {
-    Header: "Tên khóa học",
-    accessor: "courseName",
+    Header: "Tên bài tập",
+    accessor: "problemName",
     sortable: true
   },
   {
-    Header: "Loại khóa học",
-    accessor: "courseCategoryName",
-    sortable: true,
+    Header: "Nội dung bài tập",
+    accessor: "problemContent",
   },
   {
-    Header: "Giá hiện tại",
-    accessor: "fee",
-    sortable: true,
-    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
+    Header: "Loại kiểm thử",
+    accessor: "testType",
   },
   {
-    Header: "Giá gốc",
-    accessor: "originalFee",
-    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
+    Header: "Người tạo",
+    accessor: "coderName",
   },
-
   {
-    Header: "Nhãn",
-    accessor: "badgeName",
+    Header: "Giới hạn bộ nhớ",
+    accessor: "memoryLimit",
   },
-
   {
     Header: "Trạng thái",
-    accessor: "status",
+    accessor: "published",
     Cell: ({ row }) => {
-      const [status, setStatus] = useState(row?.status);
-      const courseId = row?.courseID; // Đảm bảo lấy ID đúng
+      const [status, setStatus] = useState(row?.published);
+      const problemID = row?.problemID; // Đảm bảo lấy ID đúng
       const toast = useToast(); // Sử dụng useToast
 
       const handleClick = async () => {
         const newStatus = status === 0 ? 1 : 0;
         setStatus(newStatus);
         try {
-          await updateStatus(courseId, newStatus);
+          await updateStatus(problemID, newStatus);
           toast({
             title: "Cập nhật thành công",
             description: `Cập nhật trạng thái thành công`,
@@ -92,12 +90,12 @@ export const columnsData = [
     Header: "Hành động",
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
-      deleteFunction={deleteCourse}
-      idData = "courseID"
-      detailPath = "courses"
+      deleteFunction={deleteProblem}
+      idData = "problemID"
+      detailPath = "problem"
       deleteSuccessToast={{
         title: "Đã xóa!",
-        description: "Khóa học đã được xóa thành công.",
+        description: "Bài học đã được xóa thành công.",
       }}
       deleteErrorToast={{
         title: "Xóa thất bại!",

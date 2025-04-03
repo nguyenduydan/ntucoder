@@ -65,6 +65,7 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                   width={column.width || 'fixed'}
                   bg={colorMode === 'dark' ? 'navy.800' : 'white'} // Màu nền để tránh bị trong suốt
                   zIndex={1}
+
                 >
                   <Flex>
                     <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
@@ -99,7 +100,13 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                     const truncatedContent = content.length > maxLength ? content.slice(0, maxLength) + '...' : content; // Cắt chuỗi nếu cần
 
                     return (
-                      <Td key={column.Header} fontSize={{ sm: '16px' }} width={column.width || 'auto'} borderColor="transparent">
+                      <Td
+                        key={column.Header}
+                        fontSize="clamp(12px, 2vw, 16px)" // Điều chỉnh font-size linh hoạt
+                        width={column.width || 'auto'}
+                        borderColor="transparent"
+                        padding="12px 15px"
+                      >
                         {column.Cell ? (
                           <CustomCell column={column} row={row} index={index} fetchData={fetchData} />
                         ) : (

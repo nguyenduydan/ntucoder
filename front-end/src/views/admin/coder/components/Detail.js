@@ -152,13 +152,10 @@ const CoderDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            try {
-                await update(id, formData);
-            } catch (error) {
-                console.error("Đã xảy ra lỗi khi cập nhật", error);
-            }
+            await update(id, formData);
             await fetchCoderDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
+
             toast({
                 title: "Cập nhật thành công!",
                 status: "success",

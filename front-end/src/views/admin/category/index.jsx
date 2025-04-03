@@ -6,7 +6,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import {getList} from "config/categoryService"
+import {getListCategory} from "config/categoryService"
 import {columnsData} from "views/admin/category/components/columnsData"
 import Create from "views/admin/category/components/Create";
 import {useTitle} from "utils/TitleContext"
@@ -35,7 +35,7 @@ export default function CategoryIndex() {
         async (page) => {
           setLoading(true);
           try {
-            const { data, totalPages: totalPagesResp, totalCount } = await getList({
+            const { data, totalPages: totalPagesResp, totalCount } = await getListCategory({
               page,
               pageSize,
               ascending,

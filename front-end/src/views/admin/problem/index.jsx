@@ -6,8 +6,8 @@ import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import {getList} from "config/courseService"
-import {columnsData} from "views/admin/course/components/columnsData"
+import {getList} from "config/problemService"
+import {columnsData} from "views/admin/problem/components/columnsData"
 import Create from "views/admin/problem/components/Create";
 import { useTitle } from "utils/TitleContext";
 

@@ -24,7 +24,7 @@ namespace api.Controllers
             return Ok(categories);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO dto)
+        public async Task<IActionResult> CreateCategory([FromForm] CategoryDTO dto)
         {
             if (dto == null)
             {

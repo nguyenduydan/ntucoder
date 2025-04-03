@@ -27,6 +27,7 @@ namespace api.Infrashtructure.Repositories
                     ProblemID = p.ProblemID,
                     ProblemCode = p.ProblemCode,
                     ProblemName = p.ProblemName,
+                    MemoryLimit = p.MemoryLimit,
                     TestType = p.TestType,
                     Published = p.Published,
                     CoderID = p.CoderID,
@@ -85,7 +86,7 @@ namespace api.Infrashtructure.Repositories
                 TestType = dto.TestType!,
                 TestCode = dto.TestCode!,
                 CoderID = (int)dto.CoderID!,
-                Published = 0,
+                Published = dto.Published,
                 TestCompilerID = dto.TestCompilerID ?? 1,
                 TestProgCompile = dto.TestProgCompile
             };
@@ -206,7 +207,7 @@ namespace api.Infrashtructure.Repositories
             existing.TestType = dto.TestType ?? existing.TestType;
             existing.TestCode = dto.TestCode ?? existing.TestCode;
             existing.TestCompilerID = dto.TestCompilerID ?? existing.TestCompilerID;
-            existing.Published = dto.Published ?? existing.Published;
+            existing.Published = dto.Published;
             existing.CoderID = dto.CoderID ?? existing.CoderID;
 
             // Cập nhật thể loại
