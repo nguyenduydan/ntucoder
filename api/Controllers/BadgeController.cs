@@ -1,8 +1,8 @@
 ﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
-using api.Infrashtructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using api.Infrashtructure.Repositories;
 
 
 namespace api.Controllers
@@ -11,11 +11,11 @@ namespace api.Controllers
     [ApiController]
     public class BadgeController: ControllerBase
     {
-        private readonly BadgeService _badgeService;
+        private readonly BadgeRepository _badgeRepository;
 
-        public BadgeController(BadgeService badgeService)
+        public BadgeController(BadgeRepository badgeRepository)
         {
-            _badgeService = badgeService;
+            _badgeRepository = badgeRepository;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _badgeService.GetAllBadgeAsync(query, sortField, ascending);
+                var result = await _badgeRepository.GetAllBadgeAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace api.Controllers
             }
             try
             {
-                var result = await _badgeService.CreateBadgeAsync(dto);
+                var result = await _badgeRepository.CreateBadgeAsync(dto);
                 return CreatedAtAction(nameof(CreateBadge), new { id = result.BadgeID }, result);
             }
             catch (ValidationException ex)
@@ -59,7 +59,7 @@ namespace api.Controllers
         {
             try
             {
-                var isDeleted = await _badgeService.DeleteBadgeAsync(id);
+                var isDeleted = await _badgeRepository.DeleteBadgeAsync(id);
 
                 if (isDeleted)
                 {

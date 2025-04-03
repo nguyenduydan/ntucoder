@@ -129,7 +129,7 @@ export default function Dashboard(props) {
           <Sidebar routes={routes} display="none" {...rest} />
           <Box
             float="right"
-            minHeight="100vh"
+            minHeight="95vh"
             height="100%"
             overflow="auto"
             position="relative"

@@ -67,7 +67,6 @@ export default function Home(props) {
                         </Routes>
                     </Box>
                 )}
-
             </Box>
             <Footer />
         </Box>

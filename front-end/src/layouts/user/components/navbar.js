@@ -45,7 +45,7 @@ function Navbar(props) {
             {/* Hiển thị LoadingBar */}
             <Flex align="center" gap={0} justify="space-between">
                 {/* Desktop Navigation Links */}
-                <Flex display={{ base: "none", md: "flex" }} gap={1}>
+                <Flex display={{ base: "none", lg: "flex" }} gap={1}>
                     {/* Brand */}
                     <Box
                         fontSize="xl"
@@ -58,19 +58,30 @@ function Navbar(props) {
                     </Box>
                     <Links direction="row" routes={routes} />
                 </Flex>
-                <Box display={{ base: "none", md: "flex" }} gap={5}>
+                <Box display={{ base: "none", lg: "flex" }} gap={5}>
                     <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" />
                     <Auth />
                 </Box>
                 {/* Mobile Hamburger Menu */}
-                <IconButton
-                    display={{ base: "flex", md: "none" }}
-                    aria-label="Toggle Menu"
-                    icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-                    onClick={onOpen}
-                    variant="ghost"
-                    color={textColor}
-                />
+                <Flex w="100%" display={{ base: "flex", lg: "none" }} justifyContent="space-between">
+                    <IconButton
+                        aria-label="Toggle Menu"
+                        icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+                        onClick={onOpen}
+                        variant="ghost"
+                        color={textColor}
+                    />
+                    <Box
+                        fontSize="xl"
+                        fontWeight="bold"
+                        mr={10}
+                        cursor="pointer"
+                        onClick={() => handleNavigate("/")}
+                    >
+                        <Image src={NTULogo} h="40px" />
+                    </Box>
+                </Flex>
+
             </Flex>
 
             {/* Mobile Navigation Menu */}

@@ -1,8 +1,8 @@
 ﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
-using api.Infrashtructure.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using api.Infrashtructure.Repositories;
 
 namespace api.Controllers
 {
@@ -10,11 +10,11 @@ namespace api.Controllers
     [ApiController]
     public class CoderController : ControllerBase
     {
-        private readonly CoderService _coderService;
+        private readonly CoderRepository _coderRepository;
 
-        public CoderController(CoderService coderService)
+        public CoderController(CoderRepository coderRepository)
         {
-            _coderService = coderService;
+            _coderRepository = coderRepository;
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _coderService.GetAllCoderAsync(query, sortField, ascending);
+                var result = await _coderRepository.GetAllCoderAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace api.Controllers
             }
             try
             {
-                var result = await _coderService.CreateCoderAsync(dto);
+                var result = await _coderRepository.CreateCoderAsync(dto);
                 return CreatedAtAction(nameof(CreateCoder), new { id = result.CoderID }, result);
             }
             catch (ValidationException ex)
@@ -56,7 +56,7 @@ namespace api.Controllers
         {
             try
             {
-                var coder = await _coderService.GetCoderByIdAsync(id);
+                var coder = await _coderRepository.GetCoderByIdAsync(id);
 
                 if (coder == null)
                 {
@@ -80,7 +80,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _coderService.UpdateCoderAsync(id, dto);
+                var result = await _coderRepository.UpdateCoderAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
@@ -101,7 +101,7 @@ namespace api.Controllers
         {
             try
             {
-                var isDeleted = await _coderService.DeleteCoderAsync(id);
+                var isDeleted = await _coderRepository.DeleteCoderAsync(id);
 
                 if (isDeleted)
                 {

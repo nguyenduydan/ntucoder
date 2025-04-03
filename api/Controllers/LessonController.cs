@@ -1,8 +1,6 @@
 ﻿using api.DTOs;
 using api.Infrashtructure.Helpers;
-using api.Infrashtructure.Services;
-using api.Services;
-using Microsoft.AspNetCore.Http;
+using api.Infrashtructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -11,11 +9,11 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class LessonController : ControllerBase
     {
-        private readonly LessonService _lessonService;
+        private readonly LessonRepository _lessonRepository;
 
-        public LessonController(LessonService lessonService)
+        public LessonController(LessonRepository lessonRepository)
         {
-            _lessonService = lessonService;
+            _lessonRepository = lessonRepository;
         }
 
         [HttpGet]
@@ -23,7 +21,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _lessonService.GetListAsync(query, sortField, ascending);
+                var result = await _lessonRepository.GetListAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -37,7 +35,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _lessonService.GetByIdAsync(id);
+                var result = await _lessonRepository.GetByIdAsync(id);
                 if (result == null)
                 {
                     return NotFound(new { message = $"Không tìm thấy bài học với ID {id}" });
@@ -60,7 +58,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _lessonService.CreateAsync(dto);
+                var result = await _lessonRepository.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = result.LessonID }, result);
             }
             catch (InvalidOperationException ex)
@@ -83,7 +81,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _lessonService.UpdateAsync(id, dto);
+                var result = await _lessonRepository.UpdateAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
@@ -105,7 +103,7 @@ namespace api.Controllers
         {
             try
             {
-                await _lessonService.DeleteAsync(id);
+                await _lessonRepository.DeleteAsync(id);
                 return NoContent();
             }
             catch (KeyNotFoundException)

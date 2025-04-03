@@ -91,7 +91,6 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
 
 
     const handleSubmit = async () => {
-        console.log("Dữ liệu gửi đi:", lesson);
         if (!validate()) return;
         setLoading(true);
         try {

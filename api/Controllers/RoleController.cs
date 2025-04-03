@@ -1,8 +1,8 @@
 ﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
-using api.Infrashtructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using api.Infrashtructure.Repositories;
 
 namespace api.Controllers
 {
@@ -10,11 +10,11 @@ namespace api.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly RoleService _roleService;
+        private readonly RoleRepository _roleRepository;
 
-        public RoleController (RoleService roleService)
+        public RoleController (RoleRepository roleRepository)
         {
-            _roleService = roleService;
+            _roleRepository = roleRepository;
         }
 
         [HttpGet("getlist")]
@@ -22,7 +22,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _roleService.GetAllRoleAsync(query, sortField, ascending);
+                var result = await _roleRepository.GetAllRoleAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -40,7 +40,7 @@ namespace api.Controllers
             }
             try
             {
-                var result = await _roleService.CreateRoleAsync(dto);
+                var result = await _roleRepository.CreateRoleAsync(dto);
                 return CreatedAtAction(nameof(CreateRole), new { id = result.RoleID }, result);
             }
             catch (ValidationException ex)
@@ -58,7 +58,7 @@ namespace api.Controllers
         {
             try
             {
-                var isDeleted = await _roleService.DeleteRoleAsync(id);
+                var isDeleted = await _roleRepository.DeleteRoleAsync(id);
 
                 if (isDeleted)
                 {

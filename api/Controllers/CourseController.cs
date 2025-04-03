@@ -1,6 +1,6 @@
 ﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
-using api.Services;
+using api.Infrashtructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -9,11 +9,11 @@ namespace api.Controllers
     [ApiController]
     public class CourseController : ControllerBase
     {
-        private readonly CourseService _courseService;
+        private readonly CourseRepository _courseRepository;
 
-        public CourseController(CourseService courseService)
+        public CourseController(CourseRepository courseRepository)
         {
-            _courseService = courseService;
+            _courseRepository = courseRepository;
         }
 
         [HttpGet("search")]
@@ -21,7 +21,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _courseService.SearchCoursesAsync(keyword, page, pageSize);
+                var result = await _courseRepository.SearchCourseAsync(keyword, page, pageSize);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _courseService.GetAllCoursesAsync(query, sortField, ascending);
+                var result = await _courseRepository.GetAllCoursesAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -49,7 +49,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _courseService.GetCourseByIdAsync(id);
+                var result = await _courseRepository.GetCourseByIdAsync(id);
                 if (result == null)
                 {
                     return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });
@@ -72,7 +72,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _courseService.CreateCourseAsync(courseDto);
+                var result = await _courseRepository.CreateCourseAsync(courseDto);
                 return CreatedAtAction(nameof(GetById), new { id = result.CourseID }, result);
             }
             catch (InvalidOperationException ex)
@@ -95,7 +95,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _courseService.UpdateCourseAsync(id, courseDto);
+                var result = await _courseRepository.UpdateCourseAsync(id, courseDto);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
@@ -117,7 +117,7 @@ namespace api.Controllers
         {
             try
             {
-                await _courseService.DeleteCourseAsync(id);
+                await _courseRepository.DeleteAsync(id);
                 return NoContent();
             }
             catch (KeyNotFoundException)

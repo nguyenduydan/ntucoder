@@ -16,6 +16,9 @@ import TopicTable from 'views/admin/topic/index';
 import TopicDetail from 'views/admin/topic/components/Detail';
 import LessonTable from 'views/admin/lesson/index';
 import LessonDetail from 'views/admin/lesson/components/Detail';
+import CategoryTable from 'views/admin/category/index';
+import CompilerTable from 'views/admin/compiler/index';
+import ProblemTable from 'views/admin/problem/index';
 // User Imports
 import Home from 'views/user/Home';
 import Problem from 'views/user/Problem';
@@ -26,7 +29,7 @@ import Lesson from 'views/user/Lesson';
 // Auth Imports
 //import SignInCentered from 'views/auth/signIn';
 import { PersonIcon } from 'components/icons/Icons';
-import { FaBookAtlas, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
+import { FaBookAtlas, FaLaptopCode, FaFileCode, FaBook, FaBookmark, FaAlignCenter, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
 
 
 const routes = [
@@ -59,7 +62,6 @@ const routes = [
       }
     ]
   },
-
   {
     name: 'Chủ đề',
     layout: '/admin',
@@ -103,6 +105,41 @@ const routes = [
     ]
   },
   {
+    name: 'Quản lý bài tập',
+    layout: '/admin',
+    icon: <Icon as={FaFileCode} width="20px" height="20px" color="inherit" />,
+    path: '/problem',
+    component: <ProblemTable />,
+    item: [
+      {
+        name: 'Chi tiết bài tập',
+        path: 'detail/:id',
+        component: <CoderDetail />,
+      }
+    ]
+  },
+  // {
+  //   name: 'Thể loại',
+  //   layout: '/admin',
+  //   icon: <Icon as={FaAlignCenter} width="20px" height="20px" color="inherit" />,
+  //   path: '/categorie',
+  //   component: <CategoryTable />,
+  // },
+  // {
+  //   name: 'Quản lý biên dịch',
+  //   layout: '/admin',
+  //   icon: <Icon as={FaLaptopCode} width="20px" height="20px" color="inherit" />,
+  //   path: '/compiler',
+  //   component: <CompilerTable />,
+  //   item: [
+  //     {
+  //       name: 'Chi tiết biên dịch',
+  //       path: 'detail/:id',
+  //       component: <CoderDetail />,
+  //     }
+  //   ]
+  // },
+  {
     name: 'Người dùng',
     layout: '/admin',
     icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
@@ -116,6 +153,7 @@ const routes = [
       }
     ]
   },
+
   // Auth Routes
   // {
   //   name: 'Sign In',

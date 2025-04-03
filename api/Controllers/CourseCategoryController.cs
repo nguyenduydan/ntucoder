@@ -1,6 +1,6 @@
 ﻿using api.Infrashtructure.Helpers;
 using api.DTOs;
-using api.Services;
+using api.Infrashtructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -9,18 +9,18 @@ namespace api.Controllers
     [ApiController]
     public class CourseCategoryController : ControllerBase
     {
-        private readonly CourseCategoryService _service;
+        private readonly CourseCategoryRepository _Repository;
 
-        public CourseCategoryController(CourseCategoryService service)
+        public CourseCategoryController(CourseCategoryRepository Repository)
         {
-            _service = service;
+            _Repository = Repository;
         }
 
         // ✅ Lấy danh sách danh mục có phân trang
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
         {
-            var result = await _service.GetAllCategoriesAsync(query, sortField, ascending);
+            var result = await _Repository.GetAllAsync(query, sortField, ascending);
             return Ok(result);
         }
 
@@ -35,7 +35,7 @@ namespace api.Controllers
 
             try
             {
-                var createdCategory = await _service.CreateCategoryAsync(dto);
+                var createdCategory = await _Repository.CreateCategoryAsync(dto);
                 return CreatedAtAction(nameof(GetAll), new { id = createdCategory.CourseCategoryID }, createdCategory);
             }
             catch (ArgumentException ex)
@@ -51,7 +51,7 @@ namespace api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _service.DeleteAsync(id);
+            var isDeleted = await _Repository.DeleteAsync(id);
             if (!isDeleted)
                 return NotFound(new { message = "Không tìm thấy danh mục khóa học." });
 
