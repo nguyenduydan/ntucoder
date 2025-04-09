@@ -17,10 +17,9 @@ import {
     ModalFooter,
     Select,
     useColorMode,
-    Input,
-    Image,
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
+import ImageInput from "components/fields/ImageInput";
 import { create } from "config/courseService";
 import { getList } from "config/courseCategoryService";
 import { getListBagde } from "config/badgeService";
@@ -39,7 +38,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         imageFile: null,
     });
     const [courseCategories, setCourseCategories] = useState([]);
-    const [imagePreview, setImagePreview] = useState(null);
     const [badge, setBadge] = useState([]);
     const [errors, setErrors] = useState({});
     const toast = useToast();
@@ -85,22 +83,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
             ...prev,
             [name]: name === "status" ? parseInt(value, 10) : value,
         }));
-    };
-
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setCourse((prev) => ({
-                ...prev,
-                imageFile: file, // Lưu file ảnh vào state
-            }));
-
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const validate = () => {
@@ -187,10 +169,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                                 <FlushedInput bg={boxColor} type="number" placeholder="Nhập học phí" name="originalFee" value={course.originalFee} onChange={handleChange} textColor={textColor} />
                                 <FormErrorMessage>{errors.originalFee}</FormErrorMessage>
                             </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel fontWeight="bold">Ảnh khóa học</FormLabel>
-                                <Input type="file" accept="image/*" onChange={handleImageChange} />
-                            </FormControl>
+
                         </GridItem>
                         <GridItem>
                             <FormControl isInvalid={errors.courseCategoryID} mb={4}>
@@ -221,11 +200,18 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                                     <option key="offline" value="0">Offline</option>
                                 </Select>
                             </FormControl>
-                            {imagePreview && (
-                                <Image src={imagePreview} alt="Preview" mt={3} boxSize="200px" objectFit="cover" />
-                            )}
+
                         </GridItem>
                     </Grid>
+                    <FormControl mb={4} mt={4}>
+                        <FormLabel textAlign="center" fontWeight="bold">Ảnh khóa học</FormLabel>
+                        <ImageInput
+                            label="chọn ảnh đại diện"
+                            previewWidth="40vh"
+                            previewHeight="20vh"
+
+                        />
+                    </FormControl>
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="gray" mr={3} onClick={onClose}>Hủy</Button>
