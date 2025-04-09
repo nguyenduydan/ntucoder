@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
     Modal, ModalOverlay, ModalContent, ModalBody,
-    Input, List, ListItem, Text, useColorModeValue
+    Input, List, ListItem, Text, useColorModeValue, Flex, Kbd
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import routes from 'routes.js';
 
 const SearchModal = ({ isOpen, onClose }) => {
     const [query, setQuery] = useState("");
-    const [selectedIndex, setSelectedIndex] = useState(null);  // Theo dõi mục hiện tại được chọn
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const navigate = useNavigate();
-    const inputRef = useRef(null);  // Tham chiếu đến ô Input
+    const inputRef = useRef(null);
+    const listRefs = useRef([]); // Tạo mảng các tham chiếu cho các mục trong danh sách
 
-    // Danh sách các trang
     const pages = routes
         .filter(route => route.layout === '/admin')
         .map(route => ({
@@ -24,61 +24,65 @@ const SearchModal = ({ isOpen, onClose }) => {
         page.name.toLowerCase().includes(query.toLowerCase())
     );
 
-    // Màu sắc cho dark mode và light mode
     const modalBg = useColorModeValue("white", "gray.900");
     const inputBorderColor = useColorModeValue("black", "white");
     const listItemHoverColor = useColorModeValue("gray.200", "gray.700");
     const selectedBgColor = useColorModeValue("gray.200", "gray.700");
     const textColor = useColorModeValue("gray.700", "white");
 
-    // Khi modal mở, tự động focus vào ô input và reset giá trị input
     useEffect(() => {
         if (isOpen && inputRef.current) {
             setQuery("");
-            setSelectedIndex(null); // Reset selected index
+            setSelectedIndex(null);
             inputRef.current.focus();
         }
     }, [isOpen]);
 
-    // Xử lý sự kiện bàn phím
+    useEffect(() => {
+        if (selectedIndex !== null && listRefs.current[selectedIndex]) {
+            listRefs.current[selectedIndex].scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
+    }, [selectedIndex]);
+
     const handleKeyDown = (event) => {
         if (event.key === "ArrowDown") {
-            // Di chuyển xuống mục kế tiếp
             setSelectedIndex(prevIndex =>
-                prevIndex === null
+                prevIndex === null || prevIndex === filteredPages.length - 1
                     ? 0
-                    : Math.min(filteredPages.length - 1, prevIndex + 1)
+                    : prevIndex + 1
             );
         } else if (event.key === "ArrowUp") {
-            // Di chuyển lên mục trước đó
             setSelectedIndex(prevIndex =>
-                prevIndex === null
-                    ? 0
-                    : Math.max(0, prevIndex - 1)
+                prevIndex === null || prevIndex === 0
+                    ? filteredPages.length - 1
+                    : prevIndex - 1
             );
         } else if (event.key === "Enter" && selectedIndex !== null) {
-            // Điều hướng đến trang khi nhấn Enter
             handleSelect(filteredPages[selectedIndex]);
         }
     };
 
+
     const handleSelect = (page) => {
-        navigate(page.path);  // Điều hướng đến trang có path
+        navigate(page.path);
         setQuery("");
         onClose();
     };
 
     const handleMouseEnter = (index) => {
-        setSelectedIndex(index);  // Đổi mục hiện tại khi di chuột vào
+        setSelectedIndex(index);
     };
 
     return (
         <Modal isOpen={isOpen} size="2xl" onClose={onClose} key={isOpen ? "open" : "closed"} isCentered>
             <ModalOverlay />
-            <ModalContent bg={modalBg} >
+            <ModalContent bg={modalBg}>
                 <ModalBody px={2} onKeyDown={handleKeyDown} tabIndex={-1}>
                     <Input
-                        ref={inputRef}  // Gắn ref vào Input
+                        ref={inputRef}
                         placeholder="Nhập tên trang..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -90,14 +94,15 @@ const SearchModal = ({ isOpen, onClose }) => {
                     <List ps={4} maxH="50vh" overflowY="auto">
                         {filteredPages.map((page, index) => (
                             <ListItem
-                                key={page.path}  // Sử dụng path làm key
-                                onClick={() => handleSelect(page)}  // Truyền page object vào handleSelect
+                                key={page.path}
+                                ref={el => listRefs.current[index] = el} // Gán ref cho từng mục
+                                onClick={() => handleSelect(page)}
                                 _hover={{ cursor: "pointer", bg: listItemHoverColor }}
                                 px={4}
                                 py={2}
                                 borderRadius="md"
-                                bg={selectedIndex === index ? selectedBgColor : "transparent"}  // Đổi màu khi mục được chọn
-                                onMouseEnter={() => handleMouseEnter(index)}  // Đổi mục hiện tại khi di chuột vào
+                                bg={selectedIndex === index ? selectedBgColor : "transparent"}
+                                onMouseEnter={() => handleMouseEnter(index)}
                             >
                                 <Text fontWeight="bold" color={textColor}>{page.name}</Text>
                                 <Text fontSize="sm" color="gray.500">
@@ -106,6 +111,16 @@ const SearchModal = ({ isOpen, onClose }) => {
                             </ListItem>
                         ))}
                     </List>
+                    <Flex gap="5" px={5} justify="space-evenly" align="center" my={2}>
+                        <Text fontSize="sm" color="gray.600" mt={2}>
+                            Để chọn trang nhấn <Kbd fontWeight="bold" px={3} py={1} ml={1}>↲</Kbd>
+                        </Text>
+                        <Text fontSize="sm" color="gray.600" mt={2}>
+                            Di chuyển lên
+                            <Kbd px={3} fontWeight="bold" py={1} ml={2}>↓</Kbd>
+                            <Kbd fontWeight="bold" px={3} py={1} ml={2}>↑</Kbd> để lựa chọn trang
+                        </Text>
+                    </Flex>
                 </ModalBody>
             </ModalContent>
         </Modal>

@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
 import ColumnsTable from "components/separator/ColumnsTable";
-import {columnsData} from "views/admin/coder/components/columnsData"
+import { columnsData } from "views/admin/coder/components/columnsData";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
 import CreateCoder from "views/admin/coder/components/Create";
 import Toolbar from "components/menu/ToolBar";
-import {getList} from "config/coderService"
-import {useTitle} from "utils/TitleContext"
+import { getList } from "config/coderService";
+import { useTitle } from "contexts/TitleContext";
 
 export default function CoderIndex() {
   useTitle("Quản lý người dùng");
@@ -143,7 +143,7 @@ export default function CoderIndex() {
         {/* Modal CreateCoder */}
         <CreateCoder isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         <ColumnsTable
-          columnsData ={columnsData}
+          columnsData={columnsData}
           tableData={tableData}
           loading={loading}
           onSort={handleSort}

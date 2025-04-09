@@ -6,10 +6,10 @@ import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import {getList} from "config/lessonService"
-import {columnsData} from "views/admin/lesson/components/columnsData"
+import { getList } from "config/lessonService";
+import { columnsData } from "views/admin/lesson/components/columnsData";
 import Create from "views/admin/lesson/components/Create";
-import { useTitle } from "utils/TitleContext";
+import { useTitle } from "contexts/TitleContext";
 
 
 export default function CoderIndex() {
@@ -146,7 +146,7 @@ export default function CoderIndex() {
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         <ColumnsTable
-          columnsData ={columnsData}
+          columnsData={columnsData}
           tableData={tableData}
           loading={loading}
           onSort={handleSort}

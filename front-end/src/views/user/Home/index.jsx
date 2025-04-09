@@ -3,7 +3,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React from "react";
-import { useTitle } from "utils/TitleContext";
+import { useTitle } from "contexts/TitleContext";
 
 export default function UserReports() {
   // Set title for the page

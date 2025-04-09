@@ -12,7 +12,7 @@ import { getLessons } from "config/topicService";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "utils/utils";
-import { useTitle } from "utils/TitleContext";
+import { useTitle } from "contexts/TitleContext";
 
 const CourseDetail = () => {
     const { slugId } = useParams();

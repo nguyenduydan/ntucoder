@@ -6,10 +6,10 @@ import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import {getList} from "config/compilerService"
-import {columnsData} from "views/admin/compiler/components/columnsData"
+import { getList } from "config/compilerService";
+import { columnsData } from "views/admin/compiler/components/columnsData";
 import Create from "views/admin/compiler/components/Create";
-import { useTitle } from "utils/TitleContext";
+import { useTitle } from "contexts/TitleContext";
 
 export default function CourseIndex() {
   useTitle("Quản lý biên dịch");
@@ -163,7 +163,7 @@ export default function CourseIndex() {
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         <ColumnsTable
-          columnsData ={columnsData}
+          columnsData={columnsData}
           tableData={tableData}
           loading={loading}
           onSort={handleSort}

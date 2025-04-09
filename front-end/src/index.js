@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './assets/css/App.css';
-import { TitleProvider } from "utils/TitleContext";
+import { TitleProvider } from "contexts/TitleContext";
 
 import App from './App';
 

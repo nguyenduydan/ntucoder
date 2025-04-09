@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
 import ColumnsTable from "components/separator/ColumnsTable";
-import {columnsData} from "views/admin/badge/components/columnsData"
+import { columnsData } from "views/admin/badge/components/columnsData";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
 import CreateBadge from "views/admin/badge/components/Create";
 import Toolbar from "components/menu/ToolBar";
-import {getListBagde} from "config/badgeService"
-import {useTitle} from "utils/TitleContext"
+import { getListBagde } from "config/badgeService";
+import { useTitle } from "contexts/TitleContext";
 
 export default function CoderIndex() {
   // Set title cho trang
@@ -144,7 +144,7 @@ export default function CoderIndex() {
         {/* Modal CreateCoder */}
         <CreateBadge isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         <ColumnsTable
-          columnsData ={columnsData}
+          columnsData={columnsData}
           tableData={tableData}
           loading={loading}
           onSort={handleSort}
