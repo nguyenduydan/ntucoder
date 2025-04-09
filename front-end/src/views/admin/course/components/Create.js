@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
 import ImageInput from "components/fields/ImageInput";
+
 import { create } from "config/courseService";
 import { getList } from "config/courseCategoryService";
 import { getListBagde } from "config/badgeService";
@@ -209,7 +210,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                             label="chọn ảnh đại diện"
                             previewWidth="40vh"
                             previewHeight="20vh"
-
                         />
                     </FormControl>
                 </ModalBody>

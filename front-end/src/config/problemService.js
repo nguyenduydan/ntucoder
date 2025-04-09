@@ -12,8 +12,7 @@ import api from "./apiConfig";
  * @returns {Promise<Object>} - Chứa data, totalPages và totalCount.
  */
 
-export const getList = async ({ page, pageSize, ascending, sortField, totalCount }) => {
-    const dynamicTimeout = (totalCount - pageSize + 1) * 1000;
+export const getList = async ({ page, pageSize, ascending, sortField }) => {
     try {
         const response = await api.get("/Problem", {
             params: {
@@ -21,8 +20,7 @@ export const getList = async ({ page, pageSize, ascending, sortField, totalCount
                 PageSize: pageSize,
                 ascending,
                 sortField,
-            },
-            timeout: dynamicTimeout
+            }
         });
         const dataWithStatus = Array.isArray(response.data.data)
             ? response.data.data.map(item => ({ ...item, status: item.status }))
@@ -37,6 +35,7 @@ export const getList = async ({ page, pageSize, ascending, sortField, totalCount
         throw error;
     }
 };
+
 
 /**
  * Lấy thông tin Problem theo id.
@@ -107,7 +106,7 @@ export const updateStatus = async (id, newStatus) => {
         const updatedData = { ...currentData, published: newStatus };
 
         // 3. Gửi toàn bộ dữ liệu lên server
-        const response = await api.put(`/Problem/${id}/`, updatedData, {
+        const response = await api.put(`/Problem/${id}`, updatedData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
