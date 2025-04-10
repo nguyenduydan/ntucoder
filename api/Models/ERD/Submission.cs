@@ -22,8 +22,8 @@ namespace api.Models.ERD
 
         public int? TestRunCount { get; set; }
         public string? TestResult { get; set; }
-        public string? MaxMemorySize { get; set; }
-        public string? MaxTimeDuration { get; set; }
+        public float? MaxMemorySize { get; set; }
+        public int? MaxTimeDuration { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

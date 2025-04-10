@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318062211_updatedb")]
-    partial class updatedb
+    [Migration("20250410142009_update_db")]
+    partial class update_db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -625,11 +625,11 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("MaxMemorySize")
-                        .HasColumnType("longtext");
+                    b.Property<float?>("MaxMemorySize")
+                        .HasColumnType("float");
 
-                    b.Property<string>("MaxTimeDuration")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("MaxTimeDuration")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProblemID")
                         .HasColumnType("int");
@@ -683,14 +683,14 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PreTest")
-                        .HasColumnType("longtext");
+                    b.Property<int>("PreTest")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProblemID")
                         .HasColumnType("int");
 
-                    b.Property<string>("SampleTest")
-                        .HasColumnType("longtext");
+                    b.Property<int>("SampleTest")
+                        .HasColumnType("int");
 
                     b.Property<int>("TestCaseOrder")
                         .HasColumnType("int");

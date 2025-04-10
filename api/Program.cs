@@ -40,6 +40,9 @@ builder.Services.AddScoped<LessonRepository>();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<CompilerRepository>();
 builder.Services.AddScoped<ProblemRepository>();
+builder.Services.AddScoped<SubmissionRepository>();
+builder.Services.AddScoped<TestCaseRepository>();
+builder.Services.AddScoped<TestRunRepository>();
 //Service
 builder.Services.AddScoped<MinioService>();
 

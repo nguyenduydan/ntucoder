@@ -1,59 +1,65 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
     Box,
     Text,
     VStack,
-    Divider,
     Flex,
     Grid,
     GridItem,
     Link,
     Button,
-    Image,
     Input,
     IconButton,
     useToast,
     Select,
-    Skeleton,
     useColorMode,
-    List, ListItem
+    SimpleGrid,
+    Checkbox,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
+import JoditEditor from "jodit-react";
+import sanitizeHtml from "utils/sanitizedHTML";
+import Editor from "utils/configEditor";
 
 import "moment/locale/vi";
 //import api
-import { getById, update } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
-import { formatDate, formatCurrency } from "utils/utils";
+import { getById, update } from "config/problemService";
+import { getListCategory } from "config/categoryService";
+import { getList } from "config/compilerService";
 
 
 
-const CourseDetail = () => {
+const ProblemDetail = () => {
     const { id } = useParams();
-    const [courseCategories, setCourseCategories] = useState([]);
-    const [badge, setBadge] = useState([]);
-    const [course, setCourseDetail] = useState(null);
+    const editor = useRef(null);
+
+    const [problem, setProblemDetail] = useState(null);
+    const [compiler, setCompiler] = useState([]);
+    const [categories, setProblemCategories] = useState([]);
+
     const [editField, setEditField] = useState(null);
     const [editableValues, setEditableValues] = useState({});
-    const [avatarFile, setAvatarFile] = useState(null);
+    const testTypeMapping = {
+        'Output Matching': 'Output Matching',
+        'Validate Output': 'Validate Output',
+    };
+
     const navigate = useNavigate();
     const toast = useToast();
     const [loading, setLoading] = useState(false);
-    const [avatarLoaded, setAvatarLoaded] = useState(false);
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
 
-    const fetchCourseDetail = useCallback(async () => {
+    const fetchProblemDetail = useCallback(async () => {
         try {
             const data = await getById(id);
-            setCourseDetail(data);
+            setProblemDetail(data);
             setEditableValues(data);
         } catch (error) {
             toast({
@@ -67,24 +73,24 @@ const CourseDetail = () => {
         }
     }, [id, toast]);
 
-    const fetchCategories = async () => {
+    const fetchListData = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            const badge = await getListBagde({ page: 1, pageSize: 10 });
-            setCourseCategories(data.data);
-            setBadge(badge.data);
+            const compiler = await getList({ page: 1, pageSize: 10 });
+            const category = await getListCategory({ page: 1, pageSize: 10 });
+            setProblemCategories(category.data);
+            setCompiler(compiler.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
-            setCourseCategories([]);
-            setBadge([]);
+            setProblemCategories([]);
+            setCompiler([]);
         }
     };
     useEffect(() => {
         if (id) {
-            fetchCourseDetail();
-            fetchCategories();
+            fetchProblemDetail();
+            fetchListData();
         }
-    }, [id, fetchCourseDetail]);
+    }, [id, fetchProblemDetail]);
 
 
     const handleEdit = (field) => {
@@ -94,58 +100,22 @@ const CourseDetail = () => {
     const handleInputChange = (field, value) => {
         setEditableValues((prev) => {
             const updatedValues = { ...prev, [field]: value };
-            setCourseDetail((prevCourseDetail) => ({
-                ...prevCourseDetail,
+            setProblemDetail((prevProblemDetail) => ({
+                ...prevProblemDetail,
                 [field]: value,
             }));
             return updatedValues;
         });
     };
 
-    const handleImgChange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                setEditableValues((prev) => ({ ...prev, avatar: reader.result }));
-
-                const formData = new FormData();
-                formData.append("CourseID", id);
-                formData.append("ImageFile", file);
-
-                // ✅ Thêm CourseName nếu có
-                if (editableValues.courseName) {
-                    formData.append("CourseName", editableValues.courseName);
-                }
-
-                try {
-                    await update(id, formData);
-                    await fetchCourseDetail();
-                    toast({
-                        title: "Cập nhật avatar thành công!",
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top",
-                        variant: "left-accent",
-                    });
-                } catch (error) {
-                    console.error("Đã xảy ra lỗi khi cập nhật avatar", error);
-                    toast({
-                        title: "Đã xảy ra lỗi khi cập nhật avatar.",
-                        status: "error",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top",
-                        variant: "left-accent",
-                    });
-                }
-            };
-            reader.readAsDataURL(file);
-            setAvatarFile(file);
-        }
+    const handleCategoryChange = (e, categoryID) => {
+        setProblemDetail(prev => ({
+            ...prev,
+            selectedCategoryIDs: e.target.checked
+                ? [...new Set([...prev.selectedCategoryIDs, categoryID])] // Thêm nếu checked
+                : prev.selectedCategoryIDs.filter(id => id !== categoryID), // Xóa nếu uncheck
+        }));
     };
-
 
     const handleSave = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
@@ -154,26 +124,21 @@ const CourseDetail = () => {
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
-                // Kiểm tra để tránh đính kèm CourseID trong formData
-                if (field !== "CourseID") {
+                // Kiểm tra để tránh đính kèm ProblemID trong formData
+                if (field !== "ProblemID") {
                     formData.append(field, editableValues[field]);
                 }
             });
 
-            // Nếu có file avatar, đính kèm vào formData
-            if (avatarFile) {
-                formData.append("ImageFile", avatarFile);
-            }
-
-            // Cập nhật CourseDetail sau khi chỉnh sửa
-            setCourseDetail((prev) => ({
+            // Cập nhật ProblemDetail sau khi chỉnh sửa
+            setProblemDetail((prev) => ({
                 ...prev,
                 ...editableValues,
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
             await update(id, formData);
-            await fetchCourseDetail();
+            await fetchProblemDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
                 title: "Cập nhật thành công!",
@@ -198,90 +163,63 @@ const CourseDetail = () => {
         }
     };
 
-    if (!course) {
+    if (!problem) {
         return (
             <ProgressBar />
         );
     }
     return (
         <ScrollToTop>
-            <Flex direction={{ base: "column", md: "row" }} justify="center" alignItems="center">
-                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="10px">
-                    <Box
-                        bg={boxColor}
-                        p={{ base: "4", md: "6" }}  // Padding responsive
-                        borderRadius="lg"
-                        boxShadow="lg"
-                        w={{ base: "100%", md: "100vh" }}
-                        maxW="500vh"
-                        mx="auto"
-                    >
-                        <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
-                            <Link>
-                                <Button
-                                    onClick={() => navigate(`/admin/problem`)}
-                                    variant="solid"
-                                    size="lg"
-                                    colorScheme="messenger"
-                                    borderRadius="xl"
-                                    px={5}
-                                    boxShadow="lg"
-                                    bgGradient="linear(to-l, messenger.500, navy.300)"
-                                    transition="all 0.2s ease-in-out"
-                                    _hover={{
-                                        color: "white",
-                                        transform: "scale(1.05)",
-                                    }}
-                                    _active={{
-                                        transform: "scale(0.90)",
-                                    }}
-                                >
-                                    <MdOutlineArrowBack /> Quay lại
-                                </Button>
-                            </Link>
-                        </Flex>
-                        <VStack spacing={6} align="stretch" mt={4}>
-                            {/* Avatar Section */}
-                            <Flex direction="column" align="center">
-                                <Skeleton
-                                    isLoaded={avatarLoaded}
-                                    borderRadius="md"
-                                    w="50%"
-                                    h="150px"
-                                    mb={4}
-                                >
-                                    <Image
-                                        src={editableValues.imageUrl || course.imageUrl || "/avatarSimmmple.png"}
-                                        alt="Course Avatar"
-                                        w="100%"
-                                        h="150px"
-                                        borderRadius="md"
-                                        objectFit="cover"
-                                        transition="all 0.2s ease-in-out"
-                                        _hover={{ transform: "scale(1.05)" }}
-                                        onClick={() => document.getElementById("avatarInput").click()}
-                                        onLoad={() => setAvatarLoaded(true)}
-                                        cursor="pointer"
-                                    />
-                                </Skeleton>
-                                <Input
-                                    id="avatarInput"
-                                    type="file"
-                                    onChange={handleImgChange}
-                                    display="none"
-                                />
-                            </Flex>
-                            <Divider />
-                            {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
-                                {/* Left Column */}
-                                <GridItem borderRightWidth={2}>
-                                    <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khóa học</Text>
-                                    <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-                                        {["courseName", "fee", "originalFee"].map((field) => (
+            <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="10px">
+                <Box
+                    bg={boxColor}
+                    p={{ base: "4", md: "6" }}  // Padding responsive
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    w={{ base: "100%", md: "150vh" }}
+                    maxW="600vh"
+                    mx="auto"
+                >
+                    <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
+                        <Link>
+                            <Button
+                                onClick={() => navigate(`/admin/problem`)}
+                                variant="solid"
+                                size="lg"
+                                colorScheme="messenger"
+                                borderRadius="xl"
+                                px={5}
+                                boxShadow="lg"
+                                bgGradient="linear(to-l, messenger.500, navy.300)"
+                                transition="all 0.2s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    transform: "scale(1.05)",
+                                }}
+                                _active={{
+                                    transform: "scale(0.90)",
+                                }}
+                            >
+                                <MdOutlineArrowBack /> Quay lại
+                            </Button>
+                        </Link>
+                    </Flex>
+                    <VStack spacing={6} align="stretch" mt={4}>
+                        {/* Responsive Grid: 1 column on mobile, 2 columns on md+ */}
+                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
+                            {/* Left Column */}
+                            <GridItem>
+                                <VStack align="stretch" spacing={4}>
+                                    {['problemCode', 'problemName', 'timeLimit', 'memoryLimit'].map(
+                                        (field) => (
                                             <Flex key={field} align="center">
                                                 {editField === field ? (
                                                     <Input
+                                                        type={
+                                                            field === 'timeLimit' || field === 'memoryLimit'
+                                                                ? 'number'
+                                                                : 'text'
+                                                        }
                                                         textColor={textColor}
                                                         value={editableValues[field] || ""}
                                                         onChange={(e) => handleInputChange(field, e.target.value)}
@@ -290,17 +228,18 @@ const CourseDetail = () => {
                                                         autoFocus
                                                     />
                                                 ) : (
-                                                    <Text fontSize="lg" textColor={textColor}>
+                                                    <Text fontSize="lg">
                                                         <strong>
-                                                            {field === "courseName"
-                                                                ? "Tên khóa học"
-                                                                : field === "fee"
-                                                                    ? "Giá tiền"
-                                                                    : "Giá tiền gốc"}:
-                                                        </strong>{" "}
-                                                        {field === "fee" || field === "originalFee"
-                                                            ? formatCurrency(course[field])
-                                                            : course[field] || "Chưa có thông tin"}
+                                                            {field === 'problemCode'
+                                                                ? 'Mã bài tập'
+                                                                : field === 'problemName'
+                                                                    ? 'Tên bài tập'
+                                                                    : field === 'timeLimit'
+                                                                        ? 'Thời gian giới hạn'
+                                                                        : 'Bộ nhớ giới hạn'}
+                                                            :
+                                                        </strong>{' '}
+                                                        {problem[field] || 'Chưa có thông tin'}
                                                     </Text>
                                                 )}
                                                 <IconButton
@@ -312,178 +251,259 @@ const CourseDetail = () => {
                                                     cursor="pointer"
                                                 />
                                             </Flex>
-                                        ))}
-                                        <Text fontSize="lg">
-                                            <strong>Phần trăm giảm: </strong><Text as={'span'} fontWeight={'bold'} color={'red'} >{course.discountPercent} %</Text>
+                                        ),
+                                    )}
+                                    <Flex align="center">
+                                        <Text fontSize="lg" fontWeight="bold">
+                                            Nội dung:
                                         </Text>
-                                        {/* Chọn loại khóa học field */}
-                                        <Flex align="center">
-                                            {editField === "courseCategory" ? (
-                                                <Select
-                                                    value={editableValues.courseCategoryID || ""}
-                                                    onBlur={() => setEditField(null)}
-                                                    autoFocus
-                                                    onChange={(e) => handleInputChange("courseCategoryID", e.target.value)}
-                                                    placeholder="Chọn loại khóa học"
-                                                    width={{ base: "100%", md: "50%" }}
-                                                >
-                                                    {courseCategories.map((category) => (
-                                                        <option key={category.courseCategoryID} value={category.courseCategoryID}>
-                                                            {category.name}
-                                                        </option>
-                                                    ))}
-                                                </Select>
-                                            ) : (
-                                                <Text fontSize="lg">
-                                                    <strong>Loại khóa học:</strong> {courseCategories.find(c => c.courseCategoryID === Number(course.courseCategoryID))?.name || "Chưa chọn"}
-                                                </Text>
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('problemContent')}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+                                    {editField === 'problemContent' ? (
+                                        <JoditEditor
+                                            ref={editor}
+                                            value={editableValues.problemContent}
+                                            config={Editor}
+                                            onChange={(newContent) => handleInputChange("problemContent", newContent)}
+                                            autoFocus
+                                            style={{ width: "100%", minHeight: "300px" }}
+                                        />
+                                    ) : (
+                                        <Box
+                                            overflowY={"auto"}
+                                            maxHeight="300px"
+                                            bg="gray.200"
+                                            borderRadius="md"
+                                            p={2}
+                                            sx={{ wordBreak: "break-word" }}
+                                            dangerouslySetInnerHTML={
+                                                {
+                                                    __html: sanitizeHtml(problem?.problemContent)
+                                                }
+                                            }
+                                        />
+                                    )}
 
-                                            )}
-                                            <IconButton
-                                                aria-label="Edit"
-                                                icon={<MdEdit />}
-                                                ml={2}
-                                                size="sm"
-                                                onClick={() => handleEdit("courseCategory")}
-                                                cursor="pointer"
-                                            />
-                                        </Flex>
-                                        {/* Chọn badge field */}
-                                        <Flex align="center">
-                                            {editField === "badge" ? (
-                                                <Select
-                                                    value={editableValues.badgeID || ""}
-                                                    onBlur={() => setEditField(null)}
-                                                    autoFocus
-                                                    onChange={(e) => handleInputChange("badgeID", e.target.value)}
-                                                    placeholder="Chọn nhãn"
-                                                    width={{ base: "100%", md: "50%" }}
-                                                >
-                                                    {badge.map((badge) => (
-                                                        <option key={badge.badgeID} value={badge.badgeID}>
-                                                            {badge.name}
-                                                        </option>
-                                                    ))}
-                                                </Select>
-                                            ) : (
-                                                <Text fontSize="lg">
-                                                    <strong>Nhãn:</strong> {badge.find(c => c.badgeID === Number(course.badgeID))?.name || "Chưa chọn"}
-                                                </Text>
-                                            )}
-                                            <IconButton
-                                                aria-label="Edit"
-                                                icon={<MdEdit />}
-                                                ml={2}
-                                                size="sm"
-                                                onClick={() => handleEdit("badge")}
-                                                cursor="pointer"
-                                            />
-                                        </Flex>
-
-                                        {/* Description field */}
-                                        <Flex align="center">
-                                            {editField === "description" ? (
-                                                <Input
-                                                    value={editableValues.description || ""}
-                                                    onChange={(e) => handleInputChange("description", e.target.value)}
-                                                    placeholder="Chỉnh sửa mô tả"
-                                                    onBlur={() => setEditField(null)}
-                                                    autoFocus
-                                                    textColor={textColor}
-                                                />
-                                            ) : (
-                                                <Text fontSize="lg">
-                                                    <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
-                                                </Text>
-                                            )}
-                                            <IconButton
-                                                aria-label="Edit"
-                                                icon={<MdEdit />}
-                                                ml={2}
-                                                size="sm"
-                                                onClick={() => handleEdit("description")}
-                                                cursor="pointer"
-                                            />
-                                        </Flex>
-                                    </VStack>
-                                </GridItem>
-
-                                {/* Right Column */}
-                                <GridItem>
-                                    <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
-                                    <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
-                                        <Text fontSize="lg">
-                                            <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
+                                    <Flex align="center">
+                                        <Text fontSize="lg" fontWeight="bold">
+                                            Giải thích:
                                         </Text>
-                                        <Text fontSize="lg">
-                                            <strong>Người tạo: </strong> {course.creatorName}
-                                        </Text>
-                                        {course.updatedAt && (
-                                            <>
-                                                <Text fontSize="lg">
-                                                    <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
-                                                </Text>
-                                                <Text fontSize="lg">
-                                                    <strong>Người cập nhật: </strong> {course.creatorName}
-                                                </Text>
-                                            </>
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('problemExplanation')}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+                                    {editField === 'problemExplanation' ? (
+                                        <JoditEditor
+                                            ref={editor}
+                                            value={editableValues.problemExplanation}
+                                            config={Editor}
+                                            onChange={(newContent) => handleInputChange("problemExplanation", newContent)}
+                                            autoFocus
+                                            style={{ width: "100%", minHeight: "300px" }}
+                                        />
+                                    ) : (
+                                        <Box
+                                            overflowY={"auto"}
+                                            maxHeight="300px"
+                                            bg="gray.200"
+                                            borderRadius="md"
+                                            p={2}
+                                            sx={{ wordBreak: "break-word" }}
+                                            dangerouslySetInnerHTML={
+                                                {
+                                                    __html: sanitizeHtml(problem?.problemExplanation)
+                                                }
+                                            }
+                                        />
+                                    )}
+
+                                    <Flex align="center">
+                                        {editField === 'testType' ? (
+                                            <Select
+                                                value={
+                                                    editableValues.testType || problem.testType || ''
+                                                }
+                                                onBlur={() => setEditField(null)}
+                                                onChange={(e) => handleInputChange("testType", e.target.value)}
+                                                autoFocus
+                                                width="50%"
+                                            >
+                                                <option value="Output Matching">Output Matching</option>
+                                                <option value="Validate Output">Validate Output</option>
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Hình thức kiểm tra:</strong>{' '}
+                                                {testTypeMapping[problem.testType] ||
+                                                    'Không xác định'}
+                                            </Text>
                                         )}
-                                    </VStack>
-                                </GridItem>
-                            </Grid>
-                        </VStack>
-                        <Flex justifyContent="flex-end" mt={6}>
-                            <Button
-                                variant="solid"
-                                size="lg"
-                                colorScheme="messenger"
-                                borderRadius="xl"
-                                px={10}
-                                boxShadow="lg"
-                                bgGradient="linear(to-l, green.500, green.300)"
-                                transition="all 0.2s ease-in-out"
-                                _hover={{
-                                    color: "white",
-                                    transform: "scale(1.05)",
-                                }}
-                                _active={{
-                                    transform: "scale(0.90)",
-                                }}
-                                onClick={handleSave}
-                                isLoading={loading}
-                                loadingText="Đang lưu..."
-                                disabled={editField === null}
-                            >
-                                Lưu
-                            </Button>
-                        </Flex>
-                    </Box>
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('testType')}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+                                </VStack>
+                            </GridItem>
+
+                            {/* Right Column */}
+                            <GridItem>
+                                <VStack align="stretch" spacing={4}>
+                                    <Flex align="center">
+                                        <Text fontSize="lg">
+                                            <strong>Tên người tạo:</strong>{' '}
+                                            {problem.coderName || 'Chưa có thông tin'}
+                                        </Text>
+                                    </Flex>
+
+                                    <Flex align="center">
+                                        <Text fontSize="lg">
+                                            <strong>Trạng thái:</strong>{' '}
+                                            {problem.published === 1 ? 'Công khai' : 'Riêng tư'}
+                                        </Text>
+                                    </Flex>
+
+                                    <Flex align="center">
+                                        {editField === "compiler" ? (
+                                            <Select
+                                                value={editableValues.testCompilerID || ""}
+                                                onBlur={() => setEditField(null)}
+                                                onChange={(e) => handleInputChange("testCompilerID", e.target.value)}
+                                                autoFocus
+                                                width={{ base: "100%", md: "50%" }}
+                                            >
+                                                {compiler.map((compiler) => (
+                                                    <option key={compiler.compilerID} value={compiler.compilerID}>
+                                                        {compiler.compilerName}
+                                                    </option>
+                                                ))}
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Trình biên dịch:</strong> {compiler.find(c => c.compilerID === Number(problem.testCompilerID))?.compilerName || "Chưa chọn"}
+                                            </Text>
+                                        )}
+                                    </Flex>
+
+                                    <Flex align="center">
+                                        {editField === 'selectedCategory' ? (
+                                            <SimpleGrid columns={2} spacing={2} w="full">
+                                                {categories.map((category) => (
+                                                    <Checkbox
+                                                        key={category.categoryID}
+                                                        isChecked={editableValues.selectedCategoryIDs?.includes(category.categoryID)}
+                                                        onChange={(e) => {
+                                                            const updatedCategoryIDs = e.target.checked
+                                                                ? [...new Set([...(editableValues.selectedCategoryIDs || []), category.categoryID])]
+                                                                : (editableValues.selectedCategoryIDs || []).filter((id) => id !== category.categoryID);
+
+                                                            // Cập nhật vào editableValues để khi lưu sẽ lấy đúng
+                                                            setEditableValues(prev => ({
+                                                                ...prev,
+                                                                selectedCategoryIDs: updatedCategoryIDs
+                                                            }));
+                                                        }}
+                                                    >
+                                                        {category.catName}
+                                                    </Checkbox>
+                                                ))}
+                                            </SimpleGrid>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Thể loại:</strong>{' '}
+                                                {problem.selectedCategoryNames?.length > 0
+                                                    ? problem.selectedCategoryNames.join(', ')
+                                                    : 'Chưa có danh mục'}
+                                            </Text>
+                                        )}
+
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('selectedCategory')}
+                                        />
+                                    </Flex>
+                                    <Flex align="center">
+                                        <Text fontSize="lg" fontWeight="bold">
+                                            Code test:
+                                        </Text>
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('testCode')}
+                                        />
+                                    </Flex>
+
+                                    {editField === 'testCode' ? (
+                                        <JoditEditor
+                                            ref={editor}
+                                            value={editableValues.testCode}
+                                            config={Editor}
+                                            onChange={(newContent) => handleInputChange("testCode", newContent)}
+                                            autoFocus
+                                            style={{ width: "100%", minHeight: "300px" }}
+                                        />
+                                    ) : (
+                                        <Box p={2} bg="gray.200" borderRadius="md" overflowX="auto">
+                                            <pre>
+                                                <code>{problem.testCode || 'Chưa có'}</code>
+                                            </pre>
+                                        </Box>
+                                    )}
+                                </VStack>
+                            </GridItem>
+                        </Grid>
+                    </VStack>
+                    <Flex justifyContent="flex-end" mt={6}>
+                        <Button
+                            variant="solid"
+                            size="lg"
+                            colorScheme="messenger"
+                            borderRadius="xl"
+                            px={10}
+                            boxShadow="lg"
+                            bgGradient="linear(to-l, green.500, green.300)"
+                            transition="all 0.2s ease-in-out"
+                            _hover={{
+                                color: "white",
+                                transform: "scale(1.05)",
+                            }}
+                            _active={{
+                                transform: "scale(0.90)",
+                            }}
+                            onClick={handleSave}
+                            isLoading={loading}
+                            loadingText="Đang lưu..."
+                            disabled={editField === null}
+                        >
+                            Lưu
+                        </Button>
+                    </Flex>
                 </Box>
-                {/* Thông tin danh sách topic */}
-                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
-                    <Box
-                        bg={boxColor}
-                        p={{ base: "4", md: "6" }}  // Padding responsive
-                        borderRadius="lg"
-                        boxShadow="lg"
-                        w={{ base: "100%", md: "50vh" }}
-                        maxH="60vh"
-                        mx="auto"
-                    >
-                        <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Danh sách chủ đề</Text>
-                        <List spacing={3}>
-                            {course.topics.map((topic, index) => (
-                                <ListItem key={topic.topicID} p={2} bg="gray.100" borderRadius="md">
-                                    <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
-                </Box>
-            </Flex>
+            </Box>
         </ScrollToTop>
 
     );
 };
 
-export default CourseDetail;
+export default ProblemDetail;
