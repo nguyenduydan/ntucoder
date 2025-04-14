@@ -5,6 +5,7 @@ import 'nprogress/nprogress.css'; // Import NProgress styles
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://localhost:7015/api";
 const api = axios.create({
     baseURL: API_BASE_URL,
+    timeout: 5000, // 50 seconds timeout
     headers: {
         "Content-Type": "application/json",
     },

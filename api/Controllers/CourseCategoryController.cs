@@ -26,7 +26,7 @@ namespace api.Controllers
 
         // ✅ Tạo danh mục mới
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CourseCategoryDTO dto)
+        public async Task<IActionResult> Create([FromForm] CourseCategoryDTO dto)
         {
             if (dto == null)
             {

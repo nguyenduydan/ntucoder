@@ -7,7 +7,7 @@ using api.Infrashtructure.Repositories;
 
 namespace api.Controllers
 {
-    [Route("api/badge")]
+    [Route("api/[controller]")]
     [ApiController]
     public class BadgeController: ControllerBase
     {
@@ -33,7 +33,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBadge([FromBody] BadgeDTO dto)
+        public async Task<IActionResult> CreateBadge([FromForm] BadgeDTO dto)
         {
             if (dto == null)
             {

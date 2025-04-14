@@ -2,7 +2,7 @@
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
 import { Box } from "@chakra-ui/react";
-import { deletebadge } from "config/badgeService";
+import { deleteItem } from "config/apiService";
 
 export const columnsData = [
   {
@@ -19,24 +19,24 @@ export const columnsData = [
     Header: "Mô tả",
     accessor: "description",
   },
-   {
+  {
     Header: "Mã màu",
     accessor: "color",
   },
   {
-  Header: "Review",
-  accessor: "color",
-  Cell: ({ value }) => (
-    <Box
-      w="40px"
-      h="20px"
-      bg={value}
-      border="none"
-      borderColor="gray.300"
-      borderRadius="md"
-    />
-  ),
-},
+    Header: "Review",
+    accessor: "color",
+    Cell: ({ value }) => (
+      <Box
+        w="40px"
+        h="20px"
+        bg={value}
+        border="none"
+        borderColor="gray.300"
+        borderRadius="md"
+      />
+    ),
+  },
 
   {
     Header: "Hành động",
@@ -44,8 +44,9 @@ export const columnsData = [
     Cell: (props) => (
       <ActionCell
         {...props}
-        deleteFunction={deletebadge}
-        idData = "badgeID"
+        controller="Badge"
+        deleteFunction={deleteItem}
+        idData="badgeID"
         deleteSuccessToast={{
           title: "Đã xóa!",
           description: "Nhãn đã được xóa thành công.",

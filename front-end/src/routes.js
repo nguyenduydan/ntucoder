@@ -119,6 +119,20 @@ const routes = [
       }
     ]
   },
+  {
+    name: 'Quản lý testcase',
+    layout: '/admin',
+    icon: <Icon as={FaLaptopCode} width="20px" height="20px" color="inherit" />,
+    path: '/testcase',
+    component: <ProblemTable />,
+    item: [
+      {
+        name: 'Chi tiết bài tập',
+        path: 'detail/:id',
+        component: <ProblemDetail />,
+      }
+    ]
+  },
   // {
   //   name: 'Thể loại',
   //   layout: '/admin',

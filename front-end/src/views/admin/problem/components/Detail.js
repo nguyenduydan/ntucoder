@@ -59,8 +59,17 @@ const ProblemDetail = () => {
     const fetchProblemDetail = useCallback(async () => {
         try {
             const data = await getById(id);
-            setProblemDetail(data);
-            setEditableValues(data);
+
+            setProblemDetail({
+                ...data,
+                selectedCategoryIDs: data.selectedCategoryIDs || [],
+                selectedCategoryNames: data.selectedCategoryNames || []
+            });
+
+            setEditableValues({
+                ...data,
+                selectedCategoryIDs: data.selectedCategoryIDs || []
+            });
         } catch (error) {
             toast({
                 title: "Đã xảy ra lỗi.",
@@ -94,6 +103,13 @@ const ProblemDetail = () => {
 
 
     const handleEdit = (field) => {
+        console.log("Mở edit:", field, editableValues.selectedCategoryIDs);
+        if (field === 'selectedCategory') {
+            setEditableValues((prev) => ({
+                ...prev,
+                selectedCategoryIDs: problem.selectedCategoryIDs || [],
+            }));
+        }
         setEditField(field);
     };
 
@@ -108,15 +124,6 @@ const ProblemDetail = () => {
         });
     };
 
-    const handleCategoryChange = (e, categoryID) => {
-        setProblemDetail(prev => ({
-            ...prev,
-            selectedCategoryIDs: e.target.checked
-                ? [...new Set([...prev.selectedCategoryIDs, categoryID])] // Thêm nếu checked
-                : prev.selectedCategoryIDs.filter(id => id !== categoryID), // Xóa nếu uncheck
-        }));
-    };
-
     const handleSave = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
@@ -124,8 +131,11 @@ const ProblemDetail = () => {
 
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
-                // Kiểm tra để tránh đính kèm ProblemID trong formData
-                if (field !== "ProblemID") {
+                if (field === "selectedCategoryIDs") {
+                    editableValues.selectedCategoryIDs.forEach(id => {
+                        formData.append("SelectedCategoryIDs", id); // Hoặc "SelectedCategoryIDs[]" nếu backend yêu cầu
+                    });
+                } else if (field !== "ProblemID") {
                     formData.append(field, editableValues[field]);
                 }
             });
@@ -176,8 +186,8 @@ const ProblemDetail = () => {
                     p={{ base: "4", md: "6" }}  // Padding responsive
                     borderRadius="lg"
                     boxShadow="lg"
-                    w={{ base: "100%", md: "150vh" }}
-                    maxW="600vh"
+                    w="100%"
+                    maxW="1000vh"
                     mx="auto"
                 >
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
@@ -404,25 +414,27 @@ const ProblemDetail = () => {
                                     <Flex align="center">
                                         {editField === 'selectedCategory' ? (
                                             <SimpleGrid columns={2} spacing={2} w="full">
-                                                {categories.map((category) => (
-                                                    <Checkbox
-                                                        key={category.categoryID}
-                                                        isChecked={editableValues.selectedCategoryIDs?.includes(category.categoryID)}
-                                                        onChange={(e) => {
-                                                            const updatedCategoryIDs = e.target.checked
-                                                                ? [...new Set([...(editableValues.selectedCategoryIDs || []), category.categoryID])]
-                                                                : (editableValues.selectedCategoryIDs || []).filter((id) => id !== category.categoryID);
+                                                {categories.map((category) => {
+                                                    const isChecked = editableValues.selectedCategoryIDs?.includes(category.categoryID);
+                                                    return (
+                                                        <Checkbox
+                                                            key={category.categoryID}
+                                                            isChecked={isChecked}
+                                                            onChange={(e) => {
+                                                                const updatedCategoryIDs = e.target.checked
+                                                                    ? [...new Set([...(editableValues.selectedCategoryIDs || []), category.categoryID])]
+                                                                    : (editableValues.selectedCategoryIDs || []).filter((id) => id !== category.categoryID);
 
-                                                            // Cập nhật vào editableValues để khi lưu sẽ lấy đúng
-                                                            setEditableValues(prev => ({
-                                                                ...prev,
-                                                                selectedCategoryIDs: updatedCategoryIDs
-                                                            }));
-                                                        }}
-                                                    >
-                                                        {category.catName}
-                                                    </Checkbox>
-                                                ))}
+                                                                setEditableValues(prev => ({
+                                                                    ...prev,
+                                                                    selectedCategoryIDs: updatedCategoryIDs
+                                                                }));
+                                                            }}
+                                                        >
+                                                            {category.catName}
+                                                        </Checkbox>
+                                                    );
+                                                })}
                                             </SimpleGrid>
                                         ) : (
                                             <Text fontSize="lg">

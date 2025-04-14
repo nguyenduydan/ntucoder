@@ -1,7 +1,7 @@
 // columnsData.jsx
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deletecoursecategory } from "config/courseCategoryService";
+import { deleteItem } from "config/apiService";
 
 export const columnsData = [
   {
@@ -25,11 +25,12 @@ export const columnsData = [
     Cell: (props) => (
       <ActionCell
         {...props}
-        deleteFunction={deletecoursecategory}
-        idData = "courseCategoryID"
+        controller="CourseCategory"
+        deleteFunction={deleteItem}
+        idData="courseCategoryID"
         deleteSuccessToast={{
           title: "Đã xóa!",
-          description: "Nhãn đã được xóa thành công.",
+          description: "Loại khóa học đã được xóa thành công.",
         }}
         deleteErrorToast={{
           title: "Xóa thất bại!",

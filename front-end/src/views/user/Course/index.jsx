@@ -3,7 +3,7 @@ import {
     Box, Text, Tabs, TabList, TabPanels, Tab, TabPanel,
     useColorModeValue, useToast, TabIndicator, SimpleGrid
 } from "@chakra-ui/react";
-import { getList } from "config/courseService";
+import { getList } from "config/apiService";
 import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
 import ScrollToTop from "components/scroll/ScrollToTop";
@@ -21,7 +21,7 @@ export default function Course() {
     const fetchCourses = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await getList({ page: 1, pageSize: 10, ascending: true, totalCount: 100 });
+            const response = await getList({ controller: "Course", page: 1, pageSize: 10, ascending: true, totalCount: 100 });
             setCourses(response.data.filter(course => course.status === 1));
             setLoading(false);
         } catch (error) {

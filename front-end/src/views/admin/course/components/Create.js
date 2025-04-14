@@ -21,9 +21,7 @@ import {
 import FlushedInput from "components/fields/InputField";
 import ImageInput from "components/fields/ImageInput";
 
-import { create } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
+import { createItem, getList } from "config/apiService";
 
 export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     const [course, setCourse] = useState({
@@ -68,9 +66,9 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
 
     const fetchCategories = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            const badge = await getListBagde({ page: 1, pageSize: 10 });
-            setCourseCategories(data.data);
+            const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 10 });
+            const badge = await getList({ controller: "Badge", page: 1, pageSize: 10 });
+            setCourseCategories(courseCategory.data);
             setBadge(badge.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -117,7 +115,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
             formData.append("imageFile", course.imageFile);
         }
         try {
-            await create(formData); // Gửi FormData lên backend
+            await createItem({ controller: "Course", data: formData }); // Gửi FormData lên backend
 
             toast({
                 title: 'Thêm mới khóa học thành công!',
@@ -131,9 +129,19 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
             if (fetchData) await fetchData();
             onClose();
         } catch (error) {
+            let errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
+
+            // Kiểm tra xem lỗi có phải đến từ API không
+            if (error.response && error.response.data) {
+                errorMessage = error.response.data.message || "Lỗi không xác định từ server.";
+            } else if (error.message) {
+                errorMessage = error.message; // Nếu lỗi không phải từ API, lấy message mặc định
+            }
+
+            // Hiển thị thông báo lỗi
             toast({
                 title: "Đã xảy ra lỗi.",
-                description: error.message || "Có lỗi xảy ra khi tạo khóa học.",
+                description: errorMessage,
                 status: "error",
                 duration: 2000,
                 isClosable: true,

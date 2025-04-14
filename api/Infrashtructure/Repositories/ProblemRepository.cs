@@ -172,6 +172,7 @@ namespace api.Infrashtructure.Repositories
                 TestCompilerID = problem.TestCompilerID,
                 CoderName = problem.Coder.CoderName,
                 TestCompilerName = problem.Compiler.CompilerName,
+                SelectedCategoryIDs = problem.ProblemCategories.Select(pc => pc.CategoryID).ToList(),
                 SelectedCategoryNames = problem.ProblemCategories
                 .Select(pc => pc.Category.CatName)
                 .ToList(),

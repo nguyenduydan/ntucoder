@@ -6,8 +6,8 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
-import { getById } from "config/courseService";
-import { getLessons } from "config/topicService";
+
+import { getDetail } from "config/apiService";
 
 const CourseDetail = () => {
     const { slugId } = useParams();
@@ -35,7 +35,7 @@ const CourseDetail = () => {
 
         const fetchCourse = async () => {
             try {
-                const response = await getById(courseID);
+                const response = await getDetail({ controller: "Course", id: courseID });
 
                 if (!response || Object.keys(response).length === 0) {
                     toast({
@@ -54,7 +54,7 @@ const CourseDetail = () => {
                 const topicsWithLessons = await Promise.all(
                     topics.map(async (topic) => {
                         try {
-                            const topicData = await getLessons(topic.topicID);
+                            const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
                             const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
 
                             return { ...topic, lessons: filteredLessons };

@@ -21,6 +21,7 @@ import { MdDelete } from "react-icons/md";
 const ActionCell = ({
   row,
   idData,
+  controller,
   deleteFunction,
   deleteSuccessToast = {},
   deleteErrorToast = {},
@@ -53,49 +54,49 @@ const ActionCell = ({
   };
 
   const handleDeleteClick = async () => {
-  setLoading(true);
-  try {
+    setLoading(true);
+    try {
 
-    await deleteFunction({ id });
+      await deleteFunction({ controller, id });
 
-    // Nếu thành công, hiển thị thông báo thành công
-    toast({
-      title: "Xóa thành công!",
-      description: "Người dùng đã bị xóa.",
-      status: "success",
-      duration: 2000,
-      isClosable: true,
-      position: "top",
-      variant: "left-accent",
-      ...deleteSuccessToast,
-    });
+      // Nếu thành công, hiển thị thông báo thành công
+      toast({
+        title: "Xóa thành công!",
+        description: "Người dùng đã bị xóa.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+        ...deleteSuccessToast,
+      });
 
-    onClose();
-    if (fetchData) await fetchData(); // Gọi lại hàm fetchData để tải lại dữ liệu
-  } catch (error) {
-    // Hiển thị thông báo lỗi
-    toast({
-      title: "Lỗi",
-      description:
-        error.response?.data?.message ||
-        error.message ||
-        "Có lỗi xảy ra khi thực hiện hành động.",
-      status: "error",
-      duration: 2000,
-      isClosable: true,
-      position: "top",
-      variant: "left-accent",
-      ...deleteErrorToast,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      onClose();
+      if (fetchData) await fetchData(); // Gọi lại hàm fetchData để tải lại dữ liệu
+    } catch (error) {
+      // Hiển thị thông báo lỗi
+      toast({
+        title: "Lỗi",
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Có lỗi xảy ra khi thực hiện hành động.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+        ...deleteErrorToast,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
     <Flex gap={4} justify="left" align="center">
-     {detailPath && (
+      {detailPath && (
         <Button
           variant="solid"
           size="xs"

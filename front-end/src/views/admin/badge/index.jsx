@@ -1,113 +1,78 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Box, useToast } from "@chakra-ui/react";
-import ColumnsTable from "components/separator/ColumnsTable";
-import { columnsData } from "views/admin/badge/components/columnsData";
+import React, { useEffect, useState } from "react";
+import { Box, useToast, useDisclosure } from "@chakra-ui/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
-import { useDisclosure } from "@chakra-ui/react";
-import CreateBadge from "views/admin/badge/components/Create";
 import Toolbar from "components/menu/ToolBar";
-import { getListBagde } from "config/badgeService";
+import ColumnsTable from "components/separator/ColumnsTable";
+import Create from "views/admin/badge/components/Create";
+
+import { getList } from "config/apiService";
+import { columnsData } from "views/admin/badge/components/columnsData";
 import { useTitle } from "contexts/TitleContext";
 
-export default function CoderIndex() {
-  // Set title cho trang
-  useTitle("Quãn lý nhãn");
-  // State cho dữ liệu bảng
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [prefetchCache, setPrefetchCache] = useState({});
+export default function Index() {
+  useTitle("Quản lý nhãn");
 
-  // Các state khác
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
+
+  // State for filter
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalRows, setTotalRows] = useState(0);
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Sử dụng useRef để theo dõi lỗi, tránh hiển thị toast nhiều lần
-  const errorShown = useRef(false);
+  const queryKey = ["badges", currentPage, pageSize, ascending, sortField];
 
-  const fetchPage = useCallback(
-    async (page) => {
-      setLoading(true);
-      try {
-        const { data, totalPages: totalPagesResp, totalCount } = await getListBagde({
-          page,
-          pageSize,
-          ascending,
-          sortField,
-        });
-        // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
-        if (page === 1) {
-          setTotalPages(totalPagesResp);
-          setTotalRows(totalCount);
-        }
-        // Reset error flag khi fetch thành công
-        errorShown.current = false;
-        setPrefetchCache(prev => ({ ...prev, [page]: data }));
-        return data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
-        if (!errorShown.current) {
-          errorShown.current = true;
-          toast({
-            title: "Lỗi khi tải dữ liệu",
-            description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-            position: "top",
-            variant: "left-accent",
-          });
-        }
-        return [];
-      } finally {
-        setLoading(false);
-      }
+  // Query load badge list
+  const { data, isLoading, } = useQuery({
+    queryKey,
+    queryFn: () =>
+      getList({
+        controller: "Badge",
+        page: currentPage,
+        pageSize,
+        ascending,
+        sortField,
+      }),
+    keepPreviousData: true,
+    staleTime: 1000 * 60, // cache in 1 minute
+    retry: 1,
+    onError: () => {
+      toast({
+        title: "Lỗi khi tải dữ liệu",
+        description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+      });
     },
-    [pageSize, ascending, sortField, toast]
-  );
+  });
 
-  const refreshTable = async () => {
-    setPrefetchCache({});
-    setCurrentPage(1);
-    const data = await fetchPage(1);
-    setTableData(data);
-    if (totalPages > 1) fetchPage(2);
-    if (totalPages > 2) fetchPage(3);
-  };
-
-  // Khi component mount hoặc tiêu chí thay đổi, load trang 1 và 2 cùng lúc
+  // Prefetch next page data
   useEffect(() => {
-    setPrefetchCache({});
-    setCurrentPage(1);
-    fetchPage(1);
-    fetchPage(2);
-  }, [fetchPage]);
+    if (data?.totalPages) {
+      if (currentPage < data.totalPages) {
+        queryClient.prefetchQuery({
+          queryKey: ["badges", currentPage + 1, pageSize, ascending, sortField],
+          queryFn: () =>
+            getList({
+              controller: "Badge",
+              page: currentPage + 1,
+              pageSize,
+              ascending,
+              sortField,
+            }),
+        });
+      }
+    }
+  }, [data, currentPage, pageSize, ascending, sortField, queryClient]);
 
-  // Khi currentPage thay đổi: nếu dữ liệu đã có trong cache thì cập nhật tableData, nếu không thì fetch
-  useEffect(() => {
-    if (prefetchCache[currentPage]) {
-      setTableData(prefetchCache[currentPage]);
-    } else {
-      fetchPage(currentPage).then((data) => setTableData(data));
-    }
-    // Prefetch trang tiếp theo (currentPage+1)
-    if (currentPage < totalPages && !prefetchCache[currentPage + 1]) {
-      fetchPage(currentPage + 1);
-    }
-    // Prefetch trang sau đó (currentPage+2)
-    if (currentPage + 1 < totalPages && !prefetchCache[currentPage + 2]) {
-      fetchPage(currentPage + 2);
-    }
-  }, [currentPage, prefetchCache, fetchPage, totalPages]);
-
-  // Sắp xếp dữ liệu
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -115,47 +80,47 @@ export default function CoderIndex() {
       setSortField(field);
       setAscending(true);
     }
-    // Khi thay đổi sắp xếp, reset currentPage và cache
     setCurrentPage(1);
-    setPrefetchCache({});
   };
 
-  // Thay đổi trang hiện tại
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
+    if (newPage > 0 && newPage <= data?.totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Thay đổi số lượng phần tử trên mỗi trang
   const handlePageSizeChange = (value) => {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
       setPageSize(newPageSize);
       setCurrentPage(1);
-      setPrefetchCache({});
     }
+  };
+
+  const refreshTable = () => {
+    queryClient.invalidateQueries({ queryKey: ["badges"] });
   };
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Toolbar onAdd={onOpen} onSearch />
-        {/* Modal CreateCoder */}
-        <CreateBadge isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+
         <ColumnsTable
           columnsData={columnsData}
-          tableData={tableData}
-          loading={loading}
+          tableData={data?.data || []}
+          loading={isLoading}
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
           fetchData={refreshTable}
         />
+
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
-          totalRows={totalRows}
+          totalPages={data?.totalPages || 0}
+          totalRows={data?.totalCount || 0}
           onPageChange={handlePageChange}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
     Box,
     Text,
@@ -23,18 +23,19 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-
+import JoditEditor from "jodit-react";
+import sanitizeHtml from "utils/sanitizedHTML";
+import Editor from "utils/configEditor";
 import "moment/locale/vi";
 //import api
-import { getById, update } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
+import { getDetail, updateItem, getList } from "config/apiService";
 import { formatDate, formatCurrency } from "utils/utils";
 
 
 
 const CourseDetail = () => {
     const { id } = useParams();
+    const editor = useRef(null);
     const [courseCategories, setCourseCategories] = useState([]);
     const [badge, setBadge] = useState([]);
     const [course, setCourseDetail] = useState(null);
@@ -52,7 +53,7 @@ const CourseDetail = () => {
 
     const fetchCourseDetail = useCallback(async () => {
         try {
-            const data = await getById(id);
+            const data = await getDetail({ controller: "Course", id });
             setCourseDetail(data);
             setEditableValues(data);
         } catch (error) {
@@ -69,9 +70,9 @@ const CourseDetail = () => {
 
     const fetchCategories = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            const badge = await getListBagde({ page: 1, pageSize: 10 });
-            setCourseCategories(data.data);
+            const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 10 });
+            const badge = await getList({ controller: "Badge", page: 1, pageSize: 10 });
+            setCourseCategories(courseCategory.data);
             setBadge(badge.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -119,7 +120,7 @@ const CourseDetail = () => {
                 }
 
                 try {
-                    await update(id, formData);
+                    await updateItem({ controller: "Course", id: id, data: formData });
                     await fetchCourseDetail();
                     toast({
                         title: "Cập nhật avatar thành công!",
@@ -172,7 +173,7 @@ const CourseDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            await update(id, formData);
+            await updateItem({ controller: "Course", id: id, data: formData });
             await fetchCourseDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
@@ -380,31 +381,7 @@ const CourseDetail = () => {
                                             />
                                         </Flex>
 
-                                        {/* Description field */}
-                                        <Flex align="center">
-                                            {editField === "description" ? (
-                                                <Input
-                                                    value={editableValues.description || ""}
-                                                    onChange={(e) => handleInputChange("description", e.target.value)}
-                                                    placeholder="Chỉnh sửa mô tả"
-                                                    onBlur={() => setEditField(null)}
-                                                    autoFocus
-                                                    textColor={textColor}
-                                                />
-                                            ) : (
-                                                <Text fontSize="lg">
-                                                    <strong>Mô tả:</strong> {course.description || "Chưa có thông tin"}
-                                                </Text>
-                                            )}
-                                            <IconButton
-                                                aria-label="Edit"
-                                                icon={<MdEdit />}
-                                                ml={2}
-                                                size="sm"
-                                                onClick={() => handleEdit("description")}
-                                                cursor="pointer"
-                                            />
-                                        </Flex>
+
                                     </VStack>
                                 </GridItem>
 
@@ -431,6 +408,39 @@ const CourseDetail = () => {
                                     </VStack>
                                 </GridItem>
                             </Grid>
+                            <Divider />
+                            {/* Description field */}
+                            <Flex align="center" justifyContent="center">
+                                {editField === "description" ? (
+                                    <Box width="100%" overflowY={"auto"}>
+                                        <JoditEditor
+                                            ref={editor}
+                                            value={editableValues.description}
+                                            config={Editor}
+                                            onChange={(newContent) => handleInputChange("description", newContent)}
+                                            autoFocus
+                                            height="1000px"  // Thay đổi giá trị ở đây
+                                            style={{ width: "100%", minHeight: "1000px" }}  // Cập nhật style nếu cần
+                                        />
+
+                                    </Box>
+                                ) : (
+                                    <Box width="max-content">
+                                        <Text fontSize="lg">
+                                            <strong>Nội dung bài học:</strong>
+                                            <Box overflowY={"auto"} maxHeight="300px" sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} />
+                                        </Text>
+                                    </Box>
+                                )}
+                                <IconButton
+                                    aria-label="Edit"
+                                    icon={<MdEdit />}
+                                    ml={2}
+                                    size="sm"
+                                    onClick={() => handleEdit("description")}
+                                    cursor="pointer"
+                                />
+                            </Flex>
                         </VStack>
                         <Flex justifyContent="flex-end" mt={6}>
                             <Button
@@ -457,6 +467,7 @@ const CourseDetail = () => {
                                 Lưu
                             </Button>
                         </Flex>
+
                     </Box>
                 </Box>
                 {/* Thông tin danh sách topic */}

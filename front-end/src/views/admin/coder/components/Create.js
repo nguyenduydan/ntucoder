@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/coderService";
+import { createItem } from "config/apiService";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [userName, setUserName] = useState("");
@@ -68,7 +68,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                 password,
             };
 
-            await create(data); // Gọi service
+            await createItem({ controller: "Coder", data: data }); // Gọi service
             // Hiển thị thông báo thành công
             toast({
                 title: 'Thêm mới thành công!',

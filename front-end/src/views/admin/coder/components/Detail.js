@@ -18,17 +18,21 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { getById, update } from "config/coderService";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
 import moment from "moment";
 import "moment/locale/vi";
+import { getDetail, updateItem } from "config/apiService";
+
+
+
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
 };
+
 const genderMapping = {
     0: "Nam",
     1: "Nữ",
@@ -51,7 +55,7 @@ const CoderDetail = () => {
 
     const fetchCoderDetail = useCallback(async () => {
         try {
-            const data = await getById(id);
+            const data = await getDetail({ controller: "Coder", id });
             setCoderDetail(data);
             setEditableValues(data);
         } catch (error) {
@@ -100,7 +104,7 @@ const CoderDetail = () => {
 
                 try {
                     // update image
-                    await update(id, formData);
+                    await updateItem({ controller: "Coder", id: id, data: formData });
 
                     toast({
                         title: "Cập nhật avatar thành công!",
@@ -110,6 +114,7 @@ const CoderDetail = () => {
                         position: "top",
                         variant: "left-accent",
                     });
+                    await fetchCoderDetail();
                 } catch (error) {
                     console.error("Đã xảy ra lỗi khi cập nhật avatar", error);
                     toast({
@@ -152,7 +157,7 @@ const CoderDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            await update(id, formData);
+            await updateItem({ controller: "Coder", id: id, data: formData });
             await fetchCoderDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
 
