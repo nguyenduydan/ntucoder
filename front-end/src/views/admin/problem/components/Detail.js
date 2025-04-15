@@ -27,10 +27,7 @@ import Editor from "utils/configEditor";
 
 import "moment/locale/vi";
 //import api
-import { getById, update } from "config/problemService";
-import { getListCategory } from "config/categoryService";
-import { getList } from "config/compilerService";
-
+import { getList, getDetail, updateItem } from "config/apiService";
 
 
 const ProblemDetail = () => {
@@ -58,7 +55,7 @@ const ProblemDetail = () => {
 
     const fetchProblemDetail = useCallback(async () => {
         try {
-            const data = await getById(id);
+            const data = await getDetail({ controller: "Problem", id: id });
 
             setProblemDetail({
                 ...data,
@@ -84,8 +81,8 @@ const ProblemDetail = () => {
 
     const fetchListData = async () => {
         try {
-            const compiler = await getList({ page: 1, pageSize: 10 });
-            const category = await getListCategory({ page: 1, pageSize: 10 });
+            const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
+            const category = await getList({ controller: "Category", page: 1, pageSize: 10 });
             setProblemCategories(category.data);
             setCompiler(compiler.data);
         } catch (error) {
@@ -147,7 +144,7 @@ const ProblemDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            await update(id, formData);
+            await updateItem({ controller: "Problem", id: id, data: formData });
             await fetchProblemDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({

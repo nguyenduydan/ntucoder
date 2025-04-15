@@ -109,7 +109,7 @@ namespace api.Infrashtructure.Repositories
                 TopicID = dto.TopicID,
                 LessonTitle = dto.LessonTitle,
                 LessonContent = dto.LessonContent,
-                Order = dto.Order,
+                Order = dto.Order ?? 0,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 Status = dto.Status,
@@ -135,25 +135,37 @@ namespace api.Infrashtructure.Repositories
         public async Task<LessonDetailDTO> UpdateAsync(int id, LessonDetailDTO dto)
         {
             var existingLesson = await _context.Lessons
-                .FirstOrDefaultAsync(l => l.LessonID == id);
+        .Include(l => l.LessonProblems)
+        .FirstOrDefaultAsync(l => l.LessonID == id);
 
             if (existingLesson == null)
             {
                 throw new InvalidOperationException($"Không tìm thấy bài học với ID: {id}");
             }
 
-            existingLesson.LessonTitle = dto.LessonTitle ?? existingLesson.LessonTitle;
-            existingLesson.LessonContent = dto.LessonContent ?? existingLesson.LessonContent;
-            existingLesson.Order = dto.Order;
+            // Cập nhật các trường
+            if (!string.IsNullOrEmpty(dto.LessonTitle))
+                existingLesson.LessonTitle = dto.LessonTitle;
+
+            if (!string.IsNullOrEmpty(dto.LessonContent))
+                existingLesson.LessonContent = dto.LessonContent;
+
+            existingLesson.Order = dto.Order ?? 0;
+            existingLesson.TopicID = dto.TopicID;
             existingLesson.Status = dto.Status;
             existingLesson.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
+            // Truy vấn để lấy TopicName từ bảng Topics
+            var topic = await _context.Topics
+                .FirstOrDefaultAsync(t => t.TopicID == existingLesson.TopicID);
+
             return new LessonDetailDTO
             {
                 LessonID = existingLesson.LessonID,
                 TopicID = existingLesson.TopicID,
+                TopicName = topic?.TopicName ?? "Chưa xác định", // nếu topic null thì trả fallback
                 LessonTitle = existingLesson.LessonTitle,
                 LessonContent = existingLesson.LessonContent,
                 Order = existingLesson.Order,

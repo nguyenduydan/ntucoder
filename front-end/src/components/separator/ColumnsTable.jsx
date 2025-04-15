@@ -71,11 +71,11 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                     <Text fontSize={{ sm: '10px', lg: '12px' }} textAlign="left" fontWeight="bold" color={textColor}>
                       {column.Header}
                     </Text>
-                     {column.sortable && sortField && ( // Chỉ hiển thị biểu tượng sắp xếp nếu column có sortable và sortField có giá trị
-                        <Box onClick={() => onSort && onSort(column.accessor)} cursor="pointer">
-                          {renderSortIcon(column.accessor)}
-                        </Box>
-                      )}
+                    {column.sortable && sortField && ( // Chỉ hiển thị biểu tượng sắp xếp nếu column có sortable và sortField có giá trị
+                      <Box onClick={() => onSort && onSort(column.accessor)} cursor="pointer">
+                        {renderSortIcon(column.accessor)}
+                      </Box>
+                    )}
                   </Flex>
                 </Th>
               ))}
@@ -110,7 +110,7 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                         {column.Cell ? (
                           <CustomCell column={column} row={row} index={index} fetchData={fetchData} />
                         ) : (
-                          <Text color={textColor}>{truncatedContent}</Text>
+                          <Text color={textColor} maxW="200px">{truncatedContent}</Text>
                         )}
                       </Td>
                     );

@@ -31,7 +31,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TopicDTO topic)
+        public async Task<IActionResult> Create([FromForm] TopicDTO topic)
         {
             var result = await _Repository.CreateAsync(topic);
             return Ok(result);

@@ -1,8 +1,9 @@
 // columnsData.jsx
-import React,{useState} from "react";
+import React, { useState } from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteProblem,updateStatus } from "config/problemService";
-import { Badge,useToast } from "@chakra-ui/react";
+import { deleteItem, updateStatus } from "config/apiService";
+import { Badge, useToast } from "@chakra-ui/react";
+import { useMutation } from '@tanstack/react-query';
 
 export const columnsData = [
   {
@@ -10,7 +11,7 @@ export const columnsData = [
     accessor: "stt",
     Cell: ({ rowIndex }) => rowIndex + 1,
   },
-   {
+  {
     Header: "Mã bài tập",
     accessor: "problemCode",
   },
@@ -35,31 +36,38 @@ export const columnsData = [
     Header: "Giới hạn bộ nhớ",
     accessor: "memoryLimit",
   },
+
   {
     Header: "Trạng thái",
     accessor: "published",
     Cell: ({ row }) => {
-      const [status, setStatus] = useState(row?.published);
-      const problemID = row?.problemID; // Đảm bảo lấy ID đúng
+      const [status, setStatus] = useState(row?.published); // Lấy trạng thái từ row.original
+      const problemId = row?.problemID;  // Lấy ID từ dữ liệu row
       const toast = useToast(); // Sử dụng useToast
 
-      const handleClick = async () => {
-        const newStatus = status === 0 ? 1 : 0;
-        setStatus(newStatus);
-        try {
-          await updateStatus(problemID, newStatus);
+      // Sử dụng useMutation để xử lý cập nhật trạng thái
+      const mutation = useMutation({
+        mutationFn: (newStatus) => {
+          if (!problemId) {
+            console.error("Lỗi: Không có problemId");
+            return;
+          }
+          return updateStatus({ controller: "Course", id: problemId, newStatus: newStatus });
+        },
+        onSuccess: () => {
           toast({
             title: "Cập nhật thành công",
-            description: `Cập nhật trạng thái thành công`,
+            description: "Cập nhật trạng thái thành công",
             status: "success",
             duration: 1000,
             isClosable: true,
             position: 'top',
             variant: "left-accent",
           });
-        } catch (error) {
+        },
+        onError: (error) => {
           console.error("Lỗi cập nhật trạng thái:", error);
-          setStatus(status);
+          setStatus(status); // Khôi phục lại trạng thái cũ nếu có lỗi
           toast({
             title: "Cập nhật thất bại",
             description: "Không thể cập nhật trạng thái, vui lòng thử lại.",
@@ -69,7 +77,15 @@ export const columnsData = [
             position: 'top',
             variant: "left-accent",
           });
-        }
+        },
+      });
+
+      const handleClick = () => {
+        const newStatus = status === 0 ? 1 : 0;
+        setStatus(newStatus);  // Cập nhật trạng thái local trước khi gọi API
+
+        // Gọi mutation để cập nhật trạng thái trên server
+        mutation.mutate(newStatus);
       };
 
       return (
@@ -90,9 +106,10 @@ export const columnsData = [
     Header: "Hành động",
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
-      deleteFunction={deleteProblem}
-      idData = "problemID"
-      detailPath = "problem"
+      controller="Problem"
+      deleteFunction={deleteItem}
+      idData="problemID"
+      detailPath="problem"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Bài học đã được xóa thành công.",

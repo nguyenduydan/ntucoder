@@ -17,7 +17,7 @@ import {
     Select
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/categoryService";
+import { createItem } from "config/apiService";
 
 export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }) {
     const [catName, setCatName] = useState("");
@@ -56,7 +56,7 @@ export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }
         try {
             const data = { catName, catOrder };
 
-            await create(data);
+            await createItem({ controller: "Category", data: data });
             toast({
                 title: "Thêm mới thành công!",
                 status: "success",

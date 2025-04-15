@@ -12,7 +12,7 @@ build
 
 # production
 /build
-
+request.http
 # misc
 .DS_Store
 .env.local

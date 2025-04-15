@@ -18,7 +18,7 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/courseService";
+import { createItem } from "config/apiService";
 
 export default function CreateCompilerModal({ isOpen, onClose, fetchData }) {
     const [compiler, setCompiler] = useState({
@@ -75,7 +75,7 @@ export default function CreateCompilerModal({ isOpen, onClose, fetchData }) {
 
         try {
 
-            await create(formData); // Gửi FormData lên backend
+            await createItem({ controller: "Compiler", data: formData }); // Gửi FormData lên backend
 
             toast({
                 title: 'Thêm mới biên dịch thành công!',

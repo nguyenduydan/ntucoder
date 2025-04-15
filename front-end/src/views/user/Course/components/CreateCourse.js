@@ -19,9 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/courseService";
-import { getList } from "config/courseCategoryService";
-import { getListBagde } from "config/badgeService";
+import { createItem, getList } from "config/apiService";
 
 export default function CreateCourse({ fetchData }) {
     const [course, setCourse] = useState({
@@ -65,9 +63,9 @@ export default function CreateCourse({ fetchData }) {
 
     const fetchCategories = async () => {
         try {
-            const data = await getList({ page: 1, pageSize: 10 });
-            const badgeData = await getListBagde({ page: 1, pageSize: 10 });
-            setCourseCategories(data?.data || []);
+            const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 10 });
+            const badgeData = await getList({ controller: "Bagde", page: 1, pageSize: 10 });
+            setCourseCategories(courseCategory?.data || []);
             setBadge(badgeData?.data || []);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -132,8 +130,7 @@ export default function CreateCourse({ fetchData }) {
         }
 
         try {
-            console.log("API: ", formData);
-            await create(formData); // Gửi FormData lên backend
+            await createItem({ controller: "Course", data: formData }); // Gửi FormData lên backend
 
             toast({
                 title: 'Thêm mới khóa học thành công!',

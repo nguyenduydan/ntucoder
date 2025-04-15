@@ -20,25 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-import moment from "moment";
 import "moment/locale/vi";
 import JoditEditor from "jodit-react";
 import sanitizeHtml from "utils/sanitizedHTML";
 //import API
-import { getById, update } from "config/lessonService";
-import { getList } from "config/topicService";
+import { getDetail, updateItem, getList } from "config/apiService";
 import Editor from "utils/configEditor";
-
-const formatCurrency = (amount) => {
-    return amount
-        ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
-        : "0 VND";
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
-};
+import { formatDate, formatCurrency } from "utils/utils";
 
 
 const LessonDetail = () => {
@@ -57,7 +45,7 @@ const LessonDetail = () => {
 
     const fetchLessonDetail = useCallback(async () => {
         try {
-            const data = await getById(id);
+            const data = await getDetail({ controller: "Lesson", id: id });
             setLessonDetail(data);
             setEditableValues(data);
         } catch (error) {
@@ -75,7 +63,7 @@ const LessonDetail = () => {
 
     const fetchTopic = async () => {
         try {
-            const topicData = await getList({ page: 1, pageSize: 10 });
+            const topicData = await getList({ controller: "Topic", page: 1, pageSize: 10 });
             setTopic(topicData.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -95,6 +83,7 @@ const LessonDetail = () => {
     };
 
     const handleInputChange = (field, value) => {
+        console.log(`Thay đổi trường ${field}:`, value);
         setEditableValues((prev) => {
             const updatedValues = { ...prev, [field]: value };
             setLessonDetail((prevLessonDetail) => ({
@@ -110,7 +99,6 @@ const LessonDetail = () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
             const formData = new FormData();
-
             // Lưu tất cả các trường đã chỉnh sửa.
             Object.keys(editableValues).forEach((field) => {
                 // Kiểm tra để tránh đính kèm LessonID trong formData
@@ -126,7 +114,7 @@ const LessonDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            await update(id, formData);
+            await updateItem({ controller: "Lesson", id: id, data: formData });
             await fetchLessonDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
@@ -248,9 +236,7 @@ const LessonDetail = () => {
                                                 width={{ base: "100%", md: "50%" }}
                                             >
                                                 {topic.map((topic) => (
-                                                    <option key={topic.topicID} value={topic.topicID}>
-                                                        {topic.topicName}
-                                                    </option>
+                                                    <option key={topic.topicID} value={topic.topicID}>{topic.topicName}</option>
                                                 ))}
                                             </Select>
                                         ) : (
@@ -274,6 +260,34 @@ const LessonDetail = () => {
                             <GridItem>
                                 <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
+                                    <Flex align="center">
+                                        {editField === "order" ? (
+                                            <Select
+                                                value={editableValues.order || ""}
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
+                                                onChange={(e) => handleInputChange("order", e.target.value)}
+                                                placeholder="Chọn cấp"
+                                                width={{ base: "100%", md: "50%" }}
+                                            >
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Chọn cấp:</strong> {lesson.order || "0"}
+                                            </Text>
+                                        )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit("order")}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
                                     <Text fontSize="lg">
                                         <strong>Ngày tạo: </strong>{formatDate(lesson.createdAt)}
                                     </Text>

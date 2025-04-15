@@ -20,8 +20,7 @@ import {
 } from "@chakra-ui/react";
 import JoditEditor from "jodit-react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/lessonService";
-import { getList } from "config/topicService";
+import { createItem, getList } from "config/apiService";
 import Editor from "utils/configEditor";
 
 export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
@@ -59,7 +58,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
 
     const fetchLesson = async () => {
         try {
-            const topic = await getList({ page: 1, pageSize: 10 });
+            const topic = await getList({ controller: "Topic", page: 1, pageSize: 10 });
             setTopic(topic.data);
         } catch (error) {
             console.error("Lỗi khi lấy chủ đề:", error);
@@ -94,7 +93,8 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
         if (!validate()) return;
         setLoading(true);
         try {
-            await create(lesson);
+            await createItem({ controller: "Lesson", data: lesson }); // Gửi FormData lên backend
+
             toast({
                 title: 'Thêm mới bài học thành công!',
                 status: 'success',
@@ -103,12 +103,23 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                 position: 'top',
                 variant: "left-accent",
             });
+
             if (fetchData) await fetchData();
             onClose();
         } catch (error) {
+            let errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
+
+            // Kiểm tra xem lỗi có phải đến từ API không
+            if (error.response && error.response.data) {
+                errorMessage = error.response.data.message || "Lỗi không xác định từ server.";
+            } else if (error.message) {
+                errorMessage = error.message; // Nếu lỗi không phải từ API, lấy message mặc định
+            }
+
+            // Hiển thị thông báo lỗi
             toast({
                 title: "Đã xảy ra lỗi.",
-                description: error.message || "Có lỗi xảy ra khi tạo khóa học.",
+                description: errorMessage,
                 status: "error",
                 duration: 2000,
                 isClosable: true,
@@ -146,7 +157,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                             </FormControl>
                             <FormControl mb={4}>
                                 <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
-                                <Box maxH="400px" overflowY="auto">
+                                <Box maxH="600px" overflowY="auto">
                                     <JoditEditor
                                         key={lesson.lessonID}
                                         ref={editor}
@@ -154,7 +165,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                                         config={Editor}
                                         onChange={handleEditorChange}
                                         onBlur={(newContent) => handleEditorChange(newContent)}
-                                        style={{ width: "100%", minHeight: "300px" }} // Đảm bảo kích thước hợp lý
+                                        style={{ width: "100%", height: "500px" }} // Đảm bảo kích thước hợp lý
                                     />
                                 </Box>
                             </FormControl>

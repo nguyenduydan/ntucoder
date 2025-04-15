@@ -167,7 +167,7 @@ namespace api.Infrashtructure.Repositories
                     TopicID = existingTopic.TopicID,
                     LessonTitle = l.LessonTitle,
                     LessonContent = l.LessonContent,
-                    Order = l.Order,
+                    Order = l.Order ?? 0,
                     CreatedAt = l.CreatedAt,
                     UpdatedAt = l.UpdatedAt,
                     Status = l.Status

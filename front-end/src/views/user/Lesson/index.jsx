@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, useToast, Flex, Image,Tabs, TabList, Tab, TabPanels,
-    Text, Tooltip,TabPanel,Icon,Badge } from "@chakra-ui/react";
-import { getById } from "config/lessonService";
+import {
+    Box, useToast, Flex, Image, Tabs, TabList, Tab, TabPanels,
+    Text, Tooltip, TabPanel, Icon, Badge
+} from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Split from "react-split";
 import LessonHeader from "./components/LessonHeader";
 import LessonContent from "./components/LessonContent";
 import LessonList from "./components/LessonList";
-import Problem from "../Problem/index"
-import { FaRegFileAlt, FaBook , FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
+import Problem from "../Problem/index";
+import { FaRegFileAlt, FaBook, FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
+
+import { getDetail } from "config/apiService";
 
 export default function Lesson() {
     const { lessonId } = useParams();
@@ -21,7 +24,7 @@ export default function Lesson() {
     useEffect(() => {
         const fetchLesson = async () => {
             try {
-                const response = await getById(lessonId );
+                const response = await getDetail({ controller: "Lesson", id: lessonId });
                 if (response && response.lessonTitle && response.lessonContent) {
                     setLesson(response);
                 } else {
@@ -53,7 +56,7 @@ export default function Lesson() {
     return (
         <ScrollToTop>
             <Box minH="100%" w='100%'>
-                 {lesson ? (
+                {lesson ? (
                     <Box>
                         <LessonHeader lesson={lesson} />
                         <Split className="split-container" sizes={[45, 55]} minSize={0} gutterSize={5}>
@@ -109,7 +112,7 @@ export default function Lesson() {
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
                                                 <Box maxWidth="100%">
                                                     <Text fontWeight="bold" fontSize="lg"> Giáo Trình</Text>
-                                                    <LessonList/>
+                                                    <LessonList />
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">

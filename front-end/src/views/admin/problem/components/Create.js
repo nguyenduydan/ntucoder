@@ -22,9 +22,7 @@ import {
     Checkbox
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/problemService";
-import { getListCategory } from "config/categoryService";
-import { getList } from "config/compilerService";
+import { createItem, getList } from "config/apiService";
 
 export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
     const [problem, setProblem] = useState({
@@ -75,8 +73,8 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
 
     const fetchList = async () => {
         try {
-            const category = await getListCategory({ page: 1, pageSize: 10 });
-            const compiler = await getList({ page: 1, pageSize: 10 });
+            const category = await getList({ controller: "Category", page: 1, pageSize: 10 });
+            const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
             setCategories(category.data);
             setCompilers(compiler.data);
 
@@ -145,7 +143,13 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
 
         try {
             // Gửi yêu cầu POST với JSON
-            await create(data); // Giả sử create là hàm gửi yêu cầu lên server
+            await createItem({
+                controller: "Problem",
+                data: JSON.stringify(data), // Chuyển object thành JSON
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
 
             toast({
                 title: 'Thêm mới bài toán thành công!',

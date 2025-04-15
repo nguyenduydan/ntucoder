@@ -18,8 +18,7 @@ import {
     Textarea
 } from "@chakra-ui/react";
 import FlushedInput from "components/fields/InputField";
-import { create } from "config/topicService";
-import { getList } from "config/courseService";
+import { createItem, getList } from "config/apiService";
 
 export default function CreateTopicModal({ isOpen, onClose, fetchData }) {
     const [topic, setTopic] = useState({
@@ -53,7 +52,7 @@ export default function CreateTopicModal({ isOpen, onClose, fetchData }) {
 
     const fetchCourse = async () => {
         try {
-            const course = await getList({ page: 1, pageSize: 10 });
+            const course = await getList({ controller: "Course", page: 1, pageSize: 10 });
             setCourse(course.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -81,7 +80,7 @@ export default function CreateTopicModal({ isOpen, onClose, fetchData }) {
         if (!validate()) return;
         setLoading(true);
         try {
-            await create(topic);
+            await createItem({ controller: "Topic", data: topic });
             toast({
                 title: 'Thêm mới chủ đề thành công!',
                 status: 'success',

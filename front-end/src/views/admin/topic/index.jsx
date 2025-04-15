@@ -1,112 +1,77 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Box, useToast } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Box, useToast, useDisclosure } from "@chakra-ui/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Pagination from "components/pagination/pagination";
-import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
-// import data
-import { getList } from "config/topicService";
-import { columnsData } from "views/admin/topic/components/columnsData";
 import Create from "views/admin/topic/components/Create";
+
+import { getList } from "config/apiService";
+import { columnsData } from "views/admin/topic/components/columnsData";
 import { useTitle } from "contexts/TitleContext";
 
-export default function CoderIndex() {
+export default function Index() {
   useTitle("Quản lý chủ đề");
-  // State cho dữ liệu bảng
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [prefetchCache, setPrefetchCache] = useState({});
 
-  // Các state khác
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
+
+  // State for filter
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalRows, setTotalRows] = useState(0);
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Sử dụng useRef để theo dõi lỗi, tránh hiển thị toast nhiều lần
-  const errorShown = useRef(false);
+  const queryKey = ["topics", currentPage, pageSize, ascending, sortField];
 
-  const fetchPage = useCallback(
-    async (page) => {
-      setLoading(true);
-      try {
-        const { data, totalPages: totalPagesResp, totalCount } = await getList({
-          page,
-          pageSize,
-          ascending,
-          sortField,
-        });
-        // Cập nhật tổng số trang và tổng số dòng chỉ từ trang 1
-        if (page === 1) {
-          setTotalPages(totalPagesResp);
-          setTotalRows(totalCount);
-        }
-        // Reset error flag khi fetch thành công
-        errorShown.current = false;
-
-        setPrefetchCache(prev => ({ ...prev, [page]: data }));
-
-        return data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Chỉ hiển thị toast nếu chưa hiển thị lỗi trước đó
-        if (!errorShown.current) {
-          errorShown.current = true;
-          toast({
-            title: "Lỗi khi tải dữ liệu",
-            description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-            position: "top",
-            variant: "left-accent",
-          });
-        }
-        return [];
-      } finally {
-        setLoading(false);
-      }
+  // Query load topic list
+  const { data, isLoading, } = useQuery({
+    queryKey,
+    queryFn: () =>
+      getList({
+        controller: "Topic",
+        page: currentPage,
+        pageSize,
+        ascending,
+        sortField,
+      }),
+    keepPreviousData: true,
+    staleTime: 3000, // cache in 1 minute
+    retry: 1,
+    onError: () => {
+      toast({
+        title: "Lỗi khi tải dữ liệu",
+        description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+      });
     },
-    [pageSize, ascending, sortField, toast]
-  );
+  });
 
-  const refreshTable = async () => {
-    setPrefetchCache({});
-    setCurrentPage(1);
-    const data = await fetchPage(1);
-    setTableData(data);
-    if (totalPages > 1) fetchPage(2);
-    if (totalPages > 2) fetchPage(3);
-  };
-
+  // Prefetch next page data
   useEffect(() => {
-    setPrefetchCache({});
-    setCurrentPage(1);
-    fetchPage(1);
-    fetchPage(2); // Prefetch trang sau
-  }, [fetchPage]);
-
-  useEffect(() => {
-    if (prefetchCache[currentPage]) {
-      setTableData(prefetchCache[currentPage]);
-    } else {
-      fetchPage(currentPage).then((data) => setTableData(data));
+    if (data?.totalPages) {
+      if (currentPage < data.totalPages) {
+        queryClient.prefetchQuery({
+          queryKey: ["topics", currentPage + 1, pageSize, ascending, sortField],
+          queryFn: () =>
+            getList({
+              controller: "Topic",
+              page: currentPage + 1,
+              pageSize,
+              ascending,
+              sortField,
+            }),
+        });
+      }
     }
-    // Prefetch trang tiếp theo (currentPage+1)
-    if (currentPage < totalPages && !prefetchCache[currentPage + 1]) {
-      fetchPage(currentPage + 1);
-    }
-    // Prefetch trang sau đó (currentPage+2)
-    if (currentPage + 1 < totalPages && !prefetchCache[currentPage + 2]) {
-      fetchPage(currentPage + 2);
-    }
-  }, [currentPage, prefetchCache, fetchPage, totalPages]);
-
+  }, [data, currentPage, pageSize, ascending, sortField, queryClient]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -116,11 +81,10 @@ export default function CoderIndex() {
       setAscending(true);
     }
     setCurrentPage(1);
-    setPrefetchCache({});
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
+    if (newPage > 0 && newPage <= data?.totalPages) {
       setCurrentPage(newPage);
     }
   };
@@ -130,29 +94,33 @@ export default function CoderIndex() {
     if (newPageSize !== pageSize) {
       setPageSize(newPageSize);
       setCurrentPage(1);
-      setPrefetchCache({});
     }
+  };
+
+  const refreshTable = () => {
+    queryClient.invalidateQueries({ queryKey: ["topics"] });
   };
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Toolbar onAdd={onOpen} onSearch />
-        {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+
         <ColumnsTable
           columnsData={columnsData}
-          tableData={tableData}
-          loading={loading}
+          tableData={data?.data || []}
+          loading={isLoading}
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
           fetchData={refreshTable}
         />
+
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
-          totalRows={totalRows}
+          totalPages={data?.totalPages || 0}
+          totalRows={data?.totalCount || 0}
           onPageChange={handlePageChange}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}

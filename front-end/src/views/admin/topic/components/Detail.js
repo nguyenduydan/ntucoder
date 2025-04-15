@@ -20,23 +20,10 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-import moment from "moment";
 import "moment/locale/vi";
+import { formatDate, formatCurrency } from "utils/utils";
 //import API
-import { getById, update } from "config/topicService";
-import { getList } from "config/courseService";
-
-
-const formatCurrency = (amount) => {
-    return amount
-        ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
-        : "0 VND";
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
-};
+import { getList, getDetail, updateItem } from "config/apiService";
 
 
 const TopicDetail = () => {
@@ -55,7 +42,7 @@ const TopicDetail = () => {
 
     const fetchTopicDetail = useCallback(async () => {
         try {
-            const data = await getById(id);
+            const data = await getDetail({ controller: "Topic", id: id });
             setTopicDetail(data);
             setEditableValues(data);
         } catch (error) {
@@ -72,7 +59,7 @@ const TopicDetail = () => {
 
     const fetchCourse = async () => {
         try {
-            const course = await getList({ page: 1, pageSize: 10 });
+            const course = await getList({ controller: "Course", page: 1, pageSize: 10 });
             setCourse(course.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
@@ -123,7 +110,7 @@ const TopicDetail = () => {
             }));
 
             // Gọi API PUT để cập nhật dữ liệu
-            await update(id, formData);
+            await updateItem({ controller: "Topic", id: id, data: formData });
             await fetchTopicDetail();
             setEditField(null); // Reset trạng thái chỉnh sửa
             toast({
@@ -300,6 +287,7 @@ const TopicDetail = () => {
                                     <Text fontSize="lg">
                                         <strong>Ngày tạo: </strong>{formatDate(topic.createdAt)}
                                     </Text>
+
                                     {topic.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
