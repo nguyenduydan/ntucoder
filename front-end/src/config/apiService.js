@@ -96,7 +96,7 @@ export const updateStatus = async ({ controller, id, newStatus }) => {
     }
     try {
         // 1. Lấy dữ liệu hiện tại của khóa học
-        const currentDataResponse = await api.get(`/Course/${id}`);
+        const currentDataResponse = await api.get(`/${controller}/${id}`);
         const currentData = currentDataResponse.data;
 
         // 2. Cập nhật trạng thái mới
