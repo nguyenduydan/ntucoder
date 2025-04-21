@@ -40,11 +40,11 @@ export default function Index() {
       }),
     keepPreviousData: true,
     staleTime: 3000, // cache in 1 minute
-    retry: 1,
-    onError: () => {
+    retry: false,
+    onError: (error) => {
       toast({
         title: "Lỗi khi tải dữ liệu",
-        description: "Không thể tải dữ liệu. Vui lòng thử lại sau.",
+        description: error.message || "Không thể tải dữ liệu. Vui lòng thử lại sau.",
         status: "error",
         duration: 2000,
         isClosable: true,

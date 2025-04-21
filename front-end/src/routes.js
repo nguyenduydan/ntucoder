@@ -195,12 +195,6 @@ const routes = [
       }
     ]
   },
-  {
-    name: 'BÀI TẬP',
-    layout: '/user',
-    path: '/problem',
-    component: <Problem />,
-  },
 ];
 
 export default routes;

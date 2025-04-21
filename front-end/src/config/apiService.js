@@ -1,39 +1,49 @@
-import { status } from 'nprogress';
 import api from './apiConfig';
-
 
 // @function: getList
 // @desc: Fetches a paginated list of items from the specified controller in the API
-export const getList = async ({ controller, page, pageSize, ascending, sortField }) => {
+export const getList = async ({
+    controller,
+    page = 1,
+    pageSize = 10,
+    ascending = true,
+    sortField = "id",
+}) => {
     if (!controller) {
         throw new Error("Controller không được xác định.");
     }
 
     try {
-        const res = await api.get(`/${controller}`, {
+        const response = await api.get(`/${controller}`, {
             params: { Page: page, PageSize: pageSize, ascending, sortField },
         });
 
-        const dataWithStatus = res.data.data?.map(item => ({
-            ...item,
-        })) ?? [];
+        const data = response.data;
+
+        // ✅ Nếu API trả về error trong body, thì ném lỗi
+        if (!data || data.error || data.success === false) {
+            throw new Error(data.message || "Lỗi từ phía server");
+        }
 
         return {
-            data: dataWithStatus,
-            totalPages: res.data.totalPages || 0,
-            totalCount: res.data.totalCount || 0,
+            data: data?.data || [],
+            totalPages: data?.totalPages || 0,
+            totalCount: data?.totalCount || 0,
         };
     } catch (error) {
-        console.error("❌ Error fetching data:", error);
-        return {
-            data: [],
-            totalPages: 0,
-            totalCount: 0,
-        };
+        // Kiểm tra nếu lỗi liên quan đến kết nối hoặc timeout
+        if (error.response) {
+            // Lỗi có phản hồi từ API (mã lỗi HTTP không phải 2xx)
+            throw new Error(`Lỗi từ API: ${error.response.status} - ${error.response.statusText}`);
+        } else if (error.request) {
+            // Lỗi nếu không có phản hồi từ API (kết nối hoặc timeout)
+            throw new Error("Không thể kết nối tới API. Vui lòng kiểm tra lại kết nối mạng.");
+        } else {
+            // Lỗi khác (ví dụ: lỗi cấu hình)
+            throw new Error(`Lỗi khi thực thi yêu cầu: ${error.message}`);
+        }
     }
 };
-
-
 
 // @function: getDetail
 // @desc: Fetches the details of a specific item from the specified controller in the API

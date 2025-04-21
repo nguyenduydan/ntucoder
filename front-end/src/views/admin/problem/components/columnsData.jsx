@@ -52,7 +52,7 @@ export const columnsData = [
             console.error("Lỗi: Không có problemId");
             return;
           }
-          return updateStatus({ controller: "Course", id: problemId, newStatus: newStatus });
+          return updateStatus({ controller: "Problem", id: problemId, newStatus: newStatus });
         },
         onSuccess: () => {
           toast({
