@@ -9,7 +9,7 @@ import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import { useTitle } from "contexts/TitleContext";
-
+import Banner from "assets/img/bannerCourse.png";
 
 export default function Course() {
     useTitle("Khóa học");
@@ -62,8 +62,10 @@ export default function Course() {
 
     return (
         <ScrollToTop>
-            <Box pt={{ base: "130px", md: "80px", xl: "80px" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
-                <Text fontSize="2xl" fontWeight="bold" mb="4">Danh sách khóa học</Text>
+            <Box pt={{ base: "130px", md: "80px", xl: "0" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
+                <Box mb={10} borderRadius="md">
+                    <Image src={Banner} alt="NO IMG" rounded="md"></Image>
+                </Box>
                 <Tabs variant="unstyled">
                     <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>
                         <Tab px={2} _selected={{ color: textSelect, fontWeight: "bold" }}>Tất cả khóa học</Tab>
