@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.Json;
 
 namespace api.Infrashtructure.Services
 {
@@ -108,12 +109,35 @@ namespace api.Infrashtructure.Services
                 testResult = isCorrect ? "Accepted" : "Wrong Answer";
             }
 
+
+            // Log the output for the test case to console
+            Console.WriteLine($"Test Case ID: {testCase.TestCaseID}");
+            Console.WriteLine($"Input: {testCase.Input.Trim()}");
+            Console.WriteLine($"Expected Output: {testCase.Output.Trim()}");
+            Console.WriteLine($"Actual Output: {result.output.Trim()}");
+            Console.WriteLine($"Test Result: {testResult}");
+
+            var checkerLogObj = new
+            {
+                DockerCommand = dockerCommand,
+                ExitStatus = result.isSuccess ? "Success" : "Failed",
+                StandardOutput = result.output.Trim(),
+                StandardError = result.error.Trim(),
+                Time = stopwatch.ElapsedMilliseconds + " ms",
+            };
+
+            string checkerLogJson = JsonSerializer.Serialize(checkerLogObj, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+
             if (existingTestRun != null)
             {
                 existingTestRun.TimeDuration = (int)stopwatch.ElapsedMilliseconds;
                 existingTestRun.TestOutput = result.output.Trim();
                 existingTestRun.Result = testResult;
-                existingTestRun.CheckerLog = result.error.Trim();
+                existingTestRun.CheckerLog = checkerLogJson;
                 existingTestRun.MemorySize = 0;
             }
             else
@@ -126,7 +150,7 @@ namespace api.Infrashtructure.Services
                     MemorySize = 0,
                     TestOutput = result.output.Trim(),
                     Result = testResult,
-                    CheckerLog = result.error.Trim()
+                    CheckerLog = checkerLogJson,
                 };
                 await _context.TestRuns.AddAsync(existingTestRun);
             }
@@ -137,23 +161,24 @@ namespace api.Infrashtructure.Services
         private (string, string) GetDockerCommand(Compiler compiler, string sourceCode, string input)
         {
             string containerName = $"code_runner_{Guid.NewGuid()}".Replace("-", "");
-            string dockerImage = "gcc:12"; // Chỉ sử dụng gcc cho C/C++
+            string dockerImage = "gcc:12";
 
             string extension = compiler.CompilerExtension.ToLower();
-            if (extension != ".cpp" && extension != ".c")
-                throw new Exception($"Chỉ hỗ trợ C/C++. '{compiler.CompilerName}' không được hỗ trợ.");
+            if (extension != ".cpp")
+                throw new Exception($"Chỉ hỗ trợ C++ với đuôi .cpp. '{compiler.CompilerName}' không được hỗ trợ.");
 
-            string fileName = extension == ".cpp" ? "main.cpp" : "main.c";
+            string fileName = "main.cpp";
             string encodedSource = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceCode));
-            string safeInput = input.Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
+            // Compile và chạy
+            string compileCommand = $"echo '{encodedSource}' | base64 -d > {fileName} && g++ {fileName} -o main.out";
+            string runCommand = $"echo '{input.Replace("\"", "\\\"")}' | ./main.out";
 
-            string compileCommand = $"echo '{encodedSource}' | base64 -d > {fileName} && gcc {fileName} -o main.out";
-            string runCommand = $"echo \"{safeInput}\" | ./main.out";
-
+            // Lệnh Docker tổng hợp
             string command = $"docker run --rm --name {containerName} {dockerImage} sh -c \"{compileCommand} && {runCommand}\"";
 
             return (command, containerName);
         }
+
 
         private async Task<(bool IsSuccess, string Output, string Error)> RunProcessAsync(string command, string containerName, int timeMs = 5000)
         {

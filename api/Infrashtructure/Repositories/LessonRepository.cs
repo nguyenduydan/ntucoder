@@ -155,7 +155,7 @@ namespace api.Infrashtructure.Repositories
             existingLesson.Order = dto.Order ?? 0;
             existingLesson.TopicID = dto.TopicID;
             existingLesson.Status = dto.Status;
-            existingLesson.UpdatedAt = DateTime.UtcNow;
+            existingLesson.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 

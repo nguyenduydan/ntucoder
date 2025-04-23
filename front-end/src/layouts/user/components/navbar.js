@@ -23,7 +23,7 @@ import {
     renderView,
 } from "components/scrollbar/Scrollbar";
 import { Scrollbars } from "react-custom-scrollbars-2";
-import NTULogo from "assets/img/ntu-coders.png";
+import NTULogo from "assets/img/logo.png";
 import Auth from "./auth";
 import { useNavigate } from "react-router-dom";
 

@@ -20,7 +20,7 @@ namespace api.Infrashtructure.Repositories
         {
             var objQuery = _context.Submissions
                 .Include(a => a.Problem)
-            .Include(a => a.Coder)
+                .Include(a => a.Coder)
                 .Include(a => a.Compiler)
                 .Select(a => new SubmissionDTO
                 {
@@ -59,7 +59,7 @@ namespace api.Infrashtructure.Repositories
                 ProblemID = dto.ProblemID,
                 CoderID = dto.CoderID,
                 CompilerID = dto.CompilerID,
-                SubmitTime = DateTime.UtcNow,
+                SubmitTime = DateTime.Now,
                 SubmissionCode = dto.SubmissionCode,
                 SubmissionStatus = 0,
             };
