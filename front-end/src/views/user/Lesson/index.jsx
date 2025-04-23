@@ -11,6 +11,7 @@ import LessonHeader from "./components/LessonHeader";
 import LessonContent from "./components/LessonContent";
 import LessonList from "./components/LessonList";
 import Problem from "../Problem/index";
+import ProblemList from "../Problem/components/ProblemList";
 import { FaRegFileAlt, FaBook, FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
 
 import { getDetail } from "config/apiService";
@@ -107,7 +108,9 @@ export default function Lesson() {
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box>Bài tập</Box>
+                                                <Box>
+                                                    <ProblemList lessonID={lessonId} />
+                                                </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
                                                 <Box maxWidth="100%">

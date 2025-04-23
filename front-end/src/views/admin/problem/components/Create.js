@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Button,
     FormControl,
@@ -17,14 +17,16 @@ import {
     ModalFooter,
     Select,
     useColorMode,
-    Textarea,
     SimpleGrid,
-    Checkbox
+    Checkbox, Box
 } from "@chakra-ui/react";
+import JoditEditor from "jodit-react";
+import Editor from "utils/configEditor";
 import FlushedInput from "components/fields/InputField";
 import { createItem, getList } from "config/apiService";
 
 export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
+    const editor = useRef(null);
     const [problem, setProblem] = useState({
         problemCode: "",
         problemName: "",
@@ -38,10 +40,12 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         testCode: "",
         problemContent: "",
         problemExplanation: "",
+        selectedLessonID: "",
         published: 0,
     });
     const [categories, setCategories] = useState([]);
     const [compilers, setCompilers] = useState([]);
+    const [lessons, setLessons] = useState([]);
     const [errors, setErrors] = useState({});
     const toast = useToast();
     const [loading, setLoading] = useState(false);
@@ -59,6 +63,7 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                 memoryLimit: "128",
                 testType: "Output Matching",
                 testCompilerID: "",
+                selectedLessonID: "",
                 note: "",
                 selectedCategoryIDs: [],
                 testCode: "",
@@ -75,6 +80,8 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         try {
             const category = await getList({ controller: "Category", page: 1, pageSize: 10 });
             const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
+            const lesson = await getList({ controller: "Lesson", page: 1, pageSize: 10 });
+            setLessons(lesson.data);
             setCategories(category.data);
             setCompilers(compiler.data);
 
@@ -87,6 +94,8 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         } catch (error) {
             console.error("Lỗi khi lấy danh mục bài toán:", error);
             setCategories([]);
+            setCompilers([]);
+            setLessons([]);
         }
     };
 
@@ -99,6 +108,12 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         }));
     };
 
+    const handleEditorChange = (field, content) => {
+        setProblem((prev) => ({
+            ...prev,
+            [field]: content,
+        }));
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -138,17 +153,15 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
             problemContent: problem.problemContent,
             problemExplanation: problem.problemExplanation,
             selectedCategoryIDs: problem.selectedCategoryIDs, // Mảng các thể loại đã chọn
-            publish: problem.published,
+            selectedLessonID: problem.selectedLessonID,
+            published: problem.published,
         };
 
         try {
             // Gửi yêu cầu POST với JSON
             await createItem({
                 controller: "Problem",
-                data: JSON.stringify(data), // Chuyển object thành JSON
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                data: data,
             });
 
             toast({
@@ -181,13 +194,13 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
 
 
     return (
-        <Modal size={'4xl'} isOpen={isOpen} onClose={onClose}>
+        <Modal size={'full'} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader fontSize={'25px'} textAlign={'center'}>Thêm mới bài toán</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Grid templateColumns="repeat(2, 1fr)" gap="6">
+                    <Grid templateColumns="1fr 500px" gap="6">
                         <GridItem>
                             <FormControl isInvalid={errors.problemCode} mb={4}>
                                 <FormLabel fontWeight="bold">Mã bài toán<Text as="span" color="red.500"> *</Text></FormLabel>
@@ -199,68 +212,121 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                 <FlushedInput bg={boxColor} placeholder="Nhập tên bài toán" name="problemName" value={problem.problemName} onChange={handleChange} textColor={textColor} />
                                 <FormErrorMessage>{errors.problemName}</FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={errors.timeLimit} mb={4}>
-                                <FormLabel fontWeight="bold">Giới hạn thời gian</FormLabel>
-                                <FlushedInput bg={boxColor} type="number" placeholder="Nhập giới hạn thời gian" name="timeLimit" value={problem.timeLimit} onChange={handleChange} textColor={textColor} />
-                                <FormErrorMessage>{errors.timeLimit}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl isInvalid={errors.memoryLimit} mb={4}>
-                                <FormLabel fontWeight="bold">Giới hạn bộ nhớ</FormLabel>
-                                <FlushedInput bg={boxColor} type="number" placeholder="Nhập giới hạn bộ nhớ" name="memoryLimit" value={problem.memoryLimit} onChange={handleChange} textColor={textColor} />
-                                <FormErrorMessage>{errors.memoryLimit}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel fontWeight="bold">Loại bài kiểm tra</FormLabel>
-                                <Select bg={boxColor} name="testType" value={problem.testType} onChange={handleChange} textColor={textColor}>
-                                    <option key="outputMatching" value="Output Matching">Output Matching</option>
-                                    <option key="custom" value="Custom">Custom</option>
-                                </Select>
-                            </FormControl>
-                        </GridItem>
-                        <GridItem>
-                            <FormControl isInvalid={errors.selectedCategoryIDs} mb={4}>
-                                <FormLabel fontWeight="bold">Thể loại<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <SimpleGrid columns={2} spacing={2} w="full">
-                                    {categories.map((category) => (
-                                        <Checkbox
-                                            key={category.categoryID}
-                                            isChecked={problem.selectedCategoryIDs.includes(category.categoryID)}
-                                            onChange={(e) => handleCategoryChange(e, category.categoryID)}
-                                        >
-                                            {category.catName}
-                                        </Checkbox>
-                                    ))}
-                                </SimpleGrid>
-                                <FormErrorMessage>{errors.selectedCategoryIDs}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel fontWeight="bold">Trình biên dịch</FormLabel>
-                                <Select value={problem.testCompilerID} onChange={handleChange}>
-                                    {compilers.map((compiler) => (
-                                        <option key={compiler.compilerID} value={compiler.compilerID}>
-                                            {compiler.compilerName}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </FormControl>
+
                             <FormControl isInvalid={errors.problemContent} mb={4}>
                                 <FormLabel fontWeight="bold">Nội dung bài toán</FormLabel>
-                                <Textarea bg={boxColor} placeholder="Nhập nội dung bài toán" name="problemContent" value={problem.problemContent} onChange={handleChange} textColor={textColor} />
+                                <Box maxH="600px" overflowY="auto">
+                                    <JoditEditor
+                                        key={problem.problemID + "-content"}
+                                        ref={editor}
+                                        value={problem.problemContent}
+                                        config={Editor}
+                                        onChange={(newContent) => handleEditorChange('problemContent', newContent)}
+                                        onBlur={(newContent) => handleEditorChange('problemContent', newContent)}
+                                    />
+                                </Box>
                                 <FormErrorMessage>{errors.problemContent}</FormErrorMessage>
                             </FormControl>
+
                             <FormControl isInvalid={errors.problemExplanation} mb={4}>
                                 <FormLabel fontWeight="bold">Giải thích bài toán</FormLabel>
-                                <Textarea bg={boxColor} placeholder="Nhập giải thích bài toán" name="problemExplanation" value={problem.problemExplanation} onChange={handleChange} textColor={textColor} />
+                                <Box maxH="600px" overflowY="auto">
+                                    <JoditEditor
+                                        key={problem.problemID + "-explanation"}
+                                        ref={editor}
+                                        value={problem.problemExplanation}
+                                        config={Editor}
+                                        onChange={(newContent) => handleEditorChange('problemExplanation', newContent)}
+                                        onBlur={(newContent) => handleEditorChange('problemExplanation', newContent)}
+                                    />
+                                </Box>
                                 <FormErrorMessage>{errors.problemExplanation}</FormErrorMessage>
                             </FormControl>
-                            <FormControl >
-                                <FormLabel fontWeight="bold">Trạng thái</FormLabel>
-                                <Select bg={boxColor} name="published" value={problem.published} onChange={handleChange} textColor={textColor}>
-                                    <option key="default" value="">Chọn trạng thái</option>
-                                    <option key="online" value="1">Online</option>
-                                    <option key="offline" value="0">Offline</option>
-                                </Select>
-                            </FormControl>
+
+                        </GridItem>
+                        <GridItem>
+                            <Box position="sticky" top="0" maxH="100vh" overflowY="auto">
+                                <FormControl isInvalid={errors.selectedCategoryIDs} mb={4}>
+                                    <FormLabel fontWeight="bold">
+                                        Thể loại<Text as="span" color="red.500"> *</Text>
+                                    </FormLabel>
+                                    <SimpleGrid columns={2} spacing={2} w="full">
+                                        {categories.map((category) => (
+                                            <Checkbox
+                                                key={category.categoryID}
+                                                isChecked={problem.selectedCategoryIDs.includes(category.categoryID)}
+                                                onChange={(e) => handleCategoryChange(e, category.categoryID)}
+                                            >
+                                                {category.catName}
+                                            </Checkbox>
+                                        ))}
+                                    </SimpleGrid>
+                                    <FormErrorMessage>{errors.selectedCategoryIDs}</FormErrorMessage>
+                                </FormControl>
+                                <FormControl mb={4}>
+                                    <FormLabel fontWeight="bold">Trình biên dịch</FormLabel>
+                                    <Select value={problem.testCompilerID} name="testCompilerID" onChange={handleChange}>
+                                        {compilers.map((compiler) => (
+                                            <option key={compiler.compilerID} value={compiler.compilerID}>
+                                                {compiler.compilerName}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <FormControl mb={4}>
+                                    <FormLabel fontWeight="bold">Chọn bài học</FormLabel>
+                                    <Select value={problem.selectedLessonID} name="selectedLessonID" onChange={handleChange}>
+                                        <option value="" disabled>-- Chọn bài học --</option>
+                                        {lessons.map((lesson) => (
+                                            <option key={lesson.lessonID} value={lesson.lessonID}>
+                                                {lesson.lessonTitle}
+                                            </option>
+                                        ))}
+                                    </Select>
+
+                                </FormControl>
+                                <FormControl isInvalid={errors.timeLimit} mb={4}>
+                                    <FormLabel fontWeight="bold">Giới hạn thời gian</FormLabel>
+                                    <FlushedInput
+                                        bg={boxColor}
+                                        type="number"
+                                        placeholder="Nhập giới hạn thời gian"
+                                        name="timeLimit"
+                                        value={problem.timeLimit}
+                                        onChange={handleChange}
+                                        textColor={textColor}
+                                    />
+                                    <FormErrorMessage>{errors.timeLimit}</FormErrorMessage>
+                                </FormControl>
+                                <FormControl isInvalid={errors.memoryLimit} mb={4}>
+                                    <FormLabel fontWeight="bold">Giới hạn bộ nhớ</FormLabel>
+                                    <FlushedInput
+                                        bg={boxColor}
+                                        type="number"
+                                        placeholder="Nhập giới hạn bộ nhớ"
+                                        name="memoryLimit"
+                                        value={problem.memoryLimit}
+                                        onChange={handleChange}
+                                        textColor={textColor}
+                                    />
+                                    <FormErrorMessage>{errors.memoryLimit}</FormErrorMessage>
+                                </FormControl>
+                                <FormControl mb={4}>
+                                    <FormLabel fontWeight="bold">Loại bài kiểm tra</FormLabel>
+                                    <Select bg={boxColor} name="testType" value={problem.testType} onChange={handleChange} textColor={textColor}>
+                                        <option key="outputMatching" value="Output Matching">Output Matching</option>
+                                        <option key="custom" value="Custom">Custom</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel fontWeight="bold">Trạng thái</FormLabel>
+                                    <Select bg={boxColor} name="published" value={problem.published} onChange={handleChange} textColor={textColor}>
+                                        <option key="default" value="" disabled>Chọn trạng thái</option>
+                                        <option key="online" value="1">Online</option>
+                                        <option key="offline" value="0">Offline</option>
+                                    </Select>
+                                </FormControl>
+                            </Box>
                         </GridItem>
                     </Grid>
                 </ModalBody>

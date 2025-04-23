@@ -65,11 +65,7 @@ export const getDetail = async ({ controller, id }) => {
 // @desc: Sends a request to create a new item in the specified controller in the API
 export const createItem = async ({ controller, data }) => {
     try {
-        const res = await api.post(`/${controller}`, data, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        const res = await api.post(`/${controller}`, data);
         return res.data;
     } catch (error) {
         console.error("❌ Error creating item:", error);

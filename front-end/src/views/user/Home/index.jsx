@@ -16,9 +16,11 @@ import { useTitle } from "contexts/TitleContext";
 import CourseGrid from "../Course/components/CourseGrid";
 import { getList } from "config/apiService";
 import { Background } from "./components/Background";
+import HeroSection from "./components/HeroSection";
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);
+
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 50 },
@@ -57,29 +59,11 @@ const Home = () => {
 
   return (
     <Container maxW="7xl" py={5}>
-      <MotionBox
-        textAlign="center"
-        mb={10}
-        bgGradient="linear(to-r, blue.500, green.500)"
-        p={8}
-        borderRadius="lg"
-        boxShadow="lg"
-        color="white"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        variants={fadeInUp}
-      >
-        <Heading size="xl">Chào mừng bạn đến với Website NTU-Coder</Heading>
-        <Text fontSize="lg" color="gray.300" mt={4}>
-          Khám phá hàng trăm khóa học chất lượng từ cơ bản đến nâng cao.
-        </Text>
-
-      </MotionBox>
+      <HeroSection />
       <MotionFlex alignItems="center"
         justifyContent="center"  // Căn giữa theo chiều ngang
         direction="column"
-        mb={4} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
+        mb={2} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
         <Background />
       </MotionFlex>
       <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>

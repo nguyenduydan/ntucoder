@@ -94,26 +94,45 @@ namespace api.Infrashtructure.Repositories
             // Thêm bài tập mới vào cơ sở dữ liệu
             _context.Problems.Add(problem);
             await _context.SaveChangesAsync();
+
             dto.ProblemID = problem.ProblemID;
 
-            // Thêm các thể loại vào bài tập
-            if (dto.SelectedCategoryIDs.Any())
+            // Gán thể loại nếu có
+            if (dto.SelectedCategoryIDs != null && dto.SelectedCategoryIDs.Any())
             {
                 foreach (var categoryId in dto.SelectedCategoryIDs)
                 {
-                    var problemCategory = new ProblemCategory
+                    _context.ProblemCategories.Add(new ProblemCategory
                     {
                         ProblemID = problem.ProblemID,
                         CategoryID = categoryId,
-                        Note = dto.Note,
-                    };
-                    _context.ProblemCategories.Add(problemCategory);
+                        Note = dto.Note
+                    });
+                }
+            }
+
+            if (dto.SelectedLessonID > 0) // Kiểm tra nếu có bài học được chọn
+            {
+                var lessonId = dto.SelectedLessonID;
+
+                // Kiểm tra xem bài học này đã được gán với bài tập này chưa
+                var exists = await _context.LessonProblems
+                    .AnyAsync(lp => lp.LessonID == lessonId && lp.ProblemID == problem.ProblemID);
+
+                if (!exists)
+                {
+                    _context.LessonProblems.Add(new LessonProblem
+                    {
+                        ProblemID = problem.ProblemID,
+                        LessonID = lessonId,
+                    });
                 }
                 await _context.SaveChangesAsync();
             }
 
             return dto;
         }
+
 
         // Kiểm tra xem mã bài tập có tồn tại không
         private async Task<bool> CheckProblemCodeExist(string pc)
@@ -145,12 +164,15 @@ namespace api.Infrashtructure.Repositories
         public async Task<ProblemDTO> GetProblemByIdAsync(int id)
         {
             var problem = await _context.Problems
-             .Where(p => p.ProblemID == id)
-             .Include(p => p.ProblemCategories)
-                .ThenInclude(pc => pc.Category)
-             .Include(c => c.Coder)
-             .Include(com => com.Compiler)
-             .FirstOrDefaultAsync();
+                .Where(p => p.ProblemID == id)
+                .Include(p => p.ProblemCategories)
+                    .ThenInclude(pc => pc.Category)
+                .Include(p => p.Coder)
+                .Include(p => p.Compiler)
+                .Include(p => p.LessonProblems)
+                    .ThenInclude(lp => lp.Lesson)
+                .FirstOrDefaultAsync();
+
 
             if (problem == null)
             {
@@ -176,6 +198,8 @@ namespace api.Infrashtructure.Repositories
                 SelectedCategoryNames = problem.ProblemCategories
                 .Select(pc => pc.Category.CatName)
                 .ToList(),
+                SelectedLessonID = problem.LessonProblems.Select(lp => lp.LessonID).FirstOrDefault(),
+                SelectedLessonName = problem.LessonProblems.Select(lp => lp.Lesson.LessonTitle).FirstOrDefault(),
                 Note = problem.ProblemCategories.Select(pc => pc.Note).FirstOrDefault()
             };
         }
@@ -185,6 +209,7 @@ namespace api.Infrashtructure.Repositories
         {
             var existing = await _context.Problems
                 .Include(p => p.ProblemCategories)
+                .Include(p => p.LessonProblems)
                 .FirstOrDefaultAsync(p => p.ProblemID == id);
 
             if (existing == null)
@@ -200,6 +225,7 @@ namespace api.Infrashtructure.Repositories
                 }
                 existing.ProblemCode = dto.ProblemCode!;
             }
+
             existing.ProblemName = dto.ProblemName ?? existing.ProblemName;
             existing.ProblemContent = dto.ProblemContent ?? existing.ProblemContent;
             existing.TimeLimit = dto.TimeLimit ?? existing.TimeLimit;
@@ -232,10 +258,25 @@ namespace api.Infrashtructure.Repositories
                 }
             }
 
+            // 👉 Cập nhật bài học
+            if (dto.SelectedLessonID > 0)
+            {
+                // Xóa hết các liên kết cũ
+                _context.LessonProblems.RemoveRange(existing.LessonProblems);
+
+                // Thêm liên kết mới
+                _context.LessonProblems.Add(new LessonProblem
+                {
+                    ProblemID = existing.ProblemID,
+                    LessonID = dto.SelectedLessonID,
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             dto.ProblemID = existing.ProblemID;
             return dto;
         }
+
     }
 }

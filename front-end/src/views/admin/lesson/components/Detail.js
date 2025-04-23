@@ -233,7 +233,7 @@ const LessonDetail = () => {
                                                 autoFocus
                                                 onChange={(e) => handleInputChange("topicID", e.target.value)}
                                                 placeholder="Chọn chủ đề"
-                                                width={{ base: "100%", md: "50%" }}
+                                                width="100%"
                                             >
                                                 {topic.map((topic) => (
                                                     <option key={topic.topicID} value={topic.topicID}>{topic.topicName}</option>
@@ -312,7 +312,6 @@ const LessonDetail = () => {
                                             config={Editor}
                                             onChange={(newContent) => handleInputChange("lessonContent", newContent)}
                                             autoFocus
-                                            style={{ width: "100%", minHeight: "300px" }}
                                         />
                                     </Box>
                                 ) : (

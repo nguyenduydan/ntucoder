@@ -2,6 +2,7 @@ using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
+using api.Infrashtructure.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,8 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins("http://localhost:3000")
                .AllowAnyHeader()
-               .AllowAnyMethod();
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
 
@@ -25,9 +27,9 @@ builder.Services.AddCors(options =>
 var conString = builder.Configuration.GetConnectionString("connecString") ??
      throw new InvalidOperationException("Connection string 'connecString'" +
     " not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
-    mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
 
 //Repository
 builder.Services.AddScoped<CoderRepository>();
@@ -43,8 +45,10 @@ builder.Services.AddScoped<ProblemRepository>();
 builder.Services.AddScoped<SubmissionRepository>();
 builder.Services.AddScoped<TestCaseRepository>();
 builder.Services.AddScoped<TestRunRepository>();
+builder.Services.AddScoped<CodeExecutionService>();
 //Service
 builder.Services.AddScoped<MinioService>();
+
 
 
 var app = builder.Build();
@@ -62,11 +66,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("AllowMyOrigin");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

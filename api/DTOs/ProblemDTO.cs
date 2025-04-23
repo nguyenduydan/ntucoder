@@ -20,6 +20,7 @@
         public string? Note { get; set; }
         public List<int> SelectedCategoryIDs { get; set; } = new List<int>();
         public List<string> SelectedCategoryNames { get; set; } = new List<string>();
-
+        public int SelectedLessonID { get; set; }
+        public string? SelectedLessonName { get;set; }
     }
 }

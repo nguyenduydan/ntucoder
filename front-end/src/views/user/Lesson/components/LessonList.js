@@ -9,7 +9,7 @@ import { FaRegFileCode } from "react-icons/fa";
 
 import { getDetail } from "config/apiService";
 
-const CourseDetail = () => {
+const LessonList = () => {
     const { slugId } = useParams();
     const parts = slugId ? slugId.split("-") : [];
     const courseID = parts.length > 0 ? parseInt(parts.pop(), 10) : NaN;
@@ -153,4 +153,4 @@ const CourseDetail = () => {
     );
 };
 
-export default CourseDetail;
+export default LessonList;

@@ -11,7 +11,10 @@ const editorConfig = {
         // Tùy chỉnh các cài đặt video nếu cần
         url: true, // Cho phép nhập URL video
     },
-    // Các tùy chọn khác có thể thêm vào
+    height: 350,
+    width: 'auto',
+    placeholder: 'Nhập nội dung tại đây...',
+
 };
 
 export default editorConfig;

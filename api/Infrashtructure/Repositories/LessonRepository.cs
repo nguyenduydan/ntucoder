@@ -58,7 +58,9 @@ namespace api.Infrashtructure.Repositories
         {
             var lesson = await _context.Lessons
                 .AsNoTracking()
-                .Include(l => l.LessonProblems).Include(l => l.Topic)
+                .Include(l => l.LessonProblems)
+                    .ThenInclude(lp => lp.Problem)
+                .Include(l => l.Topic)
                 .FirstOrDefaultAsync(l => l.LessonID == id);
 
             if (lesson == null)

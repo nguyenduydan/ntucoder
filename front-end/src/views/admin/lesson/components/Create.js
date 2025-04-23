@@ -76,7 +76,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
     const handleEditorChange = (content) => {
         setLesson((prev) => ({
             ...prev,
-            lessonContent: content, // ✅ Cập nhật nội dung từ TinyMCE
+            lessonContent: content,
         }));
     };
 
@@ -155,20 +155,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                                 </Select>
                                 <FormErrorMessage>{errors.topicID}</FormErrorMessage>
                             </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
-                                <Box maxH="600px" overflowY="auto">
-                                    <JoditEditor
-                                        key={lesson.lessonID}
-                                        ref={editor}
-                                        value={lesson.lessonContent}
-                                        config={Editor}
-                                        onChange={handleEditorChange}
-                                        onBlur={(newContent) => handleEditorChange(newContent)}
-                                        style={{ width: "100%", height: "500px" }} // Đảm bảo kích thước hợp lý
-                                    />
-                                </Box>
-                            </FormControl>
+
                         </Box>
                         <Box>
                             <FormControl isInvalid={!!errors.order} mb={4}>
@@ -199,6 +186,19 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                             </FormControl>
                         </Box>
                     </Grid>
+                    <FormControl mb={4}>
+                        <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
+                        <Box maxH="600px" overflowY="auto">
+                            <JoditEditor
+                                key={lesson.lessonID}
+                                ref={editor}
+                                value={lesson.lessonContent}
+                                config={Editor}
+                                onChange={handleEditorChange}
+                                onBlur={(newContent) => handleEditorChange(newContent)}
+                            />
+                        </Box>
+                    </FormControl>
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="gray" mr={3} onClick={onClose}>Hủy</Button>

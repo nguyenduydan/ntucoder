@@ -37,6 +37,7 @@ const ProblemDetail = () => {
     const [problem, setProblemDetail] = useState(null);
     const [compiler, setCompiler] = useState([]);
     const [categories, setProblemCategories] = useState([]);
+    const [lessons, setLesson] = useState([]);
 
     const [editField, setEditField] = useState(null);
     const [editableValues, setEditableValues] = useState({});
@@ -83,12 +84,15 @@ const ProblemDetail = () => {
         try {
             const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
             const category = await getList({ controller: "Category", page: 1, pageSize: 10 });
+            const lesson = await getList({ controller: "Lesson", page: 1, pageSize: 10 });
+            setLesson(lesson.data);
             setProblemCategories(category.data);
             setCompiler(compiler.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
             setProblemCategories([]);
             setCompiler([]);
+            setLesson([]);
         }
     };
     useEffect(() => {
@@ -100,7 +104,6 @@ const ProblemDetail = () => {
 
 
     const handleEdit = (field) => {
-        console.log("Mở edit:", field, editableValues.selectedCategoryIDs);
         if (field === 'selectedCategory') {
             setEditableValues((prev) => ({
                 ...prev,
@@ -345,7 +348,7 @@ const ProblemDetail = () => {
                                                 onBlur={() => setEditField(null)}
                                                 onChange={(e) => handleInputChange("testType", e.target.value)}
                                                 autoFocus
-                                                width="50%"
+                                                width="100%"
                                             >
                                                 <option value="Output Matching">Output Matching</option>
                                                 <option value="Validate Output">Validate Output</option>
@@ -393,7 +396,7 @@ const ProblemDetail = () => {
                                                 onBlur={() => setEditField(null)}
                                                 onChange={(e) => handleInputChange("testCompilerID", e.target.value)}
                                                 autoFocus
-                                                width={{ base: "100%", md: "50%" }}
+                                                width="100%"
                                             >
                                                 {compiler.map((compiler) => (
                                                     <option key={compiler.compilerID} value={compiler.compilerID}>
@@ -406,6 +409,13 @@ const ProblemDetail = () => {
                                                 <strong>Trình biên dịch:</strong> {compiler.find(c => c.compilerID === Number(problem.testCompilerID))?.compilerName || "Chưa chọn"}
                                             </Text>
                                         )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('compiler')}
+                                        />
                                     </Flex>
 
                                     <Flex align="center">
@@ -451,34 +461,34 @@ const ProblemDetail = () => {
                                         />
                                     </Flex>
                                     <Flex align="center">
-                                        <Text fontSize="lg" fontWeight="bold">
-                                            Code test:
-                                        </Text>
+                                        {editField === "lesson" ? (
+                                            <Select
+                                                name="selectedLessonID"
+                                                value={editableValues.selectedLessonID || ""}
+                                                onBlur={() => setEditField(null)}
+                                                onChange={(e) => handleInputChange("selectedLessonID", e.target.value)}
+                                                autoFocus
+                                                width="100%"
+                                            >
+                                                {lessons.map((lesson) => (
+                                                    <option key={lesson.lessonID} value={lesson.lessonID}>
+                                                        {lesson.lessonTitle}
+                                                    </option>
+                                                ))}
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Bài học: </strong> {lessons.find(l => l.lessonID === Number(problem.selectedLessonID))?.lessonTitle || "Chưa chọn"}
+                                            </Text>
+                                        )}
                                         <IconButton
                                             aria-label="Edit"
                                             icon={<MdEdit />}
                                             ml={2}
                                             size="sm"
-                                            onClick={() => handleEdit('testCode')}
+                                            onClick={() => handleEdit('lesson')}
                                         />
                                     </Flex>
-
-                                    {editField === 'testCode' ? (
-                                        <JoditEditor
-                                            ref={editor}
-                                            value={editableValues.testCode}
-                                            config={Editor}
-                                            onChange={(newContent) => handleInputChange("testCode", newContent)}
-                                            autoFocus
-                                            style={{ width: "100%", minHeight: "300px" }}
-                                        />
-                                    ) : (
-                                        <Box p={2} bg="gray.200" borderRadius="md" overflowX="auto">
-                                            <pre>
-                                                <code>{problem.testCode || 'Chưa có'}</code>
-                                            </pre>
-                                        </Box>
-                                    )}
                                 </VStack>
                             </GridItem>
                         </Grid>
