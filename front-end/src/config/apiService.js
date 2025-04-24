@@ -137,3 +137,18 @@ export const deleteItem = async ({ controller, id }) => {
         throw error; // Rethrow the error to be handled by the calling function
     }
 };
+
+
+export const getTestCase = async ({ controller, problemid }) => {
+    if (!problemid || !controller) {
+        throw new Error("ID and controller name are required to fetch details.");
+    }
+
+    try {
+        const res = await api.get(`/${controller}?problemID=${problemid}`);
+        return res.data;
+    } catch (error) {
+        console.error("❌ Error fetching detail:", error);
+        throw error; // Rethrow the error to be handled by the calling function
+    }
+};

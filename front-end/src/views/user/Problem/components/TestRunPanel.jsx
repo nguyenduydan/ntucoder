@@ -1,4 +1,15 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
+import {
+    Box,
+    Text,
+    Tabs,
+    TabList,
+    TabPanels,
+    Tab,
+    TabPanel,
+    Flex
+} from "@chakra-ui/react";
+import { getDetail, getTestCase } from "config/apiService";
+import React, { useState, useEffect } from "react";
 
 const testResults = [
     {
@@ -10,31 +21,98 @@ const testResults = [
     },
 ];
 
-const TestResultPanel = ({ hasRun }) => {
+const TestResultPanel = ({ hasRun, id }) => {
+    const [testCases, setTestCases] = useState([]);
+    const [limitTime, setLimitTime] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const limitRes = await getDetail({ controller: "Problem", id: id });
+                const testcaseRes = await getTestCase({
+                    controller: "TestCase",
+                    problemid: id,
+                });
+                if (testcaseRes || limitRes) {
+                    setLimitTime(limitRes.timeLimit || null);
+                    setTestCases(testcaseRes.data || []);
+                }
+
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu test case:", error);
+            }
+        };
+
+        if (id) {
+            fetchData();
+        }
+    }, [id]);
+
     return (
         <Box maxH="25vh" bg="gray.900" color="white" px={4} py={3} overflowY="auto">
-            <Text fontWeight="bold" fontSize="lg" mb={2}>KIỂM THỬ</Text>
-
-            {!hasRun ? (
-                <Text color="gray.400" border="1px solid" borderColor="gray.600" px={3} py={2} borderRadius="md">
-                    Vui lòng chạy thử code của bạn trước!
+            {!hasRun && testResults.length > 1 && (
+                <Text
+                    color="gray.400"
+                    border="1px solid"
+                    borderColor="gray.600"
+                    px={3}
+                    py={2}
+                    borderRadius="md"
+                >
+                    Vui lòng chạy thử code để xem kết quả đầy đủ!
                 </Text>
-            ) : (
-                <VStack align="start" spacing={4}>
-                    {testResults.map((test, index) => (
-                        <Box key={index} w="full" bg="gray.700" p={4} borderRadius="md">
-                            <Text fontWeight="semibold" mb={2}>Kiểm thử {index + 1}</Text>
-                            <Box ml={4}>
-                                <Text><strong>Đầu vào:</strong> {test.input}</Text>
-                                <Text><strong>Đầu ra thực tế:</strong> {test.actualOutput}</Text>
-                                <Text><strong>Đầu ra mong đợi:</strong> {test.expectedOutput}</Text>
-                                <Text><strong>Giới hạn thời gian:</strong> {test.timeLimit}</Text>
-                                <Text><strong>Thời gian thực thi:</strong> {test.execTime}</Text>
-                            </Box>
-                        </Box>
-                    ))}
-                </VStack>
             )}
+
+            <Tabs isLazy variant="enclosed" colorScheme="cyan" mt={3}>
+                <TabList>
+                    {testResults.map((_, index) => (
+                        <Tab key={index}>Testcase {index + 1}</Tab>
+                    ))}
+                </TabList>
+
+                <TabPanels>
+                    {testResults.map((test, index) => {
+                        if (!hasRun && index > 0) {
+                            return (
+                                <TabPanel key={index}>
+                                    <Text color="gray.400">
+                                        Bạn cần chạy thử để xem testcase này.
+                                    </Text>
+                                </TabPanel>
+                            );
+                        }
+
+                        const testcase = testCases[index];
+
+                        return (
+                            <TabPanel key={index}>
+                                <Box bg="gray.700" p={4} borderRadius="md" fontSize="14px">
+                                    <Flex justify="start" >
+                                        <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
+                                        <Text>{testcase?.input || "Không có"}</Text>
+                                    </Flex>
+                                    <Flex justify="start" >
+                                        <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
+                                        <Text>{test.actualOutput || "Không có"}</Text>
+                                    </Flex>
+                                    <Flex justify="start" >
+                                        <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
+                                        <Text>{testcase?.output || "Không có"}</Text>
+                                    </Flex>
+                                    <Flex justify="start" >
+                                        <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
+                                        <Text>{limitTime || "Không có"}</Text>
+                                    </Flex>
+                                    <Flex justify="start" >
+                                        <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
+                                        <Text>{test.execTime || "Không có"}</Text>
+                                    </Flex>
+                                </Box>
+                            </TabPanel>
+                        );
+                    })}
+                </TabPanels>
+            </Tabs>
         </Box>
     );
 };

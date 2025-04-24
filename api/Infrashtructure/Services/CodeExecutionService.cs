@@ -111,11 +111,11 @@ namespace api.Infrashtructure.Services
 
 
             // Log the output for the test case to console
-            Console.WriteLine($"Test Case ID: {testCase.TestCaseID}");
-            Console.WriteLine($"Input: {testCase.Input.Trim()}");
-            Console.WriteLine($"Expected Output: {testCase.Output.Trim()}");
-            Console.WriteLine($"Actual Output: {result.output.Trim()}");
-            Console.WriteLine($"Test Result: {testResult}");
+            //Console.WriteLine($"Test Case ID: {testCase.TestCaseID}");
+            //Console.WriteLine($"Input: {testCase.Input.Trim()}");
+            //Console.WriteLine($"Expected Output: {testCase.Output.Trim()}");
+            //Console.WriteLine($"Actual Output: {result.output.Trim()}");
+            //Console.WriteLine($"Test Result: {testResult}");
 
             var checkerLogObj = new
             {
