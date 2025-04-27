@@ -439,6 +439,32 @@ namespace api.Migrations
                     b.ToTable("LessonProblems");
                 });
 
+            modelBuilder.Entity("api.Models.ERD.Match", b =>
+                {
+                    b.Property<int>("MatchID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MatchID"));
+
+                    b.Property<int>("CoderID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LessonProblemID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Point")
+                        .HasColumnType("int");
+
+                    b.HasKey("MatchID");
+
+                    b.HasIndex("CoderID");
+
+                    b.HasIndex("LessonProblemID");
+
+                    b.ToTable("Matches");
+                });
+
             modelBuilder.Entity("api.Models.ERD.Problem", b =>
                 {
                     b.Property<int>("ProblemID")
@@ -907,6 +933,25 @@ namespace api.Migrations
                     b.Navigation("Lesson");
 
                     b.Navigation("Problem");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Match", b =>
+                {
+                    b.HasOne("api.Models.ERD.Coder", "Coder")
+                        .WithMany()
+                        .HasForeignKey("CoderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Models.ERD.LessonProblem", "LessonProblem")
+                        .WithMany()
+                        .HasForeignKey("LessonProblemID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Coder");
+
+                    b.Navigation("LessonProblem");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>

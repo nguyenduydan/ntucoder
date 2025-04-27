@@ -27,6 +27,7 @@ namespace api.Models
         public DbSet <Badge> Badges { get; set; }
         public DbSet <CourseCategory> CourseCategories { get; set; }
         public DbSet <Enrollment> Enrollments { get; set; }
+        public DbSet <Match> Matches {  get; set; }  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +60,23 @@ namespace api.Models
                       .WithOne(c => c.Account)
                       .HasForeignKey<Coder>(c => c.CoderID)
                       .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            modelBuilder.Entity<Match>(entity =>
+            {
+                entity.HasKey(m => m.MatchID);
+
+                entity.HasOne(m => m.Coder)
+                .WithMany()
+                .HasForeignKey(m => m.CoderID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(m => m.LessonProblem)
+                .WithMany()
+                .HasForeignKey(m => m.LessonProblemID)
+                .OnDelete(DeleteBehavior.Restrict);
+                      
 
             });
 
