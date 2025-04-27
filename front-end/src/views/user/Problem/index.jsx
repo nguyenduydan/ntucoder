@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import Editor from "@monaco-editor/react";
 import TestRunPanel from "./components/TestRunPanel";
 import ProblemNavbar from "./components/CodeNavBar";
 import { useLocation } from "react-router-dom";
+import { getDetail } from "config/apiService";
 
 export default function Problem() {
   const location = useLocation();
@@ -19,6 +20,23 @@ export default function Problem() {
     // Xử lý chạy thử giả lập (có thể gọi API ở đây)
     alert("Chạy thử code...");
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getDetail({
+          controller: "Problem",
+          id: problemID,
+        });
+        setCode(res.testCode || "");
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu bài tập:", error);
+      }
+    };
+
+    fetchData();
+  }, [problemID]);
+
 
   return (
     <VStack h="100%" spacing={0} align="stretch">

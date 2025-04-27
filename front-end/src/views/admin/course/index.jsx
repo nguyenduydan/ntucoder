@@ -42,6 +42,7 @@ export default function Index() {
     staleTime: 3000, // cache in 1 minute
     retry: false,
     onError: (error) => {
+      console.log("Đã bắt lỗi từ useQuery:", error);
       toast({
         title: "Lỗi khi tải dữ liệu",
         description: error.message || "Không thể tải dữ liệu. Vui lòng thử lại sau.",

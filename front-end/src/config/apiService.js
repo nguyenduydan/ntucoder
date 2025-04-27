@@ -20,7 +20,6 @@ export const getList = async ({
 
         const data = response.data;
 
-        // ✅ Nếu API trả về error trong body, thì ném lỗi
         if (!data || data.error || data.success === false) {
             throw new Error(data.message || "Lỗi từ phía server");
         }
@@ -31,17 +30,18 @@ export const getList = async ({
             totalCount: data?.totalCount || 0,
         };
     } catch (error) {
-        // Kiểm tra nếu lỗi liên quan đến kết nối hoặc timeout
+        console.error("Lỗi Axios:", error);  // để biết thật sự Axios trả gì
+
+        let message = "Đã xảy ra lỗi.";
         if (error.response) {
-            // Lỗi có phản hồi từ API (mã lỗi HTTP không phải 2xx)
-            throw new Error(`Lỗi từ API: ${error.response.status} - ${error.response.statusText}`);
+            message = `Lỗi API: ${error.response.status} - ${error.response.statusText}`;
         } else if (error.request) {
-            // Lỗi nếu không có phản hồi từ API (kết nối hoặc timeout)
-            throw new Error("Không thể kết nối tới API. Vui lòng kiểm tra lại kết nối mạng.");
-        } else {
-            // Lỗi khác (ví dụ: lỗi cấu hình)
-            throw new Error(`Lỗi khi thực thi yêu cầu: ${error.message}`);
+            message = "Không thể kết nối tới server.";
+        } else if (error.message) {
+            message = error.message;
         }
+
+        throw new Error(message);
     }
 };
 

@@ -24,6 +24,7 @@ import ProgressBar from "components/loading/loadingBar";
 import JoditEditor from "jodit-react";
 import sanitizeHtml from "utils/sanitizedHTML";
 import Editor from "utils/configEditor";
+import CodeEditor from "@monaco-editor/react";
 
 import "moment/locale/vi";
 //import api
@@ -340,6 +341,64 @@ const ProblemDetail = () => {
                                     )}
 
                                     <Flex align="center">
+                                        <Text fontSize="lg" fontWeight="bold">
+                                            Code mẫu:
+                                        </Text>
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit('testCode')}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+                                    {editField === 'testCode' ? (
+                                        <Box border="1px solid" borderColor="gray.600" borderRadius="md" mb={4}>
+                                            <CodeEditor
+                                                height="400px"
+                                                theme={"vs-dark"}
+                                                value={problem.testCode}
+                                                onChange={(value) => handleInputChange('testCode', value || '')}
+                                                onBlur={(value) => handleInputChange('testCode', value || '')}
+                                                options={{
+                                                    fontSize: 14,
+                                                    minimap: { enabled: false },
+                                                    suggestOnTriggerCharacters: true,    // Gợi ý khi gõ các ký tự đặc biệt (ví dụ: .)
+                                                    quickSuggestions: {                  // Gợi ý tự động khi đang gõ
+                                                        other: true,
+                                                        comments: true,
+                                                        strings: true
+                                                    },
+                                                    wordBasedSuggestions: true,           // Gợi ý từ các từ trong file hiện tại
+                                                    parameterHints: { enabled: true },     // Gợi ý tham số hàm
+                                                    tabCompletion: "on"
+                                                }}
+                                            />
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            overflowY={"auto"}
+                                            maxHeight="300px"
+                                            bg="gray.200"
+                                            borderRadius="md"
+                                            p={2}
+                                            sx={{ wordBreak: "break-word" }}
+                                            dangerouslySetInnerHTML={
+                                                {
+                                                    __html: sanitizeHtml(problem?.testCode)
+                                                }
+                                            }
+                                        />
+                                    )}
+
+                                </VStack>
+                            </GridItem>
+
+                            {/* Right Column */}
+                            <GridItem>
+                                <VStack align="stretch" spacing={4}>
+                                    <Flex align="center">
                                         {editField === 'testType' ? (
                                             <Select
                                                 value={
@@ -369,12 +428,6 @@ const ProblemDetail = () => {
                                             cursor="pointer"
                                         />
                                     </Flex>
-                                </VStack>
-                            </GridItem>
-
-                            {/* Right Column */}
-                            <GridItem>
-                                <VStack align="stretch" spacing={4}>
                                     <Flex align="center">
                                         <Text fontSize="lg">
                                             <strong>Tên người tạo:</strong>{' '}

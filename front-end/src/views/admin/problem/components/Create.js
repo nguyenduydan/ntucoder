@@ -18,10 +18,12 @@ import {
     Select,
     useColorMode,
     SimpleGrid,
-    Checkbox, Box
+    Checkbox, Box,
+    Flex
 } from "@chakra-ui/react";
 import JoditEditor from "jodit-react";
 import Editor from "utils/configEditor";
+import CodeEditor from "@monaco-editor/react";
 import FlushedInput from "components/fields/InputField";
 import { createItem, getList } from "config/apiService";
 
@@ -47,11 +49,15 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
     const [compilers, setCompilers] = useState([]);
     const [lessons, setLessons] = useState([]);
     const [errors, setErrors] = useState({});
+
     const toast = useToast();
     const [loading, setLoading] = useState(false);
     const { colorMode } = useColorMode();
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'gray.100' : 'whiteAlpha.100';
+
+    const [theme, setTheme] = useState("vs-dark");
+    const [language, setLanguage] = useState("cpp");
 
     useEffect(() => {
         if (isOpen) {
@@ -241,6 +247,43 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                     />
                                 </Box>
                                 <FormErrorMessage>{errors.problemExplanation}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl mb={4}>
+                                <FormLabel fontWeight="bold">Code mẫu</FormLabel>
+                                <Flex gap={20} direction="row">
+                                    <Select mb={4} value={language} onChange={(e) => setLanguage(e.target.value)}>
+                                        <option defaultValue="none" disabled>Chọn ngôn ngữ</option>
+                                        <option value="cpp">C++</option>
+                                    </Select>
+                                    <Select mb={4} value={theme} onChange={(e) => setTheme(e.target.value)}>
+                                        <option defaultValue="none" disabled>Chọn giao diện</option>
+                                        <option value="vs-dark">Tối</option>
+                                        <option value="vs-light">Sáng</option>
+                                    </Select>
+                                </Flex>
+                                <Box border="1px solid" borderColor="gray.600" borderRadius="md" mb={4}>
+                                    <CodeEditor
+                                        height="400px"
+                                        theme={theme}
+                                        language={language}
+                                        value={problem.testCode}
+                                        onChange={(value) => handleEditorChange('testCode', value || '')}
+                                        onBlur={(value) => handleEditorChange('testCode', value || '')}
+                                        options={{
+                                            fontSize: 14,
+                                            minimap: { enabled: false },
+                                            suggestOnTriggerCharacters: true,    // Gợi ý khi gõ các ký tự đặc biệt (ví dụ: .)
+                                            quickSuggestions: {                  // Gợi ý tự động khi đang gõ
+                                                other: true,
+                                                comments: true,
+                                                strings: true
+                                            },
+                                            wordBasedSuggestions: true,           // Gợi ý từ các từ trong file hiện tại
+                                            parameterHints: { enabled: true },     // Gợi ý tham số hàm
+                                            tabCompletion: "on"
+                                        }}
+                                    />
+                                </Box>
                             </FormControl>
 
                         </GridItem>

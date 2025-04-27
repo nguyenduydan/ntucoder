@@ -13,11 +13,11 @@ import React, { useState, useEffect } from "react";
 
 const testResults = [
     {
-        input: "0",
-        actualOutput: '"Hello C++"',
-        expectedOutput: '"Hello C++"',
-        timeLimit: "500 ms",
-        execTime: "20 ms",
+        input: '""',
+        actualOutput: '" "',
+        expectedOutput: '" "',
+        timeLimit: '" "',
+        execTime: '" "',
     },
 ];
 
@@ -89,23 +89,23 @@ const TestResultPanel = ({ hasRun, id }) => {
                                 <Box bg="gray.700" p={4} borderRadius="md" fontSize="14px">
                                     <Flex justify="start" >
                                         <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
-                                        <Text>{testcase?.input || "Không có"}</Text>
+                                        <Text>{testcase?.input || test.input}</Text>
                                     </Flex>
                                     <Flex justify="start" >
                                         <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
-                                        <Text>{test.actualOutput || "Không có"}</Text>
+                                        <Text>{test.actualOutput || ""}</Text>
                                     </Flex>
                                     <Flex justify="start" >
                                         <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
-                                        <Text>{testcase?.output || "Không có"}</Text>
+                                        <Text>{testcase?.output || test.expectedOutput}</Text>
                                     </Flex>
                                     <Flex justify="start" >
                                         <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
-                                        <Text>{limitTime || "Không có"}</Text>
+                                        <Text>{limitTime || test.timeLimit}</Text>
                                     </Flex>
                                     <Flex justify="start" >
                                         <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
-                                        <Text>{test.execTime || "Không có"}</Text>
+                                        <Text>{test.execTime || ""}</Text>
                                     </Flex>
                                 </Box>
                             </TabPanel>
