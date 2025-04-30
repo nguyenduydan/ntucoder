@@ -18,6 +18,7 @@ import {
     InputGroup,
     InputRightElement,
     IconButton,
+    Select,
     useColorMode,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -25,22 +26,20 @@ import FlushedInput from "components/fields/InputField";
 import { createItem } from "config/apiService";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
-    const [userName, setUserName] = useState("");
-    const [coderName, setCoderName] = useState("");
-    const [coderEmail, setCoderEmail] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState({});
-    const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
-
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'gray.100' : 'whiteAlpha.100';
+    const [userName, setUserName] = useState('');
+    const [coderName, setCoderName] = useState('');
+    const [coderEmail, setCoderEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [password, setPassword] = useState('');
+    const [roleID, setRoleID] = useState('');
+    const [errors, setErrors] = useState({});
+    const toast = useToast();
 
-
-    // Reset lại input khi modal mở
     useEffect(() => {
         if (isOpen) {
             setCoderEmail("");
@@ -52,62 +51,92 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
         }
     }, [isOpen]);
 
-    // Hàm để chuyển đổi giữa ẩn và hiện mật khẩu
     const handleClickReveal = () => {
         setShowPassword(!showPassword);
     };
+
     const handleSubmit = async () => {
-        setLoading(true); // Bật trạng thái loading khi gửi yêu cầu
+        setErrors({});
+        const inputs = {
+            userName,
+            coderName,
+            coderEmail,
+            phoneNumber,
+            password,
+            role: Number(roleID), // Ép roleID thành số
+        };
+
+        const newErrors = {};
+        Object.keys(inputs).forEach((key) => {
+            if (typeof inputs[key] === 'string' && !inputs[key].trim()) {
+                newErrors[key] = 'Không được bỏ trống.';
+            } else if (inputs[key] === null || inputs[key] === undefined) {
+                newErrors[key] = 'Không được bỏ trống.';
+            }
+        });
+
+        // Kiểm tra email hợp lệ
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (coderEmail && !emailRegex.test(coderEmail)) {
+            newErrors.coderEmail = 'Email không hợp lệ.';
+        }
+
+        // Kiểm tra họ và tên (không chứa số)
+        const nameRegex = /^[^\d]+$/;
+        if (coderName && !nameRegex.test(coderName)) {
+            newErrors.coderName = 'Họ và tên không được chứa số.';
+        }
+
+        // Kiểm tra số điện thoại (phải có đúng 10 chữ số)
+        const phoneRegex = /^\d{10}$/;
+        if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+            newErrors.phoneNumber = 'Số điện thoại phải có đúng 10 chữ số.';
+        }
+
+        // Kiểm tra độ dài mật khẩu
+        if (password && password.length < 6) {
+            newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự.';
+        }
+
+        // Kiểm tra roleID
+        if (!roleID || isNaN(roleID)) {
+            newErrors.roleID = 'Vui lòng chọn vai trò.';
+        }
+
+        // Nếu có lỗi, hiển thị và dừng lại
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            // Gửi yêu cầu tạo mới người dùng
-            const data = {
-                userName,
-                coderName,
-                coderEmail,
-                phoneNumber,
-                password,
-            };
-
-            await createItem({ controller: "Coder", data: data }); // Gọi service
-            // Hiển thị thông báo thành công
-            toast({
-                title: 'Thêm mới thành công!',
-                status: 'success',
-                duration: 2000,
-                isClosable: true,
-                position: 'top',
-                variant: 'left-accent',
+            console.log('Dữ liệu gửi lên API:', inputs);
+            await createItem({
+                controller: 'Coder',
+                data: inputs,
             });
-
+            setLoading(true);
             if (fetchData) await fetchData(); // Cập nhật dữ liệu
             setErrors({});
             onClose(); // Đóng modal
+            toast({
+                title: 'Thêm mới thành công!',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+                position: 'top',
+                variant: "top-accent"
+            });
         } catch (error) {
-            if (error.response && error.response.data.errors) {
-                // Xử lý lỗi trả về dưới dạng mảng các thông báo lỗi
-                const errorMap = error.response.data.errors.reduce((acc, err) => {
-                    if (err.includes("Tên đăng nhập")) acc.userName = err;
-                    if (err.includes("Họ và tên")) acc.coderName = err;
-                    if (err.includes("Email")) acc.coderEmail = err;
-                    if (err.includes("Số điện thoại")) acc.phoneNumber = err;
-                    if (err.includes("Mật khẩu")) acc.password = err;
-                    return acc;
-                }, {});
-                setErrors(errorMap);
-            } else {
-                // Hiển thị thông báo lỗi chung nếu không có lỗi chi tiết
-                toast({
-                    title: "Đã xảy ra lỗi.",
-                    description: error.message || "Có lỗi xảy ra khi tạo người dùng.",
-                    status: "error",
-                    duration: 2000,
-                    isClosable: true,
-                    position: "top",
-                    variant: "left-accent",
-                });
-            }
-        } finally {
-            setLoading(false); // Tắt trạng thái loading sau khi hoàn thành
+            console.error('Lỗi API:', error.response ? error.response.data : error);
+            toast({
+                title: 'Đã xảy ra lỗi.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+                position: 'top-right',
+            });
+            setLoading(false);
         }
     };
 
@@ -145,7 +174,7 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                                 <FormErrorMessage>{errors.userName}</FormErrorMessage>
                             </FormControl>
 
-                            <FormControl isInvalid={errors.password}>
+                            <FormControl isInvalid={!!errors.password}>
                                 <FormLabel fontWeight="bold">
                                     Mật khẩu<Text as="span" color="red.500"> *</Text>
                                 </FormLabel>
@@ -197,6 +226,25 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
                                     textColor={textColor}
                                 />
                                 <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={errors.roleID} mb={4}>
+                                <FormLabel fontWeight="bold">
+                                    Vai trò
+                                    <Text as="span" color="red.500">
+                                        {' '}
+                                        *
+                                    </Text>
+                                </FormLabel>
+                                <Select
+                                    placeholder="Chọn vai trò"
+                                    value={roleID}
+                                    onChange={(e) => setRoleID(e.target.value)}
+                                >
+                                    <option value="1">Admin</option>
+                                    <option value="2">User</option>
+                                    <option value="3">Manager</option>
+                                </Select>
+                                <FormErrorMessage>{errors.roleID}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                     </Grid>

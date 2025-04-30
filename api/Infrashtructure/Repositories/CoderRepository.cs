@@ -79,7 +79,8 @@ namespace api.Infrashtructure.Repositories
                 CreatedAt = coder.CreatedAt,
                 CreatedBy = coder.CreatedBy,
                 UpdatedAt = coder.UpdatedAt,
-                UpdatedBy = coder.UpdatedBy
+                UpdatedBy = coder.UpdatedBy,
+                RoleID = coder.Account.RoleID,
             };
         }
 
@@ -100,36 +101,44 @@ namespace api.Infrashtructure.Repositories
         /// </summary>
         public async Task<CreateCoderDTO> CreateCoderAsync(CreateCoderDTO dto)
         {
-            // Tạo salt và băm mật khẩu
+            if(await CheckEmailExist(dto.CoderEmail!))
+            {
+                throw new InvalidOperationException("Email đã tồn tại.");
+            }
+
+            if (await CheckUserExist(dto.UserName!))
+            {
+                throw new InvalidOperationException("Tên đăng nhập đã tồn tại.");
+            }
             var salt = PasswordHelper.GenerateSalt();
             var hashedPassword = HashPassword(dto.Password!, salt);
-
-            // Khởi tạo đối tượng Coder
-            var coder = new Coder
-            {
-                CoderName = dto.CoderName!,
-                CoderEmail = dto.CoderEmail!,
-                PhoneNumber = dto.PhoneNumber,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = "admin",
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = "admin"
-            };
-
-            // Giả sử Account có navigation property Coder (one-to-one)
             var account = new Account
             {
                 UserName = dto.UserName!,
                 Password = hashedPassword,
                 SaltMD5 = salt,
-                RoleID = 2,
-                Coder = coder
+                RoleID = dto.Role,
             };
 
             _context.Accounts.Add(account);
-            await _context.SaveChangesAsync(); // Lưu đồng thời cả Account và Coder
+            await _context.SaveChangesAsync();
 
-            dto.CoderID = account.AccountID; // Giả sử AccountID được dùng làm khóa chính chung
+            var coder = new Coder
+            {
+                CoderID = account.AccountID,
+                CoderName = dto.CoderName!,
+                CoderEmail = dto.CoderEmail!,
+                PhoneNumber = dto.PhoneNumber,
+                Gender = Enums.GenderEnum.other,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = "admin",
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = "admin",
+            };
+
+            _context.Coders.Add(coder);
+            await _context.SaveChangesAsync();
+            dto.CoderID = coder.CoderID;
             return dto;
         }
 

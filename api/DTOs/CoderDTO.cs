@@ -15,6 +15,7 @@ namespace api.DTOs
     public class CreateCoderDTO : CoderDTO
     {
         public string Password { get; set; }
+        public int Role { get; set; }
     }
     public class CoderDetailDTO: CoderDTO
     {
@@ -26,5 +27,6 @@ namespace api.DTOs
         public GenderEnum? Gender { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
+        public int RoleID { get; set; }
     }
 }

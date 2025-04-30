@@ -152,3 +152,13 @@ export const getTestCase = async ({ controller, problemid }) => {
         throw error; // Rethrow the error to be handled by the calling function
     }
 };
+
+export const login = async (data) => {
+    try {
+        const res = await api.post("/Auth/login", data);
+        return res; // ✅ Trả về full axios response
+    } catch (error) {
+        console.error("❌ Error logging in:", error);
+        throw error;
+    }
+};

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './assets/css/App.css';
 import { TitleProvider } from "contexts/TitleContext";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // Import QueryClient và QueryClientProvider
+import { AuthProvider } from 'contexts/AuthContext';
 
 import App from './App';
 
@@ -12,12 +13,15 @@ const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+
 root.render(
-  <BrowserRouter future={{ v7_relativeSplatPath: true }}>
-    <QueryClientProvider client={queryClient}>  {/* Bao quanh ứng dụng trong QueryClientProvider */}
-      <TitleProvider>
-        <App />
-      </TitleProvider>
-    </QueryClientProvider>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter future={{ v7_relativeSplatPath: true }}>
+      <QueryClientProvider client={queryClient}>  {/* Bao quanh ứng dụng trong QueryClientProvider */}
+        <TitleProvider>
+          <App />
+        </TitleProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </AuthProvider>
 );

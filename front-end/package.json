@@ -23,6 +23,7 @@
     "draft-js": "^0.11.7",
     "framer-motion": "^11.18.2",
     "jodit-react": "^5.2.15",
+    "js-cookie": "^3.0.5",
     "moment-timezone": "^0.5.46",
     "npm-force-resolutions": "^0.0.10",
     "nprogress": "^0.2.0",

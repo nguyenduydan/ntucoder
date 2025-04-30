@@ -1,6 +1,5 @@
 // columnsData.jsx
 import React from "react";
-import SwitchField from "components/fields/SwitchField";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
 import { deleteItem } from "config/apiService";
 
@@ -27,13 +26,6 @@ export const columnsData = [
   {
     Header: "SĐT",
     accessor: "phoneNumber",
-  },
-  {
-    Header: "Trạng thái",
-    accessor: "status",
-    Cell: ({ value }) => (
-      <SwitchField isChecked={value || false} reversed={true} fontSize="sm" />
-    ),
   },
   {
     Header: "Hành động",

@@ -31,7 +31,7 @@ namespace api.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> CreateCoder([FromForm] CreateCoderDTO dto)
+        public async Task<IActionResult> CreateCoder([FromBody] CreateCoderDTO dto)
         {
             if (dto == null)
             {

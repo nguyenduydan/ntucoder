@@ -3,11 +3,36 @@ using api.Infrashtructure.Services;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using api.Infrashtructure.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đọc cấu hình JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"];
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -47,6 +72,8 @@ builder.Services.AddScoped<TestCaseRepository>();
 builder.Services.AddScoped<TestRunRepository>();
 builder.Services.AddScoped<CodeExecutionService>();
 //Service
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MinioService>();
 
 
@@ -66,6 +93,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseAuthentication();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("AllowMyOrigin");
 app.UseHttpsRedirection();
