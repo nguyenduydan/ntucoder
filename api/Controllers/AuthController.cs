@@ -81,7 +81,7 @@ namespace api.Controllers
                 {
                     CoderID = coderID,
                     CoderName = coder.CoderName,
-                    RoleID = coder.RoleID
+                    RoleID = coder.Role
                 });
             }
             catch (Exception ex)

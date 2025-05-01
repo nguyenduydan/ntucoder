@@ -39,6 +39,12 @@ const genderMapping = {
     2: "Khác",
 };
 
+const roleMapping = {
+    1: "Người quản trị",
+    2: "Người dùng",
+    3: "Giáo viên",
+};
+
 const CoderDetail = () => {
     const { id } = useParams();
     const [coderDetail, setCoderDetail] = useState(null);
@@ -378,6 +384,34 @@ const CoderDetail = () => {
                                             </Text>
                                         </>
                                     )}
+                                    <Flex align="center">
+                                        {editField === "role" ? (
+                                            <Select
+                                                value={editableValues.role || ""}
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
+                                                onChange={(e) => handleInputChange("role", e.target.value)}
+                                                placeholder="Chọn vai trò"
+                                                width={{ base: "100%", md: "50%" }}
+                                            >
+                                                <option value="1">Người quản trị</option>
+                                                <option value="2">Người dùng</option>
+                                                <option value="3">Giáo viên</option>
+                                            </Select>
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Vai trò:</strong> {roleMapping[coderDetail.roleID] || "Khác"}
+                                            </Text>
+                                        )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit("role")}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
                                 </VStack>
                             </GridItem>
                         </Grid>

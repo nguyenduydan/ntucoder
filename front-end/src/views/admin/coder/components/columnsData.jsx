@@ -2,6 +2,7 @@
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
 import { deleteItem } from "config/apiService";
+import { Badge } from "@chakra-ui/react";
 
 export const columnsData = [
   {
@@ -27,6 +28,28 @@ export const columnsData = [
     Header: "SĐT",
     accessor: "phoneNumber",
   },
+
+  {
+    Header: "Quyền",
+    accessor: "role",
+    Cell: ({ row }) => {
+      const value = row?.role;
+      const roleMap = {
+        1: { label: "Quản trị viên", color: "blue" },
+        2: { label: "Người dùng", color: "red" },
+        3: { label: "Giáo viên", color: "orange" }
+      };
+
+      const role = roleMap[value] || { label: "Không xác định", color: "yellow" };
+
+      return (
+        <Badge colorScheme={role.color} boxShadow="md" px={3} py={1} borderRadius="md">
+          {role.label}
+        </Badge>
+      );
+    },
+  },
+
   {
     Header: "Hành động",
     accessor: "action",

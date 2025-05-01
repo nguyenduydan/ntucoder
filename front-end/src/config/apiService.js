@@ -162,3 +162,13 @@ export const login = async (data) => {
         throw error;
     }
 };
+
+export const register = async (data) => {
+    try {
+        const res = await api.post("/Coder", { ...data, role: 2 });
+        return res;
+    } catch (error) {
+        console.error("❌ Error registering:", error);
+        throw error;
+    }
+};

@@ -14,7 +14,7 @@ import { useAuth } from "contexts/AuthContext";
 const Auth = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isLogin, setIsLogin] = useState(true);
-    const { coder, setCoder, logout, isLoading } = useAuth();
+    const { coder, setCoder, logout } = useAuth();
 
     const handleToggle = () => setIsLogin(!isLogin);
 
@@ -24,10 +24,10 @@ const Auth = () => {
             onClose();
         }
     };
-
-    if (isLoading) {
-        return <Box textAlign="center" mt={4}>Đang kiểm tra đăng nhập...</Box>;
-    }
+    const handleRegisterSuccess = () => {
+        setIsLogin(true);  // Chuyển qua chế độ đăng nhập
+        onOpen();  // Mở modal
+    };
 
     const isOnline = Boolean(coder);
 
@@ -53,8 +53,16 @@ const Auth = () => {
                                 <Avatar size="sm" name={coder.coderName} />
                             </MenuButton>
                             <MenuList>
-                                <MenuItem>Hồ sơ</MenuItem>
-                                <MenuItem onClick={logout}>Đăng xuất</MenuItem>
+                                <MenuItem
+                                    as={NavLink}
+                                    to="/profile"
+                                    _hover={{ bg: "blue.200" }}
+                                >
+                                    Hồ sơ
+                                </MenuItem>
+                                <MenuItem _hover={{ bg: "blue.200", }} onClick={logout}>
+                                    Đăng xuất
+                                </MenuItem>
                             </MenuList>
                         </Menu>
                     </Flex>
@@ -70,18 +78,18 @@ const Auth = () => {
                 )}
             </Flex>
 
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={onClose} size={isLogin ? "md" : "2xl"}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent >
                     <ModalHeader textAlign="center">
                         {isLogin ? "Đăng nhập" : "Đăng ký"}
                     </ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody>
+                    <ModalBody textAlign={"center"} p={5}>
                         {isLogin ? (
                             <Login onSuccess={handleLoginSuccess} />
                         ) : (
-                            <Register />
+                            <Register onSuccess={handleRegisterSuccess} />
                         )}
                         <Button variant="link" mt={5} onClick={handleToggle}>
                             {isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}

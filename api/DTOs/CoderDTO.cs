@@ -11,11 +11,12 @@ namespace api.DTOs
         public string? CoderName { get; set; }
         public string? CoderEmail { get; set; }
         public string? PhoneNumber { get; set; }
+        public int Role { get; set; }
     }
     public class CreateCoderDTO : CoderDTO
     {
         public string Password { get; set; }
-        public int Role { get; set; }
+      
     }
     public class CoderDetailDTO: CoderDTO
     {
@@ -27,6 +28,5 @@ namespace api.DTOs
         public GenderEnum? Gender { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
-        public int RoleID { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using api.Infrashtructure.Repositories;
 
 namespace api.Controllers
 {
-    [Route("api/coder")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CoderController : ControllerBase
     {

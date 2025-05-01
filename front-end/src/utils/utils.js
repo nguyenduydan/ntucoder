@@ -58,3 +58,27 @@ export const animateProgress = (setProgress, duration = 1000) => {
         requestAnimationFrame(updateProgress);
     });
 };
+
+
+// validate password
+export function validatePassword(password) {
+    if (!password) {
+        return "Mật khẩu không thể bỏ trống.";
+    }
+    if (password.length < 6) {
+        return "Mật khẩu phải có ít nhất 6 ký tự.";
+    }
+    if (!/[A-Z]/.test(password)) {
+        return "Mật khẩu phải có ít nhất một chữ cái in hoa.";
+    }
+    if (!/[a-z]/.test(password)) {
+        return "Mật khẩu phải có ít nhất một chữ cái thường.";
+    }
+    if (!/[0-9]/.test(password)) {
+        return "Mật khẩu phải có ít nhất một chữ số.";
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        return "Mật khẩu phải có ít nhất một ký tự đặc biệt.";
+    }
+    return ""; // Mật khẩu hợp lệ
+}

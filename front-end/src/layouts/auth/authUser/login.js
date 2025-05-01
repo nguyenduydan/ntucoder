@@ -75,7 +75,12 @@ const Login = ({ onSuccess }) => {
 
 
     return (
-        <>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault(); // Ngăn submit mặc định của trình duyệt
+                handleLogin();
+            }}
+        >
             <FormControl isInvalid={!!errors.userName}>
                 <FormLabel fontWeight="bold">Tên đăng nhập</FormLabel>
                 <FlushedInput
@@ -105,6 +110,7 @@ const Login = ({ onSuccess }) => {
                             variant="link"
                             icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                             onClick={() => setShowPassword(!showPassword)}
+                            aria-label="Toggle Password Visibility"
                         />
                     </InputRightElement>
                 </InputGroup>
@@ -112,16 +118,16 @@ const Login = ({ onSuccess }) => {
             </FormControl>
 
             <Button
+                type="submit"
                 colorScheme="blue"
                 width="full"
                 mt={4}
-                onClick={handleLogin}
-                isLoading={loading} // Hiển thị Spinner khi đang tải
-                loadingText="Đang đăng nhập"
+                isLoading={loading}
+                loadingText="Đang đăng nhập.."
             >
                 Đăng nhập
             </Button>
-        </>
+        </form>
     );
 };
 

@@ -7,6 +7,9 @@ import routes from 'routes.js';
 import Footer from 'layouts/user/components/footer';
 import Navbar from 'layouts/user/components/navbar';
 import { Box } from '@chakra-ui/react';
+import Profile from 'views/user/Profile/index.jsx';
+import NotFound from 'views/user/NotFound.jsx';
+
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -64,7 +67,14 @@ export default function Home(props) {
                             {routes.map((route, index) => (
                                 <Route key={index} path={route.path} element={route.element} />
                             ))}
+
+                            {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
+                            <Route path="/profile" element={<Profile />} />
+
+                            {/* Optional: route 404 */}
+                            <Route path="*" element={<NotFound />} />
                         </Routes>
+
                     </Box>
                 )}
             </Box>

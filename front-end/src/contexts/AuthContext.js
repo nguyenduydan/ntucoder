@@ -42,11 +42,14 @@ export const AuthProvider = ({ children }) => {
         window.location.href = '/';
     };
 
+    const isAuthenticated = !!coder;
+
     return (
-        <AuthContext.Provider value={{ coder, setCoder, logout, isLoading }}>
+        <AuthContext.Provider value={{ coder, setCoder, logout, isLoading, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
 
 export const useAuth = () => useContext(AuthContext);

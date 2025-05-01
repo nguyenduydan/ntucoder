@@ -4,6 +4,6 @@
     {
         Admin = 1,
         User = 2,
-        Manager = 3
+        Teacher = 3
     }
 }

@@ -33,6 +33,7 @@ namespace api.Infrashtructure.Repositories
                     CoderName = a.Coder.CoderName,
                     CoderEmail = a.Coder.CoderEmail,
                     PhoneNumber = a.Coder.PhoneNumber,
+                    Role = a.RoleID,
                 });
 
             coderQuery = ApplySorting(coderQuery, sortField, ascending);
@@ -80,7 +81,7 @@ namespace api.Infrashtructure.Repositories
                 CreatedBy = coder.CreatedBy,
                 UpdatedAt = coder.UpdatedAt,
                 UpdatedBy = coder.UpdatedBy,
-                RoleID = coder.Account.RoleID,
+                Role = coder.Account.RoleID,
             };
         }
 
@@ -149,7 +150,9 @@ namespace api.Infrashtructure.Repositories
         /// </summary>
         public async Task<CoderDetailDTO> UpdateCoderAsync(int id, CoderDetailDTO dto)
         {
-            var existing = await _context.Coders.FindAsync(id);
+            var existing = await _context.Coders
+                                  .Include(c => c.Account) 
+                                  .FirstOrDefaultAsync(c => c.CoderID == id);
             if (existing == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy coder với id = {id}.");
@@ -177,7 +180,17 @@ namespace api.Infrashtructure.Repositories
             }
 
             existing.UpdatedAt = DateTime.Now;
-            //existing.UpdatedBy = "admin";
+            existing.UpdatedBy = dto.CoderName;
+            if (existing.Account != null && dto.Role != null)
+            {
+                existing.Account.RoleID = dto.Role;
+            }
+            else if (existing.Account == null)
+            {
+                // Xử lý trường hợp nếu Account không tồn tại (có thể tạo mới hoặc báo lỗi)
+                throw new KeyNotFoundException("Không tìm thấy tài khoản của coder này.");
+            }
+
 
             await _context.SaveChangesAsync();
 

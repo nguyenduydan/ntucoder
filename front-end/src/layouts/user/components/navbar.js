@@ -105,8 +105,10 @@ function Navbar(props) {
                                 renderView={renderView}
                             >
                                 <Stack spacing={3} p={3} my="30px">
+                                    <Auth />
                                     <Links direction="column" routes={routes} />
                                     <SearchInput width="100px" placeholder="Tìm kiếm... (Ctrl+K)" />
+
                                 </Stack>
                             </Scrollbars>
                         </DrawerBody>
