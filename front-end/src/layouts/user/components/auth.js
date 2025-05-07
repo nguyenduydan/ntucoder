@@ -50,7 +50,7 @@ const Auth = () => {
                         )}
                         <Menu>
                             <MenuButton as={Button} variant="none">
-                                <Avatar size="sm" name={coder.coderName} />
+                                <Avatar size="sm" src={coder.avatar || null} name={coder.coderName || 'coder'} alt="avatar" />
                             </MenuButton>
                             <MenuList>
                                 <MenuItem

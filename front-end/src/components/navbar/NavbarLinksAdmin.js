@@ -23,8 +23,12 @@ import React from 'react';
 import { MdNotificationsNone } from 'react-icons/md';
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import routes from 'routes';
+import { useAuth } from 'contexts/AuthContext';
+
+
 export default function HeaderLinks(props) {
   const { secondary } = props;
+  const { logout, coder } = useAuth();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   // Chakra Color Mode
@@ -146,11 +150,13 @@ export default function HeaderLinks(props) {
           <Avatar
             _hover={{ cursor: 'pointer' }}
             color="white"
-            name="Adela Parkson"
             bg="#11047A"
             size="sm"
             w="40px"
             h="40px"
+            name={coder.coderName || 'Coder'}
+            alt="avatar"
+            src={coder.avatar || 'https://bit.ly/broken-link'}
           />
         </MenuButton>
         <MenuList
@@ -174,32 +180,23 @@ export default function HeaderLinks(props) {
               fontWeight="700"
               color={textColor}
             >
-              👋&nbsp; Hey, Adela
+              👋&nbsp; Hey,<Text as="span" color="Red"> {coder.coderName || 'coder'}</Text>
             </Text>
           </Flex>
           <Flex flexDirection="column" p="10px" >
             <MenuItem
-              _hover={{ bg: 'none' }}
-              _focus={{ bg: 'none' }}
+              _hover={{ bg: 'gray.200' }}
               borderRadius="8px"
               px="14px"
             >
               <Text fontSize="sm">Profile Settings</Text>
             </MenuItem>
             <MenuItem
-              _hover={{ bg: 'none' }}
-              _focus={{ bg: 'none' }}
-              borderRadius="8px"
-              px="14px"
-            >
-              <Text fontSize="sm">Newsletter Settings</Text>
-            </MenuItem>
-            <MenuItem
-              _hover={{ bg: 'none' }}
-              _focus={{ bg: 'none' }}
+              _hover={{ bg: 'gray.200' }}
               color="red.400"
               borderRadius="8px"
               px="14px"
+              onClick={logout}
             >
               <Text fontSize="sm">Log out</Text>
             </MenuItem>

@@ -43,11 +43,11 @@ namespace api.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60)
+                Expires = DateTime.UtcNow.AddDays(1) //hết hạn sau 1 ngày
             };
             Response.Cookies.Append("token", token, cookieOptions);
 
-            return Ok(new { token, AccountID = user.AccountID, RoleID = user.RoleID, CoderName = coder.CoderName });
+            return Ok(new { token, AccountID = user.AccountID, Username = user.UserName, RoleID = user.RoleID, CoderName = coder.CoderName, avatar = coder.Avatar });
 
         }
         [Authorize]
@@ -81,6 +81,7 @@ namespace api.Controllers
                 {
                     CoderID = coderID,
                     CoderName = coder.CoderName,
+                    avatar = coder.Avatar,
                     RoleID = coder.Role
                 });
             }
