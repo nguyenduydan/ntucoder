@@ -8,11 +8,15 @@ import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes.js';
+import NotFound from 'views/user/NotFound.jsx';
+import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
+import { useAuth } from 'contexts/AuthContext';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
   const { ...rest } = props;
   const { onOpen } = useDisclosure();
+  const { coder } = useAuth();
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
@@ -95,10 +99,20 @@ export default function Dashboard(props) {
     return activeNavbar;
   };
 
-  const getRoutes = (routes) => {
+  const getRoutes = (routes, coder) => {
     return routes.flatMap((route, key) => {
-      if (route.layout === '/admin') {
-        let mainRoute = <Route key={key} path={route.path} element={route.component} />;
+      if (route.layout === "/admin" && route.allowedRoles?.includes(coder?.roleID)) {
+        let mainRoute = (
+          <Route
+            key={key}
+            path={route.path}
+            element={
+              <ProtectedRoute allowedRoles={route.allowedRoles}>
+                {route.component}
+              </ProtectedRoute>
+            }
+          />
+        );
 
         let subRoutes = route.item
           ? route.item.map((subRoute, subKey) => (
@@ -115,6 +129,7 @@ export default function Dashboard(props) {
       return [];
     });
   };
+
 
 
   return (
@@ -166,8 +181,10 @@ export default function Dashboard(props) {
 
               >
                 <Routes>
-                  {getRoutes(routes)}
+                  {getRoutes(routes, coder)}
                   <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                  {/* Optional: route 404 */}
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Box>
             ) : null}

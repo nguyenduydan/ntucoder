@@ -36,7 +36,7 @@ const Auth = () => {
             <Flex justifyContent="flex-end" gap={4}>
                 {isOnline ? (
                     <Flex alignItems="center">
-                        {coder.roleID === 1 && (
+                        {(coder.roleID === 1 || coder.roleID === 3) && (
                             <NavLink to="/admin/dashboard">
                                 <Button
                                     leftIcon={<MdAdminPanelSettings />}

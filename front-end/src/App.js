@@ -1,6 +1,5 @@
 import "./assets/css/App.css";
 import { Routes, Route } from "react-router-dom";
-import AuthLayout from "./layouts/auth";
 import AdminLayout from "./layouts/admin";
 import UserLayout from "./layouts/user";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
@@ -9,6 +8,7 @@ import { useState, useEffect } from "react";
 import Loading from "./components/loading/loadingSpinner";
 import { motion, AnimatePresence } from "framer-motion";
 import ProgressBar from "components/loading/ProgressBar";
+import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
 const MotionFlex = motion(Flex);
 
 export default function Main() {
@@ -40,11 +40,12 @@ export default function Main() {
             width="100%"
           >
             <Routes>
-              <Route path="auth/*" element={<AuthLayout />} />
               <Route
                 path="admin/*"
                 element={
-                  <AdminLayout theme={currentTheme} setTheme={setCurrentTheme} />
+                  <ProtectedRoute allowedRoles={[1, 3]}>
+                    <AdminLayout theme={currentTheme} setTheme={setCurrentTheme} />
+                  </ProtectedRoute>
                 }
               />
               <Route path="/*" element={

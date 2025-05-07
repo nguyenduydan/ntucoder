@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Box, Text, Tabs, TabList, TabPanels, Tab, TabPanel,
-    useColorModeValue, useToast, TabIndicator, SimpleGrid, Flex, Image
+    Box, Tabs, TabList, TabPanels, Tab, TabPanel, Center,
+    useColorModeValue, useToast, TabIndicator, SimpleGrid, Image
 } from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
 import { getList } from "config/apiService";
@@ -29,6 +29,7 @@ export default function Course() {
             toast({
                 title: "Lỗi khi lấy dữ liệu",
                 status: "error",
+                description: error.message,
                 duration: 1000,
                 isClosable: true,
                 position: "top-right",
@@ -43,22 +44,6 @@ export default function Course() {
 
     const categories = [...new Set(courses.map(course => course.courseCategoryName))];
 
-    if (courses.length === 0) {
-        return (
-            <Box pt={{ base: "130px", md: "80px", xl: "80px" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
-                <Text fontSize="2xl" fontWeight="bold" mb="4">Danh sách khóa học</Text>
-                <Flex justify="center" align="center" height="70vh">
-                    <Image
-                        src={NodataPng}
-                        alt="Không có dữ liệu"
-                        h="50%"
-                        objectFit="fill"
-                        backgroundColor="transparent"
-                    />
-                </Flex>
-            </Box>
-        );
-    }
 
     return (
         <ScrollToTop>
@@ -76,27 +61,45 @@ export default function Course() {
                     <TabIndicator mt='-3vh' height='2px' bg='blue.500' borderRadius='full' />
                     <TabPanels>
                         <TabPanel>
-                            {loading ? <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                                <SkeletonList />
-                                <SkeletonList />
-                                <SkeletonList />
-                                <SkeletonList />
-                            </SimpleGrid>
-                                : <CourseGrid courses={courses} />}
+                            {loading ? (
+                                <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                </SimpleGrid>
+                            ) : courses.length === 0 ? (
+                                <Center>
+                                    <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
+                                </Center>
+                            ) : (
+                                <CourseGrid courses={courses} />
+                            )}
                         </TabPanel>
-                        {categories.map((category, index) => (
-                            <TabPanel key={index}>
-                                {loading ? <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                </SimpleGrid> : (
-                                    <CourseGrid courses={courses.filter(course => course.courseCategoryName === category)} />
-                                )}
-                            </TabPanel>
-                        ))}
+
+                        {categories.map((category, index) => {
+                            const filtered = courses.filter(course => course.courseCategoryName === category);
+                            return (
+                                <TabPanel key={index}>
+                                    {loading ? (
+                                        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+                                            <SkeletonList />
+                                            <SkeletonList />
+                                            <SkeletonList />
+                                            <SkeletonList />
+                                        </SimpleGrid>
+                                    ) : filtered.length === 0 ? (
+                                        <Center>
+                                            <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
+                                        </Center>
+                                    ) : (
+                                        <CourseGrid courses={filtered} />
+                                    )}
+                                </TabPanel>
+                            );
+                        })}
                     </TabPanels>
+
                 </Tabs>
             </Box>
         </ScrollToTop>

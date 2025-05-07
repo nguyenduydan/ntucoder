@@ -7,13 +7,13 @@ import {
 } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/fa";
-
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "utils/utils";
 import { useTitle } from "contexts/TitleContext";
-
 import { getDetail } from "config/apiService";
+import { useAuth } from "contexts/AuthContext";
+
 
 const CourseDetail = () => {
     const { slugId } = useParams();
@@ -24,6 +24,8 @@ const CourseDetail = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const isAuthenticated = useAuth();
 
     useEffect(() => {
         if (isNaN(courseID)) {
@@ -88,9 +90,22 @@ const CourseDetail = () => {
 
         fetchCourse();
     }, [courseID, toast, navigate]);
-
-    // Set title for the page
     useTitle(course?.courseName || "Khóa học");
+
+    const handleEnroll = () => {
+        console.log("isAuthenticated", isAuthenticated); // Kiểm tra giá trị của isAuthenticated
+        if (isAuthenticated.isAuthenticated === false) {
+            toast({
+                title: "Bạn cần đăng nhập để truy cập trang này.",
+                status: "warning",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
+            });
+
+        }
+    };
 
     return (
         <ScrollToTop>
@@ -326,7 +341,15 @@ const CourseDetail = () => {
                                 <HStack><Icon as={FaCheckCircle} /><Text>Truy cập trọn đời</Text></HStack>
                                 <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                             </VStack>
-                            <Button colorScheme="green" mt={4} w="full">Đăng ký miễn phí</Button>
+                            {course?.fee === 0 ? (
+                                <Button colorScheme="green" mt={4} w="full" fontSize="18px" onClick={handleEnroll}>
+                                    Đăng ký miễn phí
+                                </Button>
+                            ) : (
+                                <Button colorScheme="red" mt={4} w="full" fontSize="18px" onClick={handleEnroll}>
+                                    Mua ngay
+                                </Button>
+                            )}
                         </Box>
                     </Box>
                 </Flex>

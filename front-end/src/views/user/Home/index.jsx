@@ -45,6 +45,7 @@ const Home = () => {
       const activeCourses = response.data.filter(course => course.status === 1).slice(0, 4);
       setCourses(activeCourses);
     } catch (error) {
+      console.error("Error fetching courses:", error);
       toast({
         title: "Lỗi khi lấy dữ liệu",
         status: "error",
@@ -75,7 +76,7 @@ const Home = () => {
       <Container maxW="7xl" py={5}>
         <HeroSection />
         <MotionFlex alignItems="center"
-          justifyContent="center"  // Căn giữa theo chiều ngang
+          justifyContent="center"
           direction="column"
           mb={2} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
           <Background />

@@ -10,7 +10,6 @@ import {
     useToast,
     FormErrorMessage,
     Text,
-    Box,
     SimpleGrid,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";

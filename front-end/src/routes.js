@@ -27,10 +27,9 @@ import Course from 'views/user/Course';
 import CourseDetailUser from 'views/user/Course/components/CourseDetail';
 import CourseCreateUser from 'views/user/Course/components/CreateCourse';
 import Lesson from 'views/user/Lesson';
-// Auth Imports
-//import SignInCentered from 'views/auth/signIn';
+
 import { PersonIcon } from 'components/icons/Icons';
-import { FaBookAtlas, FaLaptopCode, FaFileCode, FaBook, FaBookmark, FaAlignCenter, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
+import { FaBookAtlas, FaFileCode, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
 
 
 const routes = [
@@ -41,6 +40,7 @@ const routes = [
     path: '/dashboard',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <MainDashboard />,
+    allowedRoles: [1, 3],
   },
   {
     name: 'Loại khóa học',
@@ -48,6 +48,7 @@ const routes = [
     icon: <Icon as={FaBookBookmark} width="20px" height="20px" color="inherit" />,
     path: '/category-course',
     component: <CourseCategoryTable />,
+    allowedRoles: [1],
   },
   {
     name: 'Khóa học',
@@ -55,6 +56,7 @@ const routes = [
     icon: <Icon as={FaBookAtlas} width="20px" height="20px" color="inherit" />,
     path: '/course',
     component: <CourseTable />,
+    allowedRoles: [1, 3],
     item: [
       {
         name: 'Chi tiết khóa học',
@@ -69,6 +71,7 @@ const routes = [
     icon: <Icon as={FaBookOpen} width="20px" height="20px" color="inherit" />,
     path: '/topic',
     component: <TopicTable />,
+    allowedRoles: [1, 3],
     item: [
       {
         name: 'Chi tiết chủ đề',
@@ -83,6 +86,7 @@ const routes = [
     icon: <Icon as={FaBook} width="20px" height="20px" color="inherit" />,
     path: '/lesson',
     component: <LessonTable />,
+    allowedRoles: [1, 3],
     item: [
       {
         name: 'Chi tiết bài học',
@@ -97,6 +101,7 @@ const routes = [
     icon: <Icon as={FaBookmark} width="20px" height="20px" color="inherit" />,
     path: '/badge',
     component: <BadgeTable />,
+    allowedRoles: [1],
     item: [
       {
         name: 'Thêm mới nhãn',
@@ -111,6 +116,7 @@ const routes = [
     icon: <Icon as={FaFileCode} width="20px" height="20px" color="inherit" />,
     path: '/problem',
     component: <ProblemTable />,
+    allowedRoles: [1, 3],
     item: [
       {
         name: 'Chi tiết bài tập',
@@ -147,6 +153,7 @@ const routes = [
     icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
     path: '/coder',
     component: <CoderTable />,
+    allowedRoles: [1],
     item: [
       {
         name: 'Chi tiết người dùng',
@@ -156,13 +163,14 @@ const routes = [
     ]
   },
 
-  // Auth Routes
+  // //Auth Routes
   // {
   //   name: 'Sign In',
   //   layout: '/auth',
-  //   path: '/sign-in',
-  //   component: <SignInCentered />,
+  //   path: '/login',
+  //   component: <Login />,
   // },
+
 
   // User Routes
   {

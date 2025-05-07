@@ -9,6 +9,7 @@ import Navbar from 'layouts/user/components/navbar';
 import { Box } from '@chakra-ui/react';
 import Profile from 'views/user/Profile/index.jsx';
 import NotFound from 'views/user/NotFound.jsx';
+import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
 
 
 export default function Home(props) {
@@ -65,11 +66,16 @@ export default function Home(props) {
                         <Routes>
                             {getRoutes(userRoutes)}
                             {routes.map((route, index) => (
-                                <Route key={index} path={route.path} element={route.element} />
+                                <Route
+                                    key={index}
+                                    path={route.path}
+                                    element={
+                                        <ProtectedRoute>{route.component}</ProtectedRoute>
+                                    } />
                             ))}
 
                             {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
-                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
                             {/* Optional: route 404 */}
                             <Route path="*" element={<NotFound />} />
