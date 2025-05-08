@@ -12,6 +12,7 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import FlushedInput from "../../../components/fields/InputField";
 import { login } from "config/apiService";
+import api from "config/apiConfig";
 import Cookies from 'js-cookie';
 
 const Login = ({ onSuccess }) => {
@@ -36,8 +37,17 @@ const Login = ({ onSuccess }) => {
         setLoading(true); // Bắt đầu quá trình đăng nhập
         try {
             const response = await login(loginData);
-            if (response.status === 200 && response.data && response.data?.token) { // Kiểm tra sự tồn tại của token và response.data
+            if (response.status === 200 && response.data && response.data.token) {
                 Cookies.set('token', response.data.token);
+                const resUser = await api.get('/Auth/me',
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (resUser.status === 200) {
+                    onSuccess(resUser.data); // Gửi dữ liệu user lên Auth
+
+                }
                 toast({
                     title: "Đăng nhập thành công!",
                     status: "success",
@@ -45,12 +55,9 @@ const Login = ({ onSuccess }) => {
                     isClosable: true,
                     position: "top",
                 });
-                onSuccess(response.data); // Gửi dữ liệu user lên Auth
                 window.location.href = '/';
             } else {
-                // Kiểm tra sự tồn tại của message trong response.data
                 const errorMessage = response.data?.message || "Vui lòng kiểm tra thông tin";
-                // Cập nhật lỗi nếu có
                 setErrors(prevErrors => ({
                     ...prevErrors,
                     userName: errorMessage,
@@ -58,16 +65,16 @@ const Login = ({ onSuccess }) => {
                 }));
             }
         } catch (error) {
-            console.error('Error:', error); // Log lỗi để debug
-            // Cập nhật lỗi nếu có
+            console.error('Error:', error);
             setErrors(prevErrors => ({
                 ...prevErrors,
                 userName: error.response?.data || "Tên đăng nhập hoặc mật khẩu không đúng",
                 password: error.response?.data || "Tên đăng nhập hoặc mật khẩu không đúng",
             }));
         } finally {
-            setLoading(false); // Kết thúc quá trình đăng nhập
+            setLoading(false);
         }
+
     };
 
 

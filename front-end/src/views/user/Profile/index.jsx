@@ -54,6 +54,7 @@ const Profile = () => {
                     display="flex"
                     flexDirection="column"
                     alignItems="left"
+                    boxShadow="md"
                 >
                     <Flex flexDirection="column" alignItems="center">
                         <Avatar
@@ -180,7 +181,7 @@ const Profile = () => {
                     bg="white"
                     borderRadius="md"
                     p={4}
-
+                    boxShadow="md"
                 >
                     <Text fontSize="lg" color="gray.500">
                         Thông tin cá nhân

@@ -40,8 +40,8 @@ namespace api.Controllers
             }
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,
-                Secure = true,
+                //HttpOnly = true,
+                //Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(60) 
             };
