@@ -17,11 +17,22 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const res = await api.get('/Auth/me');
+                const res = await api.get('/Auth/me', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
                 if (res.status === 200) {
                     setCoder(res.data);
                 }
             } catch (err) {
+                if (err.response?.status === 401) {
+                    // Handle unauthorized (token expired or invalid)
+                    Cookies.remove('token');
+                    setCoder(null);
+                    window.location.href = '/'; // Or redirect to login page
+                }
                 console.log('Lỗi xác thực:', err);
             } finally {
                 setIsLoading(false);

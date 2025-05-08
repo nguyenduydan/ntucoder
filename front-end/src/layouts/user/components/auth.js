@@ -52,15 +52,17 @@ const Auth = () => {
                             <MenuButton as={Button} variant="none">
                                 <Avatar size="sm" src={coder.avatar || null} name={coder.coderName || 'coder'} alt="avatar" />
                             </MenuButton>
-                            <MenuList>
+                            <MenuList p={2}>
                                 <MenuItem
                                     as={NavLink}
                                     to="/profile"
-                                    _hover={{ bg: "blue.200" }}
+                                    _hover={{ bg: "gray.200" }}
+                                    px={4}
+                                    borderRadius="md"
                                 >
                                     Hồ sơ
                                 </MenuItem>
-                                <MenuItem _hover={{ bg: "blue.200", }} onClick={logout}>
+                                <MenuItem _hover={{ bg: "gray.200", }} borderRadius="md" color="red" px={4} onClick={logout}>
                                     Đăng xuất
                                 </MenuItem>
                             </MenuList>

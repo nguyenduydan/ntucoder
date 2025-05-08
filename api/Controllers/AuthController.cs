@@ -43,7 +43,7 @@ namespace api.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(1) //hết hạn sau 1 ngày
+                Expires = DateTime.UtcNow.AddMinutes(60) 
             };
             Response.Cookies.Append("token", token, cookieOptions);
 

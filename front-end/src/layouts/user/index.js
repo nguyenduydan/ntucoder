@@ -65,17 +65,16 @@ export default function Home(props) {
                     >
                         <Routes>
                             {getRoutes(userRoutes)}
-                            {routes.map((route, index) => (
+                            {routes.map((route) => (
                                 <Route
-                                    key={index}
+                                    key={`${route.path}-${route.name}`}
                                     path={route.path}
-                                    element={
-                                        <ProtectedRoute>{route.component}</ProtectedRoute>
-                                    } />
+                                    element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+                                />
                             ))}
 
                             {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
-                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            <Route path="/profile" element={<ProtectedRoute ><Profile /></ProtectedRoute>} />
 
                             {/* Optional: route 404 */}
                             <Route path="*" element={<NotFound />} />

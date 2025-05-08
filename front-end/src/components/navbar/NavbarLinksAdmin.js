@@ -154,7 +154,6 @@ export default function HeaderLinks(props) {
             size="sm"
             w="40px"
             h="40px"
-            name={coder.coderName || 'Coder'}
             alt="avatar"
             src={coder.avatar || 'https://bit.ly/broken-link'}
           />

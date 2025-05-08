@@ -252,6 +252,7 @@ const CourseDetail = () => {
                                                                                 <List spacing={2}>
                                                                                     {topic.lessons?.map((lesson) => (
                                                                                         <NavLink
+                                                                                            key={lesson.lessonID || Math.random()}
                                                                                             to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
                                                                                             style={({ isActive }) => ({
                                                                                                 textDecoration: 'none',
@@ -262,7 +263,6 @@ const CourseDetail = () => {
                                                                                                 cursor="pointer"
                                                                                                 _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
                                                                                                 transition="all .2s ease-in-out"
-                                                                                                key={lesson.lessonID || Math.random()}
                                                                                                 pl={2}
                                                                                                 bg="gray.50"
                                                                                                 borderRadius="sm" p={2}

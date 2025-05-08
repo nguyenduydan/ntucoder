@@ -12,7 +12,6 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import FlushedInput from "../../../components/fields/InputField";
 import { login } from "config/apiService";
-import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 
 const Login = ({ onSuccess }) => {
@@ -22,8 +21,6 @@ const Login = ({ onSuccess }) => {
     const [errors, setErrors] = useState({ userName: "", password: "" });
 
     const toast = useToast();
-    const navigate = useNavigate();
-
     const handleLogin = async () => {
         setErrors({ userName: "", password: "" }); // Reset errors
         // Kiểm tra nếu tên đăng nhập hoặc mật khẩu bị bỏ trống
@@ -40,7 +37,7 @@ const Login = ({ onSuccess }) => {
         try {
             const response = await login(loginData);
             if (response.status === 200 && response.data && response.data?.token) { // Kiểm tra sự tồn tại của token và response.data
-                Cookies.set('token', response.data.token, { expires: 7, sameSite: 'Lax' });
+                Cookies.set('token', response.data.token);
                 toast({
                     title: "Đăng nhập thành công!",
                     status: "success",
@@ -49,7 +46,7 @@ const Login = ({ onSuccess }) => {
                     position: "top",
                 });
                 onSuccess(response.data); // Gửi dữ liệu user lên Auth
-                navigate("/"); // Chuyển hướng đến trang chủ
+                window.location.href = '/';
             } else {
                 // Kiểm tra sự tồn tại của message trong response.data
                 const errorMessage = response.data?.message || "Vui lòng kiểm tra thông tin";

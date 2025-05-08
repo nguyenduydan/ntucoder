@@ -10,19 +10,24 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
     const [shouldRedirect, setShouldRedirect] = useState(false);
     const [redirectReason, setRedirectReason] = useState("");
 
-    console.log("coder", coder);
+    //Check data
+    //console.log("coder", coder);
 
     useEffect(() => {
-        if (isLoading) return; // Đợi tải xong
+        if (isLoading) return;
 
         if (!isAuthenticated) {
             setRedirectReason("Bạn cần đăng nhập để truy cập trang này.");
             setShouldRedirect(true);
-        } else if (!allowedRoles.includes(coder?.roleID)) {
+        } else if (
+            allowedRoles && // Chỉ kiểm tra vai trò nếu allowedRoles được cung cấp
+            !allowedRoles.includes(coder?.roleID)
+        ) {
             setRedirectReason("Bạn không có quyền truy cập.");
             setShouldRedirect(true);
         }
     }, [isAuthenticated, coder, allowedRoles, isLoading]);
+
 
     useEffect(() => {
         if (shouldRedirect && redirectReason) {

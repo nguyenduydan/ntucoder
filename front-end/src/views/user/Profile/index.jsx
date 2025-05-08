@@ -1,14 +1,195 @@
-import { Box, Text } from '@chakra-ui/react';
-import React from 'react';
+import {
+    Box,
+    Text,
+    Grid,
+    GridItem,
+    Avatar,
+    Divider,
+    Flex,
+    Tooltip
 
-const profile = () => {
+} from '@chakra-ui/react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAuth } from 'contexts/AuthContext';
+import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle } from "react-icons/fa";
+import { PiWarningCircle } from "react-icons/pi";
+import { getDetail } from 'config/apiService';
+import { useTitle } from 'contexts/TitleContext';
+
+const Profile = () => {
+    useTitle("Hồ sơ");
+    const { coder } = useAuth();
+    const { avatar, coderName, coderID } = coder || {};
+    const avatarSrc = avatar || "https://bit.ly/broken-link";
+    const [info, setInfo] = useState({});
+
+
+    const fetchData = useCallback(async () => {
+        try {
+            const res = await getDetail({ controller: "Coder", id: coderID });
+            if (res) setInfo(res);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }, [coderID]);
+
+    useEffect(() => {
+        if (coderID) fetchData();
+    }, [coderID, fetchData]);
+
+    const isCoderNameValid = !!coderName;
+    const isEmailValid = !!info?.coderEmail;
+    const isPhoneValid = !!info?.phoneNumber;
+
     return (
-        <Box>
-            <Text fontSize="2xl" fontWeight="bold" mb={4}>
-                Hồ sơ người dùng
-            </Text>
-        </Box>
+        <Box maxW="150vh" mx="auto">
+            <Box h="10vh"></Box>
+            <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap={4} mx={5} p={4}>
+                {/* Avatar and menu */}
+                <GridItem
+                    bgGradient="linear(to-b, blue.400, white)"
+                    p={4}
+                    borderRadius="md"
+                    color="black"
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="left"
+                >
+                    <Flex flexDirection="column" alignItems="center">
+                        <Avatar
+                            size="2xl"
+                            name="Coder Name"
+                            src={avatarSrc}
+                            alt="Coder Avatar"
+                            mb={4}
+                        />
+                        <Text fontSize="2xl" mb={2}>
+                            {coderName || "Coder Name"}
+                        </Text>
+                    </Flex>
+                    <Divider my={2} />
+                    <Box>
+                        <Text fontSize="xl" mt={2} textTransform="uppercase">
+                            Thông tin
+                        </Text>
+                        <Flex flexDirection="column" gap={2}>
+                            {/* User Name */}
+                            <Flex align="center" mt={2} mr={2} justify="space-between">
+                                <Flex align="center">
+                                    <FaRegUser style={{ marginRight: "8px" }} />
+                                    <Tooltip placement='top' label={coderName ? coderName : "Không có thông tin"} hasArrow fontSize="md">
+                                        <Text fontSize="md" >
+                                            {coderName || ""}
+                                        </Text>
+                                    </Tooltip>
+                                </Flex>
+                                <Flex>
+                                    <Tooltip
+                                        placement="top"
+                                        label={isCoderNameValid ? "Đã xác thực" : "Chưa xác thực"}
+
+                                    >
+                                        <Flex align="center">
+                                            {isCoderNameValid ? (
+                                                <FaCheckCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
+                                                    style={{ color: "green", fontSize: "18px" }}
+                                                />
+                                            ) : (
+                                                <PiWarningCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
+                                                    style={{ color: "red", fontSize: "18px" }}
+                                                />
+                                            )}
+                                        </Flex>
+                                    </Tooltip>
+                                </Flex>
+                            </Flex>
+
+                            {/* Email */}
+                            <Flex align="center" mt={2} mr={2} justify="space-between">
+                                <Flex align="center">
+                                    <FaMailBulk style={{ marginRight: "8px" }} />
+                                    <Tooltip placement='top' label={info?.coderEmail || "Không có thông tin"} hasArrow fontSize="md">
+                                        <Text fontSize="md" >
+                                            {info?.coderEmail || ""}
+                                        </Text>
+                                    </Tooltip>
+                                </Flex>
+                                <Flex>
+                                    <Tooltip
+                                        placement="top"
+                                        label={isEmailValid ? "Đã xác thực" : "Chưa xác thực"}
+
+                                    >
+                                        <Flex align="center">
+                                            {isEmailValid ? (
+                                                <FaCheckCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
+                                                    style={{ color: "green", fontSize: "18px" }}
+                                                />
+                                            ) : (
+                                                <PiWarningCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
+                                                    style={{ color: "red", fontSize: "18px" }}
+                                                />
+                                            )}
+                                        </Flex>
+                                    </Tooltip>
+                                </Flex>
+                            </Flex>
+
+                            {/* Phone */}
+                            <Flex align="center" mt={2} mr={2} justify="space-between">
+                                <Flex align="center">
+                                    <FaPhone style={{ marginRight: "8px" }} />
+                                    <Tooltip placement='top' label={info?.phoneNumber || "Không có thông tin"} hasArrow fontSize="md">
+                                        <Text fontSize="md" >
+                                            {info?.phoneNumber || ""}
+                                        </Text>
+                                    </Tooltip>
+                                </Flex>
+                                <Flex>
+                                    <Tooltip
+                                        placement="top"
+                                        label={isPhoneValid ? "Đã xác thực" : "Chưa xác thực"}
+
+                                    >
+                                        <Flex align="center">
+                                            {isPhoneValid ? (
+                                                <FaCheckCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
+                                                    style={{ color: "green", fontSize: "18px" }}
+                                                />
+                                            ) : (
+                                                <PiWarningCircle
+                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
+                                                    style={{ color: "red", fontSize: "18px" }}
+                                                />
+                                            )}
+                                        </Flex>
+                                    </Tooltip>
+                                </Flex>
+                            </Flex>
+                        </Flex>
+                    </Box>
+                </GridItem>
+
+                {/* Personal information */}
+                <GridItem
+                    bg="white"
+                    borderRadius="md"
+                    p={4}
+
+                >
+                    <Text fontSize="lg" color="gray.500">
+                        Thông tin cá nhân
+                    </Text>
+                    {/* Thêm nội dung chi tiết ở đây */}
+                </GridItem>
+            </Grid>
+        </Box >
     );
 };
 
-export default profile;
+export default Profile;
