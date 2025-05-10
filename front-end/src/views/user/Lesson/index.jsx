@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
     Box, useToast, Flex, Image, Tabs, TabList, Tab, TabPanels,
-    Text, Tooltip, TabPanel, Icon, Badge
+    Text, Tooltip, TabPanel, Icon, Badge, Spinner
 } from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
 import ScrollToTop from "components/scroll/ScrollToTop";
@@ -15,12 +15,12 @@ import ProblemList from "../Problem/components/ProblemList";
 import { FaRegFileAlt, FaBook, FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
 
 import { getDetail } from "config/apiService";
-
 export default function Lesson() {
     const { lessonId } = useParams();
     const toast = useToast();
     const [lesson, setLesson] = useState(null);
     const [activeTab, setActiveTab] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -39,6 +39,7 @@ export default function Lesson() {
                     console.log("Không có dữ liệu bài học");
                 }
             } catch (error) {
+                setIsLoading(false);
                 toast({
                     title: "Lỗi khi lấy dữ liệu bài học",
                     status: "error",
@@ -46,6 +47,8 @@ export default function Lesson() {
                     isClosable: true,
                     position: "top-right",
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -57,7 +60,11 @@ export default function Lesson() {
     return (
         <ScrollToTop>
             <Box minH="100%" w='100%'>
-                {lesson ? (
+                {isLoading ? (
+                    <Flex justify="center" align="center" height="70vh">
+                        <Spinner size="xl" color="blue.500" />
+                    </Flex>
+                ) : lesson ? (
                     <Box>
                         <LessonHeader lesson={lesson} />
                         <Split className="split-container" sizes={[45, 55]} minSize={0} gutterSize={5}>

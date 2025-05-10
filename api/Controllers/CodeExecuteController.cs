@@ -1,4 +1,6 @@
-﻿using api.Infrashtructure.Services;
+﻿using api.DTOs;
+using api.Infrashtructure.Repositories;
+using api.Infrashtructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace api.Controllers
     public class CodeExecuteController : ControllerBase
     {
         public readonly CodeExecutionService _codeExecutionService;
+        public readonly TestCaseRepository _testCaseRepository;
 
-        public CodeExecuteController(CodeExecutionService codeExecutionService)
+        public CodeExecuteController(CodeExecutionService codeExecutionService, TestCaseRepository testCaseRepository)
         {
             _codeExecutionService = codeExecutionService;
+            _testCaseRepository = testCaseRepository;
         }
 
         [HttpPost("{submissionId}")]
@@ -38,6 +42,46 @@ namespace api.Controllers
                 return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
+
+        [HttpPost("testRun")]
+        [HttpPost("try-run")]
+        public async Task<IActionResult> TryRunCode([FromBody] string sourceCode, string compilerExtension, int problemId)
+        {
+            TestCaseDTO testcase = await _testCaseRepository.GetSampleTestByProblemIdAsync(problemId);
+            if (testcase == null)
+            {
+                return BadRequest(new
+                {
+                    Error = "Không tìm thấy test case mẫu cho bài toán này."
+                });
+            }
+            string input = testcase.Input;
+            string expectedOutput = testcase.Output;
+            try
+            {
+                (string Result, string Output, string Error, int TimeDuration) result = await _codeExecutionService.TryRunCodeAsync(
+                    sourceCode,
+                    compilerExtension,
+                    input,
+                    expectedOutput
+                );
+                return Ok(new
+                {
+                    result.Result,
+                    result.Output,
+                    result.Error,
+                    result.TimeDuration
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = ex.Message
+                });
+            }
+        }
+
         [HttpPost("multi-sub")]
         public async Task<IActionResult> ExecuteMultipleCodes([FromBody] List<int> submissionIds)
         {

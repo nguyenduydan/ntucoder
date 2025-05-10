@@ -4,6 +4,7 @@ import ActionCell from "components/separator/ActionCell"; // Đảm bảo đư�
 import { deleteItem, updateStatus } from "config/apiService";
 import { Badge, useToast } from "@chakra-ui/react";
 import { useMutation } from '@tanstack/react-query';
+import TestCaseCountCell from "./TestcaseCountCell";
 
 export const columnsData = [
   {
@@ -25,18 +26,10 @@ export const columnsData = [
     accessor: "problemContent",
   },
   {
-    Header: "Loại kiểm thử",
-    accessor: "testType",
+    Header: "Testcase",
+    accessor: "testCase",
+    Cell: ({ row }) => <TestCaseCountCell problemId={row?.problemID} />,
   },
-  {
-    Header: "Người tạo",
-    accessor: "coderName",
-  },
-  {
-    Header: "Giới hạn bộ nhớ",
-    accessor: "memoryLimit",
-  },
-
   {
     Header: "Trạng thái",
     accessor: "published",

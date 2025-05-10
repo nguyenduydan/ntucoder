@@ -45,6 +45,47 @@ export const getList = async ({
     }
 };
 
+export const getListTestCase = async ({
+    problemId,
+    page = 1,
+    pageSize = 10,
+    ascending = true,
+    sortField = "id",
+}) => {
+
+
+    try {
+        const response = await api.get(`/TestCase`, {
+            params: { ProblemID: problemId, Page: page, PageSize: pageSize, ascending, sortField },
+        });
+
+        const data = response.data;
+
+        if (!data || data.error || data.success === false) {
+            throw new Error(data.message || "Lỗi từ phía server");
+        }
+
+        return {
+            data: data?.data || [],
+            totalPages: data?.totalPages || 0,
+            totalCount: data?.totalCount || 0,
+        };
+    } catch (error) {
+        console.error("Lỗi Axios:", error);  // để biết thật sự Axios trả gì
+
+        let message = "Đã xảy ra lỗi.";
+        if (error.response) {
+            message = `Lỗi API: ${error.response.status} - ${error.response.statusText}`;
+        } else if (error.request) {
+            message = "Không thể kết nối tới server.";
+        } else if (error.message) {
+            message = error.message;
+        }
+
+        throw new Error(message);
+    }
+};
+
 // @function: getDetail
 // @desc: Fetches the details of a specific item from the specified controller in the API
 export const getDetail = async ({ controller, id }) => {

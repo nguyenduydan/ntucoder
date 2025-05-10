@@ -10,13 +10,12 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes.js';
 import NotFound from 'views/user/NotFound.jsx';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-import { useAuth } from 'contexts/AuthContext';
+import TestCase from 'views/admin/testcase/index.jsx';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
   const { ...rest } = props;
   const { onOpen } = useDisclosure();
-  const { coder } = useAuth();
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
@@ -99,10 +98,8 @@ export default function Dashboard(props) {
     return activeNavbar;
   };
 
-  const getRoutes = (routes, coder) => {
+  const getRoutes = (routes) => {
     return routes.flatMap((route, key) => {
-      const isAdmin = coder?.roleID === 1; // Giả sử roleID = 1 là admin
-      const isAllowed = route.allowedRoles?.includes(coder?.roleID);
 
       if (route.layout === "/admin") {
         const mainRoute = (
@@ -188,8 +185,9 @@ export default function Dashboard(props) {
 
               >
                 <Routes>
-                  {getRoutes(routes, coder)}
+                  {getRoutes(routes)}
                   <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="testcase/:problemId" element={<TestCase />} />
                   {/* Optional: route 404 */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
