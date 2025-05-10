@@ -55,7 +55,6 @@ const Login = ({ onSuccess }) => {
                     isClosable: true,
                     position: "top",
                 });
-                window.location.href = '/';
             } else {
                 const errorMessage = response.data?.message || "Vui lòng kiểm tra thông tin";
                 setErrors(prevErrors => ({

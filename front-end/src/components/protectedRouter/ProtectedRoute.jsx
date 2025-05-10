@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthContext";
 import { useToast } from "@chakra-ui/react";
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
     const { isAuthenticated, coder, isLoading } = useAuth();
     const toast = useToast();
-
+    const navigate = useNavigate();
     const [shouldRedirect, setShouldRedirect] = useState(false);
     const [redirectReason, setRedirectReason] = useState("");
 
@@ -17,13 +17,11 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
         if (isLoading) return;
 
         if (!isAuthenticated) {
-            setRedirectReason("Bạn cần đăng nhập để truy cập trang này.");
+            setRedirectReason("Bạn cần phải đăng nhập.");
             setShouldRedirect(true);
         } else if (
-            allowedRoles && // Chỉ kiểm tra vai trò nếu allowedRoles được cung cấp
-            !allowedRoles.includes(coder?.roleID)
+            allowedRoles && !allowedRoles.includes(coder?.roleID)
         ) {
-            setRedirectReason("Bạn không có quyền truy cập.");
             setShouldRedirect(true);
         }
     }, [isAuthenticated, coder, allowedRoles, isLoading]);
@@ -43,7 +41,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
     }, [shouldRedirect, redirectReason, toast]);
 
     if (isLoading) return null; // Hoặc spinner nếu bạn muốn
-    if (shouldRedirect) return <Navigate to="/" replace />;
+    if (shouldRedirect) return navigate(-1);
 
     return children;
 };

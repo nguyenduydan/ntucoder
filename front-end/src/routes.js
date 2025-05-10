@@ -16,13 +16,11 @@ import TopicTable from 'views/admin/topic/index';
 import TopicDetail from 'views/admin/topic/components/Detail';
 import LessonTable from 'views/admin/lesson/index';
 import LessonDetail from 'views/admin/lesson/components/Detail';
-import CategoryTable from 'views/admin/category/index';
-import CompilerTable from 'views/admin/compiler/index';
 import ProblemTable from 'views/admin/problem/index';
 import ProblemDetail from 'views/admin/problem/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
-import Problem from 'views/user/Problem';
+//import Problem from 'views/user/Problem';
 import Course from 'views/user/Course';
 import CourseDetailUser from 'views/user/Course/components/CourseDetail';
 import CourseCreateUser from 'views/user/Course/components/CreateCourse';

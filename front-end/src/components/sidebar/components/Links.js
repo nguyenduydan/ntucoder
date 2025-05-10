@@ -3,6 +3,7 @@ import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 // chakra imports
 import { Box, Flex, HStack, Text, useColorModeValue } from "@chakra-ui/react";
+import { useAuth } from "contexts/AuthContext";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
@@ -17,6 +18,9 @@ export function SidebarLinks(props) {
   let brandColor = useColorModeValue("brand.500", "brand.400");
 
   const { routes } = props;
+  const { coder } = useAuth();
+
+  const isAdmin = coder?.roleID === 1;
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -26,37 +30,33 @@ export function SidebarLinks(props) {
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
   const createLinks = (routes) => {
     return routes.map((route, index) => {
+      const isAllowed = route.allowedRoles?.includes(coder?.roleID);
+
       if (route.category) {
         return (
-          <>
+          <React.Fragment key={`cat-${index}`}>
             <Text
               fontSize={"md"}
               color={activeColor}
               fontWeight='bold'
               mx='auto'
-              ps={{
-                sm: "10px",
-                xl: "16px",
-              }}
+              ps={{ sm: "10px", xl: "16px" }}
               pt='18px'
-              pb='12px'
-              key={index}>
+              pb='12px'>
               {route.name}
             </Text>
             {createLinks(route.items)}
-          </>
+          </React.Fragment>
         );
-      } else if (
-        route.layout === "/admin"
-      ) {
+      }
+
+      if (route.layout === "/admin" && (isAdmin || isAllowed)) {
         return (
           <NavLink key={index} to={route.layout + route.path}>
             {route.icon ? (
               <Box>
                 <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
-                  }
+                  spacing={activeRoute(route.path.toLowerCase()) ? "22px" : "26px"}
                   py='5px'
                   ps='10px'>
                   <Flex w='100%' alignItems='center' justifyContent='center'>
@@ -99,9 +99,7 @@ export function SidebarLinks(props) {
             ) : (
               <Box>
                 <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
-                  }
+                  spacing={activeRoute(route.path.toLowerCase()) ? "22px" : "26px"}
                   py='5px'
                   ps='10px'>
                   <Text
@@ -112,7 +110,9 @@ export function SidebarLinks(props) {
                         : inactiveColor
                     }
                     fontWeight={
-                      activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
+                      activeRoute(route.path.toLowerCase())
+                        ? "bold"
+                        : "normal"
                     }>
                     {route.name}
                   </Text>
@@ -123,10 +123,14 @@ export function SidebarLinks(props) {
           </NavLink>
         );
       }
+
+      // Nếu không phải admin và không được phép truy cập
+      return null;
     });
   };
-  //  BRAND
-  return createLinks(routes);
+
+  return <>{createLinks(routes)}</>;
+
 }
 
 export default SidebarLinks;

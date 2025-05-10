@@ -96,14 +96,13 @@ const CourseDetail = () => {
         console.log("isAuthenticated", isAuthenticated); // Kiểm tra giá trị của isAuthenticated
         if (isAuthenticated.isAuthenticated === false) {
             toast({
-                title: "Bạn cần đăng nhập để truy cập trang này.",
+                title: "Bạn cần phải đăng nhập.",
                 status: "warning",
                 duration: 2000,
                 isClosable: true,
                 position: "top",
                 variant: "top-accent",
             });
-
         }
     };
 
@@ -250,27 +249,50 @@ const CourseDetail = () => {
                                                                         <AccordionPanel pb={4}>
                                                                             {topic.lessons?.length ? (
                                                                                 <List spacing={2}>
-                                                                                    {topic.lessons?.map((lesson) => (
-                                                                                        <NavLink
-                                                                                            key={lesson.lessonID || Math.random()}
-                                                                                            to={`${location.pathname}/${lesson.lessonID}`} // Đường dẫn điều hướng
-                                                                                            style={({ isActive }) => ({
-                                                                                                textDecoration: 'none',
-                                                                                                color: isActive ? 'blue.500' : 'inherit', // Thay đổi màu sắc nếu link đang active
-                                                                                            })}
-                                                                                        >
+                                                                                    {topic.lessons?.map((lesson) => {
+                                                                                        const isLoggedIn = isAuthenticated.isAuthenticated;
+
+                                                                                        const LessonItem = (
                                                                                             <ListItem
                                                                                                 cursor="pointer"
                                                                                                 _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
                                                                                                 transition="all .2s ease-in-out"
                                                                                                 pl={2}
                                                                                                 bg="gray.50"
-                                                                                                borderRadius="sm" p={2}
+                                                                                                borderRadius="sm"
+                                                                                                p={2}
+                                                                                                onClick={() => {
+                                                                                                    if (!isLoggedIn) {
+                                                                                                        toast({
+                                                                                                            title: "Bạn cần đăng nhập để truy cập trang này.",
+                                                                                                            status: "warning",
+                                                                                                            duration: 2000,
+                                                                                                            isClosable: true,
+                                                                                                            position: "top",
+                                                                                                            variant: "top-accent",
+                                                                                                        });
+                                                                                                    }
+                                                                                                }}
                                                                                             >
-                                                                                                <Text fontSize="md" >📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                                <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
                                                                                             </ListItem>
-                                                                                        </NavLink>
-                                                                                    ))}
+                                                                                        );
+
+                                                                                        return isLoggedIn ? (
+                                                                                            <NavLink
+                                                                                                key={lesson.lessonID || Math.random()}
+                                                                                                to={`${location.pathname}/${lesson.lessonID}`}
+                                                                                                style={({ isActive }) => ({
+                                                                                                    textDecoration: 'none',
+                                                                                                    color: isActive ? 'blue.500' : 'inherit',
+                                                                                                })}
+                                                                                            >
+                                                                                                {LessonItem}
+                                                                                            </NavLink>
+                                                                                        ) : (
+                                                                                            <Box key={lesson.lessonID || Math.random()}>{LessonItem}</Box>
+                                                                                        );
+                                                                                    })}
                                                                                 </List>
                                                                             ) : (
                                                                                 <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>

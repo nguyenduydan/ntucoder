@@ -155,7 +155,7 @@ export default function HeaderLinks(props) {
             w="40px"
             h="40px"
             alt="avatar"
-            src={coder.avatar || 'https://bit.ly/broken-link'}
+            src={coder.avatar || 'coder'}
           />
         </MenuButton>
         <MenuList

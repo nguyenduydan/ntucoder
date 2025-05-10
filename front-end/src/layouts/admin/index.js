@@ -101,8 +101,11 @@ export default function Dashboard(props) {
 
   const getRoutes = (routes, coder) => {
     return routes.flatMap((route, key) => {
-      if (route.layout === "/admin" && route.allowedRoles?.includes(coder?.roleID)) {
-        let mainRoute = (
+      const isAdmin = coder?.roleID === 1; // Giả sử roleID = 1 là admin
+      const isAllowed = route.allowedRoles?.includes(coder?.roleID);
+
+      if (route.layout === "/admin") {
+        const mainRoute = (
           <Route
             key={key}
             path={route.path}
@@ -114,22 +117,26 @@ export default function Dashboard(props) {
           />
         );
 
-        let subRoutes = route.item
+        const subRoutes = route.item
           ? route.item.map((subRoute, subKey) => (
             <Route
               key={`${key}-${subKey}`}
               path={`${route.path}/${subRoute.path}`}
-              element={subRoute.component}
+              element={
+                <ProtectedRoute allowedRoles={subRoute.allowedRoles || route.allowedRoles}>
+                  {subRoute.component}
+                </ProtectedRoute>
+              }
             />
           ))
           : [];
 
         return [mainRoute, ...subRoutes];
       }
+
       return [];
     });
   };
-
 
 
   return (
