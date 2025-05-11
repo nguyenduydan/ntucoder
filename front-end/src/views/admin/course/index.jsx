@@ -39,7 +39,7 @@ export default function Index() {
         sortField,
       }),
     keepPreviousData: true,
-    staleTime: 3000, // cache in 1 minute
+    staleTime: 9999, // cache in 1 minute
     retry: false,
     onError: (error) => {
       console.log("Đã bắt lỗi từ useQuery:", error);

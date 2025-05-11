@@ -197,8 +197,6 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         }
     };
 
-
-
     return (
         <Modal size={'full'} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />

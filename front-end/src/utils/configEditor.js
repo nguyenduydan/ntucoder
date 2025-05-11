@@ -14,6 +14,7 @@ const editorConfig = {
     height: 350,
     width: 'auto',
     placeholder: 'Nhập nội dung tại đây...',
+    theme: 'default',
 
 };
 

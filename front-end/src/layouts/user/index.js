@@ -28,18 +28,24 @@ export default function Home(props) {
     const getRoutes = (routes) => {
         return routes.map((route, key) => {
             if (route.layout === '/user') {
+                const routeKey = `route-${key}-${route.path}`;
                 return (
-                    <>
-                        <Route path={`${route.path}`} element={route.component} key={key} />
+                    <React.Fragment key={routeKey}>
+                        <Route path={`${route.path}`} element={route.component} />
                         {route.item && route.item.map((subRoute, subKey) => (
-                            <Route key={subKey} path={`${route.path}/${subRoute.path}`} element={subRoute.component} />
+                            <Route
+                                key={`subroute-${route.path}-${subRoute.path}`}
+                                path={`${route.path}/${subRoute.path}`}
+                                element={subRoute.component}
+                            />
                         ))}
-                    </>
+                    </React.Fragment>
                 );
             }
             return null;
         });
     };
+
 
     return (
         <Box bg={bg} color={textColor} h="86vh">

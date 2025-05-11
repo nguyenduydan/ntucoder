@@ -41,7 +41,7 @@ export default function Index() {
         sortField,
       }),
     keepPreviousData: true,
-    staleTime: 3000, // cache in 1 minute
+    staleTime: 9999, // cache in 1 minute
     retry: 1,
     onError: () => {
       toast({
@@ -107,7 +107,7 @@ export default function Index() {
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Toolbar onAdd={onOpen} onSearch />
-        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} problemID={problemId} />
 
         <ColumnsTable
           columnsData={columnsData}

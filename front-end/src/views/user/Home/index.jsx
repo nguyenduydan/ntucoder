@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import SkeletonList from "../Course/components/SkeletonList";
-import ntuImage from "assets/img/ntu-coders.png";
 import { useTitle } from "contexts/TitleContext";
 import CourseGrid from "../Course/components/CourseGrid";
 import { getList } from "config/apiService";
@@ -20,6 +19,7 @@ import HeroSection from "./components/HeroSection";
 import { useAuth } from "contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
 import ScrollToTop from "components/scroll/ScrollToTop";
+
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);
@@ -119,7 +119,7 @@ const Home = () => {
           variants={fadeInUp}
         >
           <ChakraBox flex={1}>
-            <Image src={ntuImage} alt="About us" borderRadius="xl" />
+            <Image src="NTU" alt="About us" borderRadius="xl" />
           </ChakraBox>
           <ChakraBox flex={2} bg="gray.100" px={5} py={3} borderRadius="md" boxShadow="md">
             <Heading size="md" mb={4}>Về chúng tôi</Heading>

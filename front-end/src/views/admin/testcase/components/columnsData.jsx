@@ -29,19 +29,21 @@ export const columnsData = [
   {
     Header: "Hành động",
     accessor: "action",
-    Cell: (props) => <ActionCell {...props}
-      controller="TestCase"
-      deleteFunction={deleteItem}
-      idData="testCaseID"
-      deleteSuccessToast={{
-        title: "Đã xóa!",
-        description: "Bài học đã được xóa thành công.",
-      }}
-      deleteErrorToast={{
-        title: "Xóa thất bại!",
-        description: "Vui lòng thử lại sau.",
-      }}
-      fetchData={props.fetchData} // fetchData là hàm lấy dữ liệu mới
-    />
+    Cell: (props) =>
+      <ActionCell {...props}
+        controller="TestCase"
+        deleteFunction={deleteItem}
+        idData="testCaseID"
+        deleteSuccessToast={{
+          title: "Đã xóa!",
+          description: "Testcase đã được xóa thành công.",
+        }}
+        deleteErrorToast={{
+          title: "Xóa thất bại!",
+          description: "Vui lòng thử lại sau.",
+        }}
+        fetchData={props.fetchData} // fetchData là hàm lấy dữ liệu mới
+        isEdit
+      />
   }
 ];

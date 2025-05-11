@@ -1,4 +1,3 @@
-// ActionCell.jsx
 import React, { useState } from "react";
 import {
   Flex,
@@ -16,7 +15,8 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { BiSolidDetail } from "react-icons/bi";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
+import EditTestCase from "views/admin/testcase/components/Update";
 
 const ActionCell = ({
   row,
@@ -25,14 +25,28 @@ const ActionCell = ({
   deleteFunction,
   deleteSuccessToast = {},
   deleteErrorToast = {},
-  detailPath,          // Đường dẫn chi tiết tùy chỉnh
+  detailPath,
+  isEdit,
   fetchData,
 }) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [loading, setLoading] = useState(false);
 
+  // Disclosure riêng cho Edit
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+
+  // Disclosure riêng cho Delete
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+
+  const [loading, setLoading] = useState(false);
   const id = row?.original?.[idData] || row?.[idData];
 
   const handleDetailClick = () => {
@@ -53,13 +67,15 @@ const ActionCell = ({
     }
   };
 
+  const handleEditClick = () => {
+    onEditOpen();
+  };
+
   const handleDeleteClick = async () => {
     setLoading(true);
     try {
-
       await deleteFunction({ controller, id });
 
-      // Nếu thành công, hiển thị thông báo thành công
       toast({
         title: "Xóa thành công!",
         description: "Người dùng đã bị xóa.",
@@ -71,10 +87,9 @@ const ActionCell = ({
         ...deleteSuccessToast,
       });
 
-      onClose();
-      if (fetchData) await fetchData(); // Gọi lại hàm fetchData để tải lại dữ liệu
+      onDeleteClose();
+      if (fetchData) await fetchData();
     } catch (error) {
-      // Hiển thị thông báo lỗi
       toast({
         title: "Lỗi",
         description:
@@ -92,7 +107,6 @@ const ActionCell = ({
       setLoading(false);
     }
   };
-
 
   return (
     <Flex gap={4} justify="left" align="center">
@@ -117,13 +131,36 @@ const ActionCell = ({
         borderRadius="md"
         minW="auto"
         _active={{ transform: "scale(0.90)" }}
-        onClick={onOpen}
+        onClick={onDeleteOpen}
       >
         <MdDelete size="13" />
       </Button>
+
+      {isEdit && (
+        <Button
+          variant="solid"
+          size="xs"
+          colorScheme="yellow"
+          borderRadius="md"
+          minW="auto"
+          _active={{ transform: "scale(0.90)" }}
+          onClick={handleEditClick}
+        >
+          <MdEdit size="13" />
+        </Button>
+      )}
+
+      {/* Modal chỉnh sửa */}
+      <EditTestCase
+        isOpen={isEditOpen}
+        onClose={onEditClose}
+        testCaseID={id}
+        refetchData={fetchData}
+      />
+
       {/* Modal xác nhận xóa */}
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose}>
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
           <ModalOverlay bg="none" backdropFilter="auto" backdropBlur="4px" />
           <ModalContent>
             <ModalHeader>Xác nhận xóa</ModalHeader>
@@ -132,7 +169,7 @@ const ActionCell = ({
               <Text>Bạn có chắc chắn muốn xóa hay không?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="gray" mr={3} onClick={onClose}>
+              <Button colorScheme="gray" mr={3} onClick={onDeleteClose}>
                 Hủy
               </Button>
               <Button

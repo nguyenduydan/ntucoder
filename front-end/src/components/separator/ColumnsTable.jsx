@@ -105,7 +105,8 @@ export default function ColumnTable({ columnsData, tableData, loading, onSort, s
                         fontSize="clamp(12px, 2vw, 16px)" // Điều chỉnh font-size linh hoạt
                         width={column.width || 'auto'}
                         borderColor="transparent"
-                        padding="12px 15px"
+                        padding="12px 20px"
+
                       >
                         {column.Cell ? (
                           <CustomCell column={column} row={row} index={index} fetchData={fetchData} />

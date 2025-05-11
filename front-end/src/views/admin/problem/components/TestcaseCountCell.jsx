@@ -1,6 +1,6 @@
 // TestCaseCountCell.jsx
 import { useEffect, useState } from "react";
-import { Text, Link } from "@chakra-ui/react";
+import { Text, Link, Tooltip } from "@chakra-ui/react";
 import api from "config/apiConfig";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -23,9 +23,11 @@ const TestCaseCountCell = ({ problemId }) => {
     }, [problemId]);
 
     return (
-        <Link as={RouterLink} to={`/admin/testcase/${problemId}`}>
-            <Text color="blue">{count ?? "Đang tải..."}</Text>
-        </Link>
+        <Tooltip label="Xem chi tiết" placement="top" hasArrow>
+            <Link as={RouterLink} to={`/admin/testcase/${problemId}`}>
+                <Text align="center" color="blue">{count}</Text>
+            </Link>
+        </Tooltip>
     );
 };
 
