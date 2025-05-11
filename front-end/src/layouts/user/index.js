@@ -29,22 +29,34 @@ export default function Home(props) {
         return routes.map((route, key) => {
             if (route.layout === '/user') {
                 const routeKey = `route-${key}-${route.path}`;
+
                 return (
                     <React.Fragment key={routeKey}>
+                        {/* Route chính không bảo vệ */}
                         <Route path={`${route.path}`} element={route.component} />
-                        {route.item && route.item.map((subRoute, subKey) => (
-                            <Route
-                                key={`subroute-${route.path}-${subRoute.path}`}
-                                path={`${route.path}/${subRoute.path}`}
-                                element={subRoute.component}
-                            />
-                        ))}
+
+                        {/* Route con: bảo vệ dựa vào field `protected` */}
+                        {route.item && route.item.map((subRoute, subKey) => {
+                            const fullPath = `${route.path}/${subRoute.path}`;
+                            const element = subRoute.protected
+                                ? <ProtectedRoute>{subRoute.component}</ProtectedRoute>
+                                : subRoute.component;
+
+                            return (
+                                <Route
+                                    key={`subroute-${key}-${subKey}`}
+                                    path={fullPath}
+                                    element={element}
+                                />
+                            );
+                        })}
                     </React.Fragment>
                 );
             }
             return null;
         });
     };
+
 
 
     return (

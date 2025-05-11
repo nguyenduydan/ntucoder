@@ -23,7 +23,6 @@ import Home from 'views/user/Home';
 //import Problem from 'views/user/Problem';
 import Course from 'views/user/Course';
 import CourseDetailUser from 'views/user/Course/components/CourseDetail';
-import CourseCreateUser from 'views/user/Course/components/CreateCourse';
 import Lesson from 'views/user/Lesson';
 
 import { PersonIcon } from 'components/icons/Icons';
@@ -124,27 +123,6 @@ const routes = [
     ]
   },
 
-  // {
-  //   name: 'Thể loại',
-  //   layout: '/admin',
-  //   icon: <Icon as={FaAlignCenter} width="20px" height="20px" color="inherit" />,
-  //   path: '/categorie',
-  //   component: <CategoryTable />,
-  // },
-  // {
-  //   name: 'Quản lý biên dịch',
-  //   layout: '/admin',
-  //   icon: <Icon as={FaLaptopCode} width="20px" height="20px" color="inherit" />,
-  //   path: '/compiler',
-  //   component: <CompilerTable />,
-  //   item: [
-  //     {
-  //       name: 'Chi tiết biên dịch',
-  //       path: 'detail/:id',
-  //       component: <CoderDetail />,
-  //     }
-  //   ]
-  // },
   {
     name: 'Người dùng',
     layout: '/admin',
@@ -186,21 +164,19 @@ const routes = [
     item: [
       {
         name: 'Chi tiết khóa học',
-        path: ":slugId",
+        path: ':slugId',
         component: <CourseDetailUser />,
+        protected: false
       },
       {
-        name: 'Tạo khóa học',
-        path: "create",
-        component: <CourseCreateUser />,
-      },
-      {
-        name: 'chi tiết bài học',
-        path: ":slugId/:lessonId",
+        name: 'Chi tiết bài học',
+        path: ':slugId/:lessonId',
         component: <Lesson />,
+        protected: true
       }
     ]
-  },
+  }
+
 ];
 
 export default routes;

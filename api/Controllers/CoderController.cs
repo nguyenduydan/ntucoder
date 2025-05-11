@@ -3,6 +3,7 @@ using api.DTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using api.Infrashtructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
