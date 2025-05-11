@@ -19,6 +19,7 @@ import HeroSection from "./components/HeroSection";
 import { useAuth } from "contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
 import ScrollToTop from "components/scroll/ScrollToTop";
+import Logo from "assets/img/logo.png";
 
 
 const MotionBox = motion(ChakraBox);
@@ -119,7 +120,7 @@ const Home = () => {
           variants={fadeInUp}
         >
           <ChakraBox flex={1}>
-            <Image src="NTU" alt="About us" borderRadius="xl" />
+            <Image src={Logo} alt="About us" borderRadius="xl" />
           </ChakraBox>
           <ChakraBox flex={2} bg="gray.100" px={5} py={3} borderRadius="md" boxShadow="md">
             <Heading size="md" mb={4}>Về chúng tôi</Heading>

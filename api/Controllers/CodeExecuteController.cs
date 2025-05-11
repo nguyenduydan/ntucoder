@@ -43,27 +43,22 @@ namespace api.Controllers
             }
         }
 
-        [HttpPost("testRun")]
         [HttpPost("try-run")]
-        public async Task<IActionResult> TryRunCode([FromBody] string sourceCode, string compilerExtension, int problemId)
+        public async Task<IActionResult> TryRunCode([FromBody] TryRunCodeRequestDTO request)
         {
-            TestCaseDTO testcase = await _testCaseRepository.GetSampleTestByProblemIdAsync(problemId);
+            TestCaseDTO testcase = await _testCaseRepository.GetSampleTestByProblemIdAsync(request.ProblemId);
             if (testcase == null)
             {
-                return BadRequest(new
-                {
-                    Error = "Không tìm thấy test case mẫu cho bài toán này."
-                });
+                return BadRequest(new { Error = "Không tìm thấy test case mẫu cho bài toán này." });
             }
-            string input = testcase.Input;
-            string expectedOutput = testcase.Output;
+
             try
             {
-                (string Result, string Output, string Error, int TimeDuration) result = await _codeExecutionService.TryRunCodeAsync(
-                    sourceCode,
-                    compilerExtension,
-                    input,
-                    expectedOutput
+                var result = await _codeExecutionService.TryRunCodeAsync(
+                    request.SourceCode,
+                    request.CompilerExtension,
+                    testcase.Input,
+                    testcase.Output
                 );
                 return Ok(new
                 {
@@ -75,10 +70,7 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new
-                {
-                    Error = ex.Message
-                });
+                return BadRequest(new { Error = ex.Message });
             }
         }
 

@@ -182,8 +182,14 @@ namespace api.Infrashtructure.Services
         public async Task<(string Result, string Output, string Error, int TimeDuration)> TryRunCodeAsync(string sourceCode, string compilerExtension, string input, string expectedOutput = "")
         {
             string containerName = $"code_runner_{Guid.NewGuid()}".Replace("-", "");
+            string extension = compilerExtension.ToLower();
 
-            string dockerImage = compilerExtension.ToLower() switch
+            if (!extension.StartsWith("."))
+            {
+                extension = "." + extension;
+            }
+
+            string dockerImage = extension switch
             {
                 ".cpp" => "gcc:12",
                 ".java" => "openjdk:17-alpine",
@@ -215,7 +221,7 @@ namespace api.Infrashtructure.Services
             {
                 if (!string.IsNullOrWhiteSpace(expectedOutput))
                 {
-                    bool isCorrect = string.Equals(result.Output.Trim(), expectedOutput.Trim(), StringComparison.OrdinalIgnoreCase);
+                    bool isCorrect = string.Equals(result.Output.Trim(), expectedOutput.Trim(), StringComparison.Ordinal);
                     testResult = isCorrect ? "Accepted" : "Wrong Answer";
                 }
                 else

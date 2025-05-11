@@ -78,6 +78,8 @@ const ProblemList = ({ lessonID }) => {
 
     const handleBackToList = () => {
         navigate(location.pathname); // Xóa query param problemID
+        fetchProblemDetail();
+        fetchLessonData();
     };
 
     return (

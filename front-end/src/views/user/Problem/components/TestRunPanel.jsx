@@ -6,22 +6,14 @@ import {
     TabPanels,
     Tab,
     TabPanel,
-    Flex
+    Flex,
+    Grid,
+    GridItem,
 } from "@chakra-ui/react";
 import { getDetail, getTestCase } from "config/apiService";
 import React, { useState, useEffect } from "react";
 
-const testResults = [
-    {
-        input: '""',
-        actualOutput: '" "',
-        expectedOutput: '" "',
-        timeLimit: '" "',
-        execTime: '" "',
-    },
-];
-
-const TestResultPanel = ({ hasRun, id }) => {
+const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
     const [testCases, setTestCases] = useState([]);
     const [limitTime, setLimitTime] = useState(null);
 
@@ -37,7 +29,6 @@ const TestResultPanel = ({ hasRun, id }) => {
                     setLimitTime(limitRes.timeLimit || null);
                     setTestCases(testcaseRes.data || []);
                 }
-
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu test case:", error);
             }
@@ -50,7 +41,7 @@ const TestResultPanel = ({ hasRun, id }) => {
 
     return (
         <Box maxH="25vh" bg="gray.900" color="white" px={4} py={3} overflowY="auto">
-            {!hasRun && testResults.length > 1 && (
+            {!hasRun && testCases.length === 0 && (
                 <Text
                     color="gray.400"
                     border="1px solid"
@@ -65,55 +56,89 @@ const TestResultPanel = ({ hasRun, id }) => {
 
             <Tabs isLazy variant="enclosed" colorScheme="cyan" mt={3}>
                 <TabList>
-                    {testResults.map((_, index) => (
-                        <Tab key={index}>Testcase {index + 1}</Tab>
-                    ))}
+                    {testCases.length === 0 ? (
+                        <Tab key={0}>Testcase 1</Tab>  // Nếu không có test case, chỉ hiển thị một tab mặc định.
+                    ) : (
+                        testCases.map((_, index) => (
+                            <Tab key={index}>Testcase {index + 1}</Tab>
+                        ))
+                    )}
                 </TabList>
 
                 <TabPanels>
-                    {testResults.map((test, index) => {
-                        if (!hasRun && index > 0) {
-                            return (
-                                <TabPanel key={index}>
-                                    <Text color="gray.400">
-                                        Bạn cần chạy thử để xem testcase này.
-                                    </Text>
-                                </TabPanel>
-                            );
-                        }
-
-                        const testcase = testCases[index];
-
-                        return (
-                            <TabPanel key={index}>
-                                <Box bg="gray.700" p={4} borderRadius="md" fontSize="14px">
-                                    <Flex justify="start" >
+                    {testCases.length === 0 ? (
+                        <TabPanel key={0}>
+                            <Grid templateColumns="2fr 1fr" bg="gray.700" p={4} borderRadius="md" fontSize="14px">
+                                <GridItem>
+                                    <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
-                                        <Text>{testcase?.input || test.input}</Text>
+                                        <Text>Không có đầu vào</Text>
                                     </Flex>
-                                    <Flex justify="start" >
+                                    <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
-                                        <Text>{test.actualOutput || ""}</Text>
+                                        <Text>Không có đầu ra thực tế</Text>
                                     </Flex>
-                                    <Flex justify="start" >
+                                    <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
-                                        <Text>{testcase?.output || test.expectedOutput}</Text>
+                                        <Text>Không có đầu ra mong đợi</Text>
                                     </Flex>
-                                    <Flex justify="start" >
+                                    <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
-                                        <Text>{limitTime || test.timeLimit}</Text>
+                                        <Text>Không có giới hạn thời gian</Text>
                                     </Flex>
-                                    <Flex justify="start" >
+                                    <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
-                                        <Text>{test.execTime || ""}</Text>
+                                        <Text>Chưa có thông tin</Text>
                                     </Flex>
-                                </Box>
+                                </GridItem>
+                                <GridItem>
+                                    <Text fontWeight="bold" mr={5}>Hiển thị lỗi</Text>
+                                    <Text bg="black" minH="12vh" borderRadius="md" p={2}>
+                                        {errors || "Không có lỗi"}
+                                    </Text>
+                                </GridItem>
+                            </Grid>
+                        </TabPanel>
+                    ) : (
+                        testCases.map((testcase, index) => (
+                            <TabPanel key={index}>
+                                <Grid templateColumns="2fr 1fr" bg="gray.700" p={4} borderRadius="md" fontSize="14px">
+                                    <GridItem>
+                                        <Flex justify="start">
+                                            <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
+                                            <Text>{testcase.input || 'Không có đầu vào'}</Text>
+                                        </Flex>
+                                        <Flex justify="start">
+                                            <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
+                                            <Text>{testCaseResult.actualOutput || 'Không có đầu ra thực tế'}</Text>
+                                        </Flex>
+                                        <Flex justify="start">
+                                            <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
+                                            <Text>{testcase.output || 'Không có đầu ra mong đợi'}</Text>
+                                        </Flex>
+                                        <Flex justify="start">
+                                            <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
+                                            <Text>{limitTime || 'Không có giới hạn thời gian'}</Text>
+                                        </Flex>
+                                        <Flex justify="start">
+                                            <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
+                                            <Text>{testCaseResult.execTime || 'Chưa có thông tin'}</Text>
+                                        </Flex>
+                                    </GridItem>
+                                    <GridItem>
+                                        <Text fontWeight="bold" mr={5}>Hiển thị lỗi</Text>
+                                        <Text bg="black" minH="12vh" borderRadius="md" p={2}>
+                                            {errors || "Không có lỗi"}
+                                        </Text>
+                                    </GridItem>
+                                </Grid>
                             </TabPanel>
-                        );
-                    })}
+                        ))
+                    )}
                 </TabPanels>
             </Tabs>
         </Box>
+
     );
 };
 
