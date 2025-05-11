@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     if (isLoading) return null; // Hoặc spinner nếu muốn
     if (shouldRedirect) {
-        navigate("/");
+        navigate(-1);
         return null;
     }
 

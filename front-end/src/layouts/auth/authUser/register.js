@@ -227,6 +227,7 @@ const Register = ({ onSuccess }) => {
                 type="submit"
                 isLoading={loading}
                 loadingText="Đang đăng ký..."
+                _hover={{ boxShadow: "0px 4px 10px rgb(74, 222, 128)" }}
             >
                 Đăng ký
             </Button>

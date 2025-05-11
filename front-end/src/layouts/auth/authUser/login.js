@@ -127,6 +127,7 @@ const Login = ({ onSuccess }) => {
                 mt={4}
                 isLoading={loading}
                 loadingText="Đang đăng nhập.."
+                _hover={{ boxShadow: "0px 4px 10px rgb(74, 168, 222)" }}
             >
                 Đăng nhập
             </Button>
