@@ -938,7 +938,7 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.ERD.Match", b =>
                 {
                     b.HasOne("api.Models.ERD.Coder", "Coder")
-                        .WithMany()
+                        .WithMany("Matchs")
                         .HasForeignKey("CoderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1128,6 +1128,8 @@ namespace api.Migrations
                     b.Navigation("Courses");
 
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Matchs");
 
                     b.Navigation("Problems");
 

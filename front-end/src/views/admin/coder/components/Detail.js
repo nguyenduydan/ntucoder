@@ -400,7 +400,7 @@ const CoderDetail = () => {
                                             </Select>
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Vai trò:</strong> {roleMapping[coderDetail.roleID] || "Khác"}
+                                                <strong>Vai trò:</strong> {roleMapping[coderDetail.role] || "Khác"}
                                             </Text>
                                         )}
                                         <IconButton
@@ -412,6 +412,9 @@ const CoderDetail = () => {
                                             cursor="pointer"
                                         />
                                     </Flex>
+                                    <Text fontSize="lg">
+                                        <strong>Tổng điểm: </strong>{coderDetail.totalPoint}
+                                    </Text>
                                 </VStack>
                             </GridItem>
                         </Grid>

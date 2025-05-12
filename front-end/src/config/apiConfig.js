@@ -18,19 +18,15 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-api.interceptors.request.use((config) => {
-    NProgress.start();
-    const token = Cookies.get('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.response.use(
+    (response) => {
+        NProgress.done();
+        return response;
+    },
+    (error) => {
+        NProgress.done();
+        return Promise.reject(error);
     }
-
-    // Ngăn cache (nếu server có cơ chế cache)
-    config.headers['Cache-Control'] = 'no-cache';
-    config.headers['Pragma'] = 'no-cache';
-    config.headers['Expires'] = '0';
-
-    return config;
-});
+);
 
 export default api;

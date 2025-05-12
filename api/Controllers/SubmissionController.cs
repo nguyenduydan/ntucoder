@@ -1,4 +1,5 @@
 ﻿using api.DTOs;
+using api.Infrashtructure.Enums;
 using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
@@ -50,13 +51,31 @@ namespace api.Controllers
                 var coderID = _authService.GetUserIdFromToken();
                 dto.CoderID = coderID;
 
+                // 1. Luôn tạo submission với status ban đầu là Pending
+                dto.SubmissionStatus = SubmissionStatus.Pending;
+
                 var result = await _submissionRepository.CreateSubmissionAsync(dto);
+
+                // 2. Chạy test
                 var testRunResults = await _codeExecutionService.ExecuteSubmissionAsync(result.SubmissionID);
-                
+
+                // 3. Cập nhật submission dựa trên test result
+                await _submissionRepository.UpdateSubmissionAfterTestRunAsync(result.SubmissionID);
+
+                // 4. Tải lại submission để kiểm tra status sau khi update
+                var updatedSubmission = await _submissionRepository.GetSubmissionByIdAsync(result.SubmissionID);
+
+                // 5. Nếu đã được Accepted, xử lý Solved và Match
+                if (updatedSubmission.SubmissionStatus == SubmissionStatus.Accepted)
+                {
+                    await _submissionRepository.ProcessSolvedAndMatchAsync(updatedSubmission);
+                }
+
                 return Ok(new
                 {
-                    Submission = result,
-                    TestRuns = testRunResults
+                    Submission = updatedSubmission,
+                    TestRuns = testRunResults,
+                    SubmissionStatus = updatedSubmission.SubmissionStatus,
                 });
             }
             catch (InvalidOperationException ex)

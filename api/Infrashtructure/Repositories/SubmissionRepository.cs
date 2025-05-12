@@ -75,38 +75,89 @@ namespace api.Infrashtructure.Repositories
             };
         }
 
-        private async Task<bool> IsSolved(int problemID, int coderID)
-        {
-            return await _context.Solved.AnyAsync(s => s.ProblemID == problemID && s.CoderID == coderID);
-        }
-
         public async Task<SubmissionDTO> CreateSubmissionAsync(SubmissionDTO dto)
         {
-            var obj = new Submission
+            var submission = new Submission
             {
                 ProblemID = dto.ProblemID,
                 CoderID = dto.CoderID,
                 CompilerID = dto.CompilerID,
                 SubmitTime = DateTime.Now,
-                SubmissionCode = dto.SubmissionCode.ToString(),
-                SubmissionStatus = 0,
+                SubmissionCode = dto.SubmissionCode ?? "",
+                SubmissionStatus = dto.SubmissionStatus,
+                CreatedAt = DateTime.Now
             };
 
-            _context.Submissions.Add(obj);
-            if (!(await IsSolved(dto.ProblemID, dto.CoderID)))
+            _context.Submissions.Add(submission);
+            await _context.SaveChangesAsync();
+
+            dto.SubmissionID = submission.SubmissionID;
+            return dto;
+        }
+
+        public async Task ProcessSolvedAndMatchAsync(SubmissionDTO dto)
+        {
+            Console.WriteLine(dto.SubmissionStatus);
+            if (dto.SubmissionStatus != SubmissionStatus.Accepted)
+            {
+                return;
+            }
+
+            // Chuyển đổi SubmissionDTO thành Submission
+            var submission = new Submission
+            {
+                SubmissionID = dto.SubmissionID,
+                ProblemID = dto.ProblemID,
+                CoderID = dto.CoderID,
+                SubmissionStatus = dto.SubmissionStatus
+            };
+
+            // Kiểm tra và thêm vào Solved nếu chưa có
+            var isSolved = await _context.Solved
+                .AnyAsync(s => s.ProblemID == submission.ProblemID && s.CoderID == submission.CoderID);
+
+            if (!isSolved)
             {
                 var solved = new Solved
                 {
-                    ProblemID = dto.ProblemID,
-                    CoderID = dto.CoderID,
+                    ProblemID = submission.ProblemID,
+                    CoderID = submission.CoderID
                 };
                 _context.Solved.Add(solved);
-
             }
+
+            // Cập nhật điểm cho các bài học liên quan đến bài tập
+            var lessonProblems = await _context.LessonProblems
+                .Where(lp => lp.ProblemID == submission.ProblemID)
+                .ToListAsync();
+
+            foreach (var lp in lessonProblems)
+            {
+                var match = await _context.Matches
+                    .FirstOrDefaultAsync(m => m.LessonProblemID == lp.ID && m.CoderID == submission.CoderID);
+
+                if (match == null)
+                {
+                    // Tạo mới Match nếu chưa có
+                    match = new Match
+                    {
+                        CoderID = submission.CoderID,
+                        LessonProblemID = lp.ID,
+                        Point = 100 
+                    };
+                    _context.Matches.Add(match);
+                }
+                else
+                {
+                    // Cập nhật điểm nếu cần thiết
+                    match.Point = Math.Max(match.Point, 100);
+                }
+            }
+
             await _context.SaveChangesAsync();
-            dto.SubmissionID = obj.SubmissionID;
-            return dto;
         }
+
+
 
         public async Task<bool> DeleteSubmissionAsync(int id)
         {
@@ -194,39 +245,51 @@ namespace api.Infrashtructure.Repositories
 
         public async Task UpdateSubmissionAfterTestRunAsync(int submissionId)
         {
-            var obj = await _context.Submissions
+            var submission = await _context.Submissions
                 .Include(s => s.TestRuns)
                 .FirstOrDefaultAsync(s => s.SubmissionID == submissionId);
 
-            if (obj == null)
+            if (submission == null)
+                throw new KeyNotFoundException("Không tìm thấy submission.");
+
+            submission.TestRunCount = submission.TestRuns.Count;
+
+            // Ưu tiên lỗi biên dịch (nếu có)
+            if (submission.TestRuns.Any(tr => tr.Result == "CompilationError"))
             {
-                throw new KeyNotFoundException("Không tìm thấy Submission.");
+                submission.SubmissionStatus = SubmissionStatus.CompilationError;
             }
-
-            obj.TestRunCount = obj.TestRuns.Count;
-
-            if (obj.TestRuns.Any(tr => tr.Result != "Accepted"))
+            else if (submission.TestRuns.Any(tr => tr.Result == "RuntimeError"))
             {
-                obj.MaxTimeDuration = 0;
-                obj.TestResult = "Failed";
+                submission.SubmissionStatus = SubmissionStatus.RuntimeError;
+            }
+            else if (submission.TestRuns.Any(tr => tr.Result == "MemoryLimitExceeded"))
+            {
+                submission.SubmissionStatus = SubmissionStatus.MemoryLimitExceeded;
+            }
+            else if (submission.TestRuns.Any(tr => tr.Result == "TimeLimitExceeded"))
+            {
+                submission.SubmissionStatus = SubmissionStatus.TimeLimitExceeded;
+            }
+            else if (submission.TestRuns.Any(tr => tr.Result == "WrongAnswer"))
+            {
+                submission.SubmissionStatus = SubmissionStatus.WrongAnswer;
+            }
+            else if (submission.TestRuns.All(tr => tr.Result == "Accepted"))
+            {
+                submission.SubmissionStatus = SubmissionStatus.Accepted;
             }
             else
             {
-                if (obj.TestRuns.Any())
-                {
-                    obj.MaxTimeDuration = obj.TestRuns.Max(tr => tr.TimeDuration);
-                }
-                else
-                {
-                    obj.MaxTimeDuration = 0;
-                }
-                obj.TestResult = "Accepted";
+                submission.SubmissionStatus = SubmissionStatus.Pending; // fallback nếu chưa rõ
             }
 
-            obj.SubmissionStatus = SubmissionStatus.Accepted;
+            submission.MaxTimeDuration = submission.TestRuns.Max(tr => tr.TimeDuration);
+            submission.TestResult = submission.SubmissionStatus.ToString();
 
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<List<SubmissionDTO>> GetListSubmissionFromCoderIdAsync(int problemId, int coderId, string? sortField = null, bool ascending = true)
         {
@@ -245,8 +308,28 @@ namespace api.Infrashtructure.Repositories
                 TestRunCount = obj.TestRunCount,
                 TestResult = obj.TestResult,
                 MaxTimeDuration = obj.MaxTimeDuration,
-             
+                ProblemID = obj.ProblemID,
+                CoderID = obj.CoderID,
             }).ToListAsync();
+
+            // Lấy điểm nếu có Match
+            var lessonProblem = await _context.LessonProblems
+                .FirstOrDefaultAsync(lp => lp.ProblemID == problemId);
+
+            if (lessonProblem != null)
+            {
+                var match = await _context.Matches
+                    .FirstOrDefaultAsync(m => m.CoderID == coderId && m.LessonProblemID == lessonProblem.ID);
+
+                if (match != null)
+                {
+                    foreach (var item in listDTO)
+                    {
+                        item.Point = match.Point;
+                    }
+                }
+            }
+
             IQueryable<SubmissionDTO> queryDTO = listDTO.AsQueryable();
             queryDTO = ApplySorting(queryDTO, sortField, ascending);
 

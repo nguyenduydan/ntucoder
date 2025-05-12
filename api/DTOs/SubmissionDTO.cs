@@ -19,5 +19,6 @@ namespace api.DTOs
         public float? MaxMemorySize { get; set; }
         public int? MaxTimeDuration { get; set; }
         public string? SubmissionCode { get; set; }
+        public int Point {  get; set; }
     }
 }

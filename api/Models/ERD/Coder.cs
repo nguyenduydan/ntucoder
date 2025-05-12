@@ -31,7 +31,7 @@ namespace api.Models.ERD
         public string? UpdatedBy { get; set; }
 
         public virtual Account Account { get; set; }
-
+        public virtual ICollection<Match> Matchs { get; set; } = new HashSet<Match>();
         public virtual ICollection<Blog> Blogs { get; set; } = new HashSet<Blog>();
         public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
         public virtual ICollection<Submission> Submissions { get; set; } = new HashSet<Submission>();
@@ -40,5 +40,6 @@ namespace api.Models.ERD
         public virtual ICollection<Problem> Problems { get; set; } = new HashSet<Problem>();
         public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
         public virtual ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
+        
     }
 }

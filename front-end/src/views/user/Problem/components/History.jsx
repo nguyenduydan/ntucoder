@@ -10,6 +10,8 @@ import {
     Tr,
     Th,
     Td,
+    Button,
+    Flex
 } from "@chakra-ui/react";
 import { formatDate } from 'utils/utils';
 
@@ -51,8 +53,22 @@ const History = () => {
         fetchData();
     }, [fetchData]);
 
+    const handleFetchData = () => {
+        fetchData();
+    };
+
     return (
         <Box>
+            <Flex justify="flex-end" mb={3}>
+                <Button
+                    onClick={handleFetchData}
+                    colorScheme='blue'
+                    borderRadius="md"
+                    size="sm"
+                >
+                    Refresh
+                </Button>
+            </Flex>
             {isLoading ? (
                 <Table variant="striped">
                     <Tbody>

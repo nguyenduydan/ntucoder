@@ -1,5 +1,6 @@
 ﻿using api.Infrashtructure.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace api.DTOs
@@ -12,6 +13,7 @@ namespace api.DTOs
         public string? CoderEmail { get; set; }
         public string? PhoneNumber { get; set; }
         public int Role { get; set; }
+     
     }
     public class CreateCoderDTO : CoderDTO
     {
@@ -20,6 +22,7 @@ namespace api.DTOs
     }
     public class CoderDetailDTO: CoderDTO
     {
+        public int? TotalPoint { get; set; }
         public IFormFile? AvatarFile { get; set; }
         public string? Avatar { get; set; }
         public string? Description { get; set; }

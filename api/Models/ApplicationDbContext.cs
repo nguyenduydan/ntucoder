@@ -58,7 +58,6 @@ namespace api.Models
 
                 entity.HasOne(a => a.Coder)
                       .WithOne(c => c.Account)
-                      .HasForeignKey<Coder>(c => c.CoderID)
                       .OnDelete(DeleteBehavior.Cascade);
 
             });
@@ -68,17 +67,16 @@ namespace api.Models
                 entity.HasKey(m => m.MatchID);
 
                 entity.HasOne(m => m.Coder)
-                .WithMany()
-                .HasForeignKey(m => m.CoderID)
-                .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany(c => c.Matchs)
+                    .HasForeignKey(m => m.CoderID)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(m => m.LessonProblem)
-                .WithMany()
-                .HasForeignKey(m => m.LessonProblemID)
-                .OnDelete(DeleteBehavior.Restrict);
-                      
-
+                    .WithMany()
+                    .HasForeignKey(m => m.LessonProblemID)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
+
 
             modelBuilder.Entity<Blog>(entity =>
             {
@@ -157,9 +155,9 @@ namespace api.Models
 
                 // FK - One-to-One
                 entity.HasOne(c => c.Account)
-                      .WithOne(a => a.Coder)
-                      .HasForeignKey<Coder>(c => c.CoderID)
-                      .OnDelete(DeleteBehavior.Cascade);
+                       .WithOne(a => a.Coder)  
+                       .HasForeignKey<Coder>(c => c.CoderID)  
+                       .OnDelete(DeleteBehavior.Cascade);
 
                 // FK - One-to-Many
                 entity.HasMany(c => c.Blogs)

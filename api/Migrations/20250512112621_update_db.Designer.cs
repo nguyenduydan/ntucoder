@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250512041754_update_db_1252025")]
-    partial class update_db_1252025
+    [Migration("20250512112621_update_db")]
+    partial class update_db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -941,7 +941,7 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.ERD.Match", b =>
                 {
                     b.HasOne("api.Models.ERD.Coder", "Coder")
-                        .WithMany()
+                        .WithMany("Matchs")
                         .HasForeignKey("CoderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1131,6 +1131,8 @@ namespace api.Migrations
                     b.Navigation("Courses");
 
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Matchs");
 
                     b.Navigation("Problems");
 
