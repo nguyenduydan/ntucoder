@@ -9,7 +9,7 @@ import { FaRegFileCode } from "react-icons/fa";
 
 import { getDetail } from "config/apiService";
 
-const LessonList = () => {
+const LessonList = ({ onSelectLesson }) => {
     const { slugId } = useParams();
     const parts = slugId ? slugId.split("-") : [];
     const courseID = parts.length > 0 ? parseInt(parts.pop(), 10) : NaN;
@@ -119,6 +119,7 @@ const LessonList = () => {
                                                                         textDecoration: 'none',
                                                                         color: isActive ? 'blue.500' : 'inherit',
                                                                     })}
+                                                                    onClick={() => onSelectLesson?.(lesson.lessonID)}
                                                                 >
                                                                     <ListItem
                                                                         cursor="pointer"

@@ -23,6 +23,10 @@ export default function Lesson() {
     const [activeTab, setActiveTab] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
 
+    const handleSelectLesson = () => {
+        setActiveTab(0); // chuyển về tab ProblemList
+    };
+
     useEffect(() => {
         const fetchLesson = async () => {
             try {
@@ -116,7 +120,7 @@ export default function Lesson() {
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
                                                 <Box maxWidth="100%">
                                                     <Text fontWeight="bold" fontSize="lg"> Giáo Trình</Text>
-                                                    <LessonList />
+                                                    <LessonList onSelectLesson={handleSelectLesson} />
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
