@@ -516,8 +516,8 @@ namespace api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<float?>("TimeLimit")
-                        .HasColumnType("float");
+                    b.Property<int?>("TimeLimit")
+                        .HasColumnType("int");
 
                     b.HasKey("ProblemID");
 
@@ -612,7 +612,7 @@ namespace api.Migrations
                         new
                         {
                             RoleID = 3,
-                            Name = "Manager"
+                            Name = "Teacher"
                         });
                 });
 

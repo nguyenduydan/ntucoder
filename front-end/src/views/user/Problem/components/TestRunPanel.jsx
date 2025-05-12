@@ -72,23 +72,23 @@ const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
                                 <GridItem>
                                     <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
-                                        <Text>Không có đầu vào</Text>
+                                        <Text>""</Text>
                                     </Flex>
                                     <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
-                                        <Text>Không có đầu ra thực tế</Text>
+                                        <Text>""</Text>
                                     </Flex>
                                     <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
-                                        <Text>Không có đầu ra mong đợi</Text>
+                                        <Text>""</Text>
                                     </Flex>
                                     <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
-                                        <Text>Không có giới hạn thời gian</Text>
+                                        <Text>""</Text>
                                     </Flex>
                                     <Flex justify="start">
                                         <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
-                                        <Text>Chưa có thông tin</Text>
+                                        <Text>""</Text>
                                     </Flex>
                                 </GridItem>
                                 <GridItem>
@@ -106,23 +106,23 @@ const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
                                     <GridItem>
                                         <Flex justify="start">
                                             <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
-                                            <Text>{testcase.input || 'Không có đầu vào'}</Text>
+                                            <Text>{testcase.input || '" "'}</Text>
                                         </Flex>
                                         <Flex justify="start">
                                             <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
-                                            <Text>{testCaseResult.actualOutput || 'Không có đầu ra thực tế'}</Text>
+                                            <Text>{testCaseResult.actualOutput || '" "'}</Text>
                                         </Flex>
                                         <Flex justify="start">
                                             <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
-                                            <Text>{testcase.output || 'Không có đầu ra mong đợi'}</Text>
+                                            <Text>{testcase.output || '" "'}</Text>
                                         </Flex>
                                         <Flex justify="start">
                                             <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
-                                            <Text>{limitTime || 'Không có giới hạn thời gian'}</Text>
+                                            <Text>{limitTime || '" "'} ms</Text>
                                         </Flex>
                                         <Flex justify="start">
                                             <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
-                                            <Text>{testCaseResult.execTime || 'Chưa có thông tin'}</Text>
+                                            <Text>{testCaseResult.execTime || '" "'} ms</Text>
                                         </Flex>
                                     </GridItem>
                                     <GridItem>

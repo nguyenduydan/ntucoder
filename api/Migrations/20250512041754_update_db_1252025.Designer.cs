@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250427091432_updatedb")]
-    partial class updatedb
+    [Migration("20250512041754_update_db_1252025")]
+    partial class update_db_1252025
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -519,8 +519,8 @@ namespace api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<float?>("TimeLimit")
-                        .HasColumnType("float");
+                    b.Property<int?>("TimeLimit")
+                        .HasColumnType("int");
 
                     b.HasKey("ProblemID");
 
@@ -615,7 +615,7 @@ namespace api.Migrations
                         new
                         {
                             RoleID = 3,
-                            Name = "Manager"
+                            Name = "Teacher"
                         });
                 });
 

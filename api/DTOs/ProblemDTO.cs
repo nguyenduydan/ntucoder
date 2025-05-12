@@ -5,7 +5,7 @@
         public int ProblemID { get; set; }
         public string? ProblemName { get; set; }
         public string? ProblemCode { get; set; }
-        public float? TimeLimit { get; set; }
+        public int? TimeLimit { get; set; }
         public int? MemoryLimit { get; set; }
         public string? ProblemContent { get; set; }
         public string? ProblemExplanation { get; set; }

@@ -6,7 +6,7 @@ const useTitle = () => {
     const location = useLocation();
 
     useEffect(() => {
-        let title = "NTU-CODER"; // Tiêu đề mặc định
+        let title = "NTU-LMS"; // Tiêu đề mặc định
         const currentPath = location.pathname.replace(/\/$/, ""); // Xóa "/" cuối nếu có
 
         routes.forEach(route => {
@@ -18,7 +18,7 @@ const useTitle = () => {
 
             // Kiểm tra đường dẫn chính (VD: /course, /admin/dashboard)
             if (routePath === currentPath) {
-                title = `${route.name} | NTU-CODER`;
+                title = `${route.name} | NTU-LMS`;
             }
 
             // Xử lý layout USER (VD: /course/reactjs-101-123)
@@ -29,7 +29,7 @@ const useTitle = () => {
 
                     if (match) {
                         const courseName = match[1].replace(/-/g, " "); // Đổi "reactjs-101" -> "ReactJS 101"
-                        title = `${courseName} | NTU-CODER`;
+                        title = `${courseName} | NTU-LMS`;
                     }
                 });
             }
@@ -39,7 +39,7 @@ const useTitle = () => {
                 route.item.forEach(subRoute => {
                     const regex = new RegExp(`^${routePath}/${subRoute.path.replace(":id", "\\d+")}$`);
                     if (regex.test(currentPath)) {
-                        title = `${subRoute.name} | NTU-CODER`;
+                        title = `${subRoute.name} | NTU-LMS`;
                     }
                 });
             }

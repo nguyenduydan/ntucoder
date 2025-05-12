@@ -16,7 +16,12 @@ namespace api.Infrashtructure.Repositories
             _context = context;
         }
 
-        public async Task<PagedResponse<SubmissionDTO>> GetAllSubmissionsAsync(QueryObject query, string? sortField = null, bool ascending = true)
+        public async Task<PagedResponse<SubmissionDTO>> GetAllSubmissionsAsync(
+             QueryObject query,
+             string? sortField = null,
+             bool ascending = true,
+             string? searchString = null,
+             string? compilerFilter = null)
         {
             var objQuery = _context.Submissions
                 .Include(a => a.Problem)
@@ -33,9 +38,24 @@ namespace api.Infrashtructure.Repositories
                     TestResult = a.TestResult,
                     MaxTimeDuration = a.MaxTimeDuration,
                     SubmitTime = a.SubmitTime,
-                    SubmissionStatus = (int)a.SubmissionStatus,
+                    SubmissionStatus = a.SubmissionStatus ,
                 });
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var lowerSearch = searchString.ToLower();
+                objQuery = objQuery.Where(c =>
+                    c.CoderName!.ToLower().Contains(lowerSearch) ||
+                    c.ProblemName!.ToLower().Contains(lowerSearch));
+            }
+            if (!string.IsNullOrWhiteSpace(compilerFilter))
+            {
+                var lowerCompiler = compilerFilter.ToLower();
+                objQuery = objQuery.Where(c =>
+                    c.CompilerName!.ToLower().Contains(lowerCompiler));
+            }
+
             objQuery = ApplySorting(objQuery, sortField, ascending);
+
             var obj = await PagedResponse<SubmissionDTO>.CreateAsync(
                 objQuery,
                 query.Page,
@@ -47,11 +67,19 @@ namespace api.Infrashtructure.Repositories
         {
             return sortField?.ToLower() switch
             {
-                "coderid" => ascending ? query.OrderBy(a => a.CoderID) : query.OrderByDescending(a => a.CoderID),
-                "problemid" => ascending ? query.OrderBy(a => a.ProblemID) : query.OrderByDescending(a => a.ProblemID),
+                "codername" => ascending ? query.OrderBy(a => a.CoderName) : query.OrderByDescending(a => a.CoderName),
+                "problemname" => ascending ? query.OrderBy(a => a.ProblemName) : query.OrderByDescending(a => a.ProblemName),
+                "submittime" => ascending ? query.OrderBy(a => a.SubmitTime) : query.OrderByDescending(a => a.SubmitTime),
+                "maxtimeduration" => ascending ? query.OrderBy(a => a.MaxTimeDuration) : query.OrderByDescending(a => a.MaxTimeDuration),
                 _ => query.OrderBy(a => a.SubmissionID)
             };
         }
+
+        private async Task<bool> IsSolved(int problemID, int coderID)
+        {
+            return await _context.Solved.AnyAsync(s => s.ProblemID == problemID && s.CoderID == coderID);
+        }
+
         public async Task<SubmissionDTO> CreateSubmissionAsync(SubmissionDTO dto)
         {
             var obj = new Submission
@@ -60,11 +88,21 @@ namespace api.Infrashtructure.Repositories
                 CoderID = dto.CoderID,
                 CompilerID = dto.CompilerID,
                 SubmitTime = DateTime.Now,
-                SubmissionCode = dto.SubmissionCode,
+                SubmissionCode = dto.SubmissionCode.ToString(),
                 SubmissionStatus = 0,
             };
 
             _context.Submissions.Add(obj);
+            if (!(await IsSolved(dto.ProblemID, dto.CoderID)))
+            {
+                var solved = new Solved
+                {
+                    ProblemID = dto.ProblemID,
+                    CoderID = dto.CoderID,
+                };
+                _context.Solved.Add(solved);
+
+            }
             await _context.SaveChangesAsync();
             dto.SubmissionID = obj.SubmissionID;
             return dto;
@@ -105,7 +143,7 @@ namespace api.Infrashtructure.Repositories
                 CompilerID = obj.CompilerID,
                 SubmissionCode = obj.SubmissionCode,
                 SubmitTime = obj.SubmitTime,
-                SubmissionStatus = (int)obj.SubmissionStatus,
+                SubmissionStatus = obj.SubmissionStatus,
                 TestRunCount = obj.TestRunCount,
                 TestResult = obj.TestResult,
                 MaxMemorySize = obj.MaxMemorySize,
@@ -113,11 +151,10 @@ namespace api.Infrashtructure.Repositories
 
             };
         }
-        public async Task<SubmissionDTO> UpdateSubmissionAsync(int id, SubmissionDTO dto)
+        public async Task<SubmissionDTO> UpdateSubmissionAsync(SubmissionDTO dto)
         {
             var obj = await _context.Submissions
-                .Include(s => s.TestRuns)
-                .FirstOrDefaultAsync(o => o.SubmissionID == id);
+        .FirstOrDefaultAsync(o => o.CoderID == dto.CoderID && o.ProblemID == dto.ProblemID);
 
             if (obj == null)
             {
@@ -127,24 +164,17 @@ namespace api.Infrashtructure.Repositories
             obj.CompilerID = dto.CompilerID != 0 ? dto.CompilerID : obj.CompilerID;
             obj.SubmissionCode = string.IsNullOrEmpty(dto.SubmissionCode) ? obj.SubmissionCode : dto.SubmissionCode;
             obj.SubmitTime = DateTime.UtcNow;
-
-            if (dto.SubmissionStatus != (int)SubmissionStatus.Pending)
-            {
-                obj.SubmissionStatus = (SubmissionStatus)dto.SubmissionStatus;
-            }
-
+            obj.SubmissionStatus = dto.SubmissionStatus != 0 ? dto.SubmissionStatus : obj.SubmissionStatus;
             obj.TestRunCount = dto.TestRunCount ?? obj.TestRunCount;
             obj.TestResult = string.IsNullOrEmpty(dto.TestResult) ? obj.TestResult : dto.TestResult;
 
             if (obj.TestRuns.Any())
             {
                 obj.MaxTimeDuration = obj.TestRuns.Max(tr => tr.TimeDuration);
-                obj.MaxMemorySize = obj.TestRuns.Max(tr => tr.MemorySize);
             }
             else
             {
                 obj.MaxTimeDuration = 0;
-                obj.MaxMemorySize = 0;
             }
 
             await _context.SaveChangesAsync();
@@ -155,13 +185,13 @@ namespace api.Infrashtructure.Repositories
                 CompilerID = obj.CompilerID,
                 SubmissionCode = obj.SubmissionCode,
                 SubmitTime = obj.SubmitTime,
-                SubmissionStatus = (int)obj.SubmissionStatus,
+                SubmissionStatus = obj.SubmissionStatus,
                 TestRunCount = obj.TestRunCount,
                 TestResult = obj.TestResult,
-                MaxMemorySize = obj.MaxMemorySize,
                 MaxTimeDuration = obj.MaxTimeDuration
             };
         }
+
         public async Task UpdateSubmissionAfterTestRunAsync(int submissionId)
         {
             var obj = await _context.Submissions
@@ -174,17 +204,23 @@ namespace api.Infrashtructure.Repositories
             }
 
             obj.TestRunCount = obj.TestRuns.Count;
-            if (obj.TestRuns.Any())
+
+            if (obj.TestRuns.Any(tr => tr.Result != "Accepted"))
             {
-                obj.MaxTimeDuration = obj.TestRuns.Max(tr => tr.TimeDuration);
-                obj.MaxMemorySize = obj.TestRuns.Max(tr => tr.MemorySize);
-                obj.TestResult = obj.TestRuns.Any(tr => tr.Result != "Accepted") ? "Failed" : "Accepted";
+                obj.MaxTimeDuration = 0;
+                obj.TestResult = "Failed";
             }
             else
             {
-                obj.MaxTimeDuration = 0;
-                obj.MaxMemorySize = 0;
-                obj.TestResult = "No Test Runs";
+                if (obj.TestRuns.Any())
+                {
+                    obj.MaxTimeDuration = obj.TestRuns.Max(tr => tr.TimeDuration);
+                }
+                else
+                {
+                    obj.MaxTimeDuration = 0;
+                }
+                obj.TestResult = "Accepted";
             }
 
             obj.SubmissionStatus = SubmissionStatus.Accepted;
@@ -192,5 +228,47 @@ namespace api.Infrashtructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<SubmissionDTO>> GetListSubmissionFromCoderIdAsync(int problemId, int coderId, string? sortField = null, bool ascending = true)
+        {
+            IQueryable<Submission> query = _context.Submissions
+                .Include(c => c.Compiler)
+                .Where(s => s.ProblemID == problemId && s.CoderID == coderId);
+
+            List<SubmissionDTO> listDTO = await query.Select(obj => new SubmissionDTO
+            {
+                SubmissionID = obj.SubmissionID,
+                CompilerID = obj.CompilerID,
+                CompilerName = obj.Compiler.CompilerName,
+                SubmissionCode = obj.SubmissionCode,
+                SubmitTime = obj.SubmitTime,
+                SubmissionStatus = obj.SubmissionStatus,
+                TestRunCount = obj.TestRunCount,
+                TestResult = obj.TestResult,
+                MaxTimeDuration = obj.MaxTimeDuration,
+             
+            }).ToListAsync();
+            IQueryable<SubmissionDTO> queryDTO = listDTO.AsQueryable();
+            queryDTO = ApplySorting(queryDTO, sortField, ascending);
+
+            return queryDTO.ToList();
+        }
+
+        public async Task<List<SubmissionDTO>> GetListSubmissionByCoderId(int coderId)
+        {
+            return await _context.Submissions
+                .Include(c => c.Problem)
+                .Where(c => c.CoderID == coderId)
+                .OrderByDescending(c => c.SubmissionID)
+                .Select(c => new SubmissionDTO
+                {
+                    SubmissionID = c.SubmissionID,
+                    ProblemName = c.Problem.ProblemName,
+                    SubmissionStatus = c.SubmissionStatus,
+                    SubmitTime = c.SubmitTime,
+                    TestResult = c.TestResult,
+
+                })
+        .ToListAsync();
+        }
     }
 }

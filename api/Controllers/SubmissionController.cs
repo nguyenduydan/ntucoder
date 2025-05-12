@@ -2,6 +2,7 @@
 using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,19 +14,21 @@ namespace api.Controllers
     {
         private readonly SubmissionRepository _submissionRepository;
         private readonly CodeExecutionService _codeExecutionService;
+        private readonly AuthService _authService;
 
-        public SubmissionController (SubmissionRepository submissionRepository, CodeExecutionService codeExecutionService)
+        public SubmissionController(SubmissionRepository submissionRepository, CodeExecutionService codeExecutionService, AuthService authService)
         {
             _submissionRepository = submissionRepository;
             _codeExecutionService = codeExecutionService;
+            _authService = authService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllSubmissions([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllSubmissions([FromQuery] QueryObject query, string? sortField = null, bool ascending = true, string? searchString = null, string? compilerFilter = null)
         {
             try
             {
-                var result = await _submissionRepository.GetAllSubmissionsAsync(query, sortField, ascending);
+                var result = await _submissionRepository.GetAllSubmissionsAsync(query, sortField, ascending, searchString, compilerFilter);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -34,7 +37,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateSubmission([FromBody] SubmissionDTO dto)
         {
             if (dto == null)
@@ -44,9 +47,12 @@ namespace api.Controllers
 
             try
             {
+                var coderID = _authService.GetUserIdFromToken();
+                dto.CoderID = coderID;
+
                 var result = await _submissionRepository.CreateSubmissionAsync(dto);
                 var testRunResults = await _codeExecutionService.ExecuteSubmissionAsync(result.SubmissionID);
-
+                
                 return Ok(new
                 {
                     Submission = result,
@@ -63,6 +69,8 @@ namespace api.Controllers
             }
         }
 
+
+        // Get problem by ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSubmissionById(int id)
         {
@@ -84,7 +92,7 @@ namespace api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSubmission(int id, [FromBody] SubmissionDTO dto)
+        public async Task<IActionResult> UpdateSubmission([FromBody] SubmissionDTO dto)
         {
             if (dto == null)
             {
@@ -93,7 +101,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _submissionRepository.UpdateSubmissionAsync(id, dto);
+                var result = await _submissionRepository.UpdateSubmissionAsync(dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
@@ -110,6 +118,7 @@ namespace api.Controllers
             }
         }
 
+        // Delete a problem by ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubmission(int id)
         {
@@ -133,6 +142,31 @@ namespace api.Controllers
                     Message = "Có lỗi xảy ra.",
                     Error = ex.Message
                 });
+            }
+        }
+        [Authorize]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryListSubmission(int problemId, string? sortField = null, bool ascending = true)
+        {
+            var coderId = _authService.GetUserIdFromToken();
+            if (coderId == -1)
+            {
+                return Unauthorized();
+            }
+            List<SubmissionDTO> list = await _submissionRepository.GetListSubmissionFromCoderIdAsync(problemId, coderId, sortField, ascending);
+            return Ok(list);
+        }
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetListProblemByCoderId(int coderID)
+        {
+            try
+            {
+                List<SubmissionDTO> list = await _submissionRepository.GetListSubmissionByCoderId(coderID);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
             }
         }
     }

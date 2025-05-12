@@ -85,12 +85,13 @@ namespace api.Infrashtructure.Services
             (string dockerCommand, string containerName) = GetDockerCommand(submission.Compiler, submission.SubmissionCode, testCase.Input);
 
             var stopwatch = Stopwatch.StartNew();
+            int timeLimitMs = submission.Problem.TimeLimit * 1000 ?? 0;
 
             //tuple multi value
             (bool isSuccess, string output, string error) result;
             try
             {
-                result = await RunProcessAsync(dockerCommand, containerName);
+                result = await RunProcessAsync(dockerCommand, containerName, (int)timeLimitMs);
             }
             finally
             {
@@ -247,47 +248,58 @@ namespace api.Infrashtructure.Services
             };
 
             using var process = new Process { StartInfo = psi };
-            process.Start();
-            var outputTask = process.StandardOutput.ReadToEndAsync();
-            var errorTask = process.StandardError.ReadToEndAsync();
-            var waitTask = process.WaitForExitAsync();
 
-            if (await Task.WhenAny(waitTask, Task.Delay(timeMs)) == waitTask)
+            try
             {
-                string output = await outputTask;
-                string error = await errorTask;
-                return (string.IsNullOrEmpty(error), output.Trim(), error);
-            }
-            else
-            {
-                try
+                process.Start();
+
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
+                var waitTask = process.WaitForExitAsync();
+
+                var completedTask = await Task.WhenAny(waitTask, Task.Delay(timeMs));
+                if (completedTask == waitTask)
                 {
-                    var killProcess = new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        Arguments = $"/c docker rm -f {containerName}",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
+                    // Quá trình kết thúc trong giới hạn
+                    string output = await outputTask;
+                    string error = await errorTask;
+                    return (string.IsNullOrWhiteSpace(error), output.Trim(), error.Trim());
+                }
+                else
+                {
+                    // Quá thời gian: kill docker + process
+                    await KillDockerContainerAsync(containerName);
 
-                    using var kill = new Process { StartInfo = killProcess };
-                    kill.Start();
-                    await kill.WaitForExitAsync();
                     if (!process.HasExited)
                     {
-                        process.Kill();
+                        process.Kill(entireProcessTree: true); // .NET 5+
                     }
-                }
-                catch (Exception ex)
-                {
-                    return (false, string.Empty, $"Runtime Error: {ex.Message}");
-                }
 
-                return (false, string.Empty, "Runtime Error: Time Limit Exceeded");
+                    return (false, string.Empty, "Runtime Error: Time Limit Exceeded");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, string.Empty, $"Runtime Error: {ex.Message}");
             }
         }
+        private async Task KillDockerContainerAsync(string containerName)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c docker rm -f {containerName}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = new Process { StartInfo = psi };
+            process.Start();
+            await process.WaitForExitAsync();
+        }
+
     }
 
 }

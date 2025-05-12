@@ -46,7 +46,7 @@ export default function HeroSection() {
             }}
             onPointerEnter={measure}
         >
-            <Heading size="xl">Chào mừng bạn đến với Website NTU-Coder</Heading>
+            <Heading size="xl">Chào mừng bạn đến với Website NTU-LMS</Heading>
             <Text fontSize="lg" color="gray.300" mt={4}>
                 Khám phá hàng trăm khóa học chất lượng từ cơ bản đến nâng cao.
             </Text>

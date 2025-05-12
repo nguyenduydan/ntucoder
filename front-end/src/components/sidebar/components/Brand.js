@@ -1,22 +1,15 @@
 import React from "react";
-
-// Chakra imports
-import { Flex, useColorModeValue, Link } from "@chakra-ui/react";
-
-// Custom components
-import { NTULogo } from "components/icons/Icons";
+import { Flex, Link, Img } from "@chakra-ui/react";
 import { HSeparator } from "components/separator/Separator";
+import NTULogo from "assets/img/logo.png";
 
 export function SidebarBrand() {
-  //   Chakra color mode
-  let logoColor = useColorModeValue("navy.700", "white");
-
   return (
     <Flex align='center' direction='column'>
-      <Link href="/admin/dashboard">
-        <NTULogo h='26px' w='175px' my='20px' color={logoColor} />
+      <Link href="/admin/dashboard" p={2}>
+        <Img src={NTULogo} alt="NTU Logo" h="80px" />
       </Link>
-      <HSeparator mb='20px' />
+      <HSeparator mb='10px' />
     </Flex>
   );
 }

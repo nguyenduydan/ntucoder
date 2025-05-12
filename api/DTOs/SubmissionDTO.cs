@@ -1,4 +1,6 @@
-﻿namespace api.DTOs
+﻿using api.Infrashtructure.Enums;
+
+namespace api.DTOs
 {
     public class SubmissionDTO
     {
@@ -10,7 +12,7 @@
         public int ProblemID { get; set; }
         public string? ProblemName { get; set; }
         public DateTime SubmitTime { get; set; }
-        public int SubmissionStatus { get; set; }
+        public SubmissionStatus SubmissionStatus { get; set; }
         public int? SubmitLineCount { get; set; }
         public int? TestRunCount { get; set; }
         public string? TestResult { get; set; }
