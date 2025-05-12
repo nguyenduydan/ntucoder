@@ -5,8 +5,6 @@ using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Helpers;
-using System.Net;
-
 namespace api.Infrashtructure.Repositories
 {
     public class CourseRepository

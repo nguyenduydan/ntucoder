@@ -100,14 +100,13 @@ namespace api.Infrashtructure.Repositories
             }
 
             // Tìm CourseName từ CourseID
-            var course = await _context.Courses
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CourseID == dto.CourseID);
+           var courseName = await _context.Courses
+                .Where(c => c.CourseID == dto.CourseID)
+                .Select(c => c.CourseName)
+                .FirstOrDefaultAsync();
 
-            if (course == null)
-            {
+            if (courseName == null)
                 throw new InvalidOperationException("Khóa học không tồn tại.");
-            }
 
             var newTopic = new Topic
             {
@@ -126,7 +125,7 @@ namespace api.Infrashtructure.Repositories
             {
                 TopicID = newTopic.TopicID,
                 CourseID = newTopic.CourseID,
-                CourseName = course.CourseName, // Gán CourseName từ Course
+                CourseName = courseName,
                 TopicName = newTopic.TopicName,
                 TopicDescription = newTopic.TopicDescription,
                 CreatedAt = newTopic.CreatedAt,

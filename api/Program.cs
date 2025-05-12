@@ -100,6 +100,7 @@ builder.Services.AddScoped<SubmissionRepository>();
 builder.Services.AddScoped<TestCaseRepository>();
 builder.Services.AddScoped<TestRunRepository>();
 builder.Services.AddScoped<CodeExecutionService>();
+builder.Services.AddScoped<EnrollmentRepository>();
 //Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();

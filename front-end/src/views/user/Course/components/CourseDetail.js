@@ -6,7 +6,7 @@ import {
     VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel
 } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
-import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/fa";
+import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight } from "react-icons/fa";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "utils/utils";
@@ -14,6 +14,7 @@ import sanitizeHtml from "utils/sanitizedHTML";
 import { useTitle } from "contexts/TitleContext";
 import { getDetail } from "config/apiService";
 import { useAuth } from "contexts/AuthContext";
+import api from "config/apiConfig";
 
 
 const CourseDetail = () => {
@@ -25,8 +26,11 @@ const CourseDetail = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isEnrolled, setIsEnrolled] = useState(false);
 
     const isAuthenticated = useAuth();
+    const { coder } = useAuth();
+
 
     useEffect(() => {
         if (isNaN(courseID)) {
@@ -74,6 +78,17 @@ const CourseDetail = () => {
                     })
                 );
 
+                const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`,
+                    {
+                        params: {
+                            courseId: courseID || '',
+                            coderID: coder.coderID || ''
+                        }
+                    }
+                );
+                setIsEnrolled(isEnrolledRes.data.isEnrolled);
+
+
                 setCourse({ ...response, topics: topicsWithLessons });
             } catch (error) {
                 toast({
@@ -90,11 +105,18 @@ const CourseDetail = () => {
         };
 
         fetchCourse();
-    }, [courseID, toast, navigate]);
+    }, [courseID, coder.coderID, toast, navigate]);
+
+    // ✅ Tính tổng số topic và tổng số bài học
+    const totalTopics = course?.topics ? course.topics.length : 0;
+    const totalLessons = course?.topics
+        ? course.topics.reduce((sum, topic) => sum + (topic.lessons ? topic.lessons.length : 0), 0)
+        : 0;
+
+
     useTitle(course?.courseName || "Khóa học");
 
-    const handleEnroll = () => {
-        console.log("isAuthenticated", isAuthenticated); // Kiểm tra giá trị của isAuthenticated
+    const handleEnroll = async () => {
         if (isAuthenticated.isAuthenticated === false) {
             toast({
                 title: "Bạn cần phải đăng nhập.",
@@ -104,8 +126,48 @@ const CourseDetail = () => {
                 position: "top",
                 variant: "top-accent",
             });
+        } else {
+            const data = {
+                courseID: courseID,
+            };
+
+            try {
+                const res = await api.post("/Enrollment", data);
+                if (res.status === 200 || res.status === 201) {
+                    setIsEnrolled(true);
+                    toast({
+                        title: "Đăng ký khóa học thành công",
+                        status: "success",
+                        duration: 2000,
+                        isClosable: true,
+                        position: "top",
+                        variant: "top-accent",
+                    });
+                } else {
+                    toast({
+                        title: "Lỗi đăng ký khóa học",
+                        description: res.data.message,
+                        status: "error",
+                        duration: 2000,
+                        isClosable: true,
+                        position: "top",
+                        variant: "top-accent",
+                    });
+                }
+            } catch (error) {
+                console.error("Lỗi đăng ký: ", error.response ? error.response.data : error.message);
+                toast({
+                    title: error.response ? error.response.data.message : error.message,
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "top-accent",
+                });
+            }
         }
     };
+
 
     return (
         <ScrollToTop>
@@ -198,13 +260,43 @@ const CourseDetail = () => {
                                     </Flex>
 
                                     <VStack align="start" mt={4} spacing={3}>
-                                        <HStack><Icon as={FaClock} /><Text>20 giờ học</Text></HStack>
-                                        <HStack><Icon as={FaCheckCircle} /><Text>18 bài kiểm tra</Text></HStack>
-                                        <HStack><Icon as={FaCheckCircle} /><Text>80 bài lập trình</Text></HStack>
+                                        <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
+                                        <HStack><Icon as={FaCheckCircle} /><Text>{totalLessons} bài học</Text></HStack>
                                         <HStack><Icon as={FaCheckCircle} /><Text>Truy cập trọn đời</Text></HStack>
                                         <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                                     </VStack>
-                                    <Button colorScheme="green" mt={4} w="full">Đăng ký miễn phí</Button>
+                                    {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
+                                        <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                            <Button
+                                                colorScheme="blue"
+                                                mt={4}
+                                                w="full"
+                                                fontSize="18px"
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                _hover={{
+                                                    transform: "translateY(-3px)",
+                                                    boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                                    transition: "transform 0.3s ease",
+                                                }}
+                                            >
+                                                Vào học <Icon as={FaArrowRight} ml={2} />
+                                            </Button>
+                                        </NavLink>
+
+                                    ) : (
+                                        // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
+                                        <Button
+                                            colorScheme={course?.fee === 0 ? "green" : "red"}
+                                            mt={4}
+                                            w="full"
+                                            fontSize="18px"
+                                            onClick={handleEnroll}
+                                        >
+                                            {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
+                                        </Button>
+                                    )}
                                 </Box>
                             </Box>
                         </Flex>
@@ -358,21 +450,44 @@ const CourseDetail = () => {
                                 )}
                             </Flex>
                             <VStack align="start" mt={4} spacing={3}>
-                                <HStack><Icon as={FaClock} /><Text>20 giờ học</Text></HStack>
-                                <HStack><Icon as={FaCheckCircle} /><Text>18 bài kiểm tra</Text></HStack>
-                                <HStack><Icon as={FaCheckCircle} /><Text>80 bài lập trình</Text></HStack>
+                                <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
+                                <HStack><Icon as={FaCheckCircle} /><Text>{totalLessons} bài học</Text></HStack>
                                 <HStack><Icon as={FaCheckCircle} /><Text>Truy cập trọn đời</Text></HStack>
                                 <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                             </VStack>
-                            {course?.fee === 0 ? (
-                                <Button colorScheme="green" mt={4} w="full" fontSize="18px" onClick={handleEnroll}>
-                                    Đăng ký miễn phí
-                                </Button>
+                            {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
+                                <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                    <Button
+                                        colorScheme="blue"
+                                        mt={4}
+                                        w="full"
+                                        fontSize="18px"
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        _hover={{
+                                            transform: "translateY(-3px)",
+                                            boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                            transition: "transform 0.3s ease",
+                                        }}
+                                    >
+                                        Vào học <Icon as={FaArrowRight} ml={2} />
+                                    </Button>
+                                </NavLink>
+
                             ) : (
-                                <Button colorScheme="red" mt={4} w="full" fontSize="18px" onClick={handleEnroll}>
-                                    Mua ngay
+                                // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
+                                <Button
+                                    colorScheme={course?.fee === 0 ? "green" : "red"}
+                                    mt={4}
+                                    w="full"
+                                    fontSize="18px"
+                                    onClick={handleEnroll}
+                                >
+                                    {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
                                 </Button>
                             )}
+
                         </Box>
                     </Box>
                 </Flex>

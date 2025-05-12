@@ -80,7 +80,13 @@ export default function CreateTopicModal({ isOpen, onClose, fetchData }) {
         if (!validate()) return;
         setLoading(true);
         try {
-            await createItem({ controller: "Topic", data: topic });
+            const formData = new FormData();
+            formData.append("topicName", topic.topicName);
+            formData.append("courseID", topic.courseID);
+            formData.append("courseName", topic.courseName);
+            formData.append("topicDescription", topic.topicDescription);
+            formData.append("status", topic.status);
+            await createItem({ controller: "Topic", data: formData });
             toast({
                 title: 'Thêm mới chủ đề thành công!',
                 status: 'success',
