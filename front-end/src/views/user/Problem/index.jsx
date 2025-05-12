@@ -50,23 +50,26 @@ export default function Problem() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const res = await getDetail({
-          controller: "Problem",
-          id: problemID,
-        });
-        const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
-        const compilerData = compiler.data;
+      if (problemID === null) { return; }
+      else {
+        try {
+          const res = await getDetail({
+            controller: "Problem",
+            id: problemID,
+          });
+          const compiler = await getList({ controller: "Compiler", page: 1, pageSize: 10 });
+          const compilerData = compiler.data;
 
-        setCompiler(compilerData);
-        if (compilerData.length > 0) {
-          const first = compilerData[0];
-          setSelectCompiler(first);
+          setCompiler(compilerData);
+          if (compilerData.length > 0) {
+            const first = compilerData[0];
+            setSelectCompiler(first);
+          }
+
+          setCode(res.testCode || "");
+        } catch (error) {
+          console.error("Lỗi khi lấy dữ liệu bài tập:", error);
         }
-
-        setCode(res.testCode || "");
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu bài tập:", error);
       }
     };
 
@@ -74,7 +77,6 @@ export default function Problem() {
   }, [problemID]);
 
   const ResultModal = (result) => {
-    console.log(result);
     switch (result) {
       case "Accepted":
       case "Success":

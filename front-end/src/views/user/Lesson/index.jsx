@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
     Box, useToast, Flex, Image, Tabs, TabList, Tab, TabPanels,
-    Text, Tooltip, TabPanel, Icon, Badge, Spinner
+    Text, Tooltip, TabPanel, Icon, Spinner
 } from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
 import ScrollToTop from "components/scroll/ScrollToTop";
@@ -10,9 +10,10 @@ import Split from "react-split";
 import LessonHeader from "./components/LessonHeader";
 import LessonContent from "./components/LessonContent";
 import LessonList from "./components/LessonList";
+import History from "../Problem/components/History";
 import Problem from "../Problem/index";
 import ProblemList from "../Problem/components/ProblemList";
-import { FaRegFileAlt, FaBook, FaComments, FaQuestionCircle, FaBars } from "react-icons/fa";
+import { FaRegFileAlt, FaBook, FaQuestionCircle, FaBars } from "react-icons/fa";
 
 import { getDetail } from "config/apiService";
 export default function Lesson() {
@@ -95,15 +96,8 @@ export default function Lesson() {
                                                     <Icon as={FaBars} boxSize={5} />
                                                 </Tab>
                                             </Tooltip>
-                                            <Tooltip label="Tin nhắn" placement="right" hasArrow>
+                                            <Tooltip label="Lịch sử" placement="right" hasArrow>
                                                 <Tab py={4} _selected={{ bg: "blue.800" }} position="relative">
-                                                    <Icon as={FaComments} boxSize={5} />
-                                                    <Badge colorScheme="red" position="absolute" top="-2px" right="-10px" fontSize="8px">161</Badge>
-                                                </Tab>
-                                            </Tooltip>
-
-                                            <Tooltip label="Hỗ trợ" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
                                                     <Icon as={FaQuestionCircle} boxSize={5} />
                                                 </Tab>
                                             </Tooltip>
@@ -126,10 +120,10 @@ export default function Lesson() {
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box>Tin nhắn</Box>
-                                            </TabPanel>
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box>Hỗ trợ</Box>
+                                                <Box maxWidth="100%">
+                                                    <Text fontWeight="bold" fontSize="lg"> Lịch sử</Text>
+                                                    <History />
+                                                </Box>
                                             </TabPanel>
                                         </TabPanels>
                                     </Box>
