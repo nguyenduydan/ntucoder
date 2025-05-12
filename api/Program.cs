@@ -10,6 +10,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddEndpointsApiExplorer();
+
 // Đọc cấu hình JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
@@ -60,7 +62,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigin", builder =>
@@ -78,7 +80,10 @@ var conString = builder.Configuration.GetConnectionString("connecString") ??
     " not found.");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
-        mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure())
+    .EnableDetailedErrors(true)
+    .EnableSensitiveDataLogging(false)
+);
 
 //Repository
 builder.Services.AddScoped<CoderRepository>();

@@ -10,6 +10,7 @@ import { FaClock, FaCheckCircle, FaTrophy, FaUsers, FaStar } from "react-icons/f
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "utils/utils";
+import sanitizeHtml from "utils/sanitizedHTML";
 import { useTitle } from "contexts/TitleContext";
 import { getDetail } from "config/apiService";
 import { useAuth } from "contexts/AuthContext";
@@ -151,7 +152,7 @@ const CourseDetail = () => {
                                 ) : (
                                     <>
                                         <Text fontSize="3xl" letterSpacing={1.2} fontWeight="bold">{course?.courseName}</Text>
-                                        <Text mt={2}>{course?.description ?? "Không có mô tả"}</Text>
+                                        <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
                                         <HStack mt={4} spacing={4}>
                                             <Text>Tác giả: <Text as="span" color="blue.300">{course?.creatorName}</Text></Text>
                                             <Icon as={FaUsers} /> <Text>{course?.students} Học viên</Text>

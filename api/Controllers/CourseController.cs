@@ -2,6 +2,8 @@
 using api.DTOs;
 using api.Infrashtructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using api.Infrashtructure.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
@@ -10,10 +12,12 @@ namespace api.Controllers
     public class CourseController : ControllerBase
     {
         private readonly CourseRepository _courseRepository;
+        private readonly AuthService _authService;
 
-        public CourseController(CourseRepository courseRepository)
+        public CourseController(CourseRepository courseRepository , AuthService authService)
         {
             _courseRepository = courseRepository;
+            _authService = authService;
         }
 
         [HttpGet("search")]
@@ -62,12 +66,21 @@ namespace api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CourseCreateDTO courseDto)
         {
+
             if (courseDto == null)
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ." });
+            }
+
+            courseDto.CoderID = _authService.GetUserIdFromToken();
+
+            if(courseDto.CoderID == -1)
+            {
+                return Unauthorized();
             }
 
             try
@@ -85,6 +98,7 @@ namespace api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromForm] CourseDetailDTO courseDto)
         {
@@ -92,6 +106,14 @@ namespace api.Controllers
             {
                 return BadRequest(new { message = "Dữ liệu không hợp lệ." });
             }
+
+            courseDto.CoderID = _authService.GetUserIdFromToken();
+
+            if (courseDto.CoderID == -1)
+            {
+                return Unauthorized();
+            }
+
 
             try
             {
