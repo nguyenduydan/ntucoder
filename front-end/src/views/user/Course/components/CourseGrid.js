@@ -4,10 +4,15 @@ import CourseCard from "./CourseCard";
 
 const CourseGrid = ({ courses }) => (
     <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(4, 1fr)" }} gap="6">
-        {courses.map((course) => (
-            <CourseCard key={course.courseID} course={course} />
-        ))}
+        {[...courses, ...Array.from({ length: 4 - courses.length })].map((course, idx) =>
+            course ? (
+                <CourseCard key={course.courseID} course={course} />
+            ) : (
+                <CourseCard key={`placeholder-${idx}`} isPlaceholder />
+            )
+        )}
     </Grid>
+
 );
 
 export default CourseGrid;

@@ -20,7 +20,7 @@ import { useAuth } from "contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import Logo from "assets/img/logo.png";
-
+import api from "config/apiConfig";
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);
@@ -33,18 +33,34 @@ const fadeInUp = {
 
 const Home = () => {
   useTitle("Trang chủ");
+  const [coursesEnrolled, setCoursesEnrolled] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, coder } = useAuth();
 
 
   const fetchCourses = useCallback(async () => {
+    if (!coder?.coderID) return;
     setLoading(true);
     try {
-      const response = await getList({ controller: "Course", page: 1, pageSize: 10, ascending: true, totalCount: 100 });
-      const activeCourses = response.data.filter(course => course.status === 1).slice(0, 4);
-      setCourses(activeCourses);
+      const enrolledRes = await api.get(`/Enrollment/list-enroll/${coder.coderID}`);
+      const enrolledCourses = enrolledRes.data.map(e => e.courseID); // Lấy danh sách courseID
+
+      // Lấy danh sách tất cả course
+      const response = await getList({
+        controller: "Course",
+        page: 1,
+        pageSize: 100, // để đảm bảo lấy hết nếu chỉ có phân trang
+        ascending: true,
+        totalCount: 100
+      });
+      const activeCourses = response.data
+        .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
+        .slice(0, 4); // chỉ lấy tối đa 4 khóa học
+
+      setCoursesEnrolled(activeCourses);
+      setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
       toast({
@@ -58,11 +74,13 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, coder?.coderID]);
 
   useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
+    if (isAuthenticated && coder?.coderID) {
+      fetchCourses();
+    }
+  }, [isAuthenticated, coder?.coderID, fetchCourses]);
 
   if (!isAuthenticated) {
     return (
@@ -92,7 +110,7 @@ const Home = () => {
               <SkeletonList />
             </SimpleGrid>
           ) : (
-            <CourseGrid courses={courses} />
+            <CourseGrid courses={coursesEnrolled} />
           )}
         </MotionBox>
 

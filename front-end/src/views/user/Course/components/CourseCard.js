@@ -7,10 +7,45 @@ import { toSlug, getLuminance, formatCurrency } from "utils/utils";
 
 const getTextColor = (bgColor) => getLuminance(bgColor) > 0.5 ? darken(bgColor, 30) : lighten(bgColor, 50);
 
-const CourseCard = ({ course }) => {
-    const textColor = getTextColor(course.badgeColor);
+const CourseCard = ({ course, isPlaceholder = false }) => {
     const bgCard = useColorModeValue("white", "navy.900");
     const navigate = useNavigate();
+    // Nếu là placeholder thì trả về thẻ Skeleton
+    if (isPlaceholder) {
+        return (
+            <Box
+                minW={{ md: "20vh", base: "100%" }}
+                borderWidth="1px"
+                bg={bgCard}
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="md"
+                transition="all .2s ease-in-out"
+            >
+                <Image src={"/avatarSimmmple.png"} alt={"no image"} objectFit="cover" h="160px" w="full" />
+                <Box p="4">
+                    <Box bg="gray.300" h="20px" w="100px" mb="3" borderRadius="md" />
+                    <Box bg="gray.300" h="24px" w="80%" mb="2" borderRadius="md" />
+                    <Box bg="gray.200" h="16px" w="50%" mb="2" borderRadius="md" />
+                    <Flex align="center" mt="2">
+                        <Box bg="gray.200" h="16px" w="40px" borderRadius="md" />
+                    </Flex>
+                    <Flex mt="3" align="center" justify="space-between">
+                        <Box h="20px" w="60px" bg="gray.300" borderRadius="md" />
+                        <Flex alignItems="center">
+                            <Box h="16px" w="50px" bg="gray.300" borderRadius="md" mr="2" />
+                            <Box h="20px" w="30px" bg="gray.200" borderRadius="md" />
+                        </Flex>
+                    </Flex>
+                </Box>
+            </Box>
+        );
+    }
+
+
+    // Nếu không phải placeholder, thì course chắc chắn phải có
+    const textColor = getTextColor(course.badgeColor);
+
 
     const handleNagvigate = () => {
         setTimeout(() => {
@@ -20,7 +55,7 @@ const CourseCard = ({ course }) => {
 
     return (
         <Box minW={{ md: "20vh", base: "100%" }} borderWidth="1px" bg={bgCard}
-            _hover={{ transform: "scale(1.02)", cursor: "pointer" }} transition="all .2s ease-in-out"
+            _hover={{ transform: "translateY(-10px)", boxShadow: "xl", cursor: "pointer" }} transition="all .2s ease-in"
             borderRadius="lg" overflow="hidden" boxShadow="md"
             onClick={handleNagvigate}
         >
@@ -48,7 +83,9 @@ const CourseCard = ({ course }) => {
                             <Text ml="2" fontSize="sm" textDecoration="line-through" color="gray.400">
                                 {formatCurrency(course.originalFee)}
                             </Text>
-                            <Badge colorScheme="red" ml="2" px="1" color="red.500" boxShadow="sm" borderRadius="5px">{course.discountPercent}%</Badge>
+                            <Badge colorScheme="red" ml="2" px="1" color="red.500" boxShadow="sm" borderRadius="5px">
+                                {course.discountPercent}%
+                            </Badge>
                         </Flex>
                     )}
                 </Flex>
