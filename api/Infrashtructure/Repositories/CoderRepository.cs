@@ -188,6 +188,16 @@ namespace api.Infrashtructure.Repositories
 
             existing.UpdatedAt = DateTime.Now;
             existing.UpdatedBy = dto.CoderName;
+            if (dto.Role != null)
+            {
+                // Kiểm tra RoleID trong bảng Roles
+                var roleExists = await _context.Roles.AnyAsync(r => r.RoleID == dto.Role);
+                if (!roleExists)
+                {
+                    throw new InvalidOperationException("Role không tồn tại.");
+                }
+            }
+
             if (existing.Account != null && dto.Role != null)
             {
                 existing.Account.RoleID = dto.Role;

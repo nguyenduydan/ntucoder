@@ -51,7 +51,6 @@ const Review = ({ courseId }) => {
 
     const handleAddReview = async () => {
         try {
-            console.log(reviewData);
             const res = await api.post(`/Review?courseId=${courseId}`, reviewData);
             if (res.status === 200 || res.status === 201) {
                 toast({
@@ -124,7 +123,7 @@ const Review = ({ courseId }) => {
                                         }
                                     }}
                                 />
-                                <Text w="40px" textAlign="right">{percent}%</Text>
+                                <Text w="40px" textAlign="right" color="gray.400">{percent}%</Text>
                             </HStack>
                         );
                     })}

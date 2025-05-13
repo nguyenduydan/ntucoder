@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
@@ -32,8 +32,7 @@ const CourseDetail = () => {
     const isAuthenticated = useAuth();
     const { coder } = useAuth();
 
-
-    useEffect(() => {
+    const fetchCourse = useCallback(async () => {
         if (isNaN(courseID)) {
             toast({
                 title: "Lỗi",
@@ -47,65 +46,67 @@ const CourseDetail = () => {
             return;
         }
 
-        const fetchCourse = async () => {
-            try {
-                const response = await getDetail({ controller: "Course", id: courseID });
+        try {
+            const response = await getDetail({ controller: "Course", id: courseID });
 
-                if (!response || Object.keys(response).length === 0) {
-                    toast({
-                        title: "Cảnh báo",
-                        description: "Không có dữ liệu cho khóa học này.",
-                        status: "warning",
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                    setCourse(null);
-                    return;
-                }
-
-                const topics = response.topics || [];
-
-                const topicsWithLessons = await Promise.all(
-                    topics.map(async (topic) => {
-                        try {
-                            const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
-                            const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
-
-                            return { ...topic, lessons: filteredLessons };
-                        } catch (error) {
-                            console.log("Error fetching lessons:", error); // Xử lý lỗi nếu có
-                            return { ...topic, lessons: [] };
-                        }
-                    })
-                );
-
-                setCourse({ ...response, topics: topicsWithLessons });
-                if (coder?.coderID) {
-                    const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`, {
-                        params: {
-                            courseId: courseID || '',
-                            coderID: coder.coderID || ''
-                        }
-                    });
-                    setIsEnrolled(isEnrolledRes.data.isEnrolled);
-                }
-
-            } catch (error) {
+            if (!response || Object.keys(response).length === 0) {
                 toast({
-                    title: "Lỗi",
-                    description: "Không thể tải dữ liệu. Vui lòng thử lại!",
-                    status: "error",
+                    title: "Cảnh báo",
+                    description: "Không có dữ liệu cho khóa học này.",
+                    status: "warning",
                     duration: 3000,
                     isClosable: true,
                 });
                 setCourse(null);
-            } finally {
-                setLoading(false);
+                return;
             }
-        };
 
+            const topics = response.topics || [];
+
+            const topicsWithLessons = await Promise.all(
+                topics.map(async (topic) => {
+                    try {
+                        const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
+                        const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
+                        return { ...topic, lessons: filteredLessons };
+                    } catch (error) {
+                        console.log("Error fetching lessons:", error);
+                        return { ...topic, lessons: [] };
+                    }
+                })
+            );
+
+            setCourse({ ...response, topics: topicsWithLessons });
+
+            if (coder?.coderID) {
+                const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`, {
+                    params: {
+                        courseId: courseID || '',
+                        coderID: coder.coderID || ''
+                    }
+                });
+                setIsEnrolled(isEnrolledRes.data.isEnrolled);
+            }
+
+        } catch (error) {
+            toast({
+                title: "Lỗi",
+                description: "Không thể tải dữ liệu. Vui lòng thử lại!",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+            setCourse(null);
+        } finally {
+            setLoading(false);
+        }
+    }, [courseID, coder?.coderID, navigate, toast]);
+
+    useEffect(() => {
         fetchCourse();
-    }, [courseID, coder?.coderID, toast, navigate]);
+    }, [fetchCourse]);
+
+
 
     // ✅ Tính tổng số topic và tổng số bài học
     const totalTopics = course?.topics ? course.topics.length : 0;
@@ -116,6 +117,7 @@ const CourseDetail = () => {
 
     useTitle(course?.courseName || "Khóa học");
 
+    // ✅ Đăng ký khóa học
     const handleEnroll = async () => {
         if (isAuthenticated.isAuthenticated === false) {
             toast({
@@ -154,6 +156,7 @@ const CourseDetail = () => {
                         variant: "top-accent",
                     });
                 }
+                fetchCourse();
             } catch (error) {
                 console.error("Lỗi đăng ký: ", error.response ? error.response.data : error.message);
                 toast({
@@ -167,6 +170,42 @@ const CourseDetail = () => {
             }
         }
     };
+
+    // ✅ Hủy đăng ký
+    const handleUnenroll = async () => {
+        try {
+            const res = await api.delete("/Enrollment", {
+                data: {
+                    courseID: courseID,
+                    coderID: coder.coderID
+                }
+            });
+
+            if (res.status === 200) {
+                setIsEnrolled(false);
+                toast({
+                    title: "Đã hủy đăng ký khóa học.",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "top-accent",
+                });
+                fetchCourse(); // cập nhật lại dữ liệu
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi hủy đăng ký",
+                description: error.response?.data?.message || "Có lỗi xảy ra",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
+            });
+        }
+    };
+
 
 
     return (
@@ -456,25 +495,29 @@ const CourseDetail = () => {
                                 <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                             </VStack>
                             {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
-                                <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
-                                    <Button
-                                        colorScheme="blue"
-                                        mt={4}
-                                        w="full"
-                                        fontSize="18px"
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        _hover={{
-                                            transform: "translateY(-3px)",
-                                            boxShadow: "0px 4px 10px rgb(39, 87, 246)",
-                                            transition: "transform 0.3s ease",
-                                        }}
-                                    >
-                                        Vào học <Icon as={FaArrowRight} ml={2} />
+                                <Flex direction="column" gap={4}>
+                                    <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                        <Button
+                                            colorScheme="blue"
+                                            mt={4}
+                                            w="full"
+                                            fontSize="18px"
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            _hover={{
+                                                transform: "translateY(-3px)",
+                                                boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                                transition: "transform 0.3s ease",
+                                            }}
+                                        >
+                                            Vào học <Icon as={FaArrowRight} ml={2} />
+                                        </Button>
+                                    </NavLink>
+                                    <Button colorScheme="red" w="full" fontSize="18px" onClick={handleUnenroll}>
+                                        Hủy đăng ký
                                     </Button>
-                                </NavLink>
-
+                                </Flex>
                             ) : (
                                 // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
                                 <Button
@@ -487,6 +530,7 @@ const CourseDetail = () => {
                                     {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
                                 </Button>
                             )}
+
 
                         </Box>
                     </Box>

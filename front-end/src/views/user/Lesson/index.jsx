@@ -66,7 +66,7 @@ export default function Lesson() {
         <ScrollToTop>
             <Box minH="100%" w='100%'>
                 {isLoading ? (
-                    <Flex justify="center" align="center" height="70vh">
+                    <Flex justify="center" align="center" height="100vh">
                         <Spinner size="xl" color="blue.500" />
                     </Flex>
                 ) : lesson ? (

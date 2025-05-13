@@ -82,5 +82,19 @@ namespace api.Controllers
             return Ok(new { isEnrolled });
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> Unenroll([FromBody] EnrollmentDTO request)
+        {
+            try
+            {
+                await _enrollmentRepository.DeleteByCourseAndCoderAsync(request.CourseID, request.CoderID);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
     }
 }

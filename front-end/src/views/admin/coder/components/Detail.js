@@ -108,6 +108,9 @@ const CoderDetail = () => {
                 formData.append("CoderID", id);
                 formData.append("AvatarFile", file);
 
+                if (editableValues.role) {
+                    formData.append("Role", editableValues.role);
+                }
                 try {
                     // update image
                     await updateItem({ controller: "Coder", id: id, data: formData });
@@ -195,6 +198,9 @@ const CoderDetail = () => {
             <ProgressBar />
         );
     }
+
+
+
     return (
         <ScrollToTop>
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">

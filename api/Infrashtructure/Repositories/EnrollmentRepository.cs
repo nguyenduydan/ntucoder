@@ -171,6 +171,20 @@ namespace api.Infrashtructure.Repositories
             return true;
         }
 
+        public async Task<bool> DeleteByCourseAndCoderAsync(int courseID, int coderID)
+        {
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.CourseID == courseID && e.CoderID == coderID);
+
+            if (enrollment == null)
+                throw new KeyNotFoundException("Không tìm thấy bản ghi đăng ký khóa học.");
+
+            _context.Enrollments.Remove(enrollment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
         public async Task<bool> CheckCoderEnrolledAsync(int coderId, int courseId)
         {
             return await _context.Enrollments
