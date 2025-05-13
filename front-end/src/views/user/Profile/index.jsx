@@ -45,7 +45,7 @@ const Profile = () => {
     return (
         <Box maxW="180vh" minH="100vh" mx="auto">
             <Box h="10vh"></Box>
-            <Grid templateColumns={{ base: "1fr", md: "0.5fr 2fr" }} gap={4} mx={5} p={4}>
+            <Grid templateColumns={{ base: "1fr", md: "0.6fr 2fr" }} gap={4} mx={5} p={4}>
                 {/* Avatar and menu */}
                 <GridItem
                     bgGradient="linear(to-b, blue.500, blue.200)"
@@ -73,7 +73,7 @@ const Profile = () => {
                     </Flex>
                     <Divider my={2} />
                     <Box textColor="white">
-                        <Text fontSize="xl" mt={2} textTransform="uppercase">
+                        <Text fontSize="xl" mt={2} textTransform="uppercase" fontWeight="bold">
                             Thông tin
                         </Text>
                         <Flex flexDirection="column" gap={2}>

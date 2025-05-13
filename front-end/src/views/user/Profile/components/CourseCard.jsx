@@ -1,9 +1,9 @@
 import React from "react";
-import { Box, Text, Image, Flex, Progress, useColorModeValue } from "@chakra-ui/react";
+import { Box, Text, Image, Flex, Progress, useColorModeValue, HStack } from "@chakra-ui/react";
 import { StarIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { toSlug, formatNumber } from "utils/utils";
-import { PersonIcon } from "components/icons/Icons";
+import { FaUsers } from "react-icons/fa";
 
 const CourseCard = ({ course, isPlaceholder = false }) => {
     const bgCard = useColorModeValue("white", "navy.900");
@@ -76,16 +76,18 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                     {course.courseName}
                 </Text>
 
-                <Flex align="center" justifyContent="space-between" mt="2" px={4}>
+                <Flex align="center" justifyContent="space-between" mt="2" >
                     <Flex>
-                        <StarIcon color="yellow.400" />
-                        <Text ml="1" fontSize="sm" fontWeight="medium">
-                            {course.rating}
-                        </Text>
+                        <HStack spacing={0.5}>
+                            {[...Array(5)].map((_, i) => (
+                                <StarIcon boxSize={3} key={i} color={i < Math.round(course.rating) ? 'yellow.400' : 'gray.300'} />
+                            ))}
+                        </HStack>
+                        <Text ml="1" mt="2px" fontSize="sm" fontWeight="medium">  {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                     </Flex>
 
                     <Flex>
-                        <PersonIcon color="gray.400" />
+                        <FaUsers color="gray.400" />
                         <Text ml="1" fontSize="sm" fontWeight="medium">
                             {formatNumber(course.totalReviews)}
                         </Text>

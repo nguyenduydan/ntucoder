@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, Image, Badge, Flex, useColorModeValue } from "@chakra-ui/react";
+import { Box, Text, Image, Badge, Flex, HStack, useColorModeValue } from "@chakra-ui/react";
 import { StarIcon } from "@chakra-ui/icons";
 import { darken, lighten } from "@chakra-ui/theme-tools";
 import { useNavigate } from "react-router-dom";
@@ -68,9 +68,13 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                 <Flex align="center" mt="2">
                     <Text ml="1" fontSize="sm" color="gray.400">{course.creatorName}</Text>
                 </Flex>
-                <Flex align="center" mt="2">
-                    <StarIcon color="yellow.400" />
-                    <Text ml="1" fontSize="sm" fontWeight="medium">{course.rating}</Text>
+                <Flex align="center" alignItems="center" mt="2">
+                    <HStack spacing={0.5}>
+                        {[...Array(5)].map((_, i) => (
+                            <StarIcon boxSize={3} key={i} color={i < Math.round(course.rating) ? 'yellow.400' : 'gray.300'} />
+                        ))}
+                    </HStack>
+                    <Text ml="1" mt="2px" fontSize="sm" fontWeight="medium">  {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                 </Flex>
                 <Flex mt="3" align="center" justify="space-between">
                     {course.fee === 0 ? (

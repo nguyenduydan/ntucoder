@@ -202,23 +202,28 @@ namespace api.Infrashtructure.Repositories
             };
         }
 
-
-
-
         public async Task<CourseDetailDTO> GetCourseByIdAsync(int id)
         {
             var course = await _context.Courses
-                  .Include(c => c.Creator)
-                  .Include(c => c.CourseCategory)
-                  .Include(c => c.Badge)
-                  .Include(c => c.Topics)
-                  .Include(c => c.Enrollments)
-                  .FirstOrDefaultAsync(c => c.CourseID == id);
+                   .Include(c => c.Creator)
+                   .Include(c => c.CourseCategory)
+                   .Include(c => c.Badge)
+                   .Include(c => c.Topics)
+                   .Include(c => c.Enrollments) 
+                   .Include(c => c.Reviews)
+                        .ThenInclude(r => r.Coder)
+                   .FirstOrDefaultAsync(c => c.CourseID == id);
 
             if (course == null)
             {
                 throw new KeyNotFoundException($"Khóa học với ID {id} không tồn tại.");
             }
+
+            // Tính số lượng người đăng ký (TotalReviews) và điểm trung bình (Rating)
+            var totalReviews = course.Enrollments.Count();  // Số lượng người đăng ký khóa học
+            var averageRating = course.Reviews.Any()  // Kiểm tra xem có đánh giá nào không
+                ? course.Reviews.Average(r => r.Rating)  // Tính điểm trung bình của các đánh giá
+                : 0;
 
             return new CourseDetailDTO
             {
@@ -237,8 +242,8 @@ namespace api.Infrashtructure.Repositories
                 ImageUrl = course.ImageUrl,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt,
-                Rating = 0, 
-                TotalReviews = 0, 
+                Rating = averageRating,  // Gán rating trung bình từ Reviews
+                TotalReviews = totalReviews,  // Số lượng người đăng ký
                 Topics = course.Topics.Select(t => new TopicDTO
                 {
                     TopicID = t.TopicID,
@@ -250,10 +255,20 @@ namespace api.Infrashtructure.Repositories
                     CoderID = e.CoderID,
                     EnrolledAt = e.EnrolledAt
                 }).ToList(),
-                Comments = new List<CommentDTO>(),
-                Reviews = new List<ReviewDTO>() 
+                Comments = new List<CommentDTO>(),  // Nếu có comments, có thể bổ sung thêm logic ở đây
+                Reviews = course.Reviews.Select(r => new ReviewDTO
+                {
+                    ReviewID = r.ReviewID,
+                    CourseID = r.CourseID,
+                    CoderID = r.CoderID,
+                    CoderName = r.Coder != null ? r.Coder.CoderName : "Unknow",
+                    Rating = r.Rating,
+                    Content = r.Content,
+                    CreatedAt = r.CreatedAt
+                }).ToList()  // Lấy danh sách reviews
             };
         }
+
 
 
         public async Task<bool> DeleteAsync(int id)

@@ -15,6 +15,7 @@ import { useTitle } from "contexts/TitleContext";
 import { getDetail } from "config/apiService";
 import { useAuth } from "contexts/AuthContext";
 import api from "config/apiConfig";
+import Review from "./Review";
 
 
 const CourseDetail = () => {
@@ -170,7 +171,7 @@ const CourseDetail = () => {
 
     return (
         <ScrollToTop>
-            <Box p={6} maxW="100%" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
+            <Box p={6} maxW="100%" minH="100vh" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
                 <Button
                     leftIcon={<ArrowBackIcon />}
                     mb={2}
@@ -216,8 +217,8 @@ const CourseDetail = () => {
                                         <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
                                         <HStack mt={4} spacing={4}>
                                             <Text>Tác giả: <Text as="span" color="blue.300">{course?.creatorName}</Text></Text>
-                                            <Icon as={FaUsers} /> <Text>{course?.students} Học viên</Text>
-                                            <Icon as={FaStar} color="yellow.400" /> <Text>{course?.rating}</Text>
+                                            <Icon as={FaUsers} /><Text>{course?.totalReviews || "0"} Học viên</Text>
+                                            <Icon as={FaStar} color="yellow.400" /> <Text> {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                                         </HStack>
                                     </>
                                 )}
@@ -403,7 +404,7 @@ const CourseDetail = () => {
                                         </List>
                                     )}
                                 </TabPanel>
-                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Text>Đánh giá từ học viên...</Text>}</TabPanel>
+                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Review courseId={courseID} />}</TabPanel>
                                 <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Text>Bình luận từ người học...</Text>}</TabPanel>
                             </TabPanels>
                         </Tabs>
