@@ -3,7 +3,6 @@ import {
     Box,
     Heading,
     Text,
-    Button,
     VStack,
     HStack,
     useColorModeValue,
@@ -41,11 +40,11 @@ const slideUpVariant = {
 };
 
 const zoomInVariant = {
-    hidden: { opacity: 0, scale: 0 },
+    hidden: { opacity: 0, scale: 0.5 },
     visible: {
         opacity: 1,
         scale: 1,
-        transition: { duration: 0.3, ease: "easeInOut" },
+        transition: { duration: 0.5, ease: "easeInOut" },
     },
 };
 
@@ -411,11 +410,12 @@ const HomeNoLogin = () => {
                     </MotionHeading>
 
                     <MotionBox
-                        ref={sectionRef}
                         bg={cardBg}
                         borderRadius="xl"
-                        variants={slideUpVariant}
+                        variants={zoomInVariant}
                         initial="hidden"
+                        whileInView="show"
+                        viewport={{ once: true }}
                         animate={controls}
                     >
                         {isLoading ? (
@@ -430,82 +430,6 @@ const HomeNoLogin = () => {
                         )}
                     </MotionBox>
                 </Box>
-
-                {/* Skills Section */}
-                <MotionBox
-                    mt={16}
-                    p={6}
-                    bg={cardBg}
-                    borderRadius="xl"
-                    shadow="md"
-                    variants={zoomInVariant}
-                    initial="hidden"
-                    animate={controls}
-                >
-                    <Heading size="md" mb={4}>
-                        Kỹ năng
-                    </Heading>
-                    <HStack spacing={8} wrap="wrap" justify="center">
-                        {["React", "Chakra UI", "TypeScript", "Node.js", "CSS"].map((skill) => (
-                            <Box key={skill} p={4} bg="teal.500" color="white" borderRadius="md">
-                                {skill}
-                            </Box>
-                        ))}
-                    </HStack>
-                </MotionBox>
-
-                {/* Projects Section */}
-                <MotionBox
-                    mt={16}
-                    p={6}
-                    bg={cardBg}
-                    borderRadius="xl"
-                    shadow="md"
-                    variants={slideUpVariant}
-                    initial="hidden"
-                    animate={controls}
-                >
-                    <Heading size="md" mb={4}>
-                        Dự án
-                    </Heading>
-                    <Text fontSize="lg">
-                        Tôi đã tham gia phát triển các ứng dụng web và mobile. Dưới đây là một số dự án tiêu biểu:
-                    </Text>
-                    <HStack spacing={4} wrap="wrap" justify="center" mt={4}>
-                        {["E-commerce", "Blog platform", "Task Manager"].map((project) => (
-                            <Box key={project} p={4} bg="blue.500" color="white" borderRadius="md">
-                                {project}
-                            </Box>
-                        ))}
-                    </HStack>
-                </MotionBox>
-
-                {/* Contact Section */}
-                <MotionBox
-                    mt={16}
-                    p={6}
-                    bg={cardBg}
-                    borderRadius="xl"
-                    shadow="md"
-                    variants={slideUpVariant}
-                    initial="hidden"
-                    animate={controls}
-                >
-                    <Heading size="md" mb={4}>
-                        Liên hệ
-                    </Heading>
-                    <Text fontSize="lg">
-                        Bạn có thể liên hệ với tôi qua các kênh sau:
-                    </Text>
-                    <HStack spacing={4} mt={4}>
-                        <Button colorScheme="teal" variant="outline">
-                            Gửi email
-                        </Button>
-                        <Button colorScheme="blue" variant="outline">
-                            LinkedIn
-                        </Button>
-                    </HStack>
-                </MotionBox>
             </Container>
         </Box >
     );

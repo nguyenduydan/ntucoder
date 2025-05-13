@@ -15,6 +15,7 @@ import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle } from "react-icons/fa";
 import { PiWarningCircle } from "react-icons/pi";
 import { getDetail } from 'config/apiService';
 import { useTitle } from 'contexts/TitleContext';
+import CourseLearning from './components/CourseLearning';
 
 const Profile = () => {
     useTitle("Hồ sơ");
@@ -42,12 +43,12 @@ const Profile = () => {
     const isPhoneValid = !!info?.phoneNumber;
 
     return (
-        <Box maxW="150vh" mx="auto">
+        <Box maxW="150vh" minH="100vh" mx="auto">
             <Box h="10vh"></Box>
             <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap={4} mx={5} p={4}>
                 {/* Avatar and menu */}
                 <GridItem
-                    bgGradient="linear(to-b, blue.400, white)"
+                    bgGradient="linear(to-b, blue.500, blue.200)"
                     p={4}
                     borderRadius="md"
                     color="black"
@@ -63,13 +64,15 @@ const Profile = () => {
                             src={avatarSrc}
                             alt="Coder Avatar"
                             mb={4}
+                            border="4px solid white"
+                            boxShadow="0 0 10px rgb(9, 9, 238), 0 0 20px rgb(0, 242, 255)"
                         />
-                        <Text fontSize="2xl" mb={2}>
+                        <Text fontSize="2xl" mb={2} color="white" fontWeight="bold">
                             {coderName || "Coder Name"}
                         </Text>
                     </Flex>
                     <Divider my={2} />
-                    <Box>
+                    <Box textColor="white">
                         <Text fontSize="xl" mt={2} textTransform="uppercase">
                             Thông tin
                         </Text>
@@ -88,7 +91,6 @@ const Profile = () => {
                                     <Tooltip
                                         placement="top"
                                         label={isCoderNameValid ? "Đã xác thực" : "Chưa xác thực"}
-
                                     >
                                         <Flex align="center">
                                             {isCoderNameValid ? (
@@ -183,10 +185,11 @@ const Profile = () => {
                     p={4}
                     boxShadow="md"
                 >
-                    <Text fontSize="lg" color="gray.500">
-                        Thông tin cá nhân
+                    <Text fontSize="xl" color="blue" fontWeight="bold">
+                        Khóa học đã đăng ký
                     </Text>
-                    {/* Thêm nội dung chi tiết ở đây */}
+                    <Divider w="50px" h="3px" bg="blue" />
+                    <CourseLearning coderID={coderID} />
                 </GridItem>
             </Grid>
         </Box >

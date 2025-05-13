@@ -14,7 +14,6 @@ import SkeletonList from "../Course/components/SkeletonList";
 import { useTitle } from "contexts/TitleContext";
 import CourseGrid from "../Course/components/CourseGrid";
 import { getList } from "config/apiService";
-import { Background } from "./components/Background";
 import HeroSection from "./components/HeroSection";
 import { useAuth } from "contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
@@ -90,14 +89,8 @@ const Home = () => {
 
   return (
     <ScrollToTop>
-      <Container maxW="7xl" py={5}>
+      <Container maxW="7xl" py={5} minH="100%" overflow="auto" overflowY="hidden">
         <HeroSection />
-        <MotionFlex alignItems="center"
-          justifyContent="center"
-          direction="column"
-          mb={2} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
-          <Background />
-        </MotionFlex>
         <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
           <Heading size="lg" mb={4} color="blue.500">Khóa học đang học</Heading>
           {loading ? (
