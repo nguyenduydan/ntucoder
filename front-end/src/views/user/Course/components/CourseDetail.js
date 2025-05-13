@@ -1,9 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
     Tabs, TabList, List, ListItem, TabPanels, Tab, TabPanel, useToast,
-    VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel
+    VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
 } from "@chakra-ui/react";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight } from "react-icons/fa";
@@ -172,6 +178,12 @@ const CourseDetail = () => {
     };
 
     // ✅ Hủy đăng ký
+    const cancelRef = useRef();
+    const [isOpen, setIsOpen] = useState(false);
+
+    const openDialog = () => setIsOpen(true);
+    const closeDialog = () => setIsOpen(false);
+
     const handleUnenroll = async () => {
         try {
             const res = await api.delete("/Enrollment", {
@@ -191,7 +203,7 @@ const CourseDetail = () => {
                     position: "top",
                     variant: "top-accent",
                 });
-                fetchCourse(); // cập nhật lại dữ liệu
+                fetchCourse();
             }
         } catch (error) {
             toast({
@@ -205,7 +217,6 @@ const CourseDetail = () => {
             });
         }
     };
-
 
 
     return (
@@ -305,24 +316,31 @@ const CourseDetail = () => {
                                         <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                                     </VStack>
                                     {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
-                                        <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
-                                            <Button
-                                                colorScheme="blue"
-                                                mt={4}
-                                                w="full"
-                                                fontSize="18px"
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                _hover={{
-                                                    transform: "translateY(-3px)",
-                                                    boxShadow: "0px 4px 10px rgb(39, 87, 246)",
-                                                    transition: "transform 0.3s ease",
-                                                }}
-                                            >
-                                                Vào học <Icon as={FaArrowRight} ml={2} />
+                                        <Flex direction="column" gap={4}>
+                                            <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                                <Button
+                                                    colorScheme="blue"
+                                                    mt={4}
+                                                    w="full"
+                                                    fontSize="18px"
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    justifyContent="center"
+                                                    _hover={{
+                                                        transform: "translateY(-3px)",
+                                                        boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                                        transition: "transform 0.3s ease",
+                                                    }}
+                                                >
+                                                    Vào học <Icon as={FaArrowRight} ml={2} />
+                                                </Button>
+
+                                            </NavLink>
+                                            <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
+                                                Hủy đăng ký
                                             </Button>
-                                        </NavLink>
+                                        </Flex>
+
 
                                     ) : (
                                         // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
@@ -514,7 +532,7 @@ const CourseDetail = () => {
                                             Vào học <Icon as={FaArrowRight} ml={2} />
                                         </Button>
                                     </NavLink>
-                                    <Button colorScheme="red" w="full" fontSize="18px" onClick={handleUnenroll}>
+                                    <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
                                         Hủy đăng ký
                                     </Button>
                                 </Flex>
@@ -535,6 +553,37 @@ const CourseDetail = () => {
                         </Box>
                     </Box>
                 </Flex>
+                {/* Dialog hủy đăng ký */}
+                <AlertDialog
+                    isOpen={isOpen}
+                    leastDestructiveRef={cancelRef}
+                    onClose={closeDialog}
+                    isCentered
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                Xác nhận hủy đăng ký
+                            </AlertDialogHeader>
+
+                            <AlertDialogBody textAlign="center" fontSize="xl">
+                                Bạn có chắc chắn muốn hủy đăng ký khóa học này? Hành động này không thể hoàn tác.
+                            </AlertDialogBody>
+
+                            <AlertDialogFooter>
+                                <Button ref={cancelRef} onClick={closeDialog}>
+                                    Hủy
+                                </Button>
+                                <Button colorScheme="red" onClick={() => {
+                                    closeDialog();
+                                    handleUnenroll();
+                                }} ml={3}>
+                                    Xác nhận
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
             </Box>
         </ScrollToTop >
     );
