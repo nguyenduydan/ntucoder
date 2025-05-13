@@ -78,18 +78,17 @@ const CourseDetail = () => {
                     })
                 );
 
-                const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`,
-                    {
+                setCourse({ ...response, topics: topicsWithLessons });
+                if (coder?.coderID) {
+                    const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`, {
                         params: {
                             courseId: courseID || '',
                             coderID: coder.coderID || ''
                         }
-                    }
-                );
-                setIsEnrolled(isEnrolledRes.data.isEnrolled);
+                    });
+                    setIsEnrolled(isEnrolledRes.data.isEnrolled);
+                }
 
-
-                setCourse({ ...response, topics: topicsWithLessons });
             } catch (error) {
                 toast({
                     title: "Lỗi",
@@ -105,7 +104,7 @@ const CourseDetail = () => {
         };
 
         fetchCourse();
-    }, [courseID, coder.coderID, toast, navigate]);
+    }, [courseID, coder?.coderID, toast, navigate]);
 
     // ✅ Tính tổng số topic và tổng số bài học
     const totalTopics = course?.topics ? course.topics.length : 0;

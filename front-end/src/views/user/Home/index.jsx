@@ -84,9 +84,7 @@ const Home = () => {
 
   if (!isAuthenticated) {
     return (
-      <Container maxW="7xl" py={5}>
-        <HomeNoLogin />
-      </Container>
+      <HomeNoLogin />
     );
   }
 

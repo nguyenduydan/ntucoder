@@ -6,7 +6,7 @@ export default function ScrollToTop({ children }) {
 
   useEffect(() => {
     if (!location.pathname.includes("/templates")) {
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [location]);
 

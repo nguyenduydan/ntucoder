@@ -10,6 +10,7 @@ import { Box } from '@chakra-ui/react';
 import Profile from 'views/user/Profile/index.jsx';
 import NotFound from 'views/user/NotFound.jsx';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
+import ScrollToTop from 'components/scroll/ScrollToTop';
 
 
 export default function Home(props) {
@@ -60,12 +61,15 @@ export default function Home(props) {
 
 
     return (
-        <Box bg={bg} color={textColor} h="86vh">
+        <Box bg={bg} color={textColor} minHeight="100vh" display="flex" flexDirection="column">
             <Navbar routes={userRoutes} {...rest} />
+
             <Box
-                height="100%"
+                w="100%"
+                h="100%"
+                overflowX="hidden"
+                overflowY="auto"
                 overflow="auto"
-                maxHeight="100%"
                 position="relative"
                 bg={bg}
                 color={textColor}
@@ -76,32 +80,35 @@ export default function Home(props) {
                 transitionTimingFunction="linear, linear, ease"
             >
                 {getRoute() && (
-                    <Box
-                        mx='auto'
-                        w="100%"
-                        h="100%"
-                    >
-                        <Routes>
-                            {getRoutes(userRoutes)}
-                            {routes.map((route) => (
-                                <Route
-                                    key={`${route.path}-${route.name}`}
-                                    path={route.path}
-                                    element={<ProtectedRoute>{route.component}</ProtectedRoute>}
-                                />
-                            ))}
+                    <ScrollToTop>
+                        <Box
+                            mx="auto"
+                            w="100%"
+                            h="100%"
+                        >
+                            <Routes>
+                                {getRoutes(userRoutes)}
+                                {routes.map((route) => (
+                                    <Route
+                                        key={`${route.path}-${route.name}`}
+                                        path={route.path}
+                                        element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+                                    />
+                                ))}
 
-                            {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
-                            <Route path="/profile" element={<ProtectedRoute ><Profile /></ProtectedRoute>} />
+                                {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
+                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-                            {/* Optional: route 404 */}
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
-
-                    </Box>
+                                {/* Optional: route 404 */}
+                                <Route path="*" element={<NotFound />} />
+                            </Routes>
+                        </Box>
+                    </ScrollToTop>
                 )}
             </Box>
+
             <Footer />
         </Box>
+
     );
 }
