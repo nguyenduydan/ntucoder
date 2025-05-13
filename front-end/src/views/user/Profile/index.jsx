@@ -43,9 +43,9 @@ const Profile = () => {
     const isPhoneValid = !!info?.phoneNumber;
 
     return (
-        <Box maxW="150vh" minH="100vh" mx="auto">
+        <Box maxW="180vh" minH="100vh" mx="auto">
             <Box h="10vh"></Box>
-            <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap={4} mx={5} p={4}>
+            <Grid templateColumns={{ base: "1fr", md: "0.5fr 2fr" }} gap={4} mx={5} p={4}>
                 {/* Avatar and menu */}
                 <GridItem
                     bgGradient="linear(to-b, blue.500, blue.200)"
@@ -182,10 +182,11 @@ const Profile = () => {
                 <GridItem
                     bg="white"
                     borderRadius="md"
-                    p={4}
+                    px={5}
+                    py={3}
                     boxShadow="md"
                 >
-                    <Text fontSize="xl" color="blue" fontWeight="bold">
+                    <Text fontSize="xl" color="blue.600" fontWeight="bold">
                         Khóa học đã đăng ký
                     </Text>
                     <Divider w="50px" h="3px" bg="blue" />

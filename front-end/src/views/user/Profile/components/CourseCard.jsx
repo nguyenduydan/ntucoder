@@ -1,0 +1,113 @@
+import React from "react";
+import { Box, Text, Image, Flex, Progress, useColorModeValue } from "@chakra-ui/react";
+import { StarIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
+import { toSlug, formatNumber } from "utils/utils";
+import { PersonIcon } from "components/icons/Icons";
+
+const CourseCard = ({ course, isPlaceholder = false }) => {
+    const bgCard = useColorModeValue("white", "navy.900");
+    const navigate = useNavigate();
+    // Nếu là placeholder thì trả về thẻ Skeleton
+    if (isPlaceholder) {
+        return (
+            <Box
+                minW={{ md: "20vh", base: "100%" }}
+                borderWidth="1px"
+                bg={bgCard}
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="md"
+                transition="all .2s ease-in-out"
+            >
+                <Image src={"/avatarSimmmple.png"} alt={"no image"} objectFit="cover" h="160px" w="full" />
+                <Box p="4">
+                    <Box bg="gray.300" h="20px" w="100px" mb="3" borderRadius="md" />
+                    <Box bg="gray.300" h="24px" w="80%" mb="2" borderRadius="md" />
+                    <Box bg="gray.200" h="16px" w="50%" mb="2" borderRadius="md" />
+                    <Flex align="center" mt="2">
+                        <Box bg="gray.200" h="16px" w="40px" borderRadius="md" />
+                    </Flex>
+                    <Flex mt="3" align="center" justify="space-between">
+                        <Box h="20px" w="60px" bg="gray.300" borderRadius="md" />
+                        <Flex alignItems="center">
+                            <Box h="16px" w="50px" bg="gray.300" borderRadius="md" mr="2" />
+                            <Box h="20px" w="30px" bg="gray.200" borderRadius="md" />
+                        </Flex>
+                    </Flex>
+                </Box>
+            </Box>
+        );
+    }
+
+
+    const handleNagvigate = () => {
+        setTimeout(() => {
+            navigate(`/course/${toSlug(course.courseName)}-${course.courseID}`);
+        }, 100);
+    };
+
+    return (
+        <Box
+            minW={{ md: "20vh", base: "100%" }}
+            borderWidth="1px"
+            bg={bgCard}
+            _hover={{
+                transform: "translateY(-5px)",
+                boxShadow: "xl",
+                cursor: "pointer",
+            }}
+            transition="all .2s ease-in"
+            borderRadius="lg"
+            overflow="hidden"
+            boxShadow="md"
+            onClick={handleNagvigate}
+        >
+            <Image
+                src={course.imageUrl || "/avatarSimmmple.png"}
+                alt={course.title}
+                objectFit="cover"
+                h="160px"
+                w="full"
+            />
+
+            <Box px={4} py={2}>
+                <Text fontSize="lg" fontWeight="bold" color="blue">
+                    {course.courseName}
+                </Text>
+
+                <Flex align="center" justifyContent="space-between" mt="2" px={4}>
+                    <Flex>
+                        <StarIcon color="yellow.400" />
+                        <Text ml="1" fontSize="sm" fontWeight="medium">
+                            {course.rating}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <PersonIcon color="gray.400" />
+                        <Text ml="1" fontSize="sm" fontWeight="medium">
+                            {formatNumber(course.totalReviews)}
+                        </Text>
+                    </Flex>
+                    <Text ml="1" fontSize="sm" fontWeight="medium">
+                        {course.progress || "20"}%
+                    </Text>
+                </Flex>
+            </Box>
+            {/* Tiến độ hoàn thành */}
+            <Progress
+                value={course.progress || 20}
+                size="sm"
+                colorScheme="green"
+                bg="blue.100"
+                hasStripe
+                w="full"
+                borderRadius="md"
+            />
+        </Box>
+
+    );
+};
+
+export default CourseCard;

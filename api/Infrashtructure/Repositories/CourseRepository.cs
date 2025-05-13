@@ -20,28 +20,36 @@ namespace api.Infrashtructure.Repositories
         }
         public async Task<PagedResponse<CourseDTO>> GetAllCoursesAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
-            var queryData = _context.Courses
-                .AsNoTracking()
-                .Include(c => c.CourseCategory)
-                .Include(c => c.Creator)
-                .Include(c => c.Badge)
-                .Select(c => new CourseDTO
-                {
-                    CourseID = c.CourseID,
-                    CourseName = c.CourseName,
-                    CoderID = c.CoderID,
-                    CreatorName = c.Creator.CoderName,
-                    Status = c.Status,
-                    CourseCategoryID = c.CourseCategoryID,
-                    CourseCategoryName = c.CourseCategory.Name,
-                    Fee = c.Fee,
-                    OriginalFee = c.OriginalFee,
-                    IsCombo = c.IsCombo,
-                    BadgeID = c.BadgeID,
-                    ImageUrl = c.ImageUrl,
-                    BadgeName = c.Badge != null ? c.Badge.Name : null,
-                    BadgeColor = c.Badge.Color
-                });
+            var enrollCounts = _context.Enrollments
+                .GroupBy(e => e.CourseID)
+                .Select(g => new { CourseID = g.Key, Count = g.Count() });
+
+            var queryData = from course in _context.Courses.AsNoTracking()
+                            join ec in enrollCounts on course.CourseID equals ec.CourseID into joined
+                            from ec in joined.DefaultIfEmpty()
+                            select new CourseDTO
+                            {
+                                CourseID = course.CourseID,
+                                CourseName = course.CourseName,
+                                CoderID = course.CoderID,
+                                CreatorName = course.Creator.CoderName,
+                                Status = course.Status,
+                                CourseCategoryID = course.CourseCategoryID,
+                                CourseCategoryName = course.CourseCategory.Name,
+                                Fee = course.Fee,
+                                OriginalFee = course.OriginalFee,
+                                IsCombo = course.IsCombo,
+                                BadgeID = course.BadgeID,
+                                ImageUrl = course.ImageUrl,
+                                BadgeName = course.Badge != null ? course.Badge.Name : null,
+                                BadgeColor = course.Badge.Color,
+                                Rating = course.Rating,
+
+                                // ✅ Nếu không có enrollment thì gán 0
+                                TotalReviews = ec.Count
+
+                            };
+
 
             queryData = ApplySorting(queryData, sortField, ascending);
 
@@ -53,7 +61,6 @@ namespace api.Infrashtructure.Repositories
 
             return courses;
         }
-
 
         public IQueryable<CourseDTO> ApplySorting(IQueryable<CourseDTO> query, string? sortField, bool ascending)
         {

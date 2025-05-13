@@ -28,6 +28,7 @@ export const formatDate = (dateString) => {
     return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
 };
 
+export const formatNumber = (number) => new Intl.NumberFormat("vi-VN").format(number);
 
 export const easeInExpo = (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1)));
 

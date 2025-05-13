@@ -22,7 +22,8 @@
         public int DiscountPercent => (OriginalFee.HasValue && Fee.HasValue && OriginalFee > 0)
              ? (int)Math.Round(((OriginalFee.Value - Fee.Value) / OriginalFee.Value) * 100)
              : 0;
-
+        public double? Rating { get; set; }
+        public int? TotalReviews { get; set; }
     }
 
     public class CourseCreateDTO: CourseDTO
@@ -36,8 +37,7 @@
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public double Rating { get; set; }
-        public int TotalReviews { get; set; }
+
         public List<TopicDTO> Topics { get; set; } = new List<TopicDTO>();
         public List<EnrollmentDTO> Enrollments { get; set; } = new List<EnrollmentDTO>();
         public List<CommentDTO> Comments { get; set; } = new List<CommentDTO>();
