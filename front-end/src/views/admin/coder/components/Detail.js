@@ -26,6 +26,7 @@ import { getDetail, updateItem } from "config/apiService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatDateTime } from "utils/utils";
+import { getCacheBustedUrl } from "utils/utils";
 
 const genderMapping = {
     0: "Nam",
@@ -41,7 +42,7 @@ const roleMapping = {
 
 const CoderDetail = () => {
     const { id } = useParams();
-    const [coderDetail, setCoderDetail] = useState(null);
+    const [coderDetail, setCoderDetail] = useState({});;
     const [editField, setEditField] = useState(null);
     const [editableValues, setEditableValues] = useState({});
     const [avatarFile, setAvatarFile] = useState(null);
@@ -76,6 +77,13 @@ const CoderDetail = () => {
         }
     }, [id, fetchCoderDetail]);
 
+    useEffect(() => {
+        setAvatarLoaded(false);
+    }, [
+        editableValues?.avatar,
+        coderDetail?.avatar,
+    ]);
+
     const handleEdit = (field) => {
         setEditField(field);
     };
@@ -91,14 +99,8 @@ const CoderDetail = () => {
         });
     };
 
-    useEffect(() => {
-        setAvatarLoaded(false);
-    }, [
-        editableValues.avatar,
-        coderDetail?.avatar, // dùng optional chaining để tránh lỗi
-    ]);
-
     const handleAvatarChange = async (e) => {
+
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -113,6 +115,7 @@ const CoderDetail = () => {
                     formData.append("Role", editableValues.role);
                 }
                 try {
+                    console.log("Data: ", editableValues);
                     // update image
                     await updateItem({ controller: "Coder", id: id, data: formData });
 
@@ -139,11 +142,13 @@ const CoderDetail = () => {
             };
             reader.readAsDataURL(file);
             setAvatarFile(file);
+
         }
     };
 
     const handleSave = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
+
         try {
             const formData = new FormData();
 
@@ -165,6 +170,7 @@ const CoderDetail = () => {
             if (avatarFile) {
                 formData.append("AvatarFile", avatarFile);
             }
+
 
             // Cập nhật coderDetail sau khi chỉnh sửa
             setCoderDetail((prev) => ({
@@ -205,6 +211,8 @@ const CoderDetail = () => {
             <ProgressBar />
         );
     }
+
+
 
     return (
         <ScrollToTop>
@@ -252,11 +260,7 @@ const CoderDetail = () => {
                                 mb={4}
                             >
                                 <Image
-                                    src={
-                                        editableValues.avatar || coderDetail.avatar
-                                            ? `${editableValues.avatar || coderDetail.avatar}?v=${Date.now()}`
-                                            : "/avatarSimmmple.png"
-                                    }
+                                    src={getCacheBustedUrl(editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png")}
                                     alt="Coder Avatar"
                                     borderRadius="full"
                                     boxSize="200px"
@@ -265,7 +269,9 @@ const CoderDetail = () => {
                                     _hover={{ transform: "scale(1.05)" }}
                                     onClick={() => document.getElementById("avatarInput").click()}
                                     onLoad={() => setAvatarLoaded(true)}
-                                    onError={() => setAvatarLoaded(true)}
+                                    onError={() => {
+                                        setAvatarLoaded(true); // tránh Skeleton load mãi
+                                    }}
                                     cursor="pointer"
                                 />
                             </Skeleton>

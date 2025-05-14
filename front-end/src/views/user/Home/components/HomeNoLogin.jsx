@@ -5,7 +5,6 @@ import {
     Text,
     VStack,
     HStack,
-    useColorModeValue,
     Image,
     SimpleGrid,
     Container,
@@ -106,7 +105,6 @@ const draw = {
 
 
 const HomeNoLogin = () => {
-    const cardBg = useColorModeValue("white", "gray.800");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -419,14 +417,11 @@ const HomeNoLogin = () => {
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.4 }}
                             color="blue.500"
-
                         >
                             Khóa học nổi bật
                         </MotionHeading>
 
                         <MotionBox
-                            bg={cardBg}
-                            borderRadius="xl"
                             variants={zoomInVariant}
                             whileInView="visible"
                             initial="hidden"
@@ -443,7 +438,6 @@ const HomeNoLogin = () => {
                                 <CourseGrid courses={courses} />
                             )}
                         </MotionBox>
-
                     </Box>
                 </Container>
                 <Box
@@ -578,7 +572,7 @@ const HomeNoLogin = () => {
                                 whileInView="visible"
                                 viewport={{ once: true, amount: 0.3 }}
                             >
-                                <MiniCalendar borderRadius="md" maxW="full" h="50vh" />
+                                <MiniCalendar borderRadius="md" maxW="100%" h="50vh" />
                             </MotionBox>
                         </GridItem>
                     </Grid>

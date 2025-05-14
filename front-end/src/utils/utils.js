@@ -148,3 +148,10 @@ export const parseBackendErrors = (errorResponse) => {
     return messages;
 };
 
+export const getCacheBustedUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("data:")) return url; // Base64: không thêm timestamp
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}v=${Date.now()}`;
+};
+

@@ -6,7 +6,8 @@ import {
     Divider,
     Flex,
     Tooltip,
-    Button
+    Button,
+    useDisclosure
 } from '@chakra-ui/react';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from 'contexts/AuthContext';
@@ -19,14 +20,15 @@ import { formatDate } from 'utils/utils';
 import { MdEdit } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import AvatarLoadest from 'components/fields/Avatar';
-
+import UpdateModal from './components/UpdateModal';
 
 const Profile = () => {
-    useTitle("Hồ sơ");
+    useTitle("Hồ sơ cá nhân");
     const { id } = useParams();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     const { coder } = useAuth();
     const { coderID } = coder || {};
-
     const [info, setInfo] = useState({});
 
 
@@ -81,10 +83,19 @@ const Profile = () => {
                             size="md"
                             _hover={{ bg: "blue.500" }}
                             rightIcon={<MdEdit />}
-                            onClick={() => { }}
+                            onClick={onOpen}
                         >
                             Chỉnh sửa thông tin
                         </Button>
+
+                        <UpdateModal
+                            coderID={coderID}
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            onUpdated={() => {
+                                fetchData();
+                            }}
+                        />
 
                     </Flex>
                     <Divider my={2} />

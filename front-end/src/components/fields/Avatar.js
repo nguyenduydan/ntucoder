@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Avatar } from "@chakra-ui/react";
+import { getCacheBustedUrl } from "utils/utils";
 
-const AvatarLoadest = ({ src, name, ...props }) => {
+const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
     const [avatarColor, setAvatarColor] = useState("rgb(0, 242, 255)"); // Màu mặc định
 
-    const getAvatarColor = (src) => {
+    const getAvatarColor = useCallback((src) => {
         const img = new Image();
         img.crossOrigin = "Anonymous";
         img.src = src;
@@ -25,16 +26,16 @@ const AvatarLoadest = ({ src, name, ...props }) => {
 
             const rgbColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
             setAvatarColor(rgbColor);
+            onLoad?.();
         };
-    };
+    }, [onLoad]); // Memoize the function
 
     useEffect(() => {
         if (src) {
             getAvatarColor(src);
         }
-    }, [src]);
+    }, [src, getAvatarColor]); // `getAvatarColor` is now safe to be in the dependency array
 
-    const cacheBustingUrl = `${src}?v=${Date.now()}`;
 
     // Tạo shadow neon với màu avatarColor
     const neonShadow = `
@@ -47,7 +48,7 @@ const AvatarLoadest = ({ src, name, ...props }) => {
     return (
         <Avatar
             name={name}
-            src={cacheBustingUrl}
+            src={getCacheBustedUrl(src)}
             alt="Coder Avatar"
             boxShadow={neonShadow}
             border="2px solid white"
