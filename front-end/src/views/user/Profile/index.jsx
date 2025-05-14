@@ -6,16 +6,19 @@ import {
     Avatar,
     Divider,
     Flex,
-    Tooltip
-
+    Tooltip,
+    Button
 } from '@chakra-ui/react';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from 'contexts/AuthContext';
-import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle } from "react-icons/fa";
+import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle, FaCalendar } from "react-icons/fa";
 import { PiWarningCircle } from "react-icons/pi";
 import { getDetail } from 'config/apiService';
 import { useTitle } from 'contexts/TitleContext';
 import CourseLearning from './components/CourseLearning';
+import { formatDate } from 'utils/utils';
+import { MdEdit } from 'react-icons/md';
+
 
 const Profile = () => {
     useTitle("Hồ sơ");
@@ -48,7 +51,7 @@ const Profile = () => {
             <Grid templateColumns={{ base: "1fr", md: "0.6fr 2fr" }} gap={4} mx={5} p={4}>
                 {/* Avatar and menu */}
                 <GridItem
-                    bgGradient="linear(to-b, blue.500, blue.200)"
+                    bgGradient="linear(to-b, blue.600, blue.300)"
                     p={4}
                     borderRadius="md"
                     color="black"
@@ -70,12 +73,25 @@ const Profile = () => {
                         <Text fontSize="2xl" mb={2} color="white" fontWeight="bold">
                             {coderName || "Coder Name"}
                         </Text>
+
+                        <Button
+                            bg="blue"
+                            color="white"
+                            size="md"
+                            _hover={{ bg: "blue.500" }}
+                            rightIcon={<MdEdit />}
+                            onClick={() => { }}
+                        >
+                            Chỉnh sửa thông tin
+                        </Button>
+
                     </Flex>
                     <Divider my={2} />
                     <Box textColor="white">
                         <Text fontSize="xl" mt={2} textTransform="uppercase" fontWeight="bold">
                             Thông tin
                         </Text>
+
                         <Flex flexDirection="column" gap={2}>
                             {/* User Name */}
                             <Flex align="center" mt={2} mr={2} justify="space-between">
@@ -174,7 +190,25 @@ const Profile = () => {
                                     </Tooltip>
                                 </Flex>
                             </Flex>
+                            <Flex align="center" mt={2} mr={2} justify="space-between">
+                                <Flex align="center">
+                                    <FaCalendar style={{ marginRight: "8px" }} />
+                                    <Text fontSize="md" >
+                                        {info.birthDay ? formatDate(info.birthDay) : ""}
+                                    </Text>
+                                </Flex>
+                            </Flex>
                         </Flex>
+                    </Box>
+                    <Divider my={2} />
+                    {/* Giới thiệu */}
+                    <Box textColor="white" minH="10vh">
+                        <Text fontSize="xl" mt={2} textTransform="uppercase" fontWeight="bold">
+                            Giới thiệu
+                        </Text>
+                        <Text fontSize="md" mt={2}>
+                            {info?.description || ""}
+                        </Text>
                     </Box>
                 </GridItem>
 
@@ -182,14 +216,9 @@ const Profile = () => {
                 <GridItem
                     bg="white"
                     borderRadius="md"
-                    px={5}
-                    py={3}
                     boxShadow="md"
                 >
-                    <Text fontSize="xl" color="blue.600" fontWeight="bold">
-                        Khóa học đã đăng ký
-                    </Text>
-                    <Divider w="50px" h="3px" bg="blue" />
+                    {/* Course learning */}
                     <CourseLearning coderID={coderID} />
                 </GridItem>
             </Grid>

@@ -33,3 +33,14 @@ option {
   cursor: col-resize;
   width: 10px;
 }
+
+.custom-datepicker {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #0033ff;
+}
+
+.custom-datepicker:focus {
+  border: 2px solid #0033ff;
+}

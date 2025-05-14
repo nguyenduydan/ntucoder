@@ -21,7 +21,7 @@ import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
 import "moment/locale/vi";
-import { formatDate, formatCurrency } from "utils/utils";
+import { formatDateTime, formatCurrency } from "utils/utils";
 //import API
 import { getList, getDetail, updateItem } from "config/apiService";
 
@@ -285,13 +285,13 @@ const TopicDetail = () => {
                                 <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{formatDate(topic.createdAt)}
+                                        <strong>Ngày tạo: </strong>{formatDateTime(topic.createdAt)}
                                     </Text>
 
                                     {topic.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{formatDate(topic.updatedAt)}
+                                                <strong>Ngày cập nhật: </strong>{formatDateTime(topic.updatedAt)}
                                             </Text>
                                         </>
                                     )}

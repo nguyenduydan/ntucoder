@@ -56,6 +56,7 @@ namespace api.Infrashtructure.Repositories
             };
         }
 
+        //Lấy thông tin bằng id
         public async Task<CoderDetailDTO> GetCoderByIdAsync(int id)
         {
             var coder = await _context.Coders
@@ -82,6 +83,7 @@ namespace api.Infrashtructure.Repositories
                 Avatar = coder.Avatar,
                 Description = coder.Description,
                 Gender = coder.Gender,
+                BirthDay = coder.BirthDay,
                 CreatedAt = coder.CreatedAt,
                 CreatedBy = coder.CreatedBy,
                 UpdatedAt = coder.UpdatedAt,
@@ -186,6 +188,11 @@ namespace api.Infrashtructure.Repositories
                 }
             }
 
+            if (dto.BirthDay.HasValue)
+            {
+                existing.BirthDay = dto.BirthDay.Value;
+            }
+
             existing.UpdatedAt = DateTime.Now;
             existing.UpdatedBy = dto.CoderName;
             if (dto.Role != null)
@@ -219,6 +226,7 @@ namespace api.Infrashtructure.Repositories
                 Description = existing.Description,
                 Gender = existing.Gender,
                 PhoneNumber = existing.PhoneNumber,
+                BirthDay = existing.BirthDay,
                 UpdatedAt = existing.UpdatedAt,
                 UpdatedBy = existing.UpdatedBy
             };

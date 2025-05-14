@@ -12,7 +12,7 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250512112621_update_db")]
+    [Migration("20250514102803_update_db")]
     partial class update_db
     {
         /// <inheritdoc />
@@ -159,6 +159,9 @@ namespace api.Migrations
                     b.Property<string>("Avatar")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime?>("BirthDay")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CoderEmail")
                         .IsRequired()

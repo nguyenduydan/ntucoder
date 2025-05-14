@@ -26,7 +26,7 @@ import sanitizeHtml from "utils/sanitizedHTML";
 //import API
 import { getDetail, updateItem, getList } from "config/apiService";
 import Editor from "utils/configEditor";
-import { formatDate, formatCurrency } from "utils/utils";
+import { formatDateTime, formatCurrency } from "utils/utils";
 
 
 const LessonDetail = () => {
@@ -289,12 +289,12 @@ const LessonDetail = () => {
                                         />
                                     </Flex>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{formatDate(lesson.createdAt)}
+                                        <strong>Ngày tạo: </strong>{formatDateTime(lesson.createdAt)}
                                     </Text>
                                     {lesson.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{formatDate(lesson.updatedAt)}
+                                                <strong>Ngày cập nhật: </strong>{formatDateTime(lesson.updatedAt)}
                                             </Text>
                                         </>
                                     )}

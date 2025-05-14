@@ -23,9 +23,14 @@ export const getLuminance = (hex) => {
 export const formatCurrency = (amount) => amount ?
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount) : "0 VND";
 
-export const formatDate = (dateString) => {
+export const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
+};
+
+export const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return moment(dateString).locale("vi").format("DD/MM/YYYY");
 };
 
 export const formatNumber = (number) => new Intl.NumberFormat("vi-VN").format(number);

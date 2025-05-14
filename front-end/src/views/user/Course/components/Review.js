@@ -7,7 +7,7 @@ import {
 import { StarIcon } from '@chakra-ui/icons';
 import api from 'config/apiConfig';
 import StarRating from 'views/user/Course/components/StarRating';
-import { formatDate } from 'utils/utils';
+import { formatDateTime } from 'utils/utils';
 import { useAuth } from 'contexts/AuthContext';
 
 
@@ -181,7 +181,7 @@ const Review = ({ courseId }) => {
                                             <Icon as={StarIcon} key={i} color={i < review.rating ? 'yellow.400' : 'gray.300'} />
                                         ))}
                                         <Text fontSize="xs" color="gray.500">
-                                            {formatDate(review.createdAt)}
+                                            {formatDateTime(review.createdAt)}
                                         </Text>
                                     </HStack>
                                 </Box>

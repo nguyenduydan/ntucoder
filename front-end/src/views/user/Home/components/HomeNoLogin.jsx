@@ -8,14 +8,23 @@ import {
     useColorModeValue,
     Image,
     SimpleGrid,
-    Container
+    Container,
+    Flex,
+    Button,
 } from "@chakra-ui/react";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 import CodingPng from "assets/img/profile/gummy-coding.png";
+
 import { getList } from "config/apiService";
 import CourseGrid from "views/user/Course/components/CourseGrid";
 import SkeletonList from "views/user/Course/components/SkeletonList";
+
+import AnimateText from "components/animate/AnimateText";
+import Counter from "components/animate/Count";
+
+import { FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
@@ -97,26 +106,11 @@ const HomeNoLogin = () => {
     const bg = useColorModeValue("gray.50", "gray.900");
     const cardBg = useColorModeValue("white", "gray.800");
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [courses, setCourses] = useState([]);
 
     const [rotate, setRotate] = useState({ x: 0, y: 0 });
-
-    const { ref: sectionRef, inView } = useInView({
-        triggerOnce: true,
-        threshold: 0.5, // Tùy chỉnh tỉ lệ phần tử xuất hiện
-    });
-
-    const controls = useAnimation();
-
-    // Khi phần tử xuất hiện trong viewport, animation sẽ bắt đầu
-    useEffect(() => {
-        if (inView) {
-            controls.start("visible");
-        } else {
-            controls.start("hidden");
-        }
-    }, [inView, controls]);
 
     const handleMouseMove = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -136,11 +130,19 @@ const HomeNoLogin = () => {
         setRotate({ x: 0, y: 0 });
     };
 
+    // Show list course popular
     const fetchCourses = useCallback(async () => {
         setIsLoading(true);
         try {
             const res = await getList({ controller: "Course", page: 1, pageSize: 10 });
-            setCourses(res.data);
+
+            const sortedCourses = res.data
+                .filter(c => c.totalReviews >= 0)
+                .sort((a, b) => b.totalReviews - a.totalReviews);
+
+            const coursePopular = sortedCourses.slice(0, 4);
+
+            setCourses(coursePopular);
         } catch (error) {
             console.log("Không có dữ liệu bài học");
         } finally {
@@ -152,8 +154,12 @@ const HomeNoLogin = () => {
         fetchCourses();
     }, [fetchCourses]);
 
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+
     return (
-        <Box bg={bg} minH="100%">
+        <Box bg={bg} minH="100%" pb={10}>
             {/* Hero Section */}
             <Box
                 bgGradient="linear(to-r, rgb(14, 35, 192), rgb(120, 230, 255))"
@@ -307,6 +313,7 @@ const HomeNoLogin = () => {
                         flexWrap="wrap"
                         w="100%"
                         zIndex={1}
+                        flexDirection={{ base: "column", md: "row" }}
                     >
                         {/* Cột trái: Danh sách tiêu đề */}
                         <VStack align="start" spacing={6} flex="1" px={{ base: "40px", md: "240px" }}>
@@ -354,6 +361,7 @@ const HomeNoLogin = () => {
                                                 x: 10,
                                             }}
                                             transition={{ type: "spring", stiffness: 300 }}
+                                            cursor="default"
                                         >
                                             {text}
                                         </MotionText>
@@ -363,7 +371,7 @@ const HomeNoLogin = () => {
                         </VStack>
 
                         {/* Cột phải: Nội dung tương ứng */}
-                        <VStack align="start" spacing={6} flex="1">
+                        <VStack align="start" spacing={6} flex="1" >
                             <MotionBox
                                 flex="1"
                                 onMouseMove={handleMouseMove}
@@ -378,6 +386,8 @@ const HomeNoLogin = () => {
                                     scale: 1.05,
                                 }}
                                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                                cursor="none"
+                                flexWrap="wrap"
                             >
                                 <motion.div variants={zoomInVariant}>
                                     <Image
@@ -385,7 +395,7 @@ const HomeNoLogin = () => {
                                         src={CodingPng}
                                         alt="Lập trình viên đang code"
                                         borderRadius="xl"
-                                        maxW={{ base: "100%", sm: "500px" }}  // Điều chỉnh chiều rộng ảnh theo màn hình
+                                        maxW={{ base: "100%", sm: "100%" }}  // Điều chỉnh chiều rộng ảnh theo màn hình
                                     />
                                 </motion.div>
                             </MotionBox>
@@ -395,42 +405,129 @@ const HomeNoLogin = () => {
                 </MotionVStack>
             </Box>
             {/* About Section */}
-            <Container maxW="container.xl" overflow="auto" overflowY="hidden">
-                <Box mt={10} p={6}>
-                    <MotionHeading
-                        ref={sectionRef}
-                        size="xl"
-                        mb={4}
-                        align="center"
-                        variants={slideUpVariant}
-                        initial="hidden"
-                        animate={controls}
-                    >
-                        Khóa học nổi bật
-                    </MotionHeading>
+            <Box overflow="auto" overflowY="hidden">
+                <Container maxW="container.xl" >
+                    <Box mt={5} p={6}>
+                        <MotionHeading
+                            size="xl"
+                            mb={4}
+                            align="center"
+                            variants={slideUpVariant}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.4 }}
+                            color="blue.500"
 
-                    <MotionBox
-                        bg={cardBg}
-                        borderRadius="xl"
-                        variants={zoomInVariant}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true }}
-                        animate={controls}
-                    >
-                        {isLoading ? (
-                            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                                <SkeletonList />
-                                <SkeletonList />
-                                <SkeletonList />
-                                <SkeletonList />
-                            </SimpleGrid>
-                        ) : (
-                            <CourseGrid courses={courses} />
-                        )}
-                    </MotionBox>
+                        >
+                            Khóa học nổi bật
+                        </MotionHeading>
+
+                        <MotionBox
+                            bg={cardBg}
+                            borderRadius="xl"
+                            variants={zoomInVariant}
+                            whileInView="visible"
+                            initial="hidden"
+                            viewport={{ once: true, amount: 0.5 }}
+                        >
+                            {isLoading ? (
+                                <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                    <SkeletonList />
+                                </SimpleGrid>
+                            ) : (
+                                <CourseGrid courses={courses} />
+                            )}
+                        </MotionBox>
+
+                    </Box>
+                </Container>
+                <Box
+                    bgGradient="linear(to-br, blue.900,blue.700, blue.400)"
+                    mt={6}
+                    h="max-content"
+                    py={20}
+                    px={6}
+                    boxShadow="lg"
+                    clipPath="polygon(0 0, 100% 0, 100% 90%, 0 100%)"
+                    textColor="white"
+                >
+                    <Container maxW="container.xl">
+                        <MotionBox
+                            variants={slideUpVariant}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                        >
+                            <Heading fontSize={{ base: "2xl", md: "4xl" }} maxW="85vh">
+                                "Lập trình không chỉ là ngôn ngữ của máy tính, mà còn là
+                                <AnimateText text="chìa khóa" />
+                                mở ra tương lai của bạn!"
+                            </Heading>
+                        </MotionBox>
+
+                        <Flex alignItems="center" flexDirection={{ base: "column", md: "row" }} gap={5}>
+                            <Flex flexDirection="column">
+                                <MotionText
+                                    fontSize={{ base: "xl", md: "1xl" }}
+                                    mb={4}
+                                    align="start"
+                                    variants={zoomInVariant}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true, amount: 0.3 }}
+                                    flex="1"
+                                >
+                                    Hệ thống bài giảng bám sát chương trình lập trình quốc tế
+                                    Đa dạng các khóa học lập trình: Python, Java Script, C++,...
+                                    Học viên được lập trình và chấm điểm trực tiếp trên web, đánh giá chính xác khả năng hiện tại của mình.
+                                </MotionText>
+                                <Button
+                                    rightIcon={<FaArrowRight />}
+                                    bg="blue.300"
+                                    size="lg"
+                                    w="50%"
+                                    mt={4}
+                                    ml={4}
+                                    onClick={() => handleNavigate("/")}
+                                    variants={zoomInVariant}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true, amount: 0.6 }}
+                                    _hover={{ transform: "translateY(-5px)" }}
+                                >
+                                    Bắt đầu học
+                                </Button>
+                            </Flex>
+
+                            <Box flex="1">
+                                <Image src={CodingPng} alt="Lập trình viên đang code" borderRadius="xl" maxW={{ base: "100%", sm: "500px" }} />
+                            </Box>
+                        </Flex>
+                    </Container>
                 </Box>
-            </Container>
+                <SimpleGrid columns={{ base: 2, md: 4 }} spacing={6} mt={10}>
+                    <Box textAlign="center">
+                        <Heading fontSize="3rem" color="blue.500"><Counter to={10000} />+</Heading>
+                        <Text fontSize="xl">Học viên</Text>
+                    </Box>
+                    <Box textAlign="center">
+                        <Heading fontSize="3rem" color="blue.500"><Counter to={300} />+</Heading>
+                        <Text fontSize="xl">Khóa học</Text>
+                    </Box>
+                    <Box textAlign="center">
+                        <Heading fontSize="3rem" color="blue.500"><Counter to={95} />%</Heading>
+                        <Text fontSize="xl">Hài lòng</Text>
+                    </Box>
+                    <Box textAlign="center">
+                        <Heading fontSize="3rem" color="blue.500"><Counter to={50} />+</Heading>
+                        <Text fontSize="xl">Giảng viên</Text>
+                    </Box>
+                </SimpleGrid>
+
+            </Box>
         </Box >
     );
 };

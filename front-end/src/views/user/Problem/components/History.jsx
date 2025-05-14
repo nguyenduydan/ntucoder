@@ -13,7 +13,7 @@ import {
     Button,
     Flex
 } from "@chakra-ui/react";
-import { formatDate } from 'utils/utils';
+import { formatDateTime } from 'utils/utils';
 
 const columnsData = [
     { Header: "STT" },
@@ -105,7 +105,7 @@ const History = () => {
                             history.map((item, index) => (
                                 <Tr key={item.submissionID || index}>
                                     <Td p={2} fontSize="sm" textAlign="center">{index + 1}</Td>
-                                    <Td p={2} fontSize="sm" textAlign="center">{formatDate(item.submitTime)}</Td>
+                                    <Td p={2} fontSize="sm" textAlign="center">{formatDateTime(item.submitTime)}</Td>
                                     <Td p={2} fontSize="sm" textAlign="center">{item.compilerName || '---'}</Td>
                                     <Td
                                         p={2}

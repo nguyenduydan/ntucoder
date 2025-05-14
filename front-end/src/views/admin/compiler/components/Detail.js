@@ -29,7 +29,7 @@ import "moment/locale/vi";
 import { getById, update } from "config/courseService";
 import { getList } from "config/courseCategoryService";
 import { getListBagde } from "config/badgeService";
-import { formatDate, formatCurrency } from "utils/utils";
+import { formatDateTime, formatCurrency } from "utils/utils";
 
 
 
@@ -413,7 +413,7 @@ const CourseDetail = () => {
                                     <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Thông tin khác</Text>
                                     <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                         <Text fontSize="lg">
-                                            <strong>Ngày tạo: </strong>{formatDate(course.createdAt)}
+                                            <strong>Ngày tạo: </strong>{formatDateTime(course.createdAt)}
                                         </Text>
                                         <Text fontSize="lg">
                                             <strong>Người tạo: </strong> {course.creatorName}
@@ -421,7 +421,7 @@ const CourseDetail = () => {
                                         {course.updatedAt && (
                                             <>
                                                 <Text fontSize="lg">
-                                                    <strong>Ngày cập nhật: </strong>{formatDate(course.updatedAt)}
+                                                    <strong>Ngày cập nhật: </strong>{formatDateTime(course.updatedAt)}
                                                 </Text>
                                                 <Text fontSize="lg">
                                                     <strong>Người cập nhật: </strong> {course.creatorName}

@@ -76,8 +76,8 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                     {course.courseName}
                 </Text>
 
-                <Flex align="center" justifyContent="space-between" mt="2" >
-                    <Flex>
+                <Flex align="center" mt="2" >
+                    <Flex flex={1}>
                         <HStack spacing={0.5}>
                             {[...Array(5)].map((_, i) => (
                                 <StarIcon boxSize={3} key={i} color={i < Math.round(course.rating) ? 'yellow.400' : 'gray.300'} />
@@ -86,8 +86,8 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                         <Text ml="1" mt="2px" fontSize="sm" fontWeight="medium">  {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                     </Flex>
 
-                    <Flex>
-                        <FaUsers color="gray.400" />
+                    <Flex flex={1}>
+                        <FaUsers color="gray" />
                         <Text ml="1" fontSize="sm" fontWeight="medium">
                             {formatNumber(course.totalReviews)}
                         </Text>

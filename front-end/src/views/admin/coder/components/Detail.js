@@ -22,16 +22,10 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "components/scroll/ScrollToTop";
 import ProgressBar from "components/loading/loadingBar";
-import moment from "moment";
-import "moment/locale/vi";
 import { getDetail, updateItem } from "config/apiService";
-
-
-
-const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
-};
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { formatDateTime } from "utils/utils";
 
 const genderMapping = {
     0: "Nam",
@@ -342,6 +336,38 @@ const CoderDetail = () => {
                                             cursor="pointer"
                                         />
                                     </Flex>
+                                    <Flex align="center">
+                                        {editField === "birthDay" ? (
+                                            <DatePicker
+                                                selected={editableValues.birthDay ? new Date(editableValues.birthDay) : null}
+                                                onChange={(date) => handleInputChange("birthDay", date.toISOString())}
+                                                dateFormat="dd/MM/yyyy"
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                placeholderText="ngày/tháng/năm"
+                                                className="custom-datepicker"
+                                                onBlur={() => setEditField(null)}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <Text fontSize="lg">
+                                                <strong>Ngày sinh:</strong>{" "}
+                                                {editableValues.birthDay
+                                                    ? new Date(editableValues.birthDay).toLocaleDateString("vi-VN")
+                                                    : "Chưa có"}
+                                            </Text>
+                                        )}
+                                        <IconButton
+                                            aria-label="Edit"
+                                            icon={<MdEdit />}
+                                            ml={2}
+                                            size="sm"
+                                            onClick={() => handleEdit("birthDay")}
+                                            cursor="pointer"
+                                        />
+                                    </Flex>
+
 
                                     {/* Description field */}
                                     <Flex align="center">
@@ -375,7 +401,7 @@ const CoderDetail = () => {
                             <GridItem>
                                 <VStack align="stretch" ps={{ base: "0", md: "20px" }} spacing={4}>
                                     <Text fontSize="lg">
-                                        <strong>Ngày tạo: </strong>{formatDate(coderDetail.createdAt)}
+                                        <strong>Ngày tạo: </strong>{formatDateTime(coderDetail.createdAt)}
                                     </Text>
                                     <Text fontSize="lg">
                                         <strong>Người tạo: </strong> {coderDetail.createdBy}
@@ -383,7 +409,7 @@ const CoderDetail = () => {
                                     {coderDetail.updatedAt && (
                                         <>
                                             <Text fontSize="lg">
-                                                <strong>Ngày cập nhật: </strong>{formatDate(coderDetail.updatedAt)}
+                                                <strong>Ngày cập nhật: </strong>{formatDateTime(coderDetail.updatedAt)}
                                             </Text>
                                             <Text fontSize="lg">
                                                 <strong>Người cập nhật: </strong> {coderDetail.updatedBy}

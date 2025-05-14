@@ -3,7 +3,8 @@ import { Box, Text, Image, Badge, Flex, HStack, useColorModeValue } from "@chakr
 import { StarIcon } from "@chakra-ui/icons";
 import { darken, lighten } from "@chakra-ui/theme-tools";
 import { useNavigate } from "react-router-dom";
-import { toSlug, getLuminance, formatCurrency } from "utils/utils";
+import { toSlug, getLuminance, formatCurrency, formatNumber } from "utils/utils";
+import { FaUsers } from "react-icons/fa";
 
 const getTextColor = (bgColor) => getLuminance(bgColor) > 0.5 ? darken(bgColor, 30) : lighten(bgColor, 50);
 
@@ -69,12 +70,20 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                     <Text ml="1" fontSize="sm" color="gray.400">{course.creatorName}</Text>
                 </Flex>
                 <Flex align="center" alignItems="center" mt="2">
-                    <HStack spacing={0.5}>
-                        {[...Array(5)].map((_, i) => (
-                            <StarIcon boxSize={3} key={i} color={i < Math.round(course.rating) ? 'yellow.400' : 'gray.300'} />
-                        ))}
-                    </HStack>
-                    <Text ml="1" mt="2px" fontSize="sm" fontWeight="medium">  {course.rating ? course.rating.toFixed(1) : "0"}</Text>
+                    <Flex flex={1}>
+                        <HStack spacing={0.5}>
+                            {[...Array(5)].map((_, i) => (
+                                <StarIcon boxSize={3} key={i} color={i < Math.round(course.rating) ? 'yellow.400' : 'gray.300'} />
+                            ))}
+                        </HStack>
+                        <Text ml="1" mt="2px" fontSize="sm" fontWeight="medium">  {course.rating ? course.rating.toFixed(1) : "0"}</Text>
+                    </Flex>
+                    <Flex>
+                        <FaUsers color="gray.400" />
+                        <Text ml="1" fontSize="sm" fontWeight="medium">
+                            {formatNumber(course.totalReviews)}
+                        </Text>
+                    </Flex>
                 </Flex>
                 <Flex mt="3" align="center" justify="space-between">
                     {course.fee === 0 ? (

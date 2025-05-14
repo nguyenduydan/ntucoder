@@ -19,6 +19,7 @@ namespace api.Models.ERD
         public string? Avatar { get; set; }
 
         public string? Description { get; set; }
+        public DateTime? BirthDay { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

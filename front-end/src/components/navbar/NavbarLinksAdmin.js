@@ -68,6 +68,14 @@ export default function HeaderLinks(props) {
       />
       <SearchModal isOpen={isOpen} onClose={onClose} />
       <SidebarResponsive routes={routes} />
+      <Button
+        variant="outline"
+        colorScheme="blue"
+        mx={2}
+        onClick={() => window.location.href = '/'}
+      >
+        Trang người dùng
+      </Button>
       {/* Notifications */}
       <Menu>
         <MenuButton p="0px">
