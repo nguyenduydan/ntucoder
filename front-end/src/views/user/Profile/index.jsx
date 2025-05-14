@@ -76,27 +76,27 @@ const Profile = () => {
                         <Text fontSize="2xl" mb={2} color="white" fontWeight="bold">
                             {info?.coderName || "Coder Name"}
                         </Text>
+                        {(coderID && !id) && (
+                            <Box>
+                                <Button
+                                    bg="blue"
+                                    color="white"
+                                    size="md"
+                                    _hover={{ bg: "blue.500" }}
+                                    rightIcon={<MdEdit />}
+                                    onClick={onOpen}
+                                >
+                                    Chỉnh sửa thông tin
+                                </Button>
 
-                        <Button
-                            bg="blue"
-                            color="white"
-                            size="md"
-                            _hover={{ bg: "blue.500" }}
-                            rightIcon={<MdEdit />}
-                            onClick={onOpen}
-                        >
-                            Chỉnh sửa thông tin
-                        </Button>
-
-                        <UpdateModal
-                            coderID={coderID}
-                            isOpen={isOpen}
-                            onClose={onClose}
-                            onUpdated={() => {
-                                fetchData();
-                            }}
-                        />
-
+                                <UpdateModal
+                                    coderID={coderID}
+                                    isOpen={isOpen}
+                                    onClose={onClose}
+                                    onUpdated={fetchData}
+                                />
+                            </Box>
+                        )}
                     </Flex>
                     <Divider my={2} />
                     <Box textColor="white">
