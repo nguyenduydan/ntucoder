@@ -24,6 +24,7 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import FlushedInput from "components/fields/InputField";
 import { createItem } from "config/apiService";
+import { parseBackendErrors } from "utils/utils";
 
 export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
     const [loading, setLoading] = useState(false);
@@ -110,7 +111,6 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
         }
 
         try {
-            console.log('Dữ liệu gửi lên API:', inputs);
             await createItem({
                 controller: 'Coder',
                 data: inputs,
@@ -129,13 +129,28 @@ export default function CreateCoderModal({ isOpen, onClose, fetchData }) {
             });
         } catch (error) {
             console.error('Lỗi API:', error.response ? error.response.data : error);
-            toast({
-                title: 'Đã xảy ra lỗi.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-                position: 'top-right',
-            });
+            const backendMessages = parseBackendErrors(error?.response?.data || {});
+            if (backendMessages.length > 0) {
+                backendMessages.forEach((msg) =>
+                    toast({
+                        title: msg,
+                        status: "error",
+                        duration: 3000,
+                        isClosable: true,
+                        position: "top",
+                        variant: "left-accent",
+                    })
+                );
+            } else {
+                toast({
+                    title: "Đã xảy ra lỗi không xác định.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "left-accent",
+                });
+            }
             setLoading(false);
         }
     };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-    Box, Heading, Text, Textarea, Button, VStack, HStack, Avatar, Progress, Divider, Icon, useToast,
+    Box, Heading, Text, Textarea, Button, VStack, HStack, Progress, Divider, Icon, useToast,
     Flex,
     Spinner
 } from '@chakra-ui/react';
@@ -9,6 +9,8 @@ import api from 'config/apiConfig';
 import StarRating from 'views/user/Course/components/StarRating';
 import { formatDateTime } from 'utils/utils';
 import { useAuth } from 'contexts/AuthContext';
+import { NavLink } from 'react-router-dom';
+import CoderAvatar from './CoderAvatar';
 
 
 const Review = ({ courseId }) => {
@@ -173,9 +175,16 @@ const Review = ({ courseId }) => {
                     reviewsToShow.map((review) => (
                         <Box key={review.reviewID} mb={2} p={3} borderRadius="md">
                             <HStack mb={1}>
-                                <Avatar size="sm" name={review.coderName} />
+                                <CoderAvatar
+                                    coderID={review.coderID}
+                                    size="sm"
+                                />
                                 <Box>
-                                    <Text fontWeight="bold">{(review.coderName || 'Ẩn danh').replace(/(.{3}).*(@.*)/, "$1******$2")}</Text>
+                                    <NavLink
+                                        to={`/profile/${review.coderID}`}
+                                    >
+                                        <Text _hover={{ color: "blue" }} fontWeight="bold">{(review.coderName || 'Ẩn danh').replace(/(.{3}).*(@.*)/, "$1******$2")}</Text>
+                                    </NavLink>
                                     <HStack spacing={1}>
                                         {[...Array(5)].map((_, i) => (
                                             <Icon as={StarIcon} key={i} color={i < review.rating ? 'yellow.400' : 'gray.300'} />

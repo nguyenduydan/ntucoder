@@ -98,7 +98,7 @@ export default function Home(props) {
 
                                 {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
                                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-
+                                <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                                 {/* Optional: route 404 */}
                                 <Route path="*" element={<NotFound />} />
                             </Routes>

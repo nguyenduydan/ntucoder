@@ -1,4 +1,5 @@
 ﻿using api.Infrashtructure.Enums;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -26,6 +27,7 @@ namespace api.DTOs
         public IFormFile? AvatarFile { get; set; }
         public string? Avatar { get; set; }
         public string? Description { get; set; }
+
         public DateTime? BirthDay { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? CreatedBy { get; set; }

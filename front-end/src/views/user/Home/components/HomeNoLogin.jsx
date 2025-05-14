@@ -11,6 +11,8 @@ import {
     Container,
     Flex,
     Button,
+    Grid,
+    GridItem,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import CodingPng from "assets/img/profile/gummy-coding.png";
@@ -24,6 +26,7 @@ import Counter from "components/animate/Count";
 
 import { FaArrowRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import MiniCalendar from "components/calendar/MiniCalendar";
 
 
 const MotionBox = motion(Box);
@@ -35,7 +38,7 @@ const fadeInVariant = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
-        transition: { duration: 0.3, ease: "easeInOut" },
+        transition: { duration: 0.5, ease: "easeInOut" },
     },
 };
 
@@ -44,7 +47,7 @@ const slideUpVariant = {
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.3, ease: "easeInOut" },
+        transition: { duration: 0.5, ease: "easeInOut" },
     },
 };
 
@@ -103,7 +106,6 @@ const draw = {
 
 
 const HomeNoLogin = () => {
-    const bg = useColorModeValue("gray.50", "gray.900");
     const cardBg = useColorModeValue("white", "gray.800");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -159,7 +161,7 @@ const HomeNoLogin = () => {
     };
 
     return (
-        <Box bg={bg} minH="100%" pb={10}>
+        <Box bg="gray.200" minH="100%" pb={10}>
             {/* Hero Section */}
             <Box
                 bgGradient="linear(to-r, rgb(14, 35, 192), rgb(120, 230, 255))"
@@ -405,12 +407,12 @@ const HomeNoLogin = () => {
                 </MotionVStack>
             </Box>
             {/* About Section */}
-            <Box overflow="auto" overflowY="hidden">
+            <Box overflow="auto" overflowY="hidden" py={5}>
                 <Container maxW="container.xl" >
                     <Box mt={5} p={6}>
                         <MotionHeading
                             size="xl"
-                            mb={4}
+                            mb={7}
                             align="center"
                             variants={slideUpVariant}
                             initial="hidden"
@@ -508,7 +510,18 @@ const HomeNoLogin = () => {
                         </Flex>
                     </Container>
                 </Box>
-                <SimpleGrid columns={{ base: 2, md: 4 }} spacing={6} mt={10}>
+                <SimpleGrid
+                    columns={{ base: 2, md: 4 }}
+                    spacing={2}
+                    mt={10}
+                    py={10}
+                    mb={10}
+                    mx="auto"
+                    maxW={"container.xl"}
+                    alignItems="center"
+                    align="center"
+                    justifyContent="center"
+                >
                     <Box textAlign="center">
                         <Heading fontSize="3rem" color="blue.500"><Counter to={10000} />+</Heading>
                         <Text fontSize="xl">Học viên</Text>
@@ -526,6 +539,50 @@ const HomeNoLogin = () => {
                         <Text fontSize="xl">Giảng viên</Text>
                     </Box>
                 </SimpleGrid>
+                <Container maxW="container.xl" mt={10} px={5} >
+                    <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="20" justify="center">
+                        {/* Blog Section */}
+                        <GridItem colSpan={1} w="100%" h="100%" colStart={1} rowStart={1}>
+                            <MotionHeading
+                                size="xl"
+                                mb={7}
+                                align="start"
+                                variants={zoomInVariant}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, amount: 0.4 }}
+                                color="blue.500">
+                                Bài viết
+                            </MotionHeading>
+                            <Box boxShadow="lg" minH="50vh" p={4} bg="white" >
+                                Blog
+                            </Box>
+                        </GridItem>
+                        {/* Time action Section */}
+                        <GridItem colSpan={1} w="100%" h="100%" colStart={2} rowStart={1}>
+                            <MotionHeading
+                                size="xl"
+                                mb={7}
+                                align="start"
+                                variants={zoomInVariant}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, amount: 0.4 }}
+                                color="blue.500">
+                                Hoạt động
+                            </MotionHeading>
+
+                            <MotionBox
+                                variants={zoomInVariant}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, amount: 0.3 }}
+                            >
+                                <MiniCalendar borderRadius="md" maxW="full" h="50vh" />
+                            </MotionBox>
+                        </GridItem>
+                    </Grid>
+                </Container>
 
             </Box>
         </Box >

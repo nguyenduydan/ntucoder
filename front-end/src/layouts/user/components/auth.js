@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
     Box, Flex, Button, useDisclosure, Modal, ModalOverlay,
     ModalContent, ModalHeader, ModalBody, ModalCloseButton,
-    Menu, MenuButton, MenuList, MenuItem, Avatar
+    Menu, MenuButton, MenuList, MenuItem
 } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import Login from "../../auth/authUser/login";
 import Register from "../../auth/authUser/register";
 import { useAuth } from "contexts/AuthContext";
+import AvatarLoadest from "components/fields/Avatar";
 
 const Auth = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -50,7 +51,7 @@ const Auth = () => {
                         )}
                         <Menu>
                             <MenuButton as={Button} variant="none">
-                                <Avatar size="sm" src={coder.avatar || null} name={coder.coderName || 'coder'} alt="avatar" />
+                                <AvatarLoadest size="sm" src={coder.avatar || null} name={coder.coderName || 'coder'} alt="avatar" />
                             </MenuButton>
                             <MenuList p={2}>
                                 <MenuItem

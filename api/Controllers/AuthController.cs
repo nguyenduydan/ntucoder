@@ -43,7 +43,7 @@ namespace api.Controllers
                 //HttpOnly = true,
                 //Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60) 
+                Expires = DateTime.Now.AddMinutes(1440) 
             };
             Response.Cookies.Append("token", token, cookieOptions);
 

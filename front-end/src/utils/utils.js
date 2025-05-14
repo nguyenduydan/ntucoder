@@ -88,3 +88,63 @@ export function validatePassword(password) {
     }
     return ""; // Mật khẩu hợp lệ
 }
+
+export const validateInputs = (inputs) => {
+    const errors = {};
+
+    // Kiểm tra chuỗi rỗng và null/undefined
+    Object.keys(inputs).forEach((key) => {
+        const value = inputs[key];
+
+        if (typeof value === "string" && !value.trim()) {
+            errors[key] = "Không được bỏ trống.";
+        } else if (value === null || value === undefined) {
+            errors[key] = "Không được bỏ trống.";
+        }
+    });
+
+    // Kiểm tra email hợp lệ
+    if (inputs.coderEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.coderEmail)) {
+        errors.coderEmail = "Email không hợp lệ.";
+    }
+
+    // Họ tên không được chứa số
+    if (inputs.coderName && !/^[^\d]+$/.test(inputs.coderName)) {
+        errors.coderName = "Họ và tên không được chứa số.";
+    }
+
+    // Số điện thoại 10 chữ số
+    if (inputs.phoneNumber && !/^\d{10}$/.test(inputs.phoneNumber)) {
+        errors.phoneNumber = "Số điện thoại phải có đúng 10 chữ số.";
+    }
+
+    // Mật khẩu ít nhất 6 ký tự
+    if (inputs.password && inputs.password.length < 6) {
+        errors.password = "Mật khẩu phải có ít nhất 6 ký tự.";
+    }
+
+    // Vai trò là số hợp lệ
+    if (inputs.role !== undefined && (isNaN(inputs.role) || inputs.role === 0)) {
+        errors.role = "Vui lòng chọn vai trò.";
+    }
+
+    return errors;
+};
+
+
+
+//Catch error from BE
+export const parseBackendErrors = (errorResponse) => {
+    const messages = [];
+
+    if (errorResponse?.errors) {
+        for (const field in errorResponse.errors) {
+            errorResponse.errors[field].forEach(msg => {
+                messages.push(`${field}: ${msg}`);
+            });
+        }
+    }
+
+    return messages;
+};
+

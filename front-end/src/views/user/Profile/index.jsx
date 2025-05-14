@@ -3,7 +3,6 @@ import {
     Text,
     Grid,
     GridItem,
-    Avatar,
     Divider,
     Flex,
     Tooltip,
@@ -18,30 +17,33 @@ import { useTitle } from 'contexts/TitleContext';
 import CourseLearning from './components/CourseLearning';
 import { formatDate } from 'utils/utils';
 import { MdEdit } from 'react-icons/md';
+import { useParams } from 'react-router-dom';
+import AvatarLoadest from 'components/fields/Avatar';
 
 
 const Profile = () => {
     useTitle("Hồ sơ");
+    const { id } = useParams();
     const { coder } = useAuth();
-    const { avatar, coderName, coderID } = coder || {};
-    const avatarSrc = avatar || "https://bit.ly/broken-link";
+    const { coderID } = coder || {};
+
     const [info, setInfo] = useState({});
 
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await getDetail({ controller: "Coder", id: coderID });
+            const targetID = id || coderID;
+            const res = await getDetail({ controller: "Coder", id: targetID });
             if (res) setInfo(res);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-    }, [coderID]);
+    }, [id, coderID]);
 
     useEffect(() => {
-        if (coderID) fetchData();
-    }, [coderID, fetchData]);
-
-    const isCoderNameValid = !!coderName;
+        fetchData();
+    }, [fetchData]);
+    const isCoderNameValid = !!info?.coderName;
     const isEmailValid = !!info?.coderEmail;
     const isPhoneValid = !!info?.phoneNumber;
 
@@ -61,17 +63,16 @@ const Profile = () => {
                     boxShadow="md"
                 >
                     <Flex flexDirection="column" alignItems="center">
-                        <Avatar
+                        <AvatarLoadest
                             size="2xl"
                             name="Coder Name"
-                            src={avatarSrc}
+                            src={info.avatar}
                             alt="Coder Avatar"
                             mb={4}
                             border="4px solid white"
-                            boxShadow="0 0 10px rgb(9, 9, 238), 0 0 20px rgb(0, 242, 255)"
                         />
                         <Text fontSize="2xl" mb={2} color="white" fontWeight="bold">
-                            {coderName || "Coder Name"}
+                            {info?.coderName || "Coder Name"}
                         </Text>
 
                         <Button
@@ -97,9 +98,9 @@ const Profile = () => {
                             <Flex align="center" mt={2} mr={2} justify="space-between">
                                 <Flex align="center">
                                     <FaRegUser style={{ marginRight: "8px" }} />
-                                    <Tooltip placement='top' label={coderName ? coderName : "Không có thông tin"} hasArrow fontSize="md">
+                                    <Tooltip placement='top' label={info?.coderName ? info?.coderName : "Không có thông tin"} hasArrow fontSize="md">
                                         <Text fontSize="md" >
-                                            {coderName || ""}
+                                            {info?.coderName || ""}
                                         </Text>
                                     </Tooltip>
                                 </Flex>

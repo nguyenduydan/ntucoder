@@ -78,7 +78,6 @@ namespace api.Controllers
             {
                 return BadRequest(new { Errors = new List<string> { "Dữ liệu không hợp lệ." } });
             }
-
             try
             {
                 var result = await _coderRepository.UpdateCoderAsync(id, dto);
@@ -86,10 +85,12 @@ namespace api.Controllers
             }
             catch (KeyNotFoundException ex)
             {
+                Console.WriteLine($"Lỗi: {ex.Message}");
                 return NotFound(new { Message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
+                Console.WriteLine($"Lỗi: {ex.Message}");
                 return BadRequest(new { Errors = new List<string> { ex.Message } });
             }
             catch (Exception ex)

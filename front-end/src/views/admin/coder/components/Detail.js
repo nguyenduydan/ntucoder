@@ -91,6 +91,13 @@ const CoderDetail = () => {
         });
     };
 
+    useEffect(() => {
+        setAvatarLoaded(false);
+    }, [
+        editableValues.avatar,
+        coderDetail?.avatar, // dùng optional chaining để tránh lỗi
+    ]);
+
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -144,7 +151,13 @@ const CoderDetail = () => {
             Object.keys(editableValues).forEach((field) => {
                 // Kiểm tra để tránh đính kèm CoderID trong formData
                 if (field !== "CoderID") {
-                    formData.append(field, editableValues[field]);
+                    const value = editableValues[field];
+
+                    if (field === "birthDay" && (value === null || value === undefined)) {
+                        formData.append("BirthDay", "");
+                    } else {
+                        formData.append(field, value);
+                    }
                 }
             });
 
@@ -193,8 +206,6 @@ const CoderDetail = () => {
         );
     }
 
-
-
     return (
         <ScrollToTop>
             <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
@@ -241,7 +252,11 @@ const CoderDetail = () => {
                                 mb={4}
                             >
                                 <Image
-                                    src={editableValues.avatar || coderDetail.avatar || "/avatarSimmmple.png"}
+                                    src={
+                                        editableValues.avatar || coderDetail.avatar
+                                            ? `${editableValues.avatar || coderDetail.avatar}?v=${Date.now()}`
+                                            : "/avatarSimmmple.png"
+                                    }
                                     alt="Coder Avatar"
                                     borderRadius="full"
                                     boxSize="200px"
@@ -250,6 +265,7 @@ const CoderDetail = () => {
                                     _hover={{ transform: "scale(1.05)" }}
                                     onClick={() => document.getElementById("avatarInput").click()}
                                     onLoad={() => setAvatarLoaded(true)}
+                                    onError={() => setAvatarLoaded(true)}
                                     cursor="pointer"
                                 />
                             </Skeleton>
@@ -340,7 +356,7 @@ const CoderDetail = () => {
                                         {editField === "birthDay" ? (
                                             <DatePicker
                                                 selected={editableValues.birthDay ? new Date(editableValues.birthDay) : null}
-                                                onChange={(date) => handleInputChange("birthDay", date.toISOString())}
+                                                onChange={(date) => handleInputChange("birthDay", date ? date.toISOString() : "")}
                                                 dateFormat="dd/MM/yyyy"
                                                 showMonthDropdown
                                                 showYearDropdown

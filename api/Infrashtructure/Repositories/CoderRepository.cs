@@ -6,6 +6,7 @@ using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -188,10 +189,7 @@ namespace api.Infrashtructure.Repositories
                 }
             }
 
-            if (dto.BirthDay.HasValue)
-            {
-                existing.BirthDay = dto.BirthDay.Value;
-            }
+            existing.BirthDay = dto.BirthDay;
 
             existing.UpdatedAt = DateTime.Now;
             existing.UpdatedBy = dto.CoderName;
