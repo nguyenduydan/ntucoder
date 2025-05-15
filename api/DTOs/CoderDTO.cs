@@ -13,7 +13,7 @@ namespace api.DTOs
         public string? CoderName { get; set; }
         public string? CoderEmail { get; set; }
         public string? PhoneNumber { get; set; }
-        public int Role { get; set; }
+        public int? Role { get; set; }
      
     }
     public class CreateCoderDTO : CoderDTO

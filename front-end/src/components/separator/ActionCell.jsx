@@ -114,7 +114,7 @@ const ActionCell = ({
         <Button
           variant="solid"
           size="xs"
-          colorScheme="facebook"
+          colorScheme="blue"
           borderRadius="md"
           minW="auto"
           _active={{ transform: "scale(0.90)" }}

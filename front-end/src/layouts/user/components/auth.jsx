@@ -61,7 +61,7 @@ const Auth = () => {
                                     px={4}
                                     borderRadius="md"
                                 >
-                                    Hồ sơ
+                                    Hồ sơ cá nhân
                                 </MenuItem>
                                 <MenuItem _hover={{ bg: "gray.200", }} borderRadius="md" color="red" px={4} onClick={logout}>
                                     Đăng xuất

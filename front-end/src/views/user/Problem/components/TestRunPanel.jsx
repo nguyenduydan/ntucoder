@@ -54,7 +54,7 @@ const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
                 </Text>
             )}
 
-            <Tabs isLazy variant="enclosed" colorScheme="cyan" mt={3}>
+            <Tabs isLazy variant="enclosed" colorScheme="white" mt={3}>
                 <TabList>
                     {testCases.length === 0 ? (
                         <Tab key={0}>Testcase 1</Tab>  // Nếu không có test case, chỉ hiển thị một tab mặc định.

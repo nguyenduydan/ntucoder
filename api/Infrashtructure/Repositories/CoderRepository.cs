@@ -128,7 +128,7 @@ namespace api.Infrashtructure.Repositories
                 UserName = dto.UserName!,
                 Password = hashedPassword,
                 SaltMD5 = salt,
-                RoleID = dto.Role,
+                RoleID = dto.Role ?? 1,
             };
 
             _context.Accounts.Add(account);
@@ -161,21 +161,41 @@ namespace api.Infrashtructure.Repositories
         public async Task<CoderDetailDTO> UpdateCoderAsync(int id, CoderDetailDTO dto)
         {
             var existing = await _context.Coders
-                                  .Include(c => c.Account) 
-                                  .FirstOrDefaultAsync(c => c.CoderID == id);
+                                .Include(c => c.Account)
+                                .FirstOrDefaultAsync(c => c.CoderID == id);
+
             if (existing == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy coder với id = {id}.");
             }
 
-            // Giả sử các kiểm tra đầu vào đã được thực hiện từ tầng Service.
-            existing.CoderName = dto.CoderName ?? existing.CoderName;
-            existing.Description = dto.Description ?? existing.Description;
-            if (dto.Gender.HasValue)
-                existing.Gender = dto.Gender.Value;
-            existing.PhoneNumber = dto.PhoneNumber ?? existing.PhoneNumber;
+            // Cập nhật nếu khác null hoặc chuỗi rỗng
+            if (!string.IsNullOrWhiteSpace(dto.CoderName))
+            {
+                existing.CoderName = dto.CoderName;
+                existing.UpdatedBy = dto.CoderName; // Cập nhật người chỉnh sửa nếu có tên mới
+            }
 
-            // Nếu có file Avatar mới thì xử lý upload.
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+            {
+                existing.Description = dto.Description;
+            }
+
+            if (dto.Gender.HasValue)
+            {
+                existing.Gender = dto.Gender.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                existing.PhoneNumber = dto.PhoneNumber;
+            }
+
+            if (dto.BirthDay != null)
+            {
+                existing.BirthDay = dto.BirthDay;
+            }
+
             if (dto.AvatarFile != null)
             {
                 using (var stream = dto.AvatarFile.OpenReadStream())
@@ -183,36 +203,31 @@ namespace api.Infrashtructure.Repositories
                     var fileName = $"avatars/{existing.CoderID}.jpg"; // Đặt tên file theo ID
                     var bucketName = "ntucoder"; // Tên bucket MinIO
 
-                    // Upload file lên MinIO
                     var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
                     existing.Avatar = fileUrl;
                 }
             }
 
-            existing.BirthDay = dto.BirthDay;
-
-            existing.UpdatedAt = DateTime.Now;
-            existing.UpdatedBy = dto.CoderName;
-            if (dto.Role != null)
+            if (dto.Role.HasValue && dto.Role.Value != 0)
             {
-                // Kiểm tra RoleID trong bảng Roles
-                var roleExists = await _context.Roles.AnyAsync(r => r.RoleID == dto.Role);
+                var roleExists = await _context.Roles.AnyAsync(r => r.RoleID == dto.Role.Value);
                 if (!roleExists)
                 {
                     throw new InvalidOperationException("Role không tồn tại.");
                 }
+
+                if (existing.Account != null)
+                {
+                    existing.Account.RoleID = dto.Role.Value;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Không tìm thấy tài khoản của coder này.");
+                }
             }
 
-            if (existing.Account != null && dto.Role != null)
-            {
-                existing.Account.RoleID = dto.Role;
-            }
-            else if (existing.Account == null)
-            {
-                // Xử lý trường hợp nếu Account không tồn tại (có thể tạo mới hoặc báo lỗi)
-                throw new KeyNotFoundException("Không tìm thấy tài khoản của coder này.");
-            }
 
+            existing.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -229,6 +244,7 @@ namespace api.Infrashtructure.Repositories
                 UpdatedBy = existing.UpdatedBy
             };
         }
+
 
         /// <summary>
         /// Xóa coder và tài khoản liên quan.

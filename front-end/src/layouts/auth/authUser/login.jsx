@@ -38,7 +38,11 @@ const Login = ({ onSuccess }) => {
         try {
             const response = await login(loginData);
             if (response.status === 200 && response.data && response.data.token) {
-                Cookies.set('token', response.data.token);
+
+                // Luu token với thoi gian hieu luc
+                const { token, expires } = response.data;
+                Cookies.set('token', token, { expires: new Date(expires) });
+
                 const resUser = await api.get('/Auth/me',
                     {
                         withCredentials: true,
@@ -75,7 +79,6 @@ const Login = ({ onSuccess }) => {
         }
 
     };
-
 
     return (
         <form

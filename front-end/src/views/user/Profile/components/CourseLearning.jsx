@@ -9,7 +9,6 @@ import MiniCalendar from 'components/calendar/MiniCalendar';
 
 const CourseLearning = ({ coderID }) => {
     const [courseList, setCourseList] = useState([]);
-
     const fetchListData = useCallback(async () => {
         try {
             const res = await api.get(`/Enrollment/list-enroll/${coderID}`);
@@ -18,13 +17,14 @@ const CourseLearning = ({ coderID }) => {
             const response = await getList({
                 controller: "Course",
                 page: 1,
-                pageSize: 100, // để đảm bảo lấy hết nếu chỉ có phân trang
+                pageSize: 100,
                 ascending: true,
                 totalCount: 100
             });
+
             const activeCourses = response.data
                 .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
-                .slice(0, 4); // chỉ lấy tối đa 4 khóa học
+                .slice(0, 4);
 
             setCourseList(activeCourses);
         } catch (err) {
@@ -41,8 +41,9 @@ const CourseLearning = ({ coderID }) => {
             <Tabs variant='soft-rounded' colorScheme='blue' isManual >
                 <Flex justifyContent="space-between">
                     <Text fontSize="xl" color="blue.600" fontWeight="bold">
-                        Khóa học
+                        Khóa học ({courseList.length})
                     </Text>
+
                     <TabList>
                         <Tab>Tất cả khóa học</Tab>
                         <Tab>Đã đăng ký</Tab>

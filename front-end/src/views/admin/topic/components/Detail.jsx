@@ -159,7 +159,7 @@ const TopicDetail = () => {
                                 onClick={() => navigate(`/admin/topic`)}
                                 variant="solid"
                                 size="lg"
-                                colorScheme="messenger"
+                                colorScheme="teal"
                                 borderRadius="xl"
                                 px={5}
                                 boxShadow="lg"
@@ -303,7 +303,7 @@ const TopicDetail = () => {
                         <Button
                             variant="solid"
                             size="lg"
-                            colorScheme="messenger"
+                            colorScheme="teal"
                             borderRadius="xl"
                             px={10}
                             boxShadow="lg"
@@ -319,7 +319,7 @@ const TopicDetail = () => {
                             onClick={handleSave}
                             isLoading={loading}
                             loadingText="Đang lưu..."
-                            disabled={editField === null}
+
                         >
                             Lưu
                         </Button>

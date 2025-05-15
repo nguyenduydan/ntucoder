@@ -28,28 +28,40 @@ namespace api.Controllers
                 return BadRequest();
             }
 
-            var (token, user) = await _authService.AuthenticateAsync(model.UserName, model.Password);
-            if (token == null)
+            var (token, user, expires) = await _authService.AuthenticateAsync(model.UserName, model.Password);
+            if (token == null || user == null || expires == null)
             {
                 return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
             }
+
             var coder = await _coderRepository.GetCoderByIdAsync(user.AccountID);
             if (coder == null)
             {
                 return BadRequest("Không tìm thấy.");
             }
+
             var cookieOptions = new CookieOptions
             {
                 //HttpOnly = true,
                 //Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.Now.AddMinutes(1440) 
+                Expires = expires.Value
             };
             Response.Cookies.Append("token", token, cookieOptions);
-
-            return Ok(new { token, AccountID = user.AccountID, Username = user.UserName, RoleID = user.RoleID, CoderName = coder.CoderName, avatar = coder.Avatar });
-
+            Console.WriteLine(expires.Value.ToString("o"));
+            return Ok(new
+            {
+                token,
+                AccountID = user.AccountID,
+                Username = user.UserName,
+                RoleID = user.RoleID,
+                CoderName = coder.CoderName,
+                avatar = coder.Avatar,
+                Expires = expires.Value.ToLocalTime().ToString("o") // ISO format: dễ parse ở FE
+            });
         }
+
+
         [Authorize]
         [HttpPost("logout")]
         public IActionResult Logout()

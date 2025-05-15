@@ -197,7 +197,7 @@ const ProblemDetail = () => {
                                 onClick={() => navigate(`/admin/problem`)}
                                 variant="solid"
                                 size="lg"
-                                colorScheme="messenger"
+                                colorScheme="teal"
                                 borderRadius="xl"
                                 px={5}
                                 boxShadow="lg"
@@ -550,7 +550,7 @@ const ProblemDetail = () => {
                         <Button
                             variant="solid"
                             size="lg"
-                            colorScheme="messenger"
+                            colorScheme="teal"
                             borderRadius="xl"
                             px={10}
                             boxShadow="lg"
@@ -566,7 +566,7 @@ const ProblemDetail = () => {
                             onClick={handleSave}
                             isLoading={loading}
                             loadingText="Đang lưu..."
-                            disabled={editField === null}
+
                         >
                             Lưu
                         </Button>

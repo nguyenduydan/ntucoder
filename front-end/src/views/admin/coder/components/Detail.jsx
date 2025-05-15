@@ -232,7 +232,7 @@ const CoderDetail = () => {
                                 onClick={() => navigate(`/admin/coder`)}
                                 variant="solid"
                                 size="lg"
-                                colorScheme="messenger"
+                                colorScheme="teal"
                                 borderRadius="xl"
                                 px={5}
                                 boxShadow="lg"
@@ -477,7 +477,7 @@ const CoderDetail = () => {
                         <Button
                             variant="solid"
                             size="lg"
-                            colorScheme="messenger"
+                            colorScheme="teal"
                             borderRadius="xl"
                             px={10}
                             boxShadow="lg"
@@ -493,7 +493,7 @@ const CoderDetail = () => {
                             onClick={handleSave}
                             isLoading={loading}
                             loadingText="Đang lưu..."
-                            disabled={editField === null}
+
                         >
                             Lưu
                         </Button>

@@ -237,7 +237,6 @@ namespace api.Infrashtructure.Repositories
             existing.Published = dto.Published;
             existing.CoderID = dto.CoderID ?? existing.CoderID;
 
-            // Cập nhật thể loại
             if (dto.SelectedCategoryIDs != null && dto.SelectedCategoryIDs.Any())
             {
                 var existingCategoryIds = existing.ProblemCategories.Select(pc => pc.CategoryID).ToList();
@@ -258,19 +257,28 @@ namespace api.Infrashtructure.Repositories
                 }
             }
 
-            // 👉 Cập nhật bài học
+            // 👉 Cập nhật bài học an toàn
             if (dto.SelectedLessonID > 0)
             {
-                // Xóa hết các liên kết cũ
-                _context.LessonProblems.RemoveRange(existing.LessonProblems);
+                var existingLessonProblem = existing.LessonProblems.FirstOrDefault();
 
-                // Thêm liên kết mới
-                _context.LessonProblems.Add(new LessonProblem
+                // Nếu chưa có -> thêm mới
+                if (existingLessonProblem == null)
                 {
-                    ProblemID = existing.ProblemID,
-                    LessonID = dto.SelectedLessonID,
-                });
+                    _context.LessonProblems.Add(new LessonProblem
+                    {
+                        ProblemID = existing.ProblemID,
+                        LessonID = dto.SelectedLessonID,
+                    });
+                }
+                // Nếu khác LessonID -> cập nhật
+                else if (existingLessonProblem.LessonID != dto.SelectedLessonID)
+                {
+                    existingLessonProblem.LessonID = dto.SelectedLessonID;
+                    _context.LessonProblems.Update(existingLessonProblem);
+                }
             }
+
 
             await _context.SaveChangesAsync();
 

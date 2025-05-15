@@ -3,8 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./layouts/admin";
 import UserLayout from "./layouts/user";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import initialTheme from "./theme/theme"; //  { themeGreen }
-import { useState } from "react";
+import initialTheme from "./theme/theme";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProgressBar from "@/components/loading/ProgressBar";
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
@@ -19,7 +19,22 @@ export default function Main() {
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
   const { isLoading } = useAuth();
 
-  if (isLoading) {
+  // State để quản lý việc hiển thị loading với delay
+  const [showLoading, setShowLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowLoading(true);
+    }
+  }, [isLoading]);
+
+  if (showLoading) {
     return <LoadingSpinner />;
   }
 

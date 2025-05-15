@@ -24,11 +24,13 @@ import { MdNotificationsNone } from 'react-icons/md';
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import routes from 'routes';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function HeaderLinks(props) {
   const { secondary } = props;
   const { logout, coder } = useAuth();
+  const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   // Chakra Color Mode
@@ -72,7 +74,7 @@ export default function HeaderLinks(props) {
         variant="outline"
         colorScheme="blue"
         mx={2}
-        onClick={() => window.location.href = '/'}
+        onClick={() => navigate('/')}
       >
         Trang người dùng
       </Button>

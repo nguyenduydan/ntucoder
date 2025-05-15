@@ -1,5 +1,5 @@
 // Update.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -18,13 +18,23 @@ import {
     Box,
     Skeleton,
     Divider,
-    Image
+    Image,
+    SimpleGrid,
+    GridItem,
+    Textarea,
+    Text,
+    Tooltip,
+    Icon,
 } from '@chakra-ui/react';
 import { getDetail, updateItem } from '@/config/apiService';
 import { getCacheBustedUrl } from '@/utils/utils';
+import DatePicker from "react-datepicker";
+import IconBox from '@/components/icons/IconBox';
+import { FaCamera } from 'react-icons/fa6';
 
 const UpdateModal = ({ coderID, isOpen, onClose, onUpdated }) => {
     const toast = useToast();
+    const inputRef = useRef(null);
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -142,66 +152,118 @@ const UpdateModal = ({ coderID, isOpen, onClose, onUpdated }) => {
                         </Flex>
                     ) : (
                         <Box>
-                            <Flex direction="column" align="center" p={5}>
+                            {/* Avatar */}
+                            <Flex direction="column" align="center" p={5} position="relative" bgGradient={"linear(to-r, purple.400, brand.200)"}>
                                 <Skeleton
                                     isLoaded={avatarLoaded}
                                     borderRadius="md"
                                     size="2xl"
                                     mb={4}
                                 >
-                                    <Image
-                                        src={getCacheBustedUrl(formData.avatar || "/avatarSimmmple.png")}
-                                        alt="Avatar"
-                                        borderRadius="full"
-                                        boxSize="150px"
-                                        objectFit="cover"
-                                        transition="all 0.2s ease-in-out"
-                                        _hover={{ transform: "scale(1.05)" }}
-                                        onClick={() => document.getElementById("avatarInput").click()}
-                                        onLoad={() => setAvatarLoaded(true)}
-                                        onError={() => {
-                                            setAvatarLoaded(true); // tránh Skeleton load mãi
-                                        }}
-                                        cursor="pointer"
-                                    />
-                                </Skeleton>
+                                    <Box position="relative" display="inline-block" cursor="pointer">
+                                        <Tooltip label="Thay đổi avatar" placement="top" hasArrow>
+                                            <Image
+                                                src={getCacheBustedUrl(formData.avatar || "/avatarSimmmple.png")}
+                                                alt="Avatar"
+                                                borderRadius="full"
+                                                boxSize="150px"
+                                                objectFit="cover"
+                                                transition="all 0.2s ease-in-out"
+                                                _hover={{ transform: "scale(1.05)" }}
+                                                onClick={() => inputRef.current.click()}
+                                                onLoad={() => setAvatarLoaded(true)}
+                                                onError={() => setAvatarLoaded(true)}
+                                                aria-label="Thay đổi avatar"
+                                            />
+                                        </Tooltip>
 
+                                        <Icon
+                                            as={FaCamera}
+                                            zIndex={10}
+                                            position="absolute"
+                                            top="50%"
+                                            left="50%"
+                                            transform="translate(-50%, -50%)"
+                                            color="white"
+                                            fontSize="2xl"
+                                            pointerEvents="none" // tránh icon chặn event click bên dưới
+                                        />
+                                    </Box>
+                                </Skeleton>
                                 <Input
                                     id="avatarInput"
                                     type="file"
                                     onChange={handleImgChange}
                                     display="none"
+                                    ref={inputRef}
                                 />
-
                             </Flex>
                             <Divider my={4} />
-                            <FormControl mb={4}>
-                                <FormLabel>Họ và tên</FormLabel>
-                                <Input
-                                    value={formData.coderName || ''}
-                                    onChange={e => handleChange('coderName', e.target.value)}
-                                />
-                            </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel>Email</FormLabel>
-                                <Input
-                                    value={formData.coderEmail || ''}
-                                    onChange={e => handleChange('coderEmail', e.target.value)}
-                                />
-                            </FormControl>
-                            <FormControl mb={4}>
-                                <FormLabel>Số điện thoại</FormLabel>
-                                <Input
-                                    value={formData.phoneNumber || ''}
-                                    onChange={e => handleChange('phoneNumber', e.target.value)}
-                                />
-                            </FormControl>
+                            {/* Thống tin cơ bản */}
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 0, md: 5 }}>
+                                <GridItem>
+                                    <FormControl mb={4}>
+                                        <FormLabel fontWeight="bold">Họ và tên</FormLabel>
+                                        <Input
+                                            value={formData.coderName || ''}
+                                            onChange={e => handleChange('coderName', e.target.value)}
+                                        />
+                                    </FormControl>
+                                    <FormControl mb={4}>
+                                        <FormLabel fontWeight="bold">Email</FormLabel>
+                                        <Input
+                                            value={formData.coderEmail || ''}
+                                            onChange={e => handleChange('coderEmail', e.target.value)}
+                                        />
+                                    </FormControl>
 
+                                </GridItem>
+                                <GridItem>
+                                    <FormControl mb={4}>
+                                        <FormLabel fontWeight="bold">Số điện thoại</FormLabel>
+                                        <Input
+                                            value={formData.phoneNumber || ''}
+                                            onChange={e => handleChange('phoneNumber', e.target.value)}
+                                        />
+                                    </FormControl>
+                                    <FormControl mb={4}>
+                                        <FormLabel fontWeight="bold">Ngày sinh</FormLabel>
+                                        <DatePicker
+                                            selected={formData.birthDay ? new Date(formData.birthDay) : null}
+                                            onChange={(date) =>
+                                                handleChange("birthDay", date ? date.toISOString() : "")
+                                            }
+                                            dateFormat="dd/MM/yyyy"
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dropdownMode="select"
+                                            placeholderText="ngày/tháng/năm"
+                                            className="chakra-input css-bq6bms"
+                                            wrapperClassName=".react-datepicker-wrapper"
+                                        />
+                                    </FormControl>
+                                </GridItem>
+                            </SimpleGrid>
+                            <Divider my={4} />
+                            {/* Giới thiệu */}
+                            <Text fontWeight="bold" mb={2} align="center">
+                                Giới thiệu
+                            </Text>
+                            <Textarea
+                                value={formData.description || ''}
+                                onChange={e => handleChange('description', e.target.value)}
+                                maxLength={200}
+                                h="130px"
+                                resize="none"
+                            />
+                            <Text fontSize="sm" color="gray.500" textAlign="right">
+                                {formData.description.length} / 200 ký tự
+                            </Text>
                         </Box>
                     )}
                 </ModalBody>
                 <ModalFooter>
-                    <Button variant="ghost" mr={3} onClick={onClose}>
+                    <Button variant="ghost" colorScheme='red' mr={3} onClick={onClose}>
                         Hủy
                     </Button>
                     <Button

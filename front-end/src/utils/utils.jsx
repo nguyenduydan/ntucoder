@@ -155,3 +155,13 @@ export const getCacheBustedUrl = (url) => {
     return `${url}${separator}v=${Date.now()}`;
 };
 
+
+export const maskEmail = (email) => {
+    if (!email) return "";
+    const [user, domain] = email.split("@");
+    if (!user || !domain) return email;
+    return user.length > 3
+        ? `${user.slice(0, 3)}***@${domain}`
+        : `***@${domain}`;
+};
+

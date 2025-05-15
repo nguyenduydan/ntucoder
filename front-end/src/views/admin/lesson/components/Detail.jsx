@@ -163,7 +163,7 @@ const LessonDetail = () => {
                                 onClick={() => navigate(`/admin/lesson`)}
                                 variant="solid"
                                 size="lg"
-                                colorScheme="messenger"
+                                colorScheme="teal"
                                 borderRadius="xl"
                                 px={5}
                                 boxShadow="lg"
@@ -337,7 +337,7 @@ const LessonDetail = () => {
                         <Button
                             variant="solid"
                             size="lg"
-                            colorScheme="messenger"
+                            colorScheme="teal"
                             borderRadius="xl"
                             px={10}
                             boxShadow="lg"
@@ -353,7 +353,7 @@ const LessonDetail = () => {
                             onClick={handleSave}
                             isLoading={loading}
                             loadingText="Đang lưu..."
-                            disabled={editField === null}
+
                         >
                             Lưu
                         </Button>

@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Avatar } from "@chakra-ui/react";
 import { getCacheBustedUrl } from "@/utils/utils";
 
 const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
     const [avatarColor, setAvatarColor] = useState("rgb(0, 242, 255)"); // Màu mặc định
+
+    const cacheBustedSrc = useMemo(() => getCacheBustedUrl(src), [src]);
 
     const getAvatarColor = useCallback((src) => {
         const img = new Image();
@@ -31,11 +33,10 @@ const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
     }, [onLoad]); // Memoize the function
 
     useEffect(() => {
-        if (src) {
-            getAvatarColor(src);
+        if (cacheBustedSrc) {
+            getAvatarColor(cacheBustedSrc);
         }
-    }, [src, getAvatarColor]); // `getAvatarColor` is now safe to be in the dependency array
-
+    }, [cacheBustedSrc, getAvatarColor]);
 
     // Tạo shadow neon với màu avatarColor
     const neonShadow = `
@@ -48,7 +49,7 @@ const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
     return (
         <Avatar
             name={name}
-            src={getCacheBustedUrl(src)}
+            src={cacheBustedSrc}
             alt="Coder Avatar"
             boxShadow={neonShadow}
             border="2px solid white"

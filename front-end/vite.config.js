@@ -6,6 +6,9 @@ export default defineConfig({
     plugins: [react()],
     server: {
         port: 3000,
+        hmr: {
+            overlay: true,
+        },
     },
     resolve: {
         alias: {
@@ -18,6 +21,7 @@ export default defineConfig({
             'config': path.resolve(__dirname, './src/config'),
             'assets': path.resolve(__dirname, './src/assets'),
             'routes': path.resolve(__dirname, './src/routes'),
+            'theme': path.resolve(__dirname, './src/theme'),
         },
     },
 });
