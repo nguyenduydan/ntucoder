@@ -1,5 +1,5 @@
 import { Box, Text } from "@chakra-ui/react";
-import { useTitle } from "contexts/TitleContext";
+import { useTitle } from "@/contexts/TitleContext";
 
 const MainDashBoard = () => {
     useTitle("Dashboard");

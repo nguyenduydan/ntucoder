@@ -20,8 +20,8 @@ import {
     Divider,
     Image
 } from '@chakra-ui/react';
-import { getDetail, updateItem } from 'config/apiService';
-import { getCacheBustedUrl } from 'utils/utils';
+import { getDetail, updateItem } from '@/config/apiService';
+import { getCacheBustedUrl } from '@/utils/utils';
 
 const UpdateModal = ({ coderID, isOpen, onClose, onUpdated }) => {
     const toast = useToast();

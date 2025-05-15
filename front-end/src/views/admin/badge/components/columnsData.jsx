@@ -1,8 +1,8 @@
-// columnsData.jsx
+// columnsData
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
 import { Box } from "@chakra-ui/react";
-import { deleteItem } from "config/apiService";
+import { deleteItem } from "@/config/apiService";
 
 export const columnsData = [
   {

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Button } from '@chakra-ui/react';
 import { MdArrowBackIos } from 'react-icons/md';
-import sanitizeHtml from "utils/sanitizedHTML";
+import sanitizeHtml from "@/utils/sanitizedHTML";
 
 
 const ProblemDetail = ({ problem, onBack }) => {

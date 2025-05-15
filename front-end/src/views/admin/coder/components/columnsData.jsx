@@ -1,7 +1,7 @@
-// columnsData.jsx
+// columnsData
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteItem } from "config/apiService";
+import { deleteItem } from "@/config/apiService";
 import { Badge } from "@chakra-ui/react";
 
 export const columnsData = [

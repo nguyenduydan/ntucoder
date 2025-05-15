@@ -1,7 +1,7 @@
-// columnsData.jsx
+// columnsData
 import React, { useState } from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { updateStatus, deleteItem } from "config/apiService";
+import { updateStatus, deleteItem } from "@/config/apiService";
 import { Badge, useToast } from "@chakra-ui/react";
 import { useMutation } from '@tanstack/react-query';
 

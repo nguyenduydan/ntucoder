@@ -16,7 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { BiSolidDetail } from "react-icons/bi";
 import { MdDelete, MdEdit } from "react-icons/md";
-import EditTestCase from "views/admin/testcase/components/Update";
+import EditTestCase from "@/views/admin/testcase/components/Update";
 
 const ActionCell = ({
   row,

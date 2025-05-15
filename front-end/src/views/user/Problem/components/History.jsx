@@ -1,4 +1,4 @@
-import api from 'config/apiConfig';
+import api from '@/config/apiConfig';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -13,7 +13,7 @@ import {
     Button,
     Flex
 } from "@chakra-ui/react";
-import { formatDateTime } from 'utils/utils';
+import { formatDateTime } from '@/utils/utils';
 
 const columnsData = [
     { Header: "STT" },

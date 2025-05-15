@@ -4,11 +4,11 @@ import {
     useColorModeValue, useToast, TabIndicator, SimpleGrid, Image
 } from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
-import { getList } from "config/apiService";
+import { getList } from "@/config/apiService";
 import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
-import ScrollToTop from "components/scroll/ScrollToTop";
-import { useTitle } from "contexts/TitleContext";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
+import { useTitle } from "@/contexts/TitleContext";
 import Banner from "assets/img/bannerCourse.png";
 
 export default function Course() {

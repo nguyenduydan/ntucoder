@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Text, Image, Flex, Progress, useColorModeValue, HStack } from "@chakra-ui/react";
 import { StarIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
-import { toSlug, formatNumber } from "utils/utils";
+import { toSlug, formatNumber } from "@/utils/utils";
 import { FaUsers } from "react-icons/fa";
 
 const CourseCard = ({ course, isPlaceholder = false }) => {

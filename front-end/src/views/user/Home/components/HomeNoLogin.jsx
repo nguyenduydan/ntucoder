@@ -16,9 +16,9 @@ import {
 import { motion } from "framer-motion";
 import CodingPng from "assets/img/profile/gummy-coding.png";
 
-import { getList } from "config/apiService";
-import CourseGrid from "views/user/Course/components/CourseGrid";
-import SkeletonList from "views/user/Course/components/SkeletonList";
+import { getList } from "@/config/apiService";
+import CourseGrid from "@/views/user/Course/components/CourseGrid";
+import SkeletonList from "@/views/user/Course/components/SkeletonList";
 
 import AnimateText from "components/animate/AnimateText";
 import Counter from "components/animate/Count";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@chakra-ui/react";
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, coder, isLoading } = useAuth();

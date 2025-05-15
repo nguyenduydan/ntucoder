@@ -5,7 +5,7 @@ import {
     Text, Tooltip, TabPanel, Icon, Spinner
 } from "@chakra-ui/react";
 import NodataPng from "assets/img/nodata.png";
-import ScrollToTop from "components/scroll/ScrollToTop";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Split from "react-split";
 import LessonHeader from "./components/LessonHeader";
 import LessonContent from "./components/LessonContent";
@@ -15,7 +15,7 @@ import Problem from "../Problem/index";
 import ProblemList from "../Problem/components/ProblemList";
 import { FaRegFileAlt, FaBook, FaQuestionCircle, FaBars } from "react-icons/fa";
 
-import { getDetail } from "config/apiService";
+import { getDetail } from "@/config/apiService";
 export default function Lesson() {
     const { lessonId } = useParams();
     const toast = useToast();

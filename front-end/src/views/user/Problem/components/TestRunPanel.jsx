@@ -10,7 +10,7 @@ import {
     Grid,
     GridItem,
 } from "@chakra-ui/react";
-import { getDetail, getTestCase } from "config/apiService";
+import { getDetail, getTestCase } from "@/config/apiService";
 import React, { useState, useEffect } from "react";
 
 const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {

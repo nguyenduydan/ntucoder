@@ -1,7 +1,7 @@
-// TestCaseCountCell.jsx
+// TestCaseCountCell
 import { useEffect, useState } from "react";
 import { Text, Link, Tooltip } from "@chakra-ui/react";
-import api from "config/apiConfig";
+import api from "@/config/apiConfig";
 import { Link as RouterLink } from "react-router-dom";
 
 const TestCaseCountCell = ({ problemId }) => {

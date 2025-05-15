@@ -1,7 +1,7 @@
-// columnsData.jsx
+// columnsData
 import React from "react";
 import ActionCell from "components/separator/ActionCell"; // Đảm bảo đường dẫn import đúng
-import { deleteCompiler } from "config/compilerService";
+import { deleteCompiler } from "@/config/compilerService";
 
 export const columnsData = [
   {
@@ -34,8 +34,8 @@ export const columnsData = [
     accessor: "action",
     Cell: (props) => <ActionCell {...props}
       deleteFunction={deleteCompiler}
-      idData = "compilerID"
-      detailPath = "compiler"
+      idData="compilerID"
+      detailPath="compiler"
       deleteSuccessToast={{
         title: "Đã xóa!",
         description: "Khóa học đã được xóa thành công.",

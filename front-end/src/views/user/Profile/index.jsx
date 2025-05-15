@@ -7,20 +7,22 @@ import {
     Flex,
     Tooltip,
     Button,
-    useDisclosure
+    useDisclosure,
+    Center
 } from '@chakra-ui/react';
 import React, { useEffect, useState, useCallback } from 'react';
-import { useAuth } from 'contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle, FaCalendar } from "react-icons/fa";
 import { PiWarningCircle } from "react-icons/pi";
-import { getDetail } from 'config/apiService';
-import { useTitle } from 'contexts/TitleContext';
+import { getDetail } from '@/config/apiService';
+import { useTitle } from '@/contexts/TitleContext';
 import CourseLearning from './components/CourseLearning';
-import { formatDate } from 'utils/utils';
+import { formatDate } from '@/utils/utils';
 import { MdEdit } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
-import AvatarLoadest from 'components/fields/Avatar';
+import AvatarLoadest from '@/components/fields/Avatar';
 import UpdateModal from './components/UpdateModal';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const Profile = () => {
     useTitle("Hồ sơ cá nhân");
@@ -51,7 +53,23 @@ const Profile = () => {
 
     return (
         <Box maxW="180vh" minH="100vh" mx="auto">
-            <Box h="10vh"></Box>
+            <Box mt={5} ms={10}>
+                <Button
+                    colorScheme="blue"
+                    variant="link"
+                    size="md"
+                    onClick={() => window.history.back()}
+                    leftIcon={<FaArrowLeft />}
+                    _hover={{
+                        leftIcon: {
+                            transform: "translateX(-5px)",
+                            transition: "transform 0.3s ease",
+                        }
+                    }}
+                >
+                    Quay lại
+                </Button>
+            </Box>
             <Grid templateColumns={{ base: "1fr", md: "0.6fr 2fr" }} gap={4} mx={5} p={4}>
                 {/* Avatar and menu */}
                 <GridItem

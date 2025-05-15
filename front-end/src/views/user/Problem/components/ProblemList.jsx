@@ -4,7 +4,7 @@ import {
     useToast
 } from '@chakra-ui/react';
 import React, { useEffect, useState, useCallback } from 'react';
-import { getDetail } from 'config/apiService';
+import { getDetail } from '@/config/apiService';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FaCode } from "react-icons/fa6";
 import ProblemDetail from './ProblemDetail';

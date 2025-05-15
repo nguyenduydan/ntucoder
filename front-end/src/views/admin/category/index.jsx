@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Box, useToast, useDisclosure } from "@chakra-ui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import ScrollToTop from "components/scroll/ScrollToTop";
-import Pagination from "components/pagination/pagination";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
+import Pagination from "@/components/pagination/pagination";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
-import Create from "views/admin/category/components/Create";
+import Create from "@/views/admin/category/components/Create";
 
-import { getList } from "config/apiService";
+import { getList } from "@/config/apiService";
 import { columnsData } from "views/admin/category/components/columnsData";
-import { useTitle } from "contexts/TitleContext";
+import { useTitle } from "@/contexts/TitleContext";
 
 export default function Index() {
   useTitle("Quản lý danh mục");

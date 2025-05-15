@@ -15,11 +15,11 @@ import {
 import Editor from "@monaco-editor/react";
 import TestRunPanel from "./components/TestRunPanel";
 import { useLocation } from "react-router-dom";
-import { getDetail } from "config/apiService";
-import api from "config/apiConfig";
-import { useAuth } from "contexts/AuthContext";
+import { getDetail } from "@/config/apiService";
+import api from "@/config/apiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { FaHandPointUp } from "react-icons/fa";
-import { getList } from "config/apiService";
+import { getList } from "@/config/apiService";
 
 export default function Problem() {
   const location = useLocation();

@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Box, useToast } from "@chakra-ui/react";
-import ScrollToTop from "components/scroll/ScrollToTop";
-import Pagination from "components/pagination/pagination";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
+import Pagination from "@/components/pagination/pagination";
 import { useDisclosure } from "@chakra-ui/react";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 // import data
-import { getList } from "config/compilerService";
+import { getList } from "@/config/compilerService";
 import { columnsData } from "views/admin/compiler/components/columnsData";
-import Create from "views/admin/compiler/components/Create";
-import { useTitle } from "contexts/TitleContext";
+import Create from "@/views/admin/compiler/components/Create";
+import { useTitle } from "@/contexts/TitleContext";
 
 export default function CourseIndex() {
   useTitle("Quản lý biên dịch");

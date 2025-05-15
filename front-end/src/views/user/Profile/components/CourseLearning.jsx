@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import api from "config/apiConfig";
+import api from "@/config/apiConfig";
 import {
     Box, Grid, Text, Divider, Flex, Tabs, Tab, TabList, TabPanels, TabPanel
 } from '@chakra-ui/react';
 import CourseCard from 'views/user/Profile/components/CourseCard';
-import { getList } from 'config/apiService';
+import { getList } from '@/config/apiService';
 import MiniCalendar from 'components/calendar/MiniCalendar';
 
 const CourseLearning = ({ coderID }) => {

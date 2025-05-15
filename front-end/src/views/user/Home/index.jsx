@@ -11,15 +11,15 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import SkeletonList from "../Course/components/SkeletonList";
-import { useTitle } from "contexts/TitleContext";
+import { useTitle } from "@/contexts/TitleContext";
 import CourseGrid from "../Course/components/CourseGrid";
-import { getList } from "config/apiService";
+import { getList } from "@/config/apiService";
 import HeroSection from "./components/HeroSection";
-import { useAuth } from "contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
-import ScrollToTop from "components/scroll/ScrollToTop";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Logo from "assets/img/logo.png";
-import api from "config/apiConfig";
+import api from "@/config/apiConfig";
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);

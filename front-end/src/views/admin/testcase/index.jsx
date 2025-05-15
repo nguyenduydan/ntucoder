@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Box, useToast, useDisclosure } from "@chakra-ui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import ScrollToTop from "components/scroll/ScrollToTop";
-import Pagination from "components/pagination/pagination";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
+import Pagination from "@/components/pagination/pagination";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
-import Create from "views/admin/testcase/components/Create";
+import Create from "@/views/admin/testcase/components/Create";
 
-import { getListTestCase } from "config/apiService";
+import { getListTestCase } from "@/config/apiService";
 import { columnsData } from "views/admin/testcase/components/columnsData";
-import { useTitle } from "contexts/TitleContext";
+import { useTitle } from "@/contexts/TitleContext";
 import { useParams } from "react-router-dom";
 
 export default function Index() {
