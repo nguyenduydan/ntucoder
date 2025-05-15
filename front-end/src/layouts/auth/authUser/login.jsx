@@ -58,6 +58,7 @@ const Login = ({ onSuccess }) => {
                     duration: 3000,
                     isClosable: true,
                     position: "top",
+                    variant: "top-accent",
                 });
             } else {
                 const errorMessage = response.data?.message || "Vui lòng kiểm tra thông tin";
@@ -96,6 +97,7 @@ const Login = ({ onSuccess }) => {
                     onChange={(e) =>
                         setLoginData({ ...loginData, userName: e.target.value })
                     }
+                    autoFocus
                 />
                 <FormErrorMessage>{errors.userName}</FormErrorMessage>
             </FormControl>

@@ -165,13 +165,12 @@ const Profile = () => {
                         >
                             <Text
                                 fontWeight="bold"
-                                bgGradient="linear(to-r, teal.400, purple.300)"
+                                bgGradient="linear(to-r, teal.200, purple.300)"
                                 bgClip="text"
                                 fontSize="md"
                                 userSelect="none"
                             >
                                 Tổng điểm:
-
                             </Text>
                             <Badge colorScheme="yellow" ms={2} fontSize="md" px={3} py={1} borderRadius="md" display="flex" alignItems="center" gap={1}>
                                 {info?.totalPoint || 0}

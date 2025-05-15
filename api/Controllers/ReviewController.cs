@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ReviewController : ControllerBase
     {
         private readonly ReviewRepository _reviewRepository;
@@ -24,45 +24,34 @@ namespace api.Controllers
         public async Task<ActionResult> GetReviews(int courseId)
         {
             var reviews = await _reviewRepository.GetReviewsByCourseIdAsync(courseId);
-            if (reviews == null)
-            {
-                return Ok(null);
-            }
-
-            return Ok(reviews); 
+            return Ok(reviews);
         }
-
 
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<ReviewDTO>> AddReview(int courseId, [FromBody] ReviewDTO reviewDto)
         {
-            if (reviewDto == null)
-            {
-                return BadRequest(new { message = "Review data is invalid." });
-            }
-
             reviewDto.CoderID = _authService.GetUserIdFromToken();
-            if(reviewDto.CoderID == -1)
+            if (reviewDto.CoderID == -1)
             {
                 return Unauthorized();
             }
 
             reviewDto.CourseID = courseId;
 
-            var addedReview = await _reviewRepository.AddReviewAsync(reviewDto);
+            var result = await _reviewRepository.AddOrUpdateReviewAsync(reviewDto);
 
             await _reviewRepository.UpdateCourseRatingAsync(courseId);
 
-            return CreatedAtAction(nameof(GetReviews), new { courseId = courseId }, addedReview);
+            return Ok(result);
         }
 
-        [HttpPut]
-        [Route("update-rating")]
+        [HttpPut("update-rating")]
         public async Task<ActionResult> UpdateCourseRating(int courseId)
         {
             await _reviewRepository.UpdateCourseRatingAsync(courseId);
             return NoContent();
         }
     }
+
 }

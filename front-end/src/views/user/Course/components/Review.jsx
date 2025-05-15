@@ -14,7 +14,7 @@ import CoderAvatar from './CoderAvatar';
 
 
 const Review = ({ courseId }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, coder } = useAuth();
     const [reviewData, setReviewData] = useState({
         rating: 5,
         content: '',
@@ -36,7 +36,7 @@ const Review = ({ courseId }) => {
 
     const fetchReviews = useCallback(async () => {
         try {
-            const response = await api.get(`/Review?courseID=${courseId}`);
+            const response = await api.get(`/Review?courseId=${courseId}`);
             const data = response.data || [];
             setReviews(data);
 

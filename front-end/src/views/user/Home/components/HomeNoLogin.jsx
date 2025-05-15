@@ -386,7 +386,6 @@ const HomeNoLogin = () => {
                                     scale: 1.05,
                                 }}
                                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                                cursor="none"
                                 flexWrap="wrap"
                             >
                                 <motion.div variants={zoomInVariant}>

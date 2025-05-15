@@ -22,8 +22,7 @@ export default function HeroSection() {
     const gradientY = useMotionValue(0.5);
 
     const background = useTransform(() =>
-        `conic-gradient(from 0deg at calc(${gradientX.get() * 100}% - ${left}px) calc(${gradientY.get() * 100}% - ${top}px),
-         #0cdcf7, #ff0088,rgb(137, 18, 255),rgb(24, 221, 247))`
+        `conic-gradient(from 0deg at calc(${gradientX.get() * 100}% - ${left}px) calc(${gradientY.get() * 100}% - ${top}px),rgb(137, 18, 255),rgb(24, 221, 247))`
     );
 
     return (

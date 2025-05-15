@@ -15,35 +15,49 @@ namespace api.Infrashtructure.Repositories
         }
 
         // Thêm đánh giá
-        public async Task<ReviewDTO> AddReviewAsync(ReviewDTO dto)
+        public async Task<ReviewDTO> AddOrUpdateReviewAsync(ReviewDTO dto)
         {
-            var review = new Review
+            var existingReview = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.CourseID == dto.CourseID && r.CoderID == dto.CoderID);
+
+            if (existingReview != null)
             {
-                CourseID = dto.CourseID,
-                CoderID = dto.CoderID,
-                Rating = dto.Rating,
-                Content = dto.Content,
-                CreatedAt = DateTime.Now
-            };
+                // Update
+                existingReview.Rating = dto.Rating;
+                existingReview.Content = dto.Content;
+                existingReview.CreatedAt = DateTime.Now;
 
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
+                _context.Reviews.Update(existingReview);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Create new
+                var newReview = new Review
+                {
+                    CourseID = dto.CourseID,
+                    CoderID = dto.CoderID,
+                    Rating = dto.Rating,
+                    Content = dto.Content,
+                    CreatedAt = DateTime.Now
+                };
 
-            var coder = await _context.Coders
-                .Where(c => c.CoderID == dto.CoderID)
-                .FirstOrDefaultAsync();
-
+                _context.Reviews.Add(newReview);
+                await _context.SaveChangesAsync();
+                existingReview = newReview;
+            }
 
             return new ReviewDTO
             {
-                ReviewID = review.ReviewID,
-                CourseID = review.CourseID,
-                CoderID = review.CoderID,
-                Rating = review.Rating,
-                Content = review.Content,
-                CreatedAt = review.CreatedAt,
+                ReviewID = existingReview.ReviewID,
+                CourseID = existingReview.CourseID,
+                CoderID = existingReview.CoderID,
+                Rating = existingReview.Rating,
+                Content = existingReview.Content,
+                CreatedAt = existingReview.CreatedAt
             };
         }
+
 
 
         // Lấy danh sách đánh giá của 1 khoá học
@@ -53,7 +67,7 @@ namespace api.Infrashtructure.Repositories
                 .Where(r => r.CourseID == courseId)
                 .OrderByDescending(r => r.CreatedAt)
                 .Join(_context.Coders,
-                    review => review.CoderID, 
+                    review => review.CoderID,
                     coder => coder.CoderID,
                     (review, coder) => new { review, coder })
                 .Select(rc => new ReviewDTO
@@ -63,12 +77,11 @@ namespace api.Infrashtructure.Repositories
                     CoderID = rc.review.CoderID,
                     Rating = rc.review.Rating,
                     Content = rc.review.Content,
-                    CoderName = rc.coder.CoderName, // Accessing CoderName from Coders table
+                    CoderName = rc.coder.CoderName, 
                     CreatedAt = rc.review.CreatedAt
                 })
                 .ToListAsync();
         }
-
 
         // Cập nhật điểm trung bình rating trong bảng Courses
         public async Task UpdateCourseRatingAsync(int courseId)

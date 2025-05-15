@@ -33,7 +33,7 @@ const fadeInUp = {
 const Home = () => {
   useTitle("Trang chủ");
   const [coursesEnrolled, setCoursesEnrolled] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [courses, setCoursePopular] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
   const { isAuthenticated, coder } = useAuth();
@@ -58,8 +58,13 @@ const Home = () => {
         .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
         .slice(0, 4); // chỉ lấy tối đa 4 khóa học
 
+      const coursePopular = response.data
+        .filter(course => course.totalReviews >= 0)
+        .sort((a, b) => b.totalReviews - a.totalReviews)
+        .slice(0, 4);
+
       setCoursesEnrolled(activeCourses);
-      setCourses(response.data);
+      setCoursePopular(coursePopular);
     } catch (error) {
       console.error("Error fetching courses:", error);
       toast({
