@@ -23,6 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import api from "@/config/apiConfig";
 import Review from "./Review";
 import StickyTabList from "@/components/scroll/StickyTabList";
+import Comment from "./Comment";
 
 
 const CourseDetail = () => {
@@ -492,7 +493,7 @@ const CourseDetail = () => {
                                     )}
                                 </TabPanel>
                                 <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Review courseId={courseID} />}</TabPanel>
-                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Text>Bình luận từ người học...</Text>}</TabPanel>
+                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Comment courseId={courseID} />}</TabPanel>
                             </TabPanels>
                         </Tabs>
                     </Box>
@@ -579,8 +580,6 @@ const CourseDetail = () => {
                                     {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
                                 </Button>
                             )}
-
-
                         </Box>
                     </Box>
                 </Flex>

@@ -1,4 +1,7 @@
 import moment from "moment";
+import 'moment/locale/vi';
+
+moment.locale('vi');
 
 export const toSlug = (str) => {
     return str
@@ -19,22 +22,28 @@ export const getLuminance = (hex) => {
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 
-
-export const formatCurrency = (amount) => amount ?
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount) : "0 VND";
+export const formatCurrency = (amount) => amount
+    ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
+    : "0 VND";
 
 export const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY HH:mm:ss");
+    // Thiết lập đúng múi giờ UTC+7 (giờ VN), format ngày giờ
+    return moment(dateString).utcOffset(7).format("DD/MM/YYYY HH:mm:ss");
 };
 
 export const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return moment(dateString).locale("vi").format("DD/MM/YYYY");
+    return moment(dateString).utcOffset(7).format("DD/MM/YYYY");
+};
+
+export const formatRelativeTime = (dateString) => {
+    if (!dateString) return "N/A";
+    // moment tự động sử dụng locale vi đã đặt ở trên
+    return moment(dateString).utcOffset(7).fromNow();
 };
 
 export const formatNumber = (number) => new Intl.NumberFormat("vi-VN").format(number);
-
 export const easeInExpo = (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1)));
 
 /**

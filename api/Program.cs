@@ -103,6 +103,7 @@ builder.Services.AddScoped<CodeExecutionService>();
 builder.Services.AddScoped<EnrollmentRepository>();
 builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<ProgressRepository>();
+builder.Services.AddScoped<CommentRepository>();
 //Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();

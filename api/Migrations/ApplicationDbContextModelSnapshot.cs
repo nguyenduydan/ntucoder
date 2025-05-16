@@ -213,13 +213,16 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CommentTime")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int?>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentCommentID")
                         .HasColumnType("int");
 
                     b.HasKey("CommentID");
@@ -229,6 +232,8 @@ namespace api.Migrations
                     b.HasIndex("CoderID");
 
                     b.HasIndex("CourseID");
+
+                    b.HasIndex("ParentCommentID");
 
                     b.ToTable("Comments");
                 });
@@ -881,7 +886,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Blog", "Blog")
                         .WithMany("Comments")
                         .HasForeignKey("BlogID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("api.Models.ERD.Coder", "Coder")
                         .WithMany("Comments")
@@ -894,11 +899,18 @@ namespace api.Migrations
                         .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("api.Models.ERD.Comment", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Blog");
 
                     b.Navigation("Coder");
 
                     b.Navigation("Course");
+
+                    b.Navigation("ParentComment");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Course", b =>
@@ -1179,6 +1191,11 @@ namespace api.Migrations
                     b.Navigation("Solveds");
 
                     b.Navigation("Submissions");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Comment", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Compiler", b =>

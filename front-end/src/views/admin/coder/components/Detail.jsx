@@ -116,7 +116,6 @@ const CoderDetail = () => {
                     formData.append("Role", editableValues.role);
                 }
                 try {
-                    console.log("Data: ", editableValues);
                     // update image
                     await updateItem({ controller: "Coder", id: id, data: formData });
 
@@ -230,7 +229,7 @@ const CoderDetail = () => {
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
                         <ToolDetail offsetTop="15">
                             <Button
-                                onClick={() => navigate(`/admin/course`)}
+                                onClick={() => navigate(`/admin/coder`)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="teal"
