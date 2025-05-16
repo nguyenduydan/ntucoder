@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
-    Tabs, TabList, List, ListItem, TabPanels, Tab, TabPanel, useToast,
+    Tabs, List, ListItem, TabPanels, Tab, TabPanel, useToast,
     VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel,
     AlertDialog,
     AlertDialogBody,
@@ -22,6 +22,7 @@ import { getDetail } from "@/config/apiService";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/config/apiConfig";
 import Review from "./Review";
+import StickyTabList from "@/components/scroll/StickyTabList";
 
 
 const CourseDetail = () => {
@@ -262,7 +263,7 @@ const CourseDetail = () => {
                                 {loading ? (
                                     <SkeletonText noOfLines={3} spacing={4} />
                                 ) : (
-                                    <>
+                                    <Box>
                                         <Text fontSize="3xl" letterSpacing={1.2} fontWeight="bold">{course?.courseName}</Text>
                                         <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
                                         <HStack mt={4} spacing={4}>
@@ -270,7 +271,7 @@ const CourseDetail = () => {
                                             <Icon as={FaUsers} /><Text>{course?.totalReviews || "0"} Học viên</Text>
                                             <Icon as={FaStar} color="yellow.400" /> <Text> {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                                         </HStack>
-                                    </>
+                                    </Box>
                                 )}
                             </Box>
                             {/* Right Sidebar */}
@@ -360,15 +361,19 @@ const CourseDetail = () => {
 
                         {/* Tabs */}
                         <Tabs mt={6} colorScheme="blue" bg="white" borderRadius="md">
-                            <TabList>
+                            <StickyTabList offsetTop={0}>
                                 <Tab>Giới thiệu</Tab>
                                 <Tab>Giáo trình</Tab>
                                 <Tab>Đánh giá</Tab>
                                 <Tab>Bình luận</Tab>
-                            </TabList>
+                            </StickyTabList>
                             <TabPanels>
                                 <TabPanel>
-                                    {loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Text>Giới thiệu nội dung khóa học...</Text>}
+                                    {loading ?
+                                        <SkeletonText noOfLines={4} spacing={3} />
+                                        :
+                                        <Text mt={2}> <Box px={5} py={2} sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }} /></Text>
+                                    }
                                 </TabPanel>
                                 {/* Nội dung giáo trình */}
                                 <TabPanel>
@@ -399,8 +404,9 @@ const CourseDetail = () => {
                                                                         <AccordionPanel pb={4}>
                                                                             {topic.lessons?.length ? (
                                                                                 <List spacing={2}>
-                                                                                    {topic.lessons?.map((lesson) => {
+                                                                                    {topic.lessons.map((lesson) => {
                                                                                         const isLoggedIn = isAuthenticated.isAuthenticated;
+                                                                                        const key = lesson.lessonID || Math.random(); // đảm bảo key duy nhất
 
                                                                                         const LessonItem = (
                                                                                             <ListItem
@@ -428,27 +434,47 @@ const CourseDetail = () => {
                                                                                             </ListItem>
                                                                                         );
 
-                                                                                        return isLoggedIn ? (
-                                                                                            <NavLink
-                                                                                                key={lesson.lessonID || Math.random()}
-                                                                                                to={`${location.pathname}/${lesson.lessonID}`}
-                                                                                                style={({ isActive }) => ({
-                                                                                                    textDecoration: 'none',
-                                                                                                    color: isActive ? 'blue.500' : 'inherit',
-                                                                                                })}
-                                                                                            >
+                                                                                        // Nếu chưa enroll
+                                                                                        if (!isEnrolled) {
+                                                                                            return (
+                                                                                                <Box key={key}>
+                                                                                                    <Box cursor="default" >
+                                                                                                        {LessonItem}
+                                                                                                    </Box>
+                                                                                                </Box>
+                                                                                            );
+                                                                                        }
+
+                                                                                        // Nếu đã đăng nhập
+                                                                                        if (isLoggedIn) {
+                                                                                            return (
+                                                                                                <Box key={key}>
+                                                                                                    <NavLink
+                                                                                                        to={`${location.pathname}?topicID=${topic.topicID}?lessonID=${lesson.lessonID}`}
+                                                                                                        style={({ isActive }) => ({
+                                                                                                            textDecoration: 'none',
+                                                                                                            color: isActive ? 'blue.500' : 'inherit',
+                                                                                                        })}
+                                                                                                    >
+                                                                                                        {LessonItem}
+                                                                                                    </NavLink>
+                                                                                                </Box>
+                                                                                            );
+                                                                                        }
+
+                                                                                        // Nếu chưa đăng nhập
+                                                                                        return (
+                                                                                            <Box key={key}>
                                                                                                 {LessonItem}
-                                                                                            </NavLink>
-                                                                                        ) : (
-                                                                                            <Box key={lesson.lessonID || Math.random()}>{LessonItem}</Box>
+                                                                                            </Box>
                                                                                         );
                                                                                     })}
                                                                                 </List>
                                                                             ) : (
                                                                                 <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>
                                                                             )}
-
                                                                         </AccordionPanel>
+
                                                                     </>
                                                                 )}
                                                             </AccordionItem>

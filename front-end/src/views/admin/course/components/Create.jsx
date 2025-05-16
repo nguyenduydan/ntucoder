@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Button,
     FormControl,
@@ -17,13 +17,17 @@ import {
     ModalFooter,
     Select,
     useColorMode,
+    Box,
+    Divider,
 } from "@chakra-ui/react";
 import FlushedInput from "@/components/fields/InputField";
 import ImageInput from "@/components/fields/ImageInput";
-
+import JoditEditor from "jodit-react";
+import Editor from "@/utils/configEditor";
 import { createItem, getList } from "@/config/apiService";
 
 export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
+    const editor = useRef(null);
     const [course, setCourse] = useState({
         coderID: "",
         courseName: "",
@@ -34,6 +38,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         badgeID: "",
         status: 0,
         description: "",
+        overview: "",
         imageFile: null,
     });
     const [courseCategories, setCourseCategories] = useState([]);
@@ -57,6 +62,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 badgeID: "",
                 status: 0,
                 description: "",
+                overview: "",
                 imageFile: null,
             });
             setErrors({});
@@ -94,6 +100,12 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleEditorChange = (field, content) => {
+        setCourse((prev) => ({
+            ...prev,
+            [field]: content,
+        }));
+    };
     const handleSubmit = async () => {
         if (!validate()) return;
         setLoading(true);
@@ -109,6 +121,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         formData.append("badgeID", course.badgeID);
         formData.append("status", course.status);
         formData.append("description", course.description);
+        formData.append("overview", course.overview);
 
         // Nếu có file ảnh, thêm vào FormData
         if (course.imageFile) {
@@ -155,12 +168,21 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
 
 
     return (
-        <Modal size={'4xl'} isOpen={isOpen} onClose={onClose}>
+        <Modal size={'4xl'} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader fontSize={'25px'} textAlign={'center'}>Thêm mới khóa học</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
+                    <FormControl mb={6}>
+                        <FormLabel textAlign="center" fontWeight="bold">Ảnh khóa học</FormLabel>
+                        <ImageInput
+                            label="chọn ảnh đại diện"
+                            previewWidth="40vh"
+                            previewHeight="20vh"
+                        />
+                    </FormControl>
+                    <Divider my={3} />
                     <Grid templateColumns="repeat(2, 1fr)" gap="6">
                         <GridItem>
                             <FormControl isInvalid={errors.courseName} mb={4}>
@@ -209,16 +231,35 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                                     <option key="offline" value="0">Offline</option>
                                 </Select>
                             </FormControl>
-
                         </GridItem>
                     </Grid>
-                    <FormControl mb={4} mt={4}>
-                        <FormLabel textAlign="center" fontWeight="bold">Ảnh khóa học</FormLabel>
-                        <ImageInput
-                            label="chọn ảnh đại diện"
-                            previewWidth="40vh"
-                            previewHeight="20vh"
+                    <Divider my={3} />
+                    <FormControl isInvalid={errors.description} mb={4}>
+                        <FormLabel fontWeight="bold" textAlign="center">Mô tả</FormLabel>
+                        <Box>
+                            <JoditEditor
+                                key={course.courseId + "-explanation"}
+                                ref={editor}
+                                value={course.description}
+                                config={Editor}
+                                onChange={(newContent) => handleEditorChange('description', newContent)}
+                                onBlur={(newContent) => handleEditorChange('description', newContent)}
+                            />
+                        </Box>
+                        <FormErrorMessage>{errors.description}</FormErrorMessage>
+                    </FormControl>
+                    <Divider my={3} />
+                    <FormControl isInvalid={errors.overview} mb={4}>
+                        <FormLabel fontWeight="bold" textAlign="center">Giới thiệu</FormLabel>
+                        <JoditEditor
+                            key={course.courseId + "-explanation"}
+                            ref={editor}
+                            value={course.overview}
+                            config={Editor}
+                            onChange={(newContent) => handleEditorChange('overview', newContent)}
+                            onBlur={(newContent) => handleEditorChange('overview', newContent)}
                         />
+                        <FormErrorMessage>{errors.overview}</FormErrorMessage>
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>

@@ -28,10 +28,28 @@ namespace api.Models
         public DbSet <CourseCategory> CourseCategories { get; set; }
         public DbSet <Enrollment> Enrollments { get; set; }
         public DbSet <Match> Matches {  get; set; }  
+        public DbSet <Progress> Progresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base .OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Progress>(entity =>
+            {
+                entity.HasKey(p => p.ProgressID);
+
+                entity.Property(p => p.Percent)
+                      .HasDefaultValue(0)
+                      .IsRequired();
+
+                entity.Property(p => p.LastUpdated)
+                      .HasColumnType("datetime")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                      .IsRequired();
+
+                entity.HasIndex(p => new { p.CoderID, p.ObjectType, p.ObjectID })
+                      .IsUnique(); // đảm bảo 1 dòng duy nhất cho mỗi Coder-Object
+            });
 
             modelBuilder.Entity<Account>(entity =>
             {

@@ -168,7 +168,7 @@ export default function Problem() {
         coderID: coder.coderID
       };
 
-      const res = await api.post("/Submission/create", submissionData);
+      const res = await api.post("/Submission/submit", submissionData);
 
       if (res.status === 200) {
         ResultModal(res.data.testRuns[0].result);
@@ -177,12 +177,19 @@ export default function Problem() {
 
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu nộp bài:", error);
+
+      const errorMessage =
+        error.response?.data?.errors?.[0] || // lấy thông báo cụ thể nếu có
+        error.response?.data?.message || // fallback message
+        "Lỗi không xác định.";
+
       toast({
-        title: "Lỗi kết nối",
-        status: "error",
+        title: "Lỗi nộp bài",
+        status: "warning",
+        variant: "solid",
+        description: errorMessage,
         duration: 2000,
         isClosable: true,
-        variant: "left-accent",
         position: "top",
       });
     } finally {
@@ -264,10 +271,10 @@ export default function Problem() {
               leftIcon={<FaHandPointUp />}
               color={isTestRunSuccess ? "green" : "gray.500"}
               borderRadius="md"
-              isDisabled={!isTestRunSuccess}
               onClick={handleSubmission}
               isLoading={loading.status && loading.type === "submit"}
               loadingText="Đang chạy..."
+              isDisabled={!isTestRunSuccess || loading.status || problemID === null}
             >
               Nộp bài
             </Button>
@@ -279,7 +286,7 @@ export default function Problem() {
       {/* Trình biên tập code */}
       <Box h="100%" overflow="hidden" overflowY="hidden">
         <Flex direction="column" h="100%" >
-          <Box flex="6" overflow="hidden" borderBottom="1px solid #555">
+          <Box flex="6" overflow="hidden" borderBottom="1px solid #555" >
             <Editor
               height="100%"
               language={
@@ -293,9 +300,9 @@ export default function Problem() {
               options={{
                 fontSize: 14,
                 minimap: { enabled: false },
+                readOnly: loading.status,
               }}
             />
-
           </Box>
           <Box flex="3" overflow="hidden" bg="gray.900">
             <TestRunPanel hasRun={true} id={problemID} errors={error} testCaseResult={testResults} />

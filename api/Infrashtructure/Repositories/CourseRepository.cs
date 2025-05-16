@@ -5,6 +5,7 @@ using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Helpers;
+using Microsoft.JSInterop.Infrastructure;
 namespace api.Infrashtructure.Repositories
 {
     public class CourseRepository
@@ -115,7 +116,8 @@ namespace api.Infrashtructure.Repositories
                 DiscountPercent = dto.DiscountPercent,
                 IsCombo = dto.IsCombo,
                 BadgeID = dto.BadgeID,
-                ImageUrl = dto.ImageUrl
+                ImageUrl = dto.ImageUrl,
+                Overview = dto.Overview,
             };
 
             _context.Courses.Add(newCourse);
@@ -147,6 +149,7 @@ namespace api.Infrashtructure.Repositories
             if (dto.Fee.HasValue) existingCourse.Fee = dto.Fee.Value;
             if (dto.BadgeID.HasValue) existingCourse.BadgeID = dto.BadgeID.Value;
             if (dto.IsCombo) existingCourse.IsCombo = dto.IsCombo;
+            if (!string.IsNullOrEmpty(dto.Overview)) existingCourse.Overview = dto.Overview;
 
             existingCourse.UpdatedAt = DateTime.Now; // Cập nhật thời gian chỉnh sửa
 
@@ -187,6 +190,7 @@ namespace api.Infrashtructure.Repositories
                 CourseID = existingCourse.CourseID,
                 CourseName = existingCourse.CourseName,
                 Description = existingCourse.Description,
+                Overview = existingCourse.Overview,
                 CreatorName = dto.CreatorName,
                 CreatedAt = existingCourse.CreatedAt,
                 UpdatedAt = existingCourse.UpdatedAt,
@@ -230,6 +234,7 @@ namespace api.Infrashtructure.Repositories
                 CourseID = course.CourseID,
                 CourseName = course.CourseName,
                 Description = course.Description,
+                Overview = course.Overview,
                 CreatorName = course.Creator.CoderName,
                 Status = course.Status,
                 CourseCategoryID = course.CourseCategoryID,
@@ -291,6 +296,20 @@ namespace api.Infrashtructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<int> CountProblemByCourseId(int courseId)
+        {
+            var problemCount = await _context.Topics
+                .Where(t => t.CourseID == courseId)
+                .SelectMany(t => _context.Lessons.Where(l => l.TopicID == t.TopicID))
+                .SelectMany(l => _context.LessonProblems.Where(lp => lp.LessonID == l.LessonID))
+                .Select(lp => lp.ProblemID)
+                .Distinct()
+                .CountAsync();
+
+            return problemCount;
+        }
+
 
         public async Task<PagedResponse<CourseDTO>> SearchCourseAsync(string? keyword, int page, int pageSize)
         {

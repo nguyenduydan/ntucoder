@@ -132,7 +132,7 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
     };
 
     return (
-        <Modal size={'5xl'} isOpen={isOpen} onClose={onClose}>
+        <Modal size={'5xl'} isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader fontSize={'25px'} textAlign={'center'}>Thêm mới bài học</ModalHeader>
@@ -188,16 +188,14 @@ export default function CreateLessonModal({ isOpen, onClose, fetchData }) {
                     </Grid>
                     <FormControl mb={4}>
                         <FormLabel fontWeight="bold">Nội dung bài học</FormLabel>
-                        <Box maxH="600px" overflowY="auto">
-                            <JoditEditor
-                                key={lesson.lessonID}
-                                ref={editor}
-                                value={lesson.lessonContent}
-                                config={Editor}
-                                onChange={handleEditorChange}
-                                onBlur={(newContent) => handleEditorChange(newContent)}
-                            />
-                        </Box>
+                        <JoditEditor
+                            key={lesson.lessonID}
+                            ref={editor}
+                            value={lesson.lessonContent}
+                            config={Editor}
+                            onChange={handleEditorChange}
+                            onBlur={(newContent) => handleEditorChange(newContent)}
+                        />
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>

@@ -16,12 +16,14 @@ namespace api.Controllers
         private readonly SubmissionRepository _submissionRepository;
         private readonly CodeExecutionService _codeExecutionService;
         private readonly AuthService _authService;
+        private readonly ProgressRepository _progressRepository;
 
-        public SubmissionController(SubmissionRepository submissionRepository, CodeExecutionService codeExecutionService, AuthService authService)
+        public SubmissionController(SubmissionRepository submissionRepository, CodeExecutionService codeExecutionService, AuthService authService, ProgressRepository progressRepository)
         {
             _submissionRepository = submissionRepository;
             _codeExecutionService = codeExecutionService;
             _authService = authService;
+            _progressRepository = progressRepository;
         }
 
         [HttpGet("all")]
@@ -37,39 +39,44 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateSubmission([FromBody] SubmissionDTO dto)
+        [HttpPost("submit")]
+        public async Task<IActionResult> Submit([FromBody] SubmissionDTO dto)
         {
             if (dto == null)
-            {
                 return BadRequest(new { Errors = new List<string> { "Dữ liệu không hợp lệ." } });
-            }
 
             try
             {
                 var coderID = _authService.GetUserIdFromToken();
                 dto.CoderID = coderID;
-
-                // 1. Luôn tạo submission với status ban đầu là Pending
                 dto.SubmissionStatus = SubmissionStatus.Pending;
 
-                var result = await _submissionRepository.CreateSubmissionAsync(dto);
+                var submission = await _submissionRepository.CreateSubmissionAsync(dto);
 
-                // 2. Chạy test
-                var testRunResults = await _codeExecutionService.ExecuteSubmissionAsync(result.SubmissionID);
+                var testRunResults = await _codeExecutionService.ExecuteSubmissionAsync(submission.SubmissionID);
 
-                // 3. Cập nhật submission dựa trên test result
-                await _submissionRepository.UpdateSubmissionAfterTestRunAsync(result.SubmissionID);
+                await _submissionRepository.UpdateSubmissionAfterTestRunAsync(submission.SubmissionID);
 
-                // 4. Tải lại submission để kiểm tra status sau khi update
-                var updatedSubmission = await _submissionRepository.GetSubmissionByIdAsync(result.SubmissionID);
+                var updatedSubmission = await _submissionRepository.GetSubmissionByIdAsync(submission.SubmissionID);
 
-                // 5. Nếu đã được Accepted, xử lý Solved và Match
+
                 if (updatedSubmission.SubmissionStatus == SubmissionStatus.Accepted)
                 {
-                    await _submissionRepository.ProcessSolvedAndMatchAsync(updatedSubmission);
+                    await _submissionRepository.ProcessSolvedAndMatchAsync(updatedSubmission); // tính điểm 
+                    if (updatedSubmission.SubmissionStatus == SubmissionStatus.Accepted)
+                    {
+                        await _submissionRepository.ProcessSolvedAndMatchAsync(updatedSubmission); // tính điểm 
+
+                        // Lấy CourseID từ ProblemID
+                        var courseId = await _progressRepository.GetCourseIdFromProblemAsync(updatedSubmission.ProblemID);
+                        if (courseId != null)
+                        {
+                            await _progressRepository.UpdateCourseProgressAsync(updatedSubmission.CoderID, courseId.Value);
+                        }
+                    }
+
                 }
+
 
                 return Ok(new
                 {

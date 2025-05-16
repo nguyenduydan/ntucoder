@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Flex, Accordion, AccordionItem, AccordionButton, AccordionPanel,
-    List, ListItem, SkeletonText, useToast
+    List, ListItem, SkeletonText, useToast,
+    Icon
 } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
-import { FaRegFileCode } from "react-icons/fa";
+import { FaRegFileCode, FaRegCheckCircle, FaCheckCircle } from "react-icons/fa";
 
 import { getDetail } from "@/config/apiService";
+import api from "@/config/apiConfig";
 
 const LessonList = ({ onSelectLesson }) => {
     const { slugId } = useParams();
@@ -18,8 +20,9 @@ const LessonList = ({ onSelectLesson }) => {
     const toast = useToast();
     const navigate = useNavigate();
     const location = useLocation();
+    const [lessonProgress, setLessonProgress] = useState({});
 
-    useEffect(() => {
+    const fetchData = async () => {
         if (isNaN(courseID)) {
             toast({
                 title: "Lỗi",
@@ -28,60 +31,60 @@ const LessonList = ({ onSelectLesson }) => {
                 duration: 3000,
                 isClosable: true,
             });
-            setLoading(false);
             navigate("/course");
             return;
         }
 
-        const fetchCourse = async () => {
-            try {
-                const response = await getDetail({ controller: "Course", id: courseID });
+        setLoading(true);
+        try {
+            const courseRes = await getDetail({ controller: "Course", id: courseID });
+            if (!courseRes?.topics) throw new Error("Không có dữ liệu khóa học");
 
-                if (!response || Object.keys(response).length === 0) {
-                    toast({
-                        title: "Cảnh báo",
-                        description: "Không có dữ liệu cho khóa học này.",
-                        status: "warning",
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                    setCourse(null);
-                    return;
-                }
+            const topicsWithLessons = await Promise.all(
+                courseRes.topics.map(async (topic) => {
+                    try {
+                        const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
+                        return {
+                            ...topic,
+                            lessons: (topicData.lessons || []).filter(l => Number(l.status) === 1)
+                        };
+                    } catch {
+                        return { ...topic, lessons: [] };
+                    }
+                })
+            );
 
-                const topics = response.topics || [];
+            setCourse({ ...courseRes, topics: topicsWithLessons });
 
-                const topicsWithLessons = await Promise.all(
-                    topics.map(async (topic) => {
-                        try {
-                            const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
-                            const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
-
-                            return { ...topic, lessons: filteredLessons };
-                        } catch (error) {
-                            console.log("Error fetching lessons:", error);
-                            return { ...topic, lessons: [] };
-                        }
-                    })
-                );
-
-                setCourse({ ...response, topics: topicsWithLessons });
-            } catch (error) {
-                toast({
-                    title: "Lỗi",
-                    description: "Không thể tải dữ liệu. Vui lòng thử lại!",
-                    status: "error",
-                    duration: 3000,
-                    isClosable: true,
+            let progressMap = {};
+            for (const topic of topicsWithLessons) {
+                const res = await api.get(`/Progress/lesson-summary?topicId=${topic.topicID}`);
+                res.data.forEach(lp => {
+                    progressMap[lp.lessonID] = {
+                        completed: lp.completedProblems,
+                        total: lp.totalProblems
+                    };
                 });
-                setCourse(null);
-            } finally {
-                setLoading(false);
             }
-        };
+            setLessonProgress(progressMap);
 
-        fetchCourse();
-    }, [courseID, toast, navigate]);
+        } catch (error) {
+            toast({
+                title: "Lỗi",
+                description: error.message || "Không thể tải dữ liệu. Vui lòng thử lại!",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+            setCourse(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [courseID, location.pathname]);
 
     return (
         <Box>
@@ -102,8 +105,15 @@ const LessonList = ({ onSelectLesson }) => {
                                                             <Text fontSize="lg">
                                                                 <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
                                                             </Text>
-                                                            <Flex alignItems='center' gap={2} fontSize="sm">
-                                                                <Text as='span'><FaRegFileCode /></Text>Tổng số bài học: {topic?.lessons?.length || 0}
+                                                            <Flex alignItems='center' gap={10} fontSize="sm">
+                                                                <Flex alignItems='center' gap={1}>
+                                                                    <FaRegFileCode color="black" />
+                                                                    <Text>Tổng số bài học: {topic?.lessons?.length || 0}</Text>
+                                                                </Flex>
+                                                                <Flex alignItems='center' gap={1}>
+                                                                    <FaRegCheckCircle color="black" />
+                                                                    <Text>Tiến độ: {topic?.lessons?.length || 0}</Text>
+                                                                </Flex>
                                                             </Flex>
                                                         </Box>
                                                         {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
@@ -130,7 +140,27 @@ const LessonList = ({ onSelectLesson }) => {
                                                                         bg="gray.50" borderRadius="sm"
                                                                         p={2}
                                                                     >
-                                                                        <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                        <Flex alignItems="center" justifyContent="space-between" gap={2} fontSize="md">
+                                                                            <Text fontSize="md">
+                                                                                📚 {lesson.lessonTitle || "Không có tên bài học"}{" "}
+                                                                            </Text>
+                                                                            {lessonProgress[lesson.lessonID] ? (
+                                                                                lessonProgress[lesson.lessonID].completed === lessonProgress[lesson.lessonID].total && lessonProgress[lesson.lessonID].total > 0 ? (
+                                                                                    <Icon as={FaCheckCircle} fontSize="lg" color="green" />
+                                                                                ) : (
+                                                                                    <Text
+                                                                                        as="span"
+                                                                                        ml={2}
+                                                                                        color="inherit"
+                                                                                        fontWeight="bold"
+                                                                                    >
+                                                                                        {lessonProgress[lesson.lessonID].completed}/{lessonProgress[lesson.lessonID].total}
+                                                                                    </Text>
+                                                                                )
+                                                                            ) : (
+                                                                                "0/0"
+                                                                            )}
+                                                                        </Flex>
                                                                     </ListItem>
                                                                 </NavLink>
                                                             ))}

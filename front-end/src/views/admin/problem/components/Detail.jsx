@@ -25,6 +25,7 @@ import JoditEditor from "jodit-react";
 import sanitizeHtml from "@/utils/sanitizedHTML";
 import Editor from "@/utils/configEditor";
 import CodeEditor from "@monaco-editor/react";
+import { getMonacoLanguage } from "@/utils/utils";
 
 import "moment/locale/vi";
 //import api
@@ -34,9 +35,15 @@ import { getList, getDetail, updateItem } from "@/config/apiService";
 const ProblemDetail = () => {
     const { id } = useParams();
     const editor = useRef(null);
+    const navigate = useNavigate();
+    const toast = useToast();
+    const [loading, setLoading] = useState(false);
+    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
+    const textColor = colorMode === 'light' ? 'black' : 'white';
+    const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
 
     const [problem, setProblemDetail] = useState(null);
-    const [compiler, setCompiler] = useState([]);
+
     const [categories, setProblemCategories] = useState([]);
     const [lessons, setLesson] = useState([]);
 
@@ -47,13 +54,8 @@ const ProblemDetail = () => {
         'Validate Output': 'Validate Output',
     };
 
-    const navigate = useNavigate();
-    const toast = useToast();
-    const [loading, setLoading] = useState(false);
-    const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
-    const textColor = colorMode === 'light' ? 'black' : 'white';
-    const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
-
+    const [compilers, setCompiler] = useState([]);
+    const [language, setLanguage] = useState("");
 
     const fetchProblemDetail = useCallback(async () => {
         try {
@@ -88,7 +90,15 @@ const ProblemDetail = () => {
             const lesson = await getList({ controller: "Lesson", page: 1, pageSize: 10 });
             setLesson(lesson.data);
             setProblemCategories(category.data);
-            setCompiler(compiler.data);
+
+            const compilerData = compiler.data;
+
+            setCompiler(compilerData);
+
+            if (compilerData.length > 0) {
+                const defaultCompiler = compilerData[0];
+                setLanguage(defaultCompiler);
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
             setProblemCategories([]);
@@ -173,6 +183,10 @@ const ProblemDetail = () => {
             setLoading(false);  // Bật trạng thái loading khi gửi yêu cầu
         }
     };
+
+    const selectedCompiler = compilers.find(c => c.compilerID === Number(language)); // `language` là ID bạn đang select
+    const monacoLang = getMonacoLanguage(selectedCompiler?.compilerExtension || '');
+
 
     if (!problem) {
         return (
@@ -354,11 +368,24 @@ const ProblemDetail = () => {
                                         />
                                     </Flex>
                                     {editField === 'testCode' ? (
-                                        <Box border="1px solid" borderColor="gray.600" borderRadius="md" mb={4}>
+                                        <Box borderColor="gray.600" borderRadius="md" mb={4}>
+                                            <Select
+                                                mb={4}
+                                                placeholder="Chọn ngôn ngữ"
+                                                value={language}
+                                                onChange={(e) => setLanguage(e.target.value)}
+                                            >
+                                                {compilers.map((compiler) => (
+                                                    <option key={compiler.compilerID} value={compiler.compilerID}>
+                                                        {compiler.compilerName}
+                                                    </option>
+                                                ))}
+                                            </Select>
                                             <CodeEditor
                                                 height="400px"
                                                 theme={"vs-dark"}
                                                 value={problem.testCode}
+                                                language={monacoLang}
                                                 onChange={(value) => handleInputChange('testCode', value || '')}
                                                 onBlur={(value) => handleInputChange('testCode', value || '')}
                                                 options={{
@@ -445,21 +472,21 @@ const ProblemDetail = () => {
                                     <Flex align="center">
                                         {editField === "compiler" ? (
                                             <Select
-                                                value={editableValues.testCompilerID || ""}
-                                                onBlur={() => setEditField(null)}
-                                                onChange={(e) => handleInputChange("testCompilerID", e.target.value)}
-                                                autoFocus
-                                                width="100%"
+                                                mb={4}
+                                                placeholder="Chọn ngôn ngữ"
+                                                value={language}
+                                                onChange={(e) => setLanguage(e.target.value)}
                                             >
-                                                {compiler.map((compiler) => (
+                                                {compilers.map((compiler) => (
                                                     <option key={compiler.compilerID} value={compiler.compilerID}>
                                                         {compiler.compilerName}
                                                     </option>
                                                 ))}
                                             </Select>
+
                                         ) : (
                                             <Text fontSize="lg">
-                                                <strong>Trình biên dịch:</strong> {compiler.find(c => c.compilerID === Number(problem.testCompilerID))?.compilerName || "Chưa chọn"}
+                                                <strong>Trình biên dịch:</strong> {compilers.find(c => c.compilerID === Number(problem.testCompilerID))?.compilerName || "Chưa chọn"}
                                             </Text>
                                         )}
                                         <IconButton

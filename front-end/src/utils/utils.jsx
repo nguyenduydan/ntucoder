@@ -165,3 +165,23 @@ export const maskEmail = (email) => {
         : `***@${domain}`;
 };
 
+export const getMonacoLanguage = (compilerID) => {
+    switch (compilerID) {
+        case '.cpp':
+            return 'cpp';
+        case '.python':
+        case '.py':
+            return 'python';
+        case '.java':
+            return 'java';
+        case '.js':
+        case '.javascript':
+            return 'javascript';
+        case '.csharp':
+        case '.cs':
+            return 'csharp';
+        default:
+            return 'plaintext';
+    }
+};
+

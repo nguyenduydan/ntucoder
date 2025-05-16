@@ -89,23 +89,24 @@ export default function Lesson() {
                                                     <Icon as={FaRegFileAlt} boxSize={5} />
                                                 </Tab>
                                             </Tooltip>
-
-                                            <Tooltip label="Bài tập" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                    <Icon as={FaBook} boxSize={5} />
-                                                </Tab>
-                                            </Tooltip>
                                             <Tooltip label="Giáo trình" placement="right" hasArrow>
                                                 <Tab py={4} _selected={{ bg: "blue.800" }}>
                                                     <Icon as={FaBars} boxSize={5} />
                                                 </Tab>
                                             </Tooltip>
+                                            <Tooltip label="Bài tập" placement="right" hasArrow>
+                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                    <Icon as={FaBook} boxSize={5} />
+                                                </Tab>
+                                            </Tooltip>
+
                                             <Tooltip label="Lịch sử" placement="right" hasArrow>
                                                 <Tab py={4} _selected={{ bg: "blue.800" }} position="relative">
                                                     <Icon as={FaQuestionCircle} boxSize={5} />
                                                 </Tab>
                                             </Tooltip>
                                         </TabList>
+
                                         <TabPanels flex="1" display="flex" flexDirection="column">
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1" ps={2} pe={0}>
                                                 <Box maxWidth="100%" >
@@ -113,14 +114,14 @@ export default function Lesson() {
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box>
-                                                    <ProblemList lessonID={lessonId} />
-                                                </Box>
-                                            </TabPanel>
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
                                                 <Box maxWidth="100%">
                                                     <Text fontWeight="bold" fontSize="lg"> Giáo Trình</Text>
                                                     <LessonList onSelectLesson={handleSelectLesson} />
+                                                </Box>
+                                            </TabPanel>
+                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
+                                                <Box>
+                                                    <ProblemList lessonID={lessonId} />
                                                 </Box>
                                             </TabPanel>
                                             <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">

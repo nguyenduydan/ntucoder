@@ -18,7 +18,7 @@ import {
     useColorMode,
     List, ListItem
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "@/components/scroll/ScrollToTop";
@@ -206,7 +206,7 @@ const CourseDetail = () => {
     }
     return (
         <ScrollToTop>
-            <Flex direction={{ base: "column", md: "row" }} justify="center" alignItems="center">
+            <Grid templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(2, 1fr)" }} justify="center" alignItems="center" position="relative">
                 <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="10px">
                     <Box
                         bg={boxColor}
@@ -214,7 +214,7 @@ const CourseDetail = () => {
                         borderRadius="lg"
                         boxShadow="lg"
                         w={{ base: "100%", md: "100vh" }}
-                        maxW="500vh"
+                        minW="110vh"
                         mx="auto"
                     >
                         <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
@@ -428,8 +428,8 @@ const CourseDetail = () => {
                                     <Box width="max-content">
                                         <Text fontSize="lg">
                                             <strong>Nội dung bài học:</strong>
-                                            <Box overflowY={"auto"} maxHeight="300px" sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} />
                                         </Text>
+                                        <Box overflowY={"auto"} maxHeight="300px" sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} />
                                     </Box>
                                 )}
                                 <IconButton
@@ -438,6 +438,38 @@ const CourseDetail = () => {
                                     ml={2}
                                     size="sm"
                                     onClick={() => handleEdit("description")}
+                                    cursor="pointer"
+                                />
+                            </Flex>
+                            {/* Overview field */}
+                            <Flex align="center" justifyContent="center">
+                                {editField === "overview" ? (
+                                    <Box width="100%" overflowY={"auto"}>
+                                        <JoditEditor
+                                            ref={editor}
+                                            value={editableValues.overview}
+                                            config={Editor}
+                                            onChange={(newContent) => handleInputChange("overview", newContent)}
+                                            autoFocus
+                                            height="1000px"  // Thay đổi giá trị ở đây
+                                            style={{ width: "100%", minHeight: "1000px" }}  // Cập nhật style nếu cần
+                                        />
+
+                                    </Box>
+                                ) : (
+                                    <Box width="max-content">
+                                        <Text fontSize="lg" textAlign="center">
+                                            <strong>Nội dung bài học:</strong>
+                                        </Text>
+                                        <Box overflowY={"auto"} maxHeight="300px" sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }} />
+                                    </Box>
+                                )}
+                                <IconButton
+                                    aria-label="Edit"
+                                    icon={<MdEdit />}
+                                    ml={2}
+                                    size="sm"
+                                    onClick={() => handleEdit("overview")}
                                     cursor="pointer"
                                 />
                             </Flex>
@@ -471,7 +503,14 @@ const CourseDetail = () => {
                     </Box>
                 </Box>
                 {/* Thông tin danh sách topic */}
-                <Box pt={{ base: "130px", md: "80px", xl: "80px" }} px="25px">
+                <Box
+                    pt={{ base: "130px", md: "80px", xl: "80px" }}
+                    px="25px"
+                    position="fixed"
+                    top="4vh"
+                    right="2vh"
+                    display={{ base: "none", md: "none", xl: "block" }}
+                >
                     <Box
                         bg={boxColor}
                         p={{ base: "4", md: "6" }}  // Padding responsive
@@ -482,16 +521,21 @@ const CourseDetail = () => {
                         mx="auto"
                     >
                         <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Danh sách chủ đề</Text>
-                        <List spacing={3}>
+                        <List spacing={4}>
                             {course.topics.map((topic, index) => (
-                                <ListItem key={topic.topicID} p={2} bg="gray.100" borderRadius="md">
-                                    <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
-                                </ListItem>
+                                <NavLink to={`/admin/topic/detail/${topic.topicID}`} key={topic.topicID}>
+                                    <ListItem key={topic.topicID} p={2} bg="gray.100" borderRadius="md" my={2}
+                                        _hover={{ transform: "translateY(-5px)" }}
+                                        transition="transform 0.2s ease-in-out"
+                                    >
+                                        <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
+                                    </ListItem>
+                                </NavLink>
                             ))}
                         </List>
                     </Box>
                 </Box>
-            </Flex>
+            </Grid>
         </ScrollToTop>
 
     );

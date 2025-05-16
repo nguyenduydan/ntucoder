@@ -1,13 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Text, Image, Flex, Progress, useColorModeValue, HStack } from "@chakra-ui/react";
 import { StarIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { toSlug, formatNumber } from "@/utils/utils";
 import { FaUsers } from "react-icons/fa";
+import api from "@/config/apiConfig";
 
 const CourseCard = ({ course, isPlaceholder = false }) => {
     const bgCard = useColorModeValue("white", "navy.900");
     const navigate = useNavigate();
+    const [progress, setProgress] = React.useState(0);
+
+    const fetchProgress = async () => {
+        try {
+            const res = await api.get(`/Progress/course?courseId=${course.courseID}`);
+            setProgress(res.data);
+            console.log(res.data);
+        } catch (error) {
+            console.error("❌ Error fetching progress:", error);
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        fetchProgress();
+    }, []);
+
     // Nếu là placeholder thì trả về thẻ Skeleton
     if (isPlaceholder) {
         return (
@@ -93,13 +111,13 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                         </Text>
                     </Flex>
                     <Text ml="1" fontSize="sm" fontWeight="medium">
-                        {course.progress || "20"}%
+                        {(progress.percent?.toFixed(0)) || "0"}%
                     </Text>
                 </Flex>
             </Box>
             {/* Tiến độ hoàn thành */}
             <Progress
-                value={course.progress || 20}
+                value={progress.percent}
                 size="sm"
                 colorScheme="green"
                 bg="blue.100"

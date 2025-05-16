@@ -21,10 +21,6 @@ export const columnsData = [
     accessor: "topicName",
   },
   {
-    Header: "Nội dung",
-    accessor: "lessonContent",
-  },
-  {
     Header: "Cấp",
     accessor: "order",
   },

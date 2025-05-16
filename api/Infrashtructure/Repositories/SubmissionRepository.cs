@@ -77,6 +77,14 @@ namespace api.Infrashtructure.Repositories
 
         public async Task<SubmissionDTO> CreateSubmissionAsync(SubmissionDTO dto)
         {
+            var exists = await _context.Submissions
+                .AnyAsync(s => s.CoderID == dto.CoderID && s.ProblemID == dto.ProblemID);
+
+            if (exists)
+            {
+                throw new InvalidOperationException("Bạn đã nộp bài cho bài tập này rồi.");
+            }
+
             var submission = new Submission
             {
                 ProblemID = dto.ProblemID,
@@ -95,70 +103,7 @@ namespace api.Infrashtructure.Repositories
             return dto;
         }
 
-        public async Task ProcessSolvedAndMatchAsync(SubmissionDTO dto)
-        {
-            Console.WriteLine(dto.SubmissionStatus);
-            if (dto.SubmissionStatus != SubmissionStatus.Accepted)
-            {
-                return;
-            }
-
-            // Chuyển đổi SubmissionDTO thành Submission
-            var submission = new Submission
-            {
-                SubmissionID = dto.SubmissionID,
-                ProblemID = dto.ProblemID,
-                CoderID = dto.CoderID,
-                SubmissionStatus = dto.SubmissionStatus
-            };
-
-            // Kiểm tra và thêm vào Solved nếu chưa có
-            var isSolved = await _context.Solved
-                .AnyAsync(s => s.ProblemID == submission.ProblemID && s.CoderID == submission.CoderID);
-
-            if (!isSolved)
-            {
-                var solved = new Solved
-                {
-                    ProblemID = submission.ProblemID,
-                    CoderID = submission.CoderID
-                };
-                _context.Solved.Add(solved);
-            }
-
-            // Cập nhật điểm cho các bài học liên quan đến bài tập
-            var lessonProblems = await _context.LessonProblems
-                .Where(lp => lp.ProblemID == submission.ProblemID)
-                .ToListAsync();
-
-            foreach (var lp in lessonProblems)
-            {
-                var match = await _context.Matches
-                    .FirstOrDefaultAsync(m => m.LessonProblemID == lp.ID && m.CoderID == submission.CoderID);
-
-                if (match == null)
-                {
-                    // Tạo mới Match nếu chưa có
-                    match = new Match
-                    {
-                        CoderID = submission.CoderID,
-                        LessonProblemID = lp.ID,
-                        Point = 100 
-                    };
-                    _context.Matches.Add(match);
-                }
-                else
-                {
-                    // Cập nhật điểm nếu cần thiết
-                    match.Point = Math.Max(match.Point, 100);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
-
-
+       
         public async Task<bool> DeleteSubmissionAsync(int id)
         {
             var obj = await _context.Submissions.FirstOrDefaultAsync(o => o.SubmissionID == id);
@@ -352,6 +297,59 @@ namespace api.Infrashtructure.Repositories
 
                 })
         .ToListAsync();
+        }
+
+        //Tính điểm và lưu vào trong Solved
+        public async Task ProcessSolvedAndMatchAsync(SubmissionDTO dto)
+        {
+            if (dto.SubmissionStatus != SubmissionStatus.Accepted)
+                return;
+
+            var submission = new Submission
+            {
+                SubmissionID = dto.SubmissionID,
+                ProblemID = dto.ProblemID,
+                CoderID = dto.CoderID,
+                SubmissionStatus = dto.SubmissionStatus
+            };
+
+            var isSolved = await _context.Solved
+                .AnyAsync(s => s.ProblemID == submission.ProblemID && s.CoderID == submission.CoderID);
+
+            if (!isSolved)
+            {
+                _context.Solved.Add(new Solved
+                {
+                    ProblemID = submission.ProblemID,
+                    CoderID = submission.CoderID
+                });
+            }
+
+            var lessonProblems = await _context.LessonProblems
+                .Where(lp => lp.ProblemID == submission.ProblemID)
+                .ToListAsync();
+
+            foreach (var lp in lessonProblems)
+            {
+                var match = await _context.Matches
+                    .FirstOrDefaultAsync(m => m.LessonProblemID == lp.ID && m.CoderID == submission.CoderID);
+
+                if (match == null)
+                {
+                    _context.Matches.Add(new Match
+                    {
+                        CoderID = submission.CoderID,
+                        LessonProblemID = lp.ID,
+                        Point = 100
+                    });
+                }
+                else
+                {
+                    match.Point = Math.Max(match.Point, 100);
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

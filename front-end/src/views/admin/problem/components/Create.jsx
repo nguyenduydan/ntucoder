@@ -26,6 +26,7 @@ import Editor from "@/utils/configEditor";
 import CodeEditor from "@monaco-editor/react";
 import FlushedInput from "@/components/fields/InputField";
 import { createItem, getList } from "@/config/apiService";
+import { getMonacoLanguage } from "@/utils/utils";
 
 export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
     const editor = useRef(null);
@@ -197,8 +198,11 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
         }
     };
 
+    const selectedCompiler = compilers.find(c => c.compilerID === Number(language)); // `language` là ID bạn đang select
+    const monacoLang = getMonacoLanguage(selectedCompiler?.compilerExtension || '');
+
     return (
-        <Modal size={'full'} isOpen={isOpen} onClose={onClose}>
+        <Modal size={'full'} isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader fontSize={'25px'} textAlign={'center'}>Thêm mới bài toán</ModalHeader>
@@ -231,27 +235,16 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                 </Box>
                                 <FormErrorMessage>{errors.problemContent}</FormErrorMessage>
                             </FormControl>
-
-                            <FormControl isInvalid={errors.problemExplanation} mb={4}>
-                                <FormLabel fontWeight="bold">Giải thích bài toán</FormLabel>
-                                <Box maxH="600px" overflowY="auto">
-                                    <JoditEditor
-                                        key={problem.problemID + "-explanation"}
-                                        ref={editor}
-                                        value={problem.problemExplanation}
-                                        config={Editor}
-                                        onChange={(newContent) => handleEditorChange('problemExplanation', newContent)}
-                                        onBlur={(newContent) => handleEditorChange('problemExplanation', newContent)}
-                                    />
-                                </Box>
-                                <FormErrorMessage>{errors.problemExplanation}</FormErrorMessage>
-                            </FormControl>
                             <FormControl mb={4}>
                                 <FormLabel fontWeight="bold">Code mẫu</FormLabel>
                                 <Flex gap={20} direction="row">
                                     <Select mb={4} value={language} onChange={(e) => setLanguage(e.target.value)}>
                                         <option defaultValue="none" disabled>Chọn ngôn ngữ</option>
-                                        <option value="cpp">C++</option>
+                                        {compilers.map((compiler) => (
+                                            <option key={compiler.compilerID} value={compiler.compilerID}>
+                                                {compiler.compilerName}
+                                            </option>
+                                        ))}
                                     </Select>
                                     <Select mb={4} value={theme} onChange={(e) => setTheme(e.target.value)}>
                                         <option defaultValue="none" disabled>Chọn giao diện</option>
@@ -263,7 +256,7 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                                     <CodeEditor
                                         height="400px"
                                         theme={theme}
-                                        language={language}
+                                        language={monacoLang}
                                         value={problem.testCode}
                                         onChange={(value) => handleEditorChange('testCode', value || '')}
                                         onBlur={(value) => handleEditorChange('testCode', value || '')}

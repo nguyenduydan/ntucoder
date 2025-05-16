@@ -54,6 +54,7 @@ namespace api.Controllers
             try
             {
                 var result = await _courseRepository.GetCourseByIdAsync(id);
+                var count = await _courseRepository.CountProblemByCourseId(id);
                 if (result == null)
                 {
                     return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });

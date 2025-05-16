@@ -11,7 +11,7 @@ const editorConfig = {
         // Tùy chỉnh các cài đặt video nếu cần
         url: true, // Cho phép nhập URL video
     },
-    height: 350,
+    min_height: 350,
     width: 'auto',
     placeholder: 'Nhập nội dung tại đây...',
     theme: 'default',

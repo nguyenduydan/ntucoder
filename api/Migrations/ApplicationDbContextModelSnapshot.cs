@@ -306,6 +306,9 @@ namespace api.Migrations
                     b.Property<decimal?>("OriginalFee")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Overview")
+                        .HasColumnType("longtext");
+
                     b.Property<double>("Rating")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("double")
@@ -548,6 +551,41 @@ namespace api.Migrations
                     b.HasIndex("CategoryID");
 
                     b.ToTable("ProblemCategories");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.Progress", b =>
+                {
+                    b.Property<int>("ProgressID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ProgressID"));
+
+                    b.Property<int>("CoderID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("ObjectID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ObjectType")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Percent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double")
+                        .HasDefaultValue(0.0);
+
+                    b.HasKey("ProgressID");
+
+                    b.HasIndex("CoderID", "ObjectType", "ObjectID")
+                        .IsUnique();
+
+                    b.ToTable("Progresses");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Review", b =>

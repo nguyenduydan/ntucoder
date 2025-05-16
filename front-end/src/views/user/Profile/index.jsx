@@ -225,10 +225,12 @@ const Profile = () => {
                                     >
                                         <Flex align="center">
                                             {isCoderNameValid ? (
-                                                <FaCheckCircle
-                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
-                                                    style={{ color: "green", fontSize: "18px" }}
+                                                <Icon
+                                                    as={FaCheckCircle}
+                                                    color="green.300"
+                                                    boxSize={5}
                                                 />
+
                                             ) : (
                                                 <PiWarningCircle
                                                     cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
@@ -258,10 +260,12 @@ const Profile = () => {
                                     >
                                         <Flex align="center">
                                             {isEmailValid ? (
-                                                <FaCheckCircle
-                                                    cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
-                                                    style={{ color: "green", fontSize: "18px" }}
+                                                <Icon
+                                                    as={FaCheckCircle}
+                                                    color="green.300"
+                                                    boxSize={5}
                                                 />
+
                                             ) : (
                                                 <PiWarningCircle
                                                     cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
@@ -292,10 +296,12 @@ const Profile = () => {
                                         >
                                             <Flex align="center">
                                                 {isPhoneValid ? (
-                                                    <FaCheckCircle
-                                                        cursor="pointer"  // Sử dụng cursor pointer cho dấu tích xanh
-                                                        style={{ color: "green", fontSize: "18px" }}
+                                                    <Icon
+                                                        as={FaCheckCircle}
+                                                        color="green.300"
+                                                        boxSize={5}
                                                     />
+
                                                 ) : (
                                                     <PiWarningCircle
                                                         cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ

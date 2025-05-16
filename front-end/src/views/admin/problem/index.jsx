@@ -13,7 +13,7 @@ import { columnsData } from "views/admin/problem/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
 
 export default function Index() {
-  useTitle("Quản lý chủ đề");
+  useTitle("Quản lý bài tập");
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
