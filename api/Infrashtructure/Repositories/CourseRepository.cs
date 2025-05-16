@@ -214,6 +214,7 @@ namespace api.Infrashtructure.Repositories
                    .Include(c => c.Badge)
                    .Include(c => c.Topics)
                    .Include(c => c.Enrollments) 
+                        .ThenInclude(e => e.Coder)
                    .Include(c => c.Reviews)
                         .ThenInclude(r => r.Coder)
                    .FirstOrDefaultAsync(c => c.CourseID == id);
@@ -258,6 +259,7 @@ namespace api.Infrashtructure.Repositories
                 {
                     EnrollmentID = e.EnrollmentID,
                     CoderID = e.CoderID,
+                    CoderName = e.Coder.CoderName, 
                     EnrolledAt = e.EnrolledAt
                 }).ToList(),
                 Comments = new List<CommentDTO>(),  // Nếu có comments, có thể bổ sung thêm logic ở đây
@@ -309,7 +311,6 @@ namespace api.Infrashtructure.Repositories
 
             return problemCount;
         }
-
 
         public async Task<PagedResponse<CourseDTO>> SearchCourseAsync(string? keyword, int page, int pageSize)
         {

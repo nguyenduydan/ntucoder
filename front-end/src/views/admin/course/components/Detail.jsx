@@ -16,8 +16,17 @@ import {
     Select,
     Skeleton,
     useColorMode,
-    List, ListItem
+    List, ListItem,
+    Tooltip,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogBody,
+    AlertDialogFooter,
+    useDisclosure,
 } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { NavLink, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
@@ -30,12 +39,18 @@ import "moment/locale/vi";
 //import api
 import { getDetail, updateItem, getList } from "@/config/apiService";
 import { formatDateTime, formatCurrency } from "@/utils/utils";
+import api from "@/config/apiConfig";
 
 
 
 const CourseDetail = () => {
     const { id } = useParams();
     const editor = useRef(null);
+    const [selectedCoder, setSelectedCoder] = useState(null);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const cancelRef = useRef();
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const [courseCategories, setCourseCategories] = useState([]);
     const [badge, setBadge] = useState([]);
     const [course, setCourseDetail] = useState(null);
@@ -80,12 +95,14 @@ const CourseDetail = () => {
             setBadge([]);
         }
     };
+
     useEffect(() => {
         if (id) {
             fetchCourseDetail();
             fetchCategories();
         }
     }, [id, fetchCourseDetail]);
+
 
 
     const handleEdit = (field) => {
@@ -198,6 +215,58 @@ const CourseDetail = () => {
             setLoading(false);  // Bật trạng thái loading khi gửi yêu cầu
         }
     };
+
+    const confirmDelete = (coderID) => {
+        setSelectedCoder(coderID);
+        onOpen();
+    };
+
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await handleRemoveEnroll(selectedCoder);
+            onClose();
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+
+    const handleRemoveEnroll = async (coderId) => {
+        try {
+            const res = await api.delete("/Enrollment", {
+                data: {
+                    courseID: id,
+                    coderID: coderId
+                }
+            });
+
+            if (res.status === 200) {
+                toast({
+                    title: "Đã xóa người dùng ra khỏi khóa học",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "top-accent",
+                });
+                await fetchCourseDetail();
+            }
+        } catch (error) {
+            console.error("Lỗi fetch course detail:", error);  // Thêm log lỗi
+            toast({
+                title: "Lỗi xóa",
+                description: error.response?.data?.message || "Có lỗi xảy ra",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
+            });
+        }
+    };
+
+
 
     if (!course) {
         return (
@@ -517,8 +586,10 @@ const CourseDetail = () => {
                         borderRadius="lg"
                         boxShadow="lg"
                         w={{ base: "100%", md: "50vh" }}
-                        maxH="60vh"
+                        maxH="40vh"
                         mx="auto"
+                        overflow="auto"
+                        overflowY="auto"
                     >
                         <Text align={'center'} fontSize={25} mb={5} fontWeight={'bold'}>Danh sách chủ đề</Text>
                         <List spacing={4}>
@@ -534,6 +605,97 @@ const CourseDetail = () => {
                             ))}
                         </List>
                     </Box>
+                </Box>
+                {/* Thông tin danh sách coder enrolled */}
+                <Box
+                    bg="gray.50"
+                    p={{ base: "4", md: "6" }}
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    w={{ base: "100%", md: "50vh" }}
+                    maxH="40vh"
+                    mx="auto"
+                    overflowY="auto"
+                >
+                    <Text align="center" fontSize={25} mb={5} fontWeight="bold">
+                        Danh sách người đăng ký
+                    </Text>
+
+                    <List spacing={4}>
+                        {course.enrollments.map((coder, index) => (
+                            <Flex
+                                key={coder.coderID}
+                                align="center"
+                                justify="space-between"
+                                bg="gray.100"
+                                borderRadius="md"
+                                px={3}
+                                py={2}
+                            >
+                                <Tooltip label={`Xem chi tiết ${coder.coderName}`} placement="top" hasArrow>
+                                    <NavLink
+                                        to={`/admin/coder/detail/${coder.coderID}`}
+                                        style={{ flex: 1, textDecoration: "none" }}
+                                    >
+                                        <Box
+                                            _hover={{ transform: "translateY(-3px)" }}
+                                            transition="transform 0.2s ease-in-out"
+                                        >
+                                            <Text fontWeight="bold" whiteSpace="normal">
+                                                {index + 1}: {coder.coderName}
+                                            </Text>
+                                        </Box>
+                                    </NavLink>
+                                </Tooltip>
+                                <Tooltip label="Xóa người dùng" placement="top" hasArrow>
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        size="sm"
+                                        aria-label="Xóa"
+                                        isRound
+                                        ml={2}
+                                        onClick={() => confirmDelete(coder.coderID)}
+                                    />
+                                </Tooltip>
+                            </Flex>
+                        ))}
+                    </List>
+
+                    {/* Confirm Delete Dialog */}
+                    <AlertDialog
+                        isOpen={isOpen}
+                        leastDestructiveRef={cancelRef}
+                        onClose={isDeleting ? () => { } : onClose} // không đóng khi loading
+                        isCentered
+                    >
+                        <AlertDialogOverlay>
+                            <AlertDialogContent>
+                                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                    Xác nhận xóa
+                                </AlertDialogHeader>
+
+                                <AlertDialogBody>
+                                    Bạn có chắc muốn xóa người dùng này khỏi khóa học?
+                                </AlertDialogBody>
+
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef} onClick={onClose} isDisabled={isDeleting}>
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        colorScheme="red"
+                                        onClick={handleConfirmDelete}
+                                        ml={3}
+                                        isLoading={isDeleting}
+                                        loadingText="Đang xóa"
+                                    >
+                                        Xóa
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialogOverlay>
+                    </AlertDialog>
                 </Box>
             </Grid>
         </ScrollToTop>

@@ -93,7 +93,8 @@ const ActionCell = ({
       toast({
         title: "Lỗi",
         description:
-          error.response?.data?.message ||
+          error.response?.data?.error ||  // thông báo lỗi chính
+          error.response?.data?.message || // fallback nếu không có error
           error.message ||
           "Có lỗi xảy ra khi thực hiện hành động.",
         status: "error",

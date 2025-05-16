@@ -114,10 +114,6 @@ export const columnsData = [
         title: "Đã xóa!",
         description: "Khóa học đã được xóa thành công.",
       }}
-      deleteErrorToast={{
-        title: "Xóa thất bại!",
-        description: "Vui lòng thử lại sau.",
-      }}
       fetchData={props.fetchData} // fetchData là hàm lấy dữ liệu mới
     />
   }
