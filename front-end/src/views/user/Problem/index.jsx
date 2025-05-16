@@ -174,7 +174,7 @@ export default function Problem() {
         ResultModal(res.data.testRuns[0].result);
         onOpen();
       }
-
+      window.location.reload();
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu nộp bài:", error);
 

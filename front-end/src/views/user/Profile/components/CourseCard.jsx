@@ -15,7 +15,6 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
         try {
             const res = await api.get(`/Progress/course?courseId=${course.courseID}`);
             setProgress(res.data);
-            console.log(res.data);
         } catch (error) {
             console.error("❌ Error fetching progress:", error);
             throw error;

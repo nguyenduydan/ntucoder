@@ -14,7 +14,7 @@ namespace api.Controllers
         private readonly CourseRepository _courseRepository;
         private readonly AuthService _authService;
 
-        public CourseController(CourseRepository courseRepository , AuthService authService)
+        public CourseController(CourseRepository courseRepository, AuthService authService)
         {
             _courseRepository = courseRepository;
             _authService = authService;
@@ -54,10 +54,27 @@ namespace api.Controllers
             try
             {
                 var result = await _courseRepository.GetCourseByIdAsync(id);
-                var count = await _courseRepository.CountProblemByCourseId(id);
                 if (result == null)
                 {
                     return NotFound(new { message = $"Không tìm thấy khóa học với ID {id}" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
+        }
+
+        [HttpGet("problem-count")]
+        public async Task<IActionResult> CountProblemByCourseId(int courseId)
+        {
+            try
+            {
+                var result = await _courseRepository.CountProblemByCourseId(courseId);
+                if (result == null)
+                {
+                    return NotFound(new { message = $"Không tìm thấy khóa học với ID {courseId}" });
                 }
                 return Ok(result);
             }

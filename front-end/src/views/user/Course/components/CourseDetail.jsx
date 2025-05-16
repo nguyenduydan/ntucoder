@@ -12,7 +12,7 @@ import {
     AlertDialogOverlay,
 } from "@chakra-ui/react";
 import ScrollToTop from "@/components/scroll/ScrollToTop";
-import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight } from "react-icons/fa";
+import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight, FaClipboardList, FaFingerprint, FaBookOpen } from "react-icons/fa";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
 import { formatCurrency } from "@/utils/utils";
@@ -35,7 +35,7 @@ const CourseDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isEnrolled, setIsEnrolled] = useState(false);
-
+    const [problems, setProblems] = useState([]);
     const isAuthenticated = useAuth();
     const { coder } = useAuth();
 
@@ -83,6 +83,9 @@ const CourseDetail = () => {
                 })
             );
 
+            const problemsCount = await api.get(`/Course/problem-count?courseId=${courseID}`);
+
+            setProblems(problemsCount.data);
             setCourse({ ...response, topics: topicsWithLessons });
 
             if (coder?.coderID) {
@@ -277,7 +280,7 @@ const CourseDetail = () => {
                             {/* Right Sidebar */}
                             <Box
                                 w={{ base: "100%", md: "300px" }}
-                                display={{ base: "block", md: "none" }}
+                                display={{ base: "block", lg: "none" }}
                             >
                                 <Box
                                     color="white"
@@ -312,8 +315,9 @@ const CourseDetail = () => {
 
                                     <VStack align="start" mt={4} spacing={3}>
                                         <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
-                                        <HStack><Icon as={FaCheckCircle} /><Text>{totalLessons} bài học</Text></HStack>
-                                        <HStack><Icon as={FaCheckCircle} /><Text>Truy cập trọn đời</Text></HStack>
+                                        <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
+                                        <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
+                                        <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
                                         <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                                     </VStack>
                                     {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
@@ -450,7 +454,7 @@ const CourseDetail = () => {
                                                                                             return (
                                                                                                 <Box key={key}>
                                                                                                     <NavLink
-                                                                                                        to={`${location.pathname}?topicID=${topic.topicID}?lessonID=${lesson.lessonID}`}
+                                                                                                        to={`${location.pathname}/${lesson.lessonID}`}
                                                                                                         style={({ isActive }) => ({
                                                                                                             textDecoration: 'none',
                                                                                                             color: isActive ? 'blue.500' : 'inherit',
@@ -493,7 +497,7 @@ const CourseDetail = () => {
                         </Tabs>
                     </Box>
                     {/* Right Sidebar */}
-                    <Box display={{ base: "none", md: "block" }} position="relative" w="300px">
+                    <Box display={{ base: "none", lg: "block" }} position="relative" w="300px">
                         <Box
                             bg="blue.900"
                             color="white"
@@ -534,8 +538,9 @@ const CourseDetail = () => {
                             </Flex>
                             <VStack align="start" mt={4} spacing={3}>
                                 <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
-                                <HStack><Icon as={FaCheckCircle} /><Text>{totalLessons} bài học</Text></HStack>
-                                <HStack><Icon as={FaCheckCircle} /><Text>Truy cập trọn đời</Text></HStack>
+                                <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
+                                <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
+                                <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
                                 <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                             </VStack>
                             {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
