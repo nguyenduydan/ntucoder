@@ -985,9 +985,9 @@ namespace api.Migrations
                         .IsRequired();
 
                     b.HasOne("api.Models.ERD.LessonProblem", "LessonProblem")
-                        .WithMany()
+                        .WithMany("Matches")
                         .HasForeignKey("LessonProblemID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Coder");
@@ -1207,6 +1207,11 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.ERD.Lesson", b =>
                 {
                     b.Navigation("LessonProblems");
+                });
+
+            modelBuilder.Entity("api.Models.ERD.LessonProblem", b =>
+                {
+                    b.Navigation("Matches");
                 });
 
             modelBuilder.Entity("api.Models.ERD.Problem", b =>

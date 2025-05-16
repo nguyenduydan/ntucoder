@@ -7,7 +7,6 @@ import {
     Flex,
     Grid,
     GridItem,
-    Link,
     Button,
     Image,
     Input,
@@ -40,6 +39,8 @@ import "moment/locale/vi";
 import { getDetail, updateItem, getList } from "@/config/apiService";
 import { formatDateTime, formatCurrency } from "@/utils/utils";
 import api from "@/config/apiConfig";
+import ReviewList from "./ReviewList";
+import ToolDetail from "@/components/navbar/ToolDetail";
 
 
 
@@ -47,7 +48,8 @@ const CourseDetail = () => {
     const { id } = useParams();
     const editor = useRef(null);
     const [selectedCoder, setSelectedCoder] = useState(null);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isReviewOpen, onOpen: onReviewOpen, onClose: onReviewClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -64,7 +66,8 @@ const CourseDetail = () => {
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'white' : 'whiteAlpha.300';
-
+    const navColor = colorMode === 'light' ? 'white' : 'navy.800';
+    const listColor = colorMode === 'light' ? 'gray.200' : 'whiteAlpha.300';
 
     const fetchCourseDetail = useCallback(async () => {
         try {
@@ -102,8 +105,6 @@ const CourseDetail = () => {
             fetchCategories();
         }
     }, [id, fetchCourseDetail]);
-
-
 
     const handleEdit = (field) => {
         setEditField(field);
@@ -164,7 +165,6 @@ const CourseDetail = () => {
         }
     };
 
-
     const handleSave = async () => {
         setLoading(true);  // Bật trạng thái loading khi gửi yêu cầu
         try {
@@ -218,7 +218,7 @@ const CourseDetail = () => {
 
     const confirmDelete = (coderID) => {
         setSelectedCoder(coderID);
-        onOpen();
+        onDeleteOpen();
     };
 
     const handleConfirmDelete = async () => {
@@ -230,7 +230,6 @@ const CourseDetail = () => {
             setIsDeleting(false);
         }
     };
-
 
     const handleRemoveEnroll = async (coderId) => {
         try {
@@ -266,8 +265,6 @@ const CourseDetail = () => {
         }
     };
 
-
-
     if (!course) {
         return (
             <ProgressBar />
@@ -287,7 +284,7 @@ const CourseDetail = () => {
                         mx="auto"
                     >
                         <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
-                            <Link>
+                            <ToolDetail offsetTop="15" bg={navColor} borderRadius="lg">
                                 <Button
                                     onClick={() => navigate(`/admin/course`)}
                                     variant="solid"
@@ -308,7 +305,54 @@ const CourseDetail = () => {
                                 >
                                     <MdOutlineArrowBack /> Quay lại
                                 </Button>
-                            </Link>
+                                <Button
+                                    size="lg"
+                                    variant="solid"
+                                    colorScheme="blue"
+                                    px={5}
+                                    onClick={onReviewOpen}
+                                    borderRadius="xl"
+                                    boxShadow="lg"
+                                    transition="all 0.2s ease-in-out"
+                                    _hover={{
+                                        color: "white",
+                                        transform: "scale(1.05)",
+                                    }}
+                                    _active={{
+                                        transform: "scale(0.90)",
+                                    }}
+                                >
+                                    Xem đánh giá
+                                </Button>
+                                <ReviewList
+                                    courseId={id}
+                                    isOpen={isReviewOpen}
+                                    onClose={onReviewClose}
+                                />
+                                <Button
+                                    variant="solid"
+                                    size="lg"
+                                    colorScheme="teal"
+                                    borderRadius="xl"
+                                    px={10}
+                                    boxShadow="lg"
+                                    bgGradient="linear(to-l, green.500, green.300)"
+                                    transition="all 0.2s ease-in-out"
+                                    _hover={{
+                                        color: "white",
+                                        transform: "scale(1.05)",
+                                    }}
+                                    _active={{
+                                        transform: "scale(0.90)",
+                                    }}
+                                    onClick={handleSave}
+                                    isLoading={loading}
+                                    loadingText="Đang lưu..."
+
+                                >
+                                    Lưu
+                                </Button>
+                            </ToolDetail>
                         </Flex>
                         <VStack spacing={6} align="stretch" mt={4}>
                             {/* Avatar Section */}
@@ -475,6 +519,7 @@ const CourseDetail = () => {
                                             </>
                                         )}
                                     </VStack>
+
                                 </GridItem>
                             </Grid>
                             <Divider />
@@ -543,40 +588,13 @@ const CourseDetail = () => {
                                 />
                             </Flex>
                         </VStack>
-                        <Flex justifyContent="flex-end" mt={6}>
-                            <Button
-                                variant="solid"
-                                size="lg"
-                                colorScheme="teal"
-                                borderRadius="xl"
-                                px={10}
-                                boxShadow="lg"
-                                bgGradient="linear(to-l, green.500, green.300)"
-                                transition="all 0.2s ease-in-out"
-                                _hover={{
-                                    color: "white",
-                                    transform: "scale(1.05)",
-                                }}
-                                _active={{
-                                    transform: "scale(0.90)",
-                                }}
-                                onClick={handleSave}
-                                isLoading={loading}
-                                loadingText="Đang lưu..."
-
-                            >
-                                Lưu
-                            </Button>
-                        </Flex>
-
                     </Box>
                 </Box>
                 {/* Thông tin danh sách topic */}
                 <Box
-                    pt={{ base: "130px", md: "80px", xl: "80px" }}
                     px="25px"
                     position="fixed"
-                    top="4vh"
+                    top="14vh"
                     right="2vh"
                     display={{ base: "none", md: "none", xl: "block" }}
                 >
@@ -586,7 +604,7 @@ const CourseDetail = () => {
                         borderRadius="lg"
                         boxShadow="lg"
                         w={{ base: "100%", md: "50vh" }}
-                        maxH="40vh"
+                        minH="40vh"
                         mx="auto"
                         overflow="auto"
                         overflowY="auto"
@@ -595,9 +613,9 @@ const CourseDetail = () => {
                         <List spacing={4}>
                             {course.topics.map((topic, index) => (
                                 <NavLink to={`/admin/topic/detail/${topic.topicID}`} key={topic.topicID}>
-                                    <ListItem key={topic.topicID} p={2} bg="gray.100" borderRadius="md" my={2}
+                                    <ListItem key={topic.topicID} p={2} bg={listColor} borderRadius="md" my={2}
                                         _hover={{ transform: "translateY(-5px)" }}
-                                        transition="transform 0.2s ease-in-out"
+                                        transition="transform 0.1s ease-in-out"
                                     >
                                         <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic.topicName}
                                     </ListItem>
@@ -608,94 +626,103 @@ const CourseDetail = () => {
                 </Box>
                 {/* Thông tin danh sách coder enrolled */}
                 <Box
-                    bg="gray.50"
-                    p={{ base: "4", md: "6" }}
-                    borderRadius="lg"
-                    boxShadow="lg"
-                    w={{ base: "100%", md: "50vh" }}
-                    maxH="40vh"
-                    mx="auto"
-                    overflowY="auto"
+                    px="25px"
+                    position="fixed"
+                    bottom="10px"
+                    right="2vh"
+                    display={{ base: "none", md: "none", xl: "block" }}
                 >
-                    <Text align="center" fontSize={25} mb={5} fontWeight="bold">
-                        Danh sách người đăng ký
-                    </Text>
-
-                    <List spacing={4}>
-                        {course.enrollments.map((coder, index) => (
-                            <Flex
-                                key={coder.coderID}
-                                align="center"
-                                justify="space-between"
-                                bg="gray.100"
-                                borderRadius="md"
-                                px={3}
-                                py={2}
-                            >
-                                <Tooltip label={`Xem chi tiết ${coder.coderName}`} placement="top" hasArrow>
-                                    <NavLink
-                                        to={`/admin/coder/detail/${coder.coderID}`}
-                                        style={{ flex: 1, textDecoration: "none" }}
-                                    >
-                                        <Box
-                                            _hover={{ transform: "translateY(-3px)" }}
-                                            transition="transform 0.2s ease-in-out"
-                                        >
-                                            <Text fontWeight="bold" whiteSpace="normal">
-                                                {index + 1}: {coder.coderName}
-                                            </Text>
-                                        </Box>
-                                    </NavLink>
-                                </Tooltip>
-                                <Tooltip label="Xóa người dùng" placement="top" hasArrow>
-                                    <IconButton
-                                        icon={<DeleteIcon />}
-                                        colorScheme="red"
-                                        size="sm"
-                                        aria-label="Xóa"
-                                        isRound
-                                        ml={2}
-                                        onClick={() => confirmDelete(coder.coderID)}
-                                    />
-                                </Tooltip>
-                            </Flex>
-                        ))}
-                    </List>
-
-                    {/* Confirm Delete Dialog */}
-                    <AlertDialog
-                        isOpen={isOpen}
-                        leastDestructiveRef={cancelRef}
-                        onClose={isDeleting ? () => { } : onClose} // không đóng khi loading
-                        isCentered
+                    <Box
+                        bg={boxColor}
+                        p={{ base: "4", md: "6" }}
+                        borderRadius="lg"
+                        boxShadow="lg"
+                        w={{ base: "100%", md: "50vh" }}
+                        minH="40vh"
+                        mx="auto"
+                        overflow="auto"
+                        overflowY="auto"
                     >
-                        <AlertDialogOverlay>
-                            <AlertDialogContent>
-                                <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                    Xác nhận xóa
-                                </AlertDialogHeader>
+                        <Text align="center" fontSize={25} mb={5} fontWeight="bold">
+                            Danh sách người đăng ký
+                        </Text>
 
-                                <AlertDialogBody>
-                                    Bạn có chắc muốn xóa người dùng này khỏi khóa học?
-                                </AlertDialogBody>
+                        <List spacing={4}>
+                            {course.enrollments.map((coder, index) => (
+                                <Flex
+                                    key={coder.coderID}
+                                    align="center"
+                                    justify="space-between"
+                                    bg="transparent"
+                                >
+                                    <Tooltip label={`Xem chi tiết ${coder.coderName}`} placement="top" hasArrow>
+                                        <NavLink
+                                            to={`/admin/coder/detail/${coder.coderID}`}
+                                            style={{ flex: 1, textDecoration: "none" }}
+                                        >
+                                            <Box
+                                                bg={listColor}
+                                                p={2}
+                                                borderRadius="md"
+                                                _hover={{ transform: "translateY(-3px)" }}
+                                                transition="all 0.1s ease-in-out"
+                                            >
+                                                <Text fontWeight="bold" whiteSpace="normal" color={textColor}>
+                                                    {index + 1}: {coder.coderName}
+                                                </Text>
+                                            </Box>
+                                        </NavLink>
+                                    </Tooltip>
+                                    <Tooltip label="Xóa người dùng" placement="top" hasArrow>
+                                        <IconButton
+                                            icon={<DeleteIcon />}
+                                            colorScheme="red"
+                                            size="sm"
+                                            aria-label="Xóa"
+                                            isRound
+                                            ml={2}
+                                            onClick={() => confirmDelete(coder.coderID)}
+                                        />
+                                    </Tooltip>
+                                </Flex>
+                            ))}
+                        </List>
 
-                                <AlertDialogFooter>
-                                    <Button ref={cancelRef} onClick={onClose} isDisabled={isDeleting}>
-                                        Hủy
-                                    </Button>
-                                    <Button
-                                        colorScheme="red"
-                                        onClick={handleConfirmDelete}
-                                        ml={3}
-                                        isLoading={isDeleting}
-                                        loadingText="Đang xóa"
-                                    >
-                                        Xóa
-                                    </Button>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialogOverlay>
-                    </AlertDialog>
+                        {/* Confirm Delete Dialog */}
+                        <AlertDialog
+                            isOpen={isDeleteOpen}
+                            leastDestructiveRef={cancelRef}
+                            onClose={isDeleting ? () => { } : onDeleteClose} // không đóng khi loading
+                            isCentered
+                        >
+                            <AlertDialogOverlay>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                        Xác nhận xóa
+                                    </AlertDialogHeader>
+
+                                    <AlertDialogBody>
+                                        Bạn có chắc muốn xóa người dùng này khỏi khóa học?
+                                    </AlertDialogBody>
+
+                                    <AlertDialogFooter>
+                                        <Button ref={cancelRef} onClick={onDeleteClose} isDisabled={isDeleting}>
+                                            Hủy
+                                        </Button>
+                                        <Button
+                                            colorScheme="red"
+                                            onClick={handleConfirmDelete}
+                                            ml={3}
+                                            isLoading={isDeleting}
+                                            loadingText="Đang xóa"
+                                        >
+                                            Xóa
+                                        </Button>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialogOverlay>
+                        </AlertDialog>
+                    </Box>
                 </Box>
             </Grid>
         </ScrollToTop>

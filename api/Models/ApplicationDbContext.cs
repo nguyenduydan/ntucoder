@@ -90,9 +90,9 @@ namespace api.Models
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(m => m.LessonProblem)
-                    .WithMany()
+                    .WithMany(lp => lp.Matches)
                     .HasForeignKey(m => m.LessonProblemID)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
 
@@ -319,15 +319,31 @@ namespace api.Models
                 entity.HasOne(c => c.Badge)
                       .WithMany()
                       .HasForeignKey(c => c.BadgeID)
-                      .OnDelete(DeleteBehavior.Cascade);
+                     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasMany(c => c.Reviews)
                       .WithOne(r => r.Course)
                       .HasForeignKey(r => r.CourseID)
                       .OnDelete(DeleteBehavior.Cascade);
+
                 entity.HasOne(c => c.CourseCategory)
                       .WithMany(cc => cc.Courses)
                       .HasForeignKey(c => c.CourseCategoryID)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(c => c.Topics)
+                        .WithOne(t => t.Course)
+                        .HasForeignKey(t => t.CourseID)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(c => c.Comments)
+                      .WithOne(cm => cm.Course)
+                      .HasForeignKey(cm => cm.CourseID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(c => c.Enrollments)
+                      .WithOne(e => e.Course)
+                      .HasForeignKey(e => e.CourseID)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 

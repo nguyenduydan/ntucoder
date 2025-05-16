@@ -27,6 +27,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatDateTime } from "@/utils/utils";
 import { getCacheBustedUrl } from "@/utils/utils";
+import ToolDetail from "@/components/navbar/ToolDetail";
 
 const genderMapping = {
     0: "Nam",
@@ -227,9 +228,9 @@ const CoderDetail = () => {
                     mx="auto"
                 >
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
-                        <Link>
+                        <ToolDetail offsetTop="15">
                             <Button
-                                onClick={() => navigate(`/admin/coder`)}
+                                onClick={() => navigate(`/admin/course`)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="teal"
@@ -248,7 +249,31 @@ const CoderDetail = () => {
                             >
                                 <MdOutlineArrowBack /> Quay lại
                             </Button>
-                        </Link>
+
+                            <Button
+                                variant="solid"
+                                size="lg"
+                                colorScheme="teal"
+                                borderRadius="xl"
+                                px={10}
+                                boxShadow="lg"
+                                bgGradient="linear(to-l, green.500, green.300)"
+                                transition="all 0.2s ease-in-out"
+                                _hover={{
+                                    color: "white",
+                                    transform: "scale(1.05)",
+                                }}
+                                _active={{
+                                    transform: "scale(0.90)",
+                                }}
+                                onClick={handleSave}
+                                isLoading={loading}
+                                loadingText="Đang lưu..."
+
+                            >
+                                Lưu
+                            </Button>
+                        </ToolDetail>
                     </Flex>
                     <VStack spacing={6} align="stretch" mt={4}>
                         {/* Avatar Section */}

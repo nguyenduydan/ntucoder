@@ -281,17 +281,11 @@ namespace api.Infrashtructure.Repositories
         public async Task<bool> DeleteAsync(int id)
         {
             var course = await _context.Courses
-                .Include(c => c.Enrollments)
                 .FirstOrDefaultAsync(c => c.CourseID == id);
 
             if (course == null)
             {
                 throw new KeyNotFoundException("Khóa học không tồn tại.");
-            }
-
-            if (course.Enrollments.Any())
-            {
-                throw new InvalidOperationException("Không thể xóa khóa học có học viên đã đăng ký.");
             }
 
             _context.Courses.Remove(course);

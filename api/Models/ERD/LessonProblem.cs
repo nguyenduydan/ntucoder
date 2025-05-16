@@ -8,6 +8,8 @@
 
         public virtual Lesson Lesson { get; set; }
         public virtual Problem Problem { get; set; }
+
+        public virtual ICollection<Match> Matches { get; set; } = new HashSet<Match>();
     }
 
 }

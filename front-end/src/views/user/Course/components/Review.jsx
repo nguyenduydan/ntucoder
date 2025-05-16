@@ -14,7 +14,7 @@ import CoderAvatar from './CoderAvatar';
 
 
 const Review = ({ courseId }) => {
-    const { isAuthenticated, coder } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [reviewData, setReviewData] = useState({
         rating: 5,
         content: '',
