@@ -17,7 +17,12 @@ import {
     Switch,
     FormControl,
     FormLabel,
-    VStack,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogBody,
+    AlertDialogFooter,
 } from '@chakra-ui/react';
 
 import ReactQuill from 'react-quill';
@@ -25,15 +30,25 @@ import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from '@/utils/formatReactQuill';
 import { createItem } from '@/config/apiService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDisclosure } from '@chakra-ui/react';
 
 const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [published, setPublished] = useState(true);
     const [pinHome, setPinHome] = useState(false);
+    const cancelRef = React.useRef();
+
+    const {
+        isOpen: isConfirmOpen,
+        onOpen: onConfirmOpen,
+        onClose: onConfirmClose,
+    } = useDisclosure();
 
     const toast = useToast();
     const { coder } = useAuth();
+
+    const hasChanges = title.trim() || content.trim() !== '' || !published || pinHome;
 
     const resetForm = () => {
         setTitle('');
@@ -66,8 +81,8 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
         const newPost = {
             title: title,
             content: content,
-            published: published ? 1 : 0,  // chuyển true/false thành 1/0
-            pinHome: pinHome ? 1 : 0,      // nếu pinHome cũng là bool thì làm tương tự
+            published: published ? 1 : 0,
+            pinHome: pinHome ? 1 : 0,
         };
 
         try {
@@ -98,86 +113,126 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
         }
     };
 
+    const handleClose = () => {
+        if (hasChanges) {
+            onConfirmOpen();
+        } else {
+            resetForm();
+            onClose();
+        }
+    };
+
+    const confirmClose = () => {
+        resetForm();
+        onConfirmClose();
+        onClose();
+    };
+
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={() => {
-                resetForm();
-                onClose();
-            }}
-            size="6xl"
-            isCentered
-            scrollBehavior="inside"
-            motionPreset="slideInBottom"
-        >
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
-                    <FormControl>
-                        <FormLabel textAlign="center" fontWeight="bold" fontSize="2xl">Đăng bài viết mới</FormLabel>
-                        <Input
-                            placeholder="Nhập tiêu đề bài viết"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            autoFocus
-                        />
-                    </FormControl>
-                    <Flex align="center" mt={4} bgGradient="linear(to-r, blue.500, blue.400)" p={2} borderRadius="lg">
-                        <Avatar src={authorAvatar} mr={3} />
-                        <Text color="white" fontWeight="bold">{authorName}</Text>
-                    </Flex>
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody >
-                    <Box mb={3} >
+        <>
+            <Modal
+                isOpen={isOpen}
+                onClose={handleClose}
+                size="6xl"
+                isCentered
+                scrollBehavior="inside"
+                motionPreset="slideInBottom"
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
                         <FormControl>
-                            <FormLabel fontWeight="bold">Nội dung</FormLabel>
-                            <ReactQuill
-                                value={content}
-                                onChange={setContent}
-                                modules={modules}
-                                formats={formats}
-                                theme="snow"
-                                placeholder="Chia sẻ cảm nghĩ của bạn hoặc thêm hình ảnh vào nội dung..."
+                            <FormLabel textAlign="center" fontWeight="bold" fontSize="2xl">Đăng bài viết mới</FormLabel>
+                            <Input
+                                placeholder="Nhập tiêu đề bài viết"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                autoFocus
                             />
                         </FormControl>
-                    </Box>
-                </ModalBody>
+                        <Flex align="center" mt={4} bgGradient="linear(to-r, blue.500, blue.400)" p={2} borderRadius="lg">
+                            <Avatar src={authorAvatar} mr={3} />
+                            <Text color="white" fontWeight="bold">{authorName}</Text>
+                        </Flex>
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Box mb={3}>
+                            <FormControl>
+                                <FormLabel fontWeight="bold">Nội dung</FormLabel>
+                                <ReactQuill
+                                    value={content}
+                                    onChange={setContent}
+                                    modules={modules}
+                                    formats={formats}
+                                    theme="snow"
+                                    placeholder="Chia sẻ cảm nghĩ của bạn hoặc thêm hình ảnh vào nội dung..."
+                                />
+                            </FormControl>
+                        </Box>
+                    </ModalBody>
 
-                <ModalFooter justifyContent="space-between">
-                    <Flex gap={4} flex={1}>
-                        <FormControl display="flex" alignItems="center">
-                            <FormLabel htmlFor="published" mb="0" fontWeight="bold">Công khai</FormLabel>
-                            <Switch
-                                id="published"
-                                isChecked={published}
-                                onChange={(e) => setPublished(e.target.checked)}
-                            />
-                        </FormControl>
+                    <ModalFooter justifyContent="space-between">
+                        <Flex gap={4} flex={1}>
+                            <FormControl display="flex" alignItems="center">
+                                <FormLabel htmlFor="published" mb="0" fontWeight="bold">Công khai</FormLabel>
+                                <Switch
+                                    id="published"
+                                    isChecked={published}
+                                    onChange={(e) => setPublished(e.target.checked)}
+                                />
+                            </FormControl>
 
-                        <FormControl display="flex" alignItems="center">
-                            <FormLabel htmlFor="pinHome" mb="0" fontWeight="bold">Ghim ở trang chủ</FormLabel>
-                            <Switch
-                                id="pinHome"
-                                isChecked={pinHome}
-                                onChange={(e) => setPinHome(e.target.checked)}
-                            />
-                        </FormControl>
-                    </Flex>
-                    <Box>
-                        <Button variant="ghost" mr={3} onClick={() => {
-                            resetForm();
-                            onClose();
-                        }}>
-                            Hủy
-                        </Button>
-                        <Button colorScheme="blue" onClick={handlePost}>
-                            Đăng bài
-                        </Button>
-                    </Box>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                            <FormControl display="flex" alignItems="center">
+                                <FormLabel htmlFor="pinHome" mb="0" fontWeight="bold">Ghim ở trang chủ</FormLabel>
+                                <Switch
+                                    id="pinHome"
+                                    isChecked={pinHome}
+                                    onChange={(e) => setPinHome(e.target.checked)}
+                                />
+                            </FormControl>
+                        </Flex>
+                        <Box>
+                            <Button variant="ghost" mr={3} onClick={handleClose}>
+                                Hủy
+                            </Button>
+                            <Button colorScheme="blue" onClick={handlePost}>
+                                Đăng bài
+                            </Button>
+                        </Box>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            {/* Dialog xác nhận đóng */}
+            <AlertDialog
+                isOpen={isConfirmOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onConfirmClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Cảnh báo
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Bạn có chắc chắn muốn bỏ tạo bài mới?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onConfirmClose}>
+                                Tiếp tục chỉnh sửa
+                            </Button>
+                            <Button colorScheme="red" onClick={confirmClose} ml={3}>
+                                Hủy
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
     );
 };
 

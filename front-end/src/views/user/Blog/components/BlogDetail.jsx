@@ -84,7 +84,7 @@ const BlogDetail = () => {
     }
 
     return (
-        <Flex maxW="200vh" mx="auto" mt={8} gap={8} px={4}>
+        <Flex maxW="200vh" mx="auto" mt={8} gap={8} px={4} mb={8}>
 
             {/* Nội dung blog */}
             <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
@@ -108,7 +108,7 @@ const BlogDetail = () => {
             </Box>
 
             {/* Sidebar: danh sách blog khác */}
-            <Box flex="1" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" overflowY="auto">
+            <Box flex="0.8" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" overflowY="auto">
                 <Heading size="md" mb={4}>Bài viết khác</Heading>
                 <Stack spacing={4}>
                     {allBlogs.length === 0 ? (
