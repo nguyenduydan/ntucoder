@@ -1,7 +1,9 @@
 ﻿using api.DTOs;
 using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
+using api.Infrashtructure.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +14,12 @@ namespace api.Controllers
     public class ProblemController : ControllerBase
     {
         private readonly ProblemRepository _problemRepository;
-     
+        private readonly AuthService _autService; 
 
-        public ProblemController(ProblemRepository problemRepository)
+        public ProblemController(ProblemRepository problemRepository, AuthService authService)
         {
             _problemRepository = problemRepository;
+            _autService = authService;
         }
 
         [HttpGet]
@@ -33,6 +36,7 @@ namespace api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateProblem([FromBody] ProblemDTO dto)
         {
@@ -40,6 +44,8 @@ namespace api.Controllers
             {
                 return BadRequest(new { Errors = new List<string> { "Dữ liệu không hợp lệ." } });
             }
+            dto.CoderID = _autService.GetUserIdFromToken();
+            if(dto.CoderID == -1) return Unauthorized();
             try
             {
                 var result = await _problemRepository.CreateProblemAsync(dto);

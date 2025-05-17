@@ -14,6 +14,7 @@ import History from "../Problem/components/History";
 import Problem from "../Problem/index";
 import ProblemList from "../Problem/components/ProblemList";
 import { FaRegFileAlt, FaBook, FaQuestionCircle, FaBars } from "react-icons/fa";
+import { IoIosChatbubbles } from "react-icons/io";
 
 import { getDetail } from "@/config/apiService";
 export default function Lesson() {

@@ -31,6 +31,57 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCoderByID(int id)
+        {
+            try
+            {
+                var coder = await _coderRepository.GetCoderByIdAsync(id);
+
+                if (coder == null)
+                {
+                    return NotFound(new { Message = "Không tìm thấy coder với ID được cung cấp." });
+                }
+
+                return Ok(coder);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("top-hightest")]
+        public async Task<IActionResult> GetTopHightest()
+        {
+            try
+            {
+                var result = await _coderRepository.GetTop3HighestAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <param name="q">Từ khóa tìm kiếm theo tên coder</param>
+        [HttpGet("list-ranking")]
+        public async Task<IActionResult> GetListRanking([FromQuery] QueryObject query, [FromQuery] string? q)
+        {
+            try
+            {
+                var result = await _coderRepository.GetListCoderRakingAsync(query, q);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCoder([FromBody] CreateCoderDTO dto)
         {
@@ -52,25 +103,7 @@ namespace api.Controllers
                 return BadRequest(new { Errors = new List<string> { ex.Message } });
             }
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCoderByID(int id)
-        {
-            try
-            {
-                var coder = await _coderRepository.GetCoderByIdAsync(id);
-
-                if (coder == null)
-                {
-                    return NotFound(new { Message = "Không tìm thấy coder với ID được cung cấp." });
-                }
-
-                return Ok(coder);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+    
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCoder(int id, [FromForm] CoderDetailDTO dto)
         {

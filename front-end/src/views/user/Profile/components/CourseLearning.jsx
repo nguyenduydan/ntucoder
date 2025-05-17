@@ -51,7 +51,7 @@ const CourseLearning = ({ coderID }) => {
             const coursesWithProgress = await Promise.all(
                 courses.map(async (course) => {
                     try {
-                        const progressRes = await api.get(`/Progress/course?courseId=${course.courseID}`);
+                        const progressRes = await api.get(`/Progress/course?courseId=${course.courseID}?coderId=${coderID}`);
                         return {
                             ...course,
                             progress: progressRes.data.percent ?? 0,

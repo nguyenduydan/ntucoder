@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,10 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
         BearerFormat = "JWT",
@@ -104,11 +109,13 @@ builder.Services.AddScoped<EnrollmentRepository>();
 builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<ProgressRepository>();
 builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<BlogRepository>();
 //Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MinioService>();
 
+builder.Services.AddHttpClient();
 
 
 var app = builder.Build();

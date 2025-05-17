@@ -22,6 +22,7 @@ export default defineConfig({
             'assets': path.resolve(__dirname, './src/assets'),
             'routes': path.resolve(__dirname, './src/routes'),
             'theme': path.resolve(__dirname, './src/theme'),
+            'hooks': path.resolve(__dirname, './src/hooks'),
         },
     },
     optimizeDeps: {

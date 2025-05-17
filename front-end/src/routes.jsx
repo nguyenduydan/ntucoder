@@ -21,9 +21,12 @@ import ProblemDetail from '@/views/admin/problem/components/Detail';
 // User Imports
 import Home from 'views/user/Home';
 //import Problem from 'views/user/Problem';
-import Course from 'views/user/Course';
+import Course from '@/views/user/Course';
 import CourseDetailUser from '@/views/user/Course/components/CourseDetail';
 import Lesson from 'views/user/Lesson';
+import Ranking from '@/views/user/Ranking';
+import Blog from '@/views/user/Blog';
+import BlogDetail from '@/views/user/Blog/components/BlogDetail';
 
 import { PersonIcon } from '@/components/icons/Icons';
 import { FaBookAtlas, FaFileCode, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
@@ -155,6 +158,7 @@ const routes = [
     path: '/',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <Home />,
+    protected: false
   },
   {
     name: 'HỌC TẬP',
@@ -173,6 +177,29 @@ const routes = [
         path: ':slugId/:lessonId',
         component: <Lesson />,
         protected: true
+      }
+    ]
+  },
+
+  {
+    name: 'XÊP HẠNG',
+    layout: '/user',
+    path: '/ranking',
+    component: <Ranking />,
+    protected: false
+  },
+  {
+    name: 'BÀI VIẾT',
+    layout: '/user',
+    path: '/blogs',
+    component: <Blog />,
+    protected: false,
+    item: [
+      {
+        name: 'Chi tiết bài viết',
+        path: ':slugId',
+        component: <BlogDetail />,
+        protected: false
       }
     ]
   }

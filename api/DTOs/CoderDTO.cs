@@ -14,7 +14,6 @@ namespace api.DTOs
         public string? CoderEmail { get; set; }
         public string? PhoneNumber { get; set; }
         public int? Role { get; set; }
-     
     }
     public class CreateCoderDTO : CoderDTO
     {

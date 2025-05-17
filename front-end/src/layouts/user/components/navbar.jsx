@@ -59,7 +59,7 @@ function Navbar(props) {
                     <Links direction="row" routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", lg: "flex" }} gap={5}>
-                    <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" />
+                    <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" boxShadow="lg" borderRadius="full" />
                     <Auth />
                 </Box>
                 {/* Mobile Hamburger Menu */}

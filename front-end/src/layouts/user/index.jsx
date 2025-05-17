@@ -10,8 +10,6 @@ import { Box } from '@chakra-ui/react';
 import Profile from 'views/user/Profile/index';
 import NotFound from 'views/user/NotFound';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-import ScrollToTop from '@/components/scroll/ScrollToTop';
-import Lesson from '@/views/user/Lesson';
 
 
 export default function Home(props) {
@@ -81,31 +79,29 @@ export default function Home(props) {
                 transitionTimingFunction="linear, linear, ease"
             >
                 {getRoute() && (
-                    <ScrollToTop>
-                        <Box
-                            mx="auto"
-                            w="100%"
-                            h="100%"
-                        >
-                            <Routes>
-                                {getRoutes(userRoutes)}
-                                {routes.map((route) => (
-                                    <Route
-                                        key={`${route.path}-${route.name}`}
-                                        path={route.path}
-                                        element={<ProtectedRoute>{route.component}</ProtectedRoute>}
-                                    />
-                                ))}
+                    <Box
+                        mx="auto"
+                        w="100%"
+                        h="100%"
+                    >
+                        <Routes>
+                            {getRoutes(userRoutes)}
+                            {routes.map((route) => (
+                                <Route
+                                    key={`${route.path}-${route.name}`}
+                                    path={route.path}
+                                    element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+                                />
+                            ))}
 
-                                {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
-                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                                <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                                {/* <Route path="/course/:slug?topicId=:topicId?lessonId=:lessonId" element={<ProtectedRoute><Lesson /></ProtectedRoute>} /> */}
-                                {/* Optional: route 404 */}
-                                <Route path="*" element={<NotFound />} />
-                            </Routes>
-                        </Box>
-                    </ScrollToTop>
+                            {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
+                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            {/* <Route path="/course/:slug?topicId=:topicId?lessonId=:lessonId" element={<ProtectedRoute><Lesson /></ProtectedRoute>} /> */}
+                            {/* Optional: route 404 */}
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </Box>
                 )}
             </Box>
 

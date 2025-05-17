@@ -7,9 +7,9 @@ import { FaRegImage, FaTrashAlt } from "react-icons/fa";
 
 const ImageInput = ({
     onImageChange,
-    inputProps = {},
     previewWidth = '150px',
-    previewHeight = '150px'
+    previewHeight = '150px',
+    ...inputProps
 }) => {
     const [preview, setPreview] = useState(null);
 

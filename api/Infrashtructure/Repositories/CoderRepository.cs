@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -278,5 +279,76 @@ namespace api.Infrashtructure.Repositories
         {
             return await _context.Accounts.AnyAsync(c => c.UserName == username);
         }
+
+        public async Task<List<CoderDetailDTO>> GetTop3HighestAsync()
+        {
+            var coders = await _context.Coders
+                .AsNoTracking()
+                .Include(c => c.Account)
+                .Include(c => c.Matchs)
+                .ToListAsync();
+
+            var coderDTOs = coders
+                .Select(c => new CoderDetailDTO
+                {
+                    CoderID = c.CoderID,
+                    UserName = c.Account.UserName,
+                    CoderName = c.CoderName,
+                    CoderEmail = c.CoderEmail,
+                    PhoneNumber = c.PhoneNumber,
+                    Avatar = c.Avatar,
+                    Description = c.Description,
+                    Gender = c.Gender,
+                    BirthDay = c.BirthDay,
+                    CreatedAt = c.CreatedAt,
+                    CreatedBy = c.CreatedBy,
+                    UpdatedAt = c.UpdatedAt,
+                    UpdatedBy = c.UpdatedBy,
+                    Role = c.Account.RoleID,
+                    TotalPoint = c.Matchs.Sum(m => m.Point)
+                })
+                .OrderByDescending(c => c.TotalPoint)
+                .Take(3)
+                .ToList();
+
+            return coderDTOs;
+        }
+
+        public async Task<PagedResponse<CoderDetailDTO>> GetListCoderRakingAsync(QueryObject query, string search)
+        {
+            var coderQuery = _context.Accounts
+                .AsNoTracking()
+                .Include(a => a.Coder)
+                .Select(a => new CoderDetailDTO
+                {
+                    CoderID = a.Coder.CoderID,
+                    UserName = a.UserName,
+                    CoderName = a.Coder.CoderName,
+                    CoderEmail = a.Coder.CoderEmail,
+                    PhoneNumber = a.Coder.PhoneNumber,
+                    Avatar = a.Coder.Avatar,
+                    Role = a.RoleID,
+                    TotalPoint = a.Coder.Matchs.Sum(m => m.Point)
+                });
+
+            // ✅ Thêm tìm kiếm theo tên coder (nếu có)
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchLower = search.ToLower();
+                coderQuery = coderQuery.Where(c =>
+                    c.CoderName.ToLower().Contains(searchLower));
+            }
+
+            // ✅ Sắp xếp theo điểm giảm dần
+            coderQuery = coderQuery.OrderByDescending(c => c.TotalPoint);
+
+            var pagedResponse = await PagedResponse<CoderDetailDTO>.CreateAsync(
+                 coderQuery,
+                 query.Page,
+                 query.PageSize);
+
+            return pagedResponse;
+        }
+
     }
 }

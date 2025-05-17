@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import {
     Input,
     InputGroup,
@@ -13,36 +13,22 @@ import {
 import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 
 const SearchInput = ({
-    placeholder = "Search...",
+    value,
+    onChange,
     onSearch,
-    onQuickSearch,
     suggestions = [],
-    width = "300px",
-    variant = "outline",
-    borderRadius = "30px",
-    bgColor,
-    textColor,
-    border = "none",
-    boxShadow = "lg"
+    ...props
 }) => {
-    const [value, setValue] = useState("");
-    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const { colorMode } = useColorMode();
-    const defaultTextColor = textColor || (colorMode === "light" ? "black" : "white");
-    const defaultBackgroundColor = bgColor || (colorMode === "light" ? "gray.100" : "black");
     const iconColor = colorMode === "light" ? "black" : "whiteAlpha.700";
     const inputRef = useRef();
 
-    const handleChange = (e) => {
-        const inputValue = e.target.value;
-        setValue(inputValue);
-        if (onQuickSearch) {
-            onQuickSearch(inputValue);
-        }
-        setFilteredSuggestions(
-            suggestions.filter((s) => s.toLowerCase().includes(inputValue.toLowerCase()))
+    const filteredSuggestions = useMemo(() => {
+        if (!value) return [];
+        return suggestions.filter((s) =>
+            s.toLowerCase().includes(value.toLowerCase())
         );
-    };
+    }, [value, suggestions]);
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter" && onSearch) {
@@ -51,14 +37,12 @@ const SearchInput = ({
     };
 
     const handleClear = () => {
-        setValue("");
-        setFilteredSuggestions([]);
+        onChange({ target: { value: "" } });
         if (onSearch) onSearch("");
     };
 
     const handleSuggestionClick = (suggestion) => {
-        setValue(suggestion);
-        setFilteredSuggestions([]);
+        onChange({ target: { value: suggestion } });
         if (onSearch) onSearch(suggestion);
     };
 
@@ -66,39 +50,32 @@ const SearchInput = ({
         const handleKeyDown = (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
                 e.preventDefault();
-                inputRef.current && inputRef.current.focus();
+                inputRef.current?.focus();
             }
         };
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
 
     return (
-        <Box position="relative">
+        <Box position="relative" {...props}>
             <InputGroup>
                 <InputLeftElement pointerEvents="none">
-                    <SearchIcon color={defaultTextColor} />
+                    <SearchIcon />
                 </InputLeftElement>
                 <Input
                     ref={inputRef}
-                    minW={width}
-                    variant={variant}
-                    borderRadius={borderRadius}
-                    placeholder={placeholder}
                     value={value}
-                    textColor={defaultTextColor}
-                    bg={defaultBackgroundColor}
-                    border={border}
-                    boxShadow={boxShadow}
-                    onChange={handleChange}
+                    onChange={onChange}
                     onKeyPress={handleKeyPress}
+                    width="100%"
+                    {...props}
                 />
                 {value && (
                     <InputRightElement>
                         <IconButton
                             size="sm"
-                            aria-label="Xóa nội dung"
+                            aria-label="Clear input"
                             icon={<CloseIcon />}
                             onClick={handleClear}
                             variant="ghost"
@@ -111,15 +88,18 @@ const SearchInput = ({
                     </InputRightElement>
                 )}
             </InputGroup>
+
             {filteredSuggestions.length > 0 && (
                 <List
                     position="absolute"
-                    bg={defaultBackgroundColor}
+                    bg={colorMode === "light" ? "gray.100" : "black"}
                     mt={2}
-                    width={width}
+                    width="100%"
                     borderRadius="md"
                     boxShadow="md"
                     zIndex={1000}
+                    maxHeight="200px"
+                    overflowY="auto"
                 >
                     {filteredSuggestions.map((suggestion, index) => (
                         <ListItem

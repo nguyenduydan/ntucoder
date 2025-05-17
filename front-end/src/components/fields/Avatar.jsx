@@ -41,9 +41,7 @@ const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
     // Tạo shadow neon với màu avatarColor
     const neonShadow = `
         0 0 5px ${avatarColor},
-        0 0 10px ${avatarColor},
-        0 0 20px ${avatarColor},
-        0 0 30px ${avatarColor}
+        0 0 10px ${avatarColor}
     `;
 
     return (

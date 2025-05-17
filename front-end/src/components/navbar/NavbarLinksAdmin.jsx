@@ -25,6 +25,7 @@ import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import routes from 'routes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AvatarLoadest from '../fields/Avatar';
 
 
 export default function HeaderLinks(props) {
@@ -157,7 +158,7 @@ export default function HeaderLinks(props) {
       </Button>
       <Menu >
         <MenuButton p="0px">
-          <Avatar
+          <AvatarLoadest
             _hover={{ cursor: 'pointer' }}
             color="white"
             bg="#11047A"

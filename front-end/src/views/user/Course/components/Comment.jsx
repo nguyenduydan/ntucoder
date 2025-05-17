@@ -8,12 +8,13 @@ import {
     AlertDialogContent,
     AlertDialogOverlay,
     useToast,
-    Skeleton
+    Skeleton,
 } from '@chakra-ui/react';
-import { GrSend } from "react-icons/gr";
 import { useAuth } from '@/contexts/AuthContext';
+import { NavLink } from 'react-router-dom';
 import api from '@/config/apiConfig';
 import { formatRelativeTime } from '@/utils/utils';
+import InputComment from '@/components/fields/InputComment';
 
 const COMMENTS_PAGE_SIZE = 5;
 
@@ -104,7 +105,11 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
                 <Avatar size="sm" name={comment.coderName} src={comment.coderAvatar} mr={3} mt={5} zIndex={1} />
                 <Box bg="gray.200" p={3} borderRadius="md" w="full" zIndex={1}>
                     <Flex justify="space-between" align="center">
-                        <Text fontWeight="bold" fontSize="sm">{comment.coderName}</Text>
+                        <NavLink
+                            to={`/profile/${comment.coderID}`}
+                        >
+                            <Text fontWeight="bold" fontSize="sm">{comment.coderName}</Text>
+                        </NavLink>
                         {isAuthenticated && coder?.coderID === comment.coderID && (
                             <Button
                                 size="xs"
@@ -221,7 +226,6 @@ const CommentSection = ({ courseId }) => {
     // Mới thêm: state sort
     const [sortBy, setSortBy] = useState('CommentTime'); // mặc định
     const [ascending, setAscending] = useState(false); // false = mới nhất trước
-
 
     // Fetch comments theo page + pageSize + sort
     const fetchComments = async (page = 1, append = false, pageSize = COMMENTS_PAGE_SIZE) => {
@@ -420,20 +424,14 @@ const CommentSection = ({ courseId }) => {
             </Box>
             {/* Input thêm bình luận */}
             {isAuthenticated && (
-                <HStack mt={3}>
-                    <Avatar size="sm" name={coder?.name || 'Bạn'} src={coder?.avatar || 'https://bit.ly/prosper-baba'} />
-                    <Input
-                        placeholder="Viết bình luận..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-                        bg="white"
-                    />
-                    <Button rightIcon={<GrSend />} colorScheme="green" onClick={handleAddComment}>Gửi</Button>
-                </HStack>
+                <InputComment
+                    coder={coder}
+                    newComment={newComment}
+                    setNewComment={setNewComment}
+                    handleAddComment={handleAddComment}
+                />
             )}
-
-        </Box>
+        </Box >
     );
 };
 

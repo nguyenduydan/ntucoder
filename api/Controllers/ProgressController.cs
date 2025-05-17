@@ -20,14 +20,18 @@ namespace api.Controllers
         }
 
         [HttpGet("course")]
-        public async Task<IActionResult> GetCourseProgress(int courseId)
+        public async Task<IActionResult> GetCourseProgress(int courseId, int? coderId = null)
         {
-            var coderId = _authService.GetUserIdFromToken();
-            if (coderId == -1) return Unauthorized();
+            var currentUserId = _authService.GetUserIdFromToken();
+            if (currentUserId == -1) return Unauthorized(); // Bắt buộc phải đăng nhập
 
-            var result = await _progressRepository.GetCourseProgressAsync(courseId, coderId);
+            // Nếu không truyền coderId thì mặc định lấy của chính người dùng
+            var targetCoderId = coderId ?? currentUserId;
+
+            var result = await _progressRepository.GetCourseProgressAsync(courseId, targetCoderId);
             return Ok(result);
         }
+
 
         [HttpGet("topic-summary")]
         public async Task<IActionResult> GetTopicSummary(int courseId)
