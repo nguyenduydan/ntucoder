@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
         }
         Cookies.remove('token');
         setCoder(null);
-        window.location.href = '/';
+        window.location.reload();
     };
 
     const isAuthenticated = !!coder;

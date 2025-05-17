@@ -24,4 +24,7 @@ export default defineConfig({
             'theme': path.resolve(__dirname, './src/theme'),
         },
     },
+    optimizeDeps: {
+        include: ['moment', 'moment/locale/vi'], // ép bundler giữ lại locale vi
+    },
 });

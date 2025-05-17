@@ -10,11 +10,9 @@
         public DateTime? CommentTime { get; set; }
     }
 
-    public class CommentResponseDto
+    public class CommentResponseDto: CommentDTO
     {
         public int CommentID { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public DateTime CommentTime { get; set; }
         public string CoderName { get; set; } = string.Empty;
         public string? CoderAvatar { get; set; }
         public List<CommentResponseDto>? Replies { get; set; }

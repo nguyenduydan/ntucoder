@@ -7,7 +7,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 import App from './App';
-
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+dayjs.locale('vi');
 // Tạo một instance của QueryClientc
 const queryClient = new QueryClient();
 

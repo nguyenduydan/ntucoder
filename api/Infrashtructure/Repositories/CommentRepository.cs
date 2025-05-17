@@ -111,6 +111,10 @@ namespace api.Infrashtructure.Repositories
             return new CommentResponseDto
             {
                 CommentID = comment.CommentID,
+                CoderID = comment.CoderID,
+                CourseID = comment.CourseID,
+                ParentCommentID = comment.ParentCommentID,
+                BlogID = comment.BlogID,
                 Content = comment.Content,
                 CommentTime = comment.CommentTime,
                 CoderName = comment.Coder?.CoderName ?? "Ẩn danh",

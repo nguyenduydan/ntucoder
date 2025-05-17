@@ -88,7 +88,7 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
         } catch (err) {
             console.error('Delete comment error', err);
             toast({
-                title: "Lỗi khi xóa bình luận",
+                title: "Bạn không thể xóa bình luận này",
                 status: "error",
                 position: "top",
                 variant: "top-accent",
@@ -101,11 +101,11 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
     return (
         <Box>
             <Flex align="flex-start" mb={2} position="relative">
-                <Avatar size="sm" name={comment.coderName} src={comment.coderAvatar} mr={3} zIndex={1} />
-                <Box bg="gray.100" p={3} borderRadius="md" w="full" zIndex={1}>
+                <Avatar size="sm" name={comment.coderName} src={comment.coderAvatar} mr={3} mt={5} zIndex={1} />
+                <Box bg="gray.200" p={3} borderRadius="md" w="full" zIndex={1}>
                     <Flex justify="space-between" align="center">
                         <Text fontWeight="bold" fontSize="sm">{comment.coderName}</Text>
-                        {isAuthenticated && coder?.id === comment.coderId && (
+                        {isAuthenticated && coder?.coderID === comment.coderID && (
                             <Button
                                 size="xs"
                                 colorScheme="red"
@@ -139,13 +139,12 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
                     <Collapse in={showReplyInput} animateOpacity>
                         {isAuthenticated && (
                             <VStack mt={2} align="stretch" spacing={1}>
-                                <Text fontWeight="bold" color="blue.600">@{comment.coderName}</Text>
                                 <HStack>
                                     <Input
-                                        size="sm"
                                         placeholder="Trả lời bình luận..."
                                         value={replyText}
                                         autoFocus
+                                        bg="white"
                                         onChange={(e) => setReplyText(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSendReply()}
                                     />
@@ -354,7 +353,7 @@ const CommentSection = ({ courseId }) => {
     if (loading) return <Text textAlign="center">Đang tải bình luận...</Text>;
 
     return (
-        <Box w="100%" maxW="700px" mx="auto" px={4} py={2}>
+        <Box w="100%" maxW="100%" mx="auto" px={4} py={2}>
             {!isAuthenticated && (
                 <Text color="red" fontStyle="italic">
                     **Đăng nhập để có thể bình luận
