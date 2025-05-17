@@ -12,6 +12,7 @@ import {
     Stack,
     useDisclosure,
     Center,
+    Divider,
 } from '@chakra-ui/react';
 
 import api from '@/config/apiConfig';
@@ -60,7 +61,7 @@ const Blog = () => {
 
     const latestBlog = blogs.length > 0 ? blogs[0] : null;
     const newestBlogs = blogs.slice(0, 6);
-    const olderBlogs = blogs.slice(6);
+    const olderBlogs = blogs.slice();
 
     const getPlainText = (html) => {
         const clean = sanitizeHtml(html);
@@ -165,7 +166,16 @@ const Blog = () => {
                     ) : (
                         newestBlogs.map((blog) => (
                             <NavLink to={`/blogs/${toSlug(latestBlog.title || latestBlog.Title)}-${latestBlog.blogID}`}>
-                                <Box key={blog.blogID || blog.BlogID} mb={4} borderBottom="1px" borderColor="gray.200" pb={3}>
+                                <Box
+                                    key={blog.blogID || blog.BlogID}
+                                    mb={4}
+                                    py={3}
+                                    px={4}
+                                    borderRadius="md"
+                                    bg="gray.200"
+                                    _hover={{ bg: 'gray.300' }}
+                                    transition="all 0.2s ease-in-out"
+                                >
                                     <Text fontWeight="semibold" noOfLines={1}>
                                         {blog.title || blog.Title || 'Tiêu đề không có'}
                                     </Text>
@@ -173,6 +183,7 @@ const Blog = () => {
                                         {formatDate(blog.blogDate || blog.BlogDate)}
                                     </Text>
                                 </Box>
+                                <Divider my={2} />
                             </NavLink>
                         ))
                     )}
@@ -197,33 +208,28 @@ const Blog = () => {
                             <Box
                                 key={blog.blogID || blog.BlogID}
                                 p={4}
-                                rounded="md"
-                                shadow="sm"
-                                borderWidth="1px"
+                                mb={4}
+                                py={3}
+                                px={4}
+                                borderRadius="md"
+                                bg="gray.200"
+                                _hover={{ bg: 'gray.300' }}
+                                transition="all 0.2s ease-in-out"
                             >
-                                <Flex align="center" mb={3}>
+                                <Flex align="center">
                                     <Avatar size="sm" mr={3} />
                                     <Box>
                                         <Text fontWeight="bold" fontSize="md" lineHeight="short">
                                             {blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
                                         </Text>
-                                        <Text fontSize="xs" color="gray.500">
-                                            {new Date(blog.blogDate || blog.BlogDate).toLocaleDateString()}
+                                        <Text fontSize="sm" color="gray.500">
+                                            {formatDateTime(blog.blogDate || blog.BlogDate)}
                                         </Text>
                                     </Box>
                                 </Flex>
-                                <Text whiteSpace="pre-wrap" fontSize="md" mb={3}>
-                                    {blog.content || blog.Content}
+                                <Text fontWeight="semibold" noOfLines={1}>
+                                    {blog.title || blog.Title || 'Tiêu đề không có'}
                                 </Text>
-                                {blog.image && (
-                                    <Image
-                                        src={blog.image}
-                                        alt="Blog Image"
-                                        rounded="md"
-                                        maxH="200px"
-                                        objectFit="cover"
-                                    />
-                                )}
                             </Box>
                         ))}
                     </Stack>
