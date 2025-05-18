@@ -14,7 +14,7 @@ import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 
 const SearchInput = ({
     value,
-    onChange,
+    onChange = () => { },
     onSearch,
     suggestions = [],
     ...props

@@ -159,7 +159,7 @@ export default function CourseIndex() {
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch />
+        <Toolbar onAdd={onOpen} onSearch={(keyword) => console.log(keyword)} />
         {/* Modal CreateCoder */}
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
         <ColumnsTable

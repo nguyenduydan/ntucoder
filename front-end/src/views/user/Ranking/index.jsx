@@ -2,26 +2,21 @@ import api from '@/config/apiConfig';
 import {
     Box,
     Heading,
-    VStack,
-    Text,
-    StackDivider,
-    Badge,
-    SimpleGrid,
     Flex,
     Container,
+    useToast,
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
-import { FaCrown } from 'react-icons/fa';
-import CoderAvatar from '../Course/components/CoderAvatar';
 import CoderRankingTable from './component/CoderRankingTable';
 import Pagination from "@/components/pagination/pagination";
 import useDebounce from '@/hooks/useDebounce';
 import SearchInput from '@/components/fields/searchInput';
-import { NavLink } from 'react-router-dom';
 import { useTitle } from '@/contexts/TitleContext';
+import TopCoderCard from './component/TopCoderCard';
 
 const CoderBoard = () => {
     useTitle('Ranking');
+    const toast = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [codersHighest, setCoderHighest] = useState([]);
     const [coders, setCoders] = useState([]);
@@ -41,6 +36,15 @@ const CoderBoard = () => {
             }
         } catch (error) {
             console.error('Failed to fetch top 3 coders:', error);
+            toast({
+                title: 'Failed to fetch data',
+                description: error.message,
+                status: 'error',
+                duration: 2000,
+                isClosable: true,
+                variant: 'top-accent',
+                position: 'top'
+            });
         } finally {
             setIsLoading(false);
         }
@@ -63,6 +67,15 @@ const CoderBoard = () => {
             }
         } catch (error) {
             console.error('Failed to fetch top 3 coders:', error);
+            toast({
+                title: 'Failed to fetch data',
+                description: error.message,
+                status: 'error',
+                duration: 2000,
+                isClosable: true,
+                variant: 'top-accent',
+                position: 'top'
+            });
         } finally {
             setIsLoading(false);
         }
@@ -107,84 +120,26 @@ const CoderBoard = () => {
 
                 {/* Top 3 Coders */}
                 <Flex justify="center" align="flex-end" gap={10}>
-                    {top2 && (
-                        <VStack
-                            bgGradient="linear(to-br, green.800, green.500, green.300)"
-                            borderRadius="md"
-                            p={4}
-                            shadow="md"
-                            width="300px"
-                            _hover={{ shadow: 'lg', transform: 'scale(1.05)' }}
-                            transition="all 0.3s ease"
-                            position="relative"
-                        >
-                            <Badge colorScheme="yellow" position="absolute" top="2" right="2" fontSize="md" px={2} borderRadius="full">
-                                #2
-                            </Badge>
-                            <NavLink to={`/profile/${top2.coderID}`}>
-                                <Flex flexDirection="column" align="center" mb={2}>
-                                    <CoderAvatar size="lg" name={top2.coderName} src={top2.avatar} mb={2} />
-                                    <Text fontWeight="bold" fontSize="md">{top2.coderName}</Text>
-                                </Flex>
-                            </NavLink>
-                            <Badge fontSize="sm" colorScheme="teal" fontWeight="semibold">{top2.totalPoint} điểm</Badge>
-                        </VStack>
-                    )}
-
-                    {top1 && (
-                        <VStack
-                            bgGradient="linear(to-br, yellow.800, yellow.500, yellow.300)"
-                            borderRadius="md"
-                            p={6}
-                            shadow="2xl"
-                            width="400px"
-                            position="relative"
-                            transition="all 0.3s ease"
-                            _hover={{
-                                shadow: '4xl',
-                                boxShadow: '0 0 20px 4px rgba(255, 223, 71, 0.9)',
-                                transform: 'scale(1.07)',
-                            }}
-                        >
-                            <Box position="absolute" top="-32px" color="yellow.400" fontSize="6xl">
-                                <FaCrown />
-                            </Box>
-                            <Badge colorScheme="yellow" position="absolute" top="4" right="4" fontSize="lg" px={3} borderRadius="full">
-                                #1
-                            </Badge>
-                            <NavLink to={`/profile/${top1.coderID}`}>
-                                <Flex flexDirection="column" align="center" mb={2}>
-                                    <CoderAvatar size="2xl" name={top1.coderName} src={top1.avatar} mb={2} />
-                                    <Text fontWeight="bold" fontSize="xl">{top1.coderName}</Text>
-                                </Flex>
-                            </NavLink>
-                            <Badge fontSize="lg" colorScheme="teal" fontWeight="semibold">{top1.totalPoint} điểm</Badge>
-                        </VStack>
-                    )}
-
-                    {top3 && (
-                        <VStack
-                            bgGradient="linear(to-br, blue.800, blue.500, blue.300)"
-                            borderRadius="md"
-                            p={4}
-                            shadow="md"
-                            width="300px"
-                            _hover={{ shadow: 'lg', transform: 'scale(1.05)' }}
-                            transition="all 0.3s ease"
-                            position="relative"
-                        >
-                            <Badge colorScheme="yellow" position="absolute" top="2" right="2" fontSize="md" px={2} borderRadius="full">
-                                #3
-                            </Badge>
-                            <NavLink to={`/profile/${top3.coderID}`}>
-                                <Flex flexDirection="column" align="center" mb={2}>
-                                    <CoderAvatar size="lg" name={top3.coderName} src={top3.avatar} mb={2} />
-                                    <Text fontWeight="bold" fontSize="md">{top3.coderName}</Text>
-                                </Flex>
-                            </NavLink>
-                            <Badge fontSize="sm" colorScheme="teal" fontWeight="semibold">{top3.totalPoint} điểm</Badge>
-                        </VStack>
-                    )}
+                    <TopCoderCard
+                        coder={top2}
+                        rank={2}
+                        gradient="linear(to-br, green.800, green.500, green.300)"
+                        isLoading={isLoading}
+                    />
+                    <TopCoderCard
+                        coder={top1}
+                        rank={1}
+                        gradient="linear(to-br, yellow.800, yellow.500, yellow.300)"
+                        crown
+                        size="2xl"
+                        isLoading={isLoading}
+                    />
+                    <TopCoderCard
+                        coder={top3}
+                        rank={3}
+                        gradient="linear(to-br, blue.800, blue.500, blue.300)"
+                        isLoading={isLoading}
+                    />
                 </Flex>
             </Box>
             {/* Listranking */}

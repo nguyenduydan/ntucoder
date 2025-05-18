@@ -110,5 +110,43 @@ namespace api.Controllers
             return Ok(new { increased = result = true });
         }
 
+        [HttpGet("TopViewed")]
+        public async Task<IActionResult> GetTopViewed([FromQuery] int count = 4)
+        {
+            try
+            {
+                var result = await _repository.GetTopViewedBlogsAsync(count);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi server", error = ex.Message });
+            }
+        }
+
+        [HttpGet("Latest")]
+        public async Task<IActionResult> GetLatest([FromQuery] QueryObject query, [FromQuery] string excludedIds = null)
+        {
+            try
+            {
+                List<int> excludedList = new List<int>();
+                if (!string.IsNullOrEmpty(excludedIds))
+                {
+                    excludedList = excludedIds
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(idStr => int.TryParse(idStr, out int id) ? id : (int?)null)
+                        .Where(id => id.HasValue)
+                        .Select(id => id.Value)
+                        .ToList();
+                }
+
+                var result = await _repository.GetLatestAsync(query, excludedList);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi server", error = ex.Message });
+            }
+        }
     }
 }

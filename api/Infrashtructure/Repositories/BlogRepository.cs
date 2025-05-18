@@ -27,6 +27,7 @@ namespace api.Infrashtructure.Repositories
             var queryData = _context.Blogs
                 .Include(b => b.Coder)
                 .AsNoTracking()
+                 .Where(b => b.Published == 1)
                 .Select(b => new BlogDTO
                 {
                     BlogID = b.BlogID,
@@ -39,12 +40,14 @@ namespace api.Infrashtructure.Repositories
                     CoderName = b.Coder.CoderName,
                     AvatarCoder = b.Coder.Avatar,
                     ImageBlogUrl = b.BlogImage,
-                    ViewCount = b.ViewCount,
-                });
+                    ViewCount = b.ViewCount.GetValueOrDefault() // Đảm bảo không null
+                })
+                .OrderByDescending(b => b.BlogDate); // ✅ Mới nhất lên đầu
 
             var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(queryData, query.Page, query.PageSize);
             return pagedResult;
         }
+
 
         // Lấy blog theo ID
         public async Task<BlogDTO?> GetByIdAsync(int id)
@@ -169,5 +172,65 @@ namespace api.Infrashtructure.Repositories
 
             return true;
         }
+
+        // Lấy top view cao nhất
+        public async Task<List<BlogDTO>> GetTopViewedBlogsAsync(int count)
+        {
+            return await _context.Blogs
+                .Include(b => b.Coder)
+                .AsNoTracking()
+                .Where(b => b.Published == 1)
+                .OrderByDescending(b => b.ViewCount)
+                .Take(count)
+                .Select(b => new BlogDTO
+                {
+                    BlogID = b.BlogID,
+                    Title = b.Title,
+                    BlogDate = b.BlogDate,
+                    Content = b.Content,
+                    Published = b.Published,
+                    PinHome = b.PinHome,
+                    CoderID = b.CoderID,
+                    CoderName = b.Coder.CoderName,
+                    AvatarCoder = b.Coder.Avatar,
+                    ImageBlogUrl = b.BlogImage,
+                    ViewCount = b.ViewCount.GetValueOrDefault()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<PagedResponse<BlogDTO>> GetLatestAsync(QueryObject query, List<int> excludedIds = null)
+        {
+            var queryData = _context.Blogs
+                .Include(b => b.Coder)
+                .AsNoTracking()
+                .Where(b => b.Published == 1);
+
+            if (excludedIds != null && excludedIds.Any())
+            {
+                queryData = queryData.Where(b => !excludedIds.Contains(b.BlogID));
+            }
+
+            var projected = queryData
+                .Select(b => new BlogDTO
+                {
+                    BlogID = b.BlogID,
+                    Title = b.Title,
+                    BlogDate = b.BlogDate,
+                    Content = b.Content,
+                    Published = b.Published,
+                    PinHome = b.PinHome,
+                    CoderID = b.CoderID,
+                    CoderName = b.Coder.CoderName,
+                    AvatarCoder = b.Coder.Avatar,
+                    ImageBlogUrl = b.BlogImage,
+                    ViewCount = b.ViewCount.GetValueOrDefault()
+                })
+                .OrderByDescending(b => b.BlogDate);
+
+            var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(projected, query.Page, query.PageSize);
+            return pagedResult;
+        }
+
     }
 }

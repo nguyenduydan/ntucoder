@@ -19,7 +19,7 @@ const CoderRankingTable = ({ coders, loading }) => {
     return (
         <Box>
             <TableContainer maxH="360px" overflowY="auto">
-                <Table variant="striped" size="sm" colorScheme="blue">
+                <Table size="sm" colorScheme="blue">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
                         <Tr>
                             <Th w="20px" py={3}>#</Th>
@@ -28,33 +28,49 @@ const CoderRankingTable = ({ coders, loading }) => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {loading
-                            ? Array.from({ length: 5 }).map((_, idx) => (
+                        {loading ? (
+                            Array.from({ length: 5 }).map((_, idx) => (
                                 <Tr key={`skeleton-${idx}`}>
-                                    <Td py={4}><Skeleton height="100%" /></Td>
-                                    <Td py={4}><Skeleton height="100%" /></Td>
-                                    <Td py={4}><Skeleton height="100%" /></Td>
+                                    <Td py={4}>
+                                        <Skeleton height="20px" width="100%" />
+                                    </Td>
+                                    <Td py={4}>
+                                        <Skeleton height="20px" width="100%" />
+                                    </Td>
+                                    <Td py={4}>
+                                        <Skeleton height="20px" width="100%" />
+                                    </Td>
                                 </Tr>
                             ))
-                            : Array.isArray(coders) &&
+                        ) : Array.isArray(coders) && coders.length > 0 ? (
                             coders.map((coder, idx) => (
                                 <Tr key={coder.coderID}>
                                     <Td py={4} fontWeight="bold">{idx + 1}</Td>
                                     <Td py={4}>
                                         <NavLink to={`/profile/${coder.coderID}`}>
-                                            <Flex alignItems="center" gap={3} _hover={{ color: "blue.600", transform: "scale(1.02)" }} transition="all .2s ease-in-out">
+                                            <Flex
+                                                alignItems="center"
+                                                gap={3}
+                                                _hover={{ color: "blue.600", transform: "scale(1.02)" }}
+                                                transition="all .2s ease-in-out"
+                                            >
                                                 <Avatar name={coder.coderName} src={coder.avatar} size="sm" />
                                                 <Text fontWeight="bold">{coder.coderName}</Text>
                                             </Flex>
                                         </NavLink>
                                     </Td>
                                     <Td py={4}>
-                                        <Badge colorScheme="green">
-                                            {coder.totalPoint} điểm
-                                        </Badge>
+                                        <Badge colorScheme="green">{coder.totalPoint} điểm</Badge>
                                     </Td>
                                 </Tr>
-                            ))}
+                            ))
+                        ) : (
+                            <Tr>
+                                <Td colSpan={3} py={6} textAlign="center">
+                                    <Text fontStyle="italic" color="gray.500">Không có dữ liệu để hiển thị.</Text>
+                                </Td>
+                            </Tr>
+                        )}
                     </Tbody>
                 </Table>
             </TableContainer>

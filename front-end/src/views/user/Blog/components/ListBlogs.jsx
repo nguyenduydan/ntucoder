@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Text, Stack, Flex, Spinner, Heading, Image, Button } from '@chakra-ui/react';
 import { toSlug } from '@/utils/utils';
 import InfoBlog from './InfoBlog';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import { useNavigate } from 'react-router-dom';
 
+
 const ListBlogs = ({ blogs, loading }) => {
     const navigate = useNavigate();
+
     return (
-        <Box p={6} >
+        <Box>
             <Heading fontSize="xl" fontWeight="bold" mb={4} textTransform="uppercase">
                 Các bài viết trước đó
             </Heading>
             {loading ? (
-                <Flex justify="center" align="center" height="80vh">
+                <Flex justify="center" align="center" height="30vh" bg="white">
                     <Spinner />
                 </Flex>
             ) : blogs.length === 0 ? (
-                <Text textAlign="center" color="gray.500">
-                    Không có bài viết nào khác.
-                </Text>
+                <Box minH="30vh" display="flex" justifyContent="center" bg="white" boxShadow="md" rounded="md" alignItems="center">
+                    <Text>Chưa có bài viết nào.</Text>
+                </Box>
             ) : (
                 <Stack spacing={4}>
                     {blogs.map((blog) => (
