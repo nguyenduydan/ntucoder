@@ -22,11 +22,11 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedResponse<BlogDTO>>> GetAll([FromQuery] QueryObject query)
+        public async Task<ActionResult<PagedResponse<BlogDTO>>> GetAll([FromQuery] QueryObject query, int? coderID)
         {
             try
             {
-                var blogs = await _repository.GetAllAsync(query);
+                var blogs = await _repository.GetAllAsync(query, coderID);
                 return Ok(blogs);
             }
             catch (Exception ex)

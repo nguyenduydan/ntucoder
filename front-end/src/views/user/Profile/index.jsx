@@ -28,6 +28,7 @@ import CoderAvatar from '../Course/components/CoderAvatar';
 import ModalEdit from '@/views/user/Profile/components/ModalEdit';
 import { FaArrowLeft, FaEdit, FaCheck, FaTimes, FaStar } from 'react-icons/fa';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
+import BlogBox from './components/BlogBox';
 
 
 const Profile = () => {
@@ -403,6 +404,7 @@ const Profile = () => {
                     >
                         {/* Course learning */}
                         <CourseLearning coderID={id || coderID} />
+                        <BlogBox coderID={id || coderID} />
                     </GridItem>
                 </Grid>
             </Box >

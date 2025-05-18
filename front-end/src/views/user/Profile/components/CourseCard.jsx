@@ -50,7 +50,6 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
         }, 100);
     };
 
-    console.log("course", course);
     return (
         <Box
             minW={{ md: "20vh", base: "100%" }}
@@ -70,6 +69,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
             <Image
                 src={course.imageUrl || "/avatarSimmmple.png"}
                 alt={course.title}
+                name={course.title}
                 objectFit="cover"
                 h="160px"
                 w="full"

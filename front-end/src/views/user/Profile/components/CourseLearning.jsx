@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api from "@/config/apiConfig";
 import {
-    Box, Grid, Text, Divider, Flex, Tabs, Tab, TabList, TabPanels, TabPanel,
+    Box, Text, Divider, Flex, Tabs, Tab, TabList, TabPanels, TabPanel,
     Skeleton,
     HStack
 } from '@chakra-ui/react';
@@ -30,9 +30,6 @@ const CourseLearning = ({ coderID }) => {
                 totalCount: 100
             });
             const allCourses = response.data || [];
-
-            // Lọc khóa đã enroll
-            const enrolledCourses = allCourses.filter(c => enrolledCourseIDs.includes(c.courseID));
 
             // Lấy progress hàng loạt
             const progressRes = await api.get('/Progress/courses', {
@@ -77,7 +74,7 @@ const CourseLearning = ({ coderID }) => {
     }, [fetchCourseData]);
 
     return (
-        <Box mt={5} px={6} py={2}>
+        <Box mt={5} px={6} py={2} minH="50vh">
             <Tabs variant='soft-rounded' colorScheme='blue' onChange={index => setTabIndex(index)} isLazy>
                 <Flex justifyContent="space-between">
                     <Text fontSize="xl" color="blue.600" fontWeight="bold">

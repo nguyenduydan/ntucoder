@@ -22,30 +22,36 @@ namespace api.Infrashtructure.Repositories
         }
 
         // Lấy danh sách tất cả blog
-        public async Task<PagedResponse<BlogDTO>> GetAllAsync(QueryObject query)
+        public async Task<PagedResponse<BlogDTO>> GetAllAsync(QueryObject query, int? coderID)
         {
             var queryData = _context.Blogs
-                .Include(b => b.Coder)
-                .AsNoTracking()
-                 .Where(b => b.Published == 1)
-                .Select(b => new BlogDTO
-                {
-                    BlogID = b.BlogID,
-                    Title = b.Title,
-                    BlogDate = b.BlogDate,
-                    Content = b.Content,
-                    Published = b.Published,
-                    PinHome = b.PinHome,
-                    CoderID = b.CoderID,
-                    CoderName = b.Coder.CoderName,
-                    AvatarCoder = b.Coder.Avatar,
-                    ImageBlogUrl = b.BlogImage,
-                    ViewCount = b.ViewCount.GetValueOrDefault() // Đảm bảo không null
-                })
-                .OrderByDescending(b => b.BlogDate); // ✅ Mới nhất lên đầu
+               .Include(b => b.Coder)
+               .AsNoTracking()
+               .Where(b => b.Published == 1);
 
-            var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(queryData, query.Page, query.PageSize);
+            if (coderID.HasValue)
+            {
+                queryData = queryData.Where(b => b.CoderID == coderID);
+            }
+
+            var projected = queryData.Select(b => new BlogDTO
+            {
+                BlogID = b.BlogID,
+                Title = b.Title,
+                BlogDate = b.BlogDate,
+                Content = b.Content,
+                Published = b.Published,
+                PinHome = b.PinHome,
+                CoderID = b.CoderID,
+                CoderName = b.Coder.CoderName,
+                AvatarCoder = b.Coder.Avatar,
+                ImageBlogUrl = b.BlogImage,
+                ViewCount = b.ViewCount.GetValueOrDefault()
+            }).OrderByDescending(b => b.BlogDate);
+
+            var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(projected, query.Page, query.PageSize);
             return pagedResult;
+
         }
 
 

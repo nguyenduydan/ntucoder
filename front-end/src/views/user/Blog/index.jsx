@@ -373,7 +373,12 @@ const Blog = () => {
                         </Box>
                     </Flex>
                     {/* Dưới cùng: List blog còn lại */}
-                    <ListBlogs blogs={latestBlogs} loading={loading} />
+                    <Heading fontSize="xl" fontWeight="bold" mb={4} textTransform="uppercase">
+                        Các bài viết trước đó
+                    </Heading>
+                    <Box minH="40vh">
+                        <ListBlogs blogs={latestBlogs} loading={loading} />
+                    </Box>
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}

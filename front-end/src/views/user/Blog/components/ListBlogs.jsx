@@ -5,17 +5,13 @@ import InfoBlog from './InfoBlog';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import { useNavigate } from 'react-router-dom';
 
-
 const ListBlogs = ({ blogs, loading }) => {
     const navigate = useNavigate();
 
     return (
         <Box>
-            <Heading fontSize="xl" fontWeight="bold" mb={4} textTransform="uppercase">
-                Các bài viết trước đó
-            </Heading>
             {loading ? (
-                <Flex justify="center" align="center" height="30vh" bg="white">
+                <Flex justify="center" align="center" h="50vh" bg="white">
                     <Spinner />
                 </Flex>
             ) : blogs.length === 0 ? (
@@ -34,16 +30,13 @@ const ListBlogs = ({ blogs, loading }) => {
                         >
                             <Box flex="0.3" mr={4} display={{ base: 'none', md: 'block' }}>
                                 <Image
-
                                     size="md"
                                     name={blog.title || blog.Title || 'Không có ảnh'}
-                                    src={blog.imageBlogUrl || './avatarSimmmple.png'}
+                                    src={blog.imageBlogUrl || 'https://via.placeholder.com/150'}
                                     w="100%"
                                     maxH="20vh"
                                     objectFit="cover"
                                     alt={blog.title || blog.Title || 'Không có ảnh'}
-                                    fallbackSrc="./avatarSimmmple.png"
-                                    fallback={true}
                                     borderRadius="md"
                                 />
                             </Box>

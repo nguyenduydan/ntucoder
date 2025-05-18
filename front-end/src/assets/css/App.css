@@ -142,7 +142,7 @@ option {
 /* Tạo nút Prev custom bằng CSS */
 .slick-prev {
   left: 8px !important;
-  z-index: 1000;
+  z-index: 1 !important;
   height: 30px !important;
   background-color: #ffffff!important;
   border-radius: 50%;
@@ -160,7 +160,7 @@ option {
 /* Tạo nút Next custom bằng CSS */
 .slick-next {
   right: 8px !important;
-  z-index: 1000;
+  z-index: 1 !important;
   height: 30px !important;
   background-color: #ffffff !important;
   border-radius: 50%;
