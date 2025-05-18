@@ -2,23 +2,31 @@
 using api.DTOs;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.Infrashtructure.Services;
+using Microsoft.Extensions.Caching.Memory;
+using api.Infrashtructure.Helpers;
 
 namespace api.Infrashtructure.Repositories
 {
     public class BlogRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly MinioService _minioService;
+        private readonly IMemoryCache _memoryCache;
 
-        public BlogRepository(ApplicationDbContext context)
+        public BlogRepository(ApplicationDbContext context, MinioService minioService, IMemoryCache memoryCache)
         {
             _context = context;
+            _minioService = minioService;
+            _memoryCache = memoryCache;
         }
 
         // Lấy danh sách tất cả blog
-        public async Task<List<BlogDTO>> GetAllAsync()
+        public async Task<PagedResponse<BlogDTO>> GetAllAsync(QueryObject query)
         {
-            return await _context.Blogs
+            var queryData = _context.Blogs
                 .Include(b => b.Coder)
+                .AsNoTracking()
                 .Select(b => new BlogDTO
                 {
                     BlogID = b.BlogID,
@@ -29,8 +37,13 @@ namespace api.Infrashtructure.Repositories
                     PinHome = b.PinHome,
                     CoderID = b.CoderID,
                     CoderName = b.Coder.CoderName,
-                    Avatar = b.Coder.Avatar,
-                }).ToListAsync();
+                    AvatarCoder = b.Coder.Avatar,
+                    ImageBlogUrl = b.BlogImage,
+                    ViewCount = b.ViewCount,
+                });
+
+            var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(queryData, query.Page, query.PageSize);
+            return pagedResult;
         }
 
         // Lấy blog theo ID
@@ -49,7 +62,9 @@ namespace api.Infrashtructure.Repositories
                     PinHome = b.PinHome,
                     CoderID = b.CoderID,
                     CoderName = b.Coder.CoderName,
-                    Avatar = b.Coder.Avatar,
+                    AvatarCoder = b.Coder.Avatar,
+                    ImageBlogUrl= b.BlogImage,
+                    ViewCount = b.ViewCount,
                 }).FirstOrDefaultAsync();
         }
 
@@ -64,11 +79,26 @@ namespace api.Infrashtructure.Repositories
             var coderExists = await _context.Coders.AnyAsync(c => c.CoderID == dto.CoderID);
             if (!coderExists) throw new ArgumentException("Invalid CoderID");
 
+            // Nếu có file Avatar mới thì xử lý upload.
+            if (dto.ImageFile != null)
+            {
+                using (var stream = dto.ImageFile.OpenReadStream())
+                {
+                    var fileName = $"imgCourse/{dto.BlogID + "_" + dto.BlogDate + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
+                    var bucketName = "ntucoder"; // Tên bucket MinIO
+
+                    // Upload file lên MinIO
+                    var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
+                    dto.ImageBlogUrl = fileUrl;
+                }
+            }
+
             var blog = new Blog
             {
                 Title = dto.Title,
                 BlogDate = DateTime.Now,
                 Content = dto.Content,
+                BlogImage = dto.ImageBlogUrl,
                 Published = dto.Published,
                 PinHome = dto.PinHome,
                 CoderID = dto.CoderID,
@@ -111,6 +141,32 @@ namespace api.Infrashtructure.Repositories
 
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // increasing view
+        public async Task<bool> IncreaseViewAsync(int blogId, string ipAddress)
+        {
+            if (string.IsNullOrEmpty(ipAddress))
+                return false;
+
+            var cacheKey = $"blog_view_{blogId}_{ipAddress}";
+
+            if (_memoryCache.TryGetValue(cacheKey, out _))
+            {
+                // IP này đã tăng view gần đây
+                return false;
+            }
+
+            var blog = await _context.Blogs.FindAsync(blogId);
+            if (blog == null) return false;
+
+            blog.ViewCount = (blog.ViewCount ?? 0) + 1;
+            await _context.SaveChangesAsync();
+
+            // Lưu IP vào cache 5p 
+            _memoryCache.Set(cacheKey, true, TimeSpan.FromMinutes(5));
+
             return true;
         }
     }

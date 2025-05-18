@@ -203,7 +203,7 @@ const CoderBoard = () => {
                         borderWidth="1px"
                     />
                 </Flex>
-                <CoderRankingTable coders={coders} />
+                <CoderRankingTable coders={coders} loading={isLoading} />
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}

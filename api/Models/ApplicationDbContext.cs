@@ -106,6 +106,7 @@ namespace api.Models
 
                 entity.Property(b => b.BlogDate)
                       .IsRequired()
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP")
                       .HasColumnType("datetime");
 
                 entity.Property(b => b.Content)

@@ -11,31 +11,40 @@ import {
     Badge,
     Box,
     Flex,
+    Skeleton
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 
-const CoderRankingTable = ({ coders }) => {
+const CoderRankingTable = ({ coders, loading }) => {
     return (
         <Box>
             <TableContainer maxH="360px" overflowY="auto">
-                <Table variant="striped" size="sm" colorScheme='blue'>
+                <Table variant="striped" size="sm" colorScheme="blue">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
                         <Tr>
-                            <Th w="20px" py={3} >#</Th>
+                            <Th w="20px" py={3}>#</Th>
                             <Th ps={5}>Tên người dùng</Th>
                             <Th ps={5}>Điểm</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {Array.isArray(coders) &&
+                        {loading
+                            ? Array.from({ length: 5 }).map((_, idx) => (
+                                <Tr key={`skeleton-${idx}`}>
+                                    <Td py={4}><Skeleton height="100%" /></Td>
+                                    <Td py={4}><Skeleton height="100%" /></Td>
+                                    <Td py={4}><Skeleton height="100%" /></Td>
+                                </Tr>
+                            ))
+                            : Array.isArray(coders) &&
                             coders.map((coder, idx) => (
                                 <Tr key={coder.coderID}>
                                     <Td py={4} fontWeight="bold">{idx + 1}</Td>
-                                    <Td py={4} display="flex" alignItems="center" gap={3}>
+                                    <Td py={4}>
                                         <NavLink to={`/profile/${coder.coderID}`}>
-                                            <Flex alignItems="center" _hover={{ color: "blue", transform: "scale(1.02)" }} transition={"all .2s ease-in-out"}>
+                                            <Flex alignItems="center" gap={3} _hover={{ color: "blue.600", transform: "scale(1.02)" }} transition="all .2s ease-in-out">
                                                 <Avatar name={coder.coderName} src={coder.avatar} size="sm" />
-                                                <Text fontWeight="bold" ms={2}>{coder.coderName}</Text>
+                                                <Text fontWeight="bold">{coder.coderName}</Text>
                                             </Flex>
                                         </NavLink>
                                     </Td>
@@ -49,7 +58,6 @@ const CoderRankingTable = ({ coders }) => {
                     </Tbody>
                 </Table>
             </TableContainer>
-
         </Box>
     );
 };

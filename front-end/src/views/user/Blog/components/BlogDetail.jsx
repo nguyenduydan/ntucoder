@@ -2,19 +2,22 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Box,
-    Avatar,
     Flex,
     Text,
     Spinner,
     Stack,
     Heading,
-    Divider,
     useToast,
+    Button,
+    Container,
 } from '@chakra-ui/react';
 import api from '@/config/apiConfig';
 import sanitizeHtml from '@/utils/sanitizedHTML';
-import { formatDateTime, toSlug } from '@/utils/utils';
-import AvatarLoadest from '@/components/fields/Avatar';
+import { formatDateTime, formatDate, toSlug } from '@/utils/utils';
+import { useTitle } from '@/contexts/TitleContext';
+import { FaArrowLeft } from 'react-icons/fa';
+import CoderAvatar from '@/views/user/Course/components/CoderAvatar';
+import ScrollToTop from '@/components/scroll/ScrollToTop';
 
 const BlogDetail = () => {
     const { slugId } = useParams();
@@ -48,7 +51,11 @@ const BlogDetail = () => {
 
             // Lấy danh sách tất cả blog (hoặc bạn có thể phân trang tùy ý)
             const allRes = await api.get(`/Blog`);
-            setAllBlogs(allRes.data.filter(b => b.blogID !== blogId)); // bỏ bài hiện tại ra
+            const limitBlogs = allRes.data.filter(b => b.blogID !== blogId).slice(0, 10);// bỏ bài hiện tại ra
+            setAllBlogs(limitBlogs);
+
+            //Tăng view
+            await api.post(`/Blog/${blogId}/view`);
 
         } catch (err) {
             toast({
@@ -67,74 +74,108 @@ const BlogDetail = () => {
         fetchData();
     }, [fetchData]);
 
-    if (loading) {
-        return (
-            <Flex justify="center" align="center" height="80vh">
-                <Spinner size="xl" />
-            </Flex>
-        );
-    }
-
-    if (!blog) {
-        return (
-            <Flex justify="center" align="center" height="80vh">
-                <Text>Không tìm thấy bài viết</Text>
-            </Flex>
-        );
-    }
+    useTitle(blog?.title || '');
 
     return (
-        <Flex maxW="200vh" mx="auto" mt={8} gap={8} px={4} mb={8}>
+        <ScrollToTop>
+            <Container maxW="8xl" mx="auto" minH="85vh" mt={8}>
+                <Button
+                    leftIcon={<FaArrowLeft />}
+                    mb={2}
+                    mt={3}
+                    colorScheme='blue' variant='ghost'
+                    onClick={() => navigate(-1)}
+                >
+                    Trở về trước
+                </Button>
 
-            {/* Nội dung blog */}
-            <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
-                <Heading mb={4}>{blog.title}</Heading>
-                <Flex align="center" mb={5}>
-                    <AvatarLoadest src={blog.avatar || blog.Avatar} size="md" mr={4} />
-                    <Box>
-                        <Text fontWeight="bold" fontSize="lg">
-                            {blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
-                        </Text>
-                        <Text fontSize="sm" color="gray.500">
-                            {formatDateTime(blog.blogDate || blog.BlogDate)}
-                        </Text>
+                <Flex maxW="200vh" gap={8} px={4} mb={8}>
+                    {/* Nội dung blog */}
+                    <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
+                        <Heading mb={4}>{blog?.title || "Tiêu đề bài viết"}</Heading>
+
+                        {loading ? (
+                            <Flex justify="center" align="center" height="80vh">
+                                <Spinner />
+                            </Flex>
+                        ) : !blog ? (
+                            <Text>Không tìm thấy bài viết</Text>
+                        ) : (
+                            <>
+                                <Flex align="center" mb={5}>
+                                    <CoderAvatar coderID={blog.coderID || blog.CoderID} size="sm" mr={3} />
+                                    <Box>
+                                        <Text fontWeight="bold" fontSize="lg">
+                                            {blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
+                                        </Text>
+                                        <Text fontSize="sm" color="gray.500">
+                                            {formatDateTime(blog.blogDate || blog.BlogDate)}
+                                        </Text>
+                                    </Box>
+                                </Flex>
+                                <Box
+                                    px={5}
+                                    sx={{ wordBreak: "break-word" }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
+                                />
+                            </>
+                        )}
+                    </Box>
+
+                    {/* Sidebar: danh sách blog khác */}
+                    <Box flex="0.8" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" display="flex" flexDirection="column">
+                        <Flex
+                            align="center"
+                            justify="space-between"
+                            mb={4}
+                            py={2}
+                        >
+                            <Heading size="md">Bài viết khác</Heading>
+                            <Button colorScheme="blue" variant="link" size="sm" onClick={() => navigate("/blogs")}>
+                                Xem tất cả
+                            </Button>
+                        </Flex>
+
+                        <Box overflowY="auto">
+                            <Stack spacing={4}>
+                                {loading ? (
+                                    <Flex justify="center" align="center" height="80vh">
+                                        <Spinner />
+                                    </Flex>
+                                ) : allBlogs.length === 0 ? (
+                                    <Text fontSize="sm" color="gray.600">
+                                        Không có bài viết khác
+                                    </Text>
+                                ) : (
+                                    allBlogs.map(item => (
+                                        <Box
+                                            key={item.blogID}
+                                            p={3}
+                                            borderRadius="md"
+                                            bg="white"
+                                            boxShadow="sm"
+                                            cursor="pointer"
+                                            _hover={{ bg: "blue.50" }}
+                                            onClick={() => navigate(`/blogs/${toSlug(item.title)}-${item.blogID}`)}
+                                        >
+                                            <Text fontWeight="bold" mb={1}>
+                                                {item.title}
+                                            </Text>
+                                            <Text fontSize="sm" color="gray.600">
+                                                {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 100)}...
+                                            </Text>
+                                            <Text fontSize="xs" color="gray.500" mt={2}>
+                                                {formatDate(item.blogDate)}
+                                            </Text>
+                                        </Box>
+                                    ))
+                                )}
+                            </Stack>
+                        </Box>
                     </Box>
                 </Flex>
-                <Box
-                    px={5}
-                    sx={{ wordBreak: "break-word" }}
-                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
-                />
-            </Box>
-
-            {/* Sidebar: danh sách blog khác */}
-            <Box flex="0.8" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" overflowY="auto">
-                <Heading size="md" mb={4}>Bài viết khác</Heading>
-                <Stack spacing={4}>
-                    {allBlogs.length === 0 ? (
-                        <Text fontSize="sm" color="gray.600">Không có bài viết khác</Text>
-                    ) : (
-                        allBlogs.map(item => (
-                            <Box
-                                key={item.blogID}
-                                p={3}
-                                borderRadius="md"
-                                bg="white"
-                                boxShadow="sm"
-                                cursor="pointer"
-                                _hover={{ bg: "blue.50" }}
-                                onClick={() => navigate(`/blog/${toSlug(item.title)}-${item.blogID}`)}
-                            >
-                                <Text fontWeight="bold" mb={1}>{item.title}</Text>
-                                <Text fontSize="sm" color="gray.600">
-                                    {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 100)}...
-                                </Text>
-                            </Box>
-                        ))
-                    )}
-                </Stack>
-            </Box>
-        </Flex>
+            </Container>
+        </ScrollToTop>
     );
 };
 

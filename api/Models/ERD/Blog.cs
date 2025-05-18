@@ -8,8 +8,10 @@ namespace api.Models.ERD
     {
         public int BlogID { get; set; }
         public string Title { get; set; }
+        public string? BlogImage { get; set; }
         public DateTime BlogDate { get; set; }
         public string Content { get; set; }
+        public int? ViewCount { get; set; }
         public int Published { get; set; }
         public int PinHome { get; set; }
         public int CoderID { get; set; }

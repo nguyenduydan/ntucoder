@@ -1,4 +1,5 @@
 ﻿using api.DTOs;
+using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
 using api.Models;
@@ -21,11 +22,20 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BlogDTO>>> GetAll()
+        public async Task<ActionResult<PagedResponse<BlogDTO>>> GetAll([FromQuery] QueryObject query)
         {
-            var blogs = await _repository.GetAllAsync();
-            return Ok(blogs);
+            try
+            {
+                var blogs = await _repository.GetAllAsync(query);
+                return Ok(blogs);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log nếu cần
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy danh sách blog.", error = ex.Message });
+            }
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -91,5 +101,14 @@ namespace api.Controllers
             if (!success) return NotFound();
             return NoContent();
         }
+
+        [HttpPost("{id}/view")]
+        public async Task<IActionResult> IncreaseView(int id)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var result = await _repository.IncreaseViewAsync(id, ip);
+            return Ok(new { increased = result = true });
+        }
+
     }
 }

@@ -116,6 +116,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MinioService>();
 
 builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
 
 
 var app = builder.Build();

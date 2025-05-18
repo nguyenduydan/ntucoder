@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250516201515_UpdateCommentTable")]
-    partial class UpdateCommentTable
+    [Migration("20250518062337_UpdateBlogTable")]
+    partial class UpdateBlogTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,7 +103,12 @@ namespace api.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BlogID"));
 
                     b.Property<DateTime>("BlogDate")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("BlogImage")
+                        .HasColumnType("longtext");
 
                     b.Property<int>("CoderID")
                         .HasColumnType("int");
@@ -122,6 +127,9 @@ namespace api.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
 
                     b.HasKey("BlogID");
 

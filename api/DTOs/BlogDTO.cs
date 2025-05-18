@@ -5,7 +5,10 @@
         public int BlogID { get; set; }
         public int CoderID { get; set; }
         public string? CoderName { get; set; }
-        public string? Avatar { get; set; }
+        public int? ViewCount { get; set; }
+        public string? AvatarCoder {  get; set; }
+        public IFormFile? ImageFile { get; set; }
+        public string? ImageBlogUrl { get; set; }
         public string Title { get; set; }
         public DateTime BlogDate { get; set; }
         public string Content { get; set; }
