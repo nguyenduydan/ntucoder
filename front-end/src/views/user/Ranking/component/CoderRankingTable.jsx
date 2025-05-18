@@ -17,8 +17,8 @@ import { NavLink } from "react-router-dom";
 
 const CoderRankingTable = ({ coders, loading }) => {
     return (
-        <Box>
-            <TableContainer maxH="360px" overflowY="auto">
+        <Box minH="40vh">
+            <TableContainer>
                 <Table size="sm" colorScheme="blue">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
                         <Tr>
@@ -67,7 +67,7 @@ const CoderRankingTable = ({ coders, loading }) => {
                         ) : (
                             <Tr>
                                 <Td colSpan={3} py={6} textAlign="center">
-                                    <Text fontStyle="italic" color="gray.500">Không có dữ liệu để hiển thị.</Text>
+                                    <Text fontStyle="italic" color="gray.500" fontSize="md">Không có dữ liệu để hiển thị.</Text>
                                 </Td>
                             </Tr>
                         )}

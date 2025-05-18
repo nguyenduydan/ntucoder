@@ -143,7 +143,7 @@ const CoderBoard = () => {
                 </Flex>
             </Box>
             {/* Listranking */}
-            <Box bg="white" p={4} borderRadius="md" shadow="md" mb={8}>
+            <Box bg="white" p={4} borderRadius="md" shadow="md" mb={8} minH="50vh">
                 <Flex justify="flex-start" mb={8}>
                     <SearchInput
                         type="text"
@@ -156,6 +156,7 @@ const CoderBoard = () => {
                         borderRadius="full"
                         boxShadow="md"
                         borderWidth="1px"
+                        w="300px"
                     />
                 </Flex>
                 <CoderRankingTable coders={coders} loading={isLoading} />

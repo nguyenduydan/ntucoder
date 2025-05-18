@@ -43,6 +43,7 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.25.1",
     "react-scripts": "^5.0.0",
+    "react-simple-typewriter": "^5.0.1",
     "react-slick": "^0.30.3",
     "react-split": "^2.0.14",
     "slick-carousel": "^1.8.1",

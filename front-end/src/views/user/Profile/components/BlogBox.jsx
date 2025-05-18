@@ -50,7 +50,7 @@ const BlogBox = ({ coderID }) => {
     };
 
     return (
-        <Box px={6} py={5}>
+        <Box px={6} py={5} minH="50vh">
             <Heading fontSize="xl" fontWeight="bold" mb={4} textTransform="uppercase">
                 Các bài viết đã đăng
             </Heading>

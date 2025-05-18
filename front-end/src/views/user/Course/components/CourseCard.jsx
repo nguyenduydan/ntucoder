@@ -55,7 +55,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
     };
 
     return (
-        <Box minW={{ md: "20vh", base: "100%" }} borderWidth="1px" bg={bgCard}
+        <Box minW={{ md: "20vh", base: "100%" }} bg={bgCard}
             _hover={{ transform: "translateY(-10px)", boxShadow: "xl", cursor: "pointer" }} transition="all .2s ease-in"
             borderRadius="lg" overflow="hidden" boxShadow="md"
             onClick={handleNagvigate}

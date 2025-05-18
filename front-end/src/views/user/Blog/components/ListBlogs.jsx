@@ -32,7 +32,7 @@ const ListBlogs = ({ blogs, loading }) => {
                                 <Image
                                     size="md"
                                     name={blog.title || blog.Title || 'Không có ảnh'}
-                                    src={blog.imageBlogUrl || 'https://via.placeholder.com/150'}
+                                    src={blog.imageBlogUrl || './avatarSimmmple.png'}
                                     w="100%"
                                     maxH="20vh"
                                     objectFit="cover"
