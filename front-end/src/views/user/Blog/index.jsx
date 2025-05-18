@@ -301,7 +301,7 @@ const Blog = () => {
                             <Heading size={{ base: "sm", md: "md" }} mb={4} textTransform="uppercase">
                                 Các bài viết nổi bật
                             </Heading>
-                            <BlogTopViews topViewedBlogs={topViewedBlogs} loading={loading} />
+                            <BlogTopViews blogs={topViewedBlogs} loading={loading} />
 
                         </Box>
                     </Flex>

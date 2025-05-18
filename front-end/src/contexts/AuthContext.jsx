@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
             console.log('Lỗi khi đăng xuất:', e);
         } finally {
             setCoder(null);
-            window.location.href = '/'; // hoặc reload
+            window.location.reload(); // hoặc reload
         }
     };
 
