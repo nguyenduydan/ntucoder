@@ -183,27 +183,31 @@ const Home = () => {
             )}
           </MotionBox>
 
-          <MotionFlex
-            direction={{ base: "column", md: "row" }}
-            alignItems="center"
-            gap={10}
-            mb={12}
-          >
+          <Flex direction={{ base: "column", md: "row" }} gap={6} align="stretch">
+            {/* Bên trái: Bài viết nổi bật */}
             <ChakraBox
               flex={1}
-              minH={{ base: "50vh", md: "76vh" }}
+              minH={{ base: "60vh", md: "90vh" }}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
               variants={fadeInUp}
+              display="flex"
+              flexDirection="column"
             >
               <Heading size="lg" mb={10} color="blue.500">Bài viết nổi bật</Heading>
               <BlogTopViews blogs={blogs} loading={loading} />
             </ChakraBox>
 
-            <ChakraBox flex={0.7} minH={{ base: "50vh", md: "85vh" }}>
+            {/* Bên phải: Hoạt động */}
+            <ChakraBox
+              flex={1}
+              minH={{ base: "60vh", md: "90vh" }}
+              display="flex"
+              flexDirection="column"
+            >
               <Heading size="lg" mb={4} color="blue.500">Hoạt động</Heading>
-              <Box>
+              <Box flex={1}>
                 {/* Top 3 học viên */}
                 <Box
                   mb={5}
@@ -213,7 +217,7 @@ const Home = () => {
                   variants={fadeInUp}
                 >
                   <Heading size="md" mb={5}>Top 3 Học Viên Xuất Sắc</Heading>
-                  <VStack direction="row" spacing={3} justify="flex-start" align="flex-start" >
+                  <VStack spacing={3} align="flex-start">
                     {codersHighest.map((coder, index) => (
                       <HStack
                         key={index}
@@ -237,18 +241,24 @@ const Home = () => {
                     ))}
                   </VStack>
                 </Box>
-                <MotionBox
-                  initial={{ opacity: 0, scale: 0.4 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  {/* Dòng 2: "Về chúng tôi" và Lịch */}
-                  <MiniCalendar maxW="500px" fontSize="sm" maxH="400px" boxShadow="md" />
-                </MotionBox>
+
+                <Box mt="auto" transform="scale(0.9)" transformOrigin="top center" w="100%">
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0.4 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6 }}
+                    viewport={{ once: true }}
+                  >
+                    <MiniCalendar
+                      maxW="400px"
+                      fontSize="xs"
+                      boxShadow="md"
+                    />
+                  </MotionBox>
+                </Box>
               </Box>
             </ChakraBox>
-          </MotionFlex>
+          </Flex>
         </Container>
       </ChakraBox>
     </ScrollToTop>

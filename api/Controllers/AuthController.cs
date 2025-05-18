@@ -65,9 +65,16 @@ namespace api.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("token");
+            Response.Cookies.Delete("token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // nếu sử dụng HTTPS
+                SameSite = SameSiteMode.None,
+            });
+
             return Ok(new { message = "Đăng xuất thành công" });
         }
+
         [Authorize(Roles = "1")]
         [HttpGet("protected-route")]
         public IActionResult ProtectedRoute()

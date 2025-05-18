@@ -37,11 +37,10 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await api.post('/Auth/logout'); // xóa cookie token ở backend hoặc client nếu cần
+            await api.post('/Auth/logout', {}, { withCredentials: true });
         } catch (e) {
             console.log('Lỗi khi đăng xuất:', e);
         } finally {
-            Cookies.remove('token'); // xóa JS cookie nếu có
             setCoder(null);
             window.location.href = '/'; // hoặc reload
         }
