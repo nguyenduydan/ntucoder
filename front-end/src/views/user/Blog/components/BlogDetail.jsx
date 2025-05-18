@@ -51,7 +51,7 @@ const BlogDetail = () => {
 
             // Lấy danh sách tất cả blog (hoặc bạn có thể phân trang tùy ý)
             const allRes = await api.get(`/Blog`);
-            const limitBlogs = allRes.data.filter(b => b.blogID !== blogId).slice(0, 10);// bỏ bài hiện tại ra
+            const limitBlogs = allRes.data.data.filter(b => b.blogID !== blogId).slice(0, 10);// bỏ bài hiện tại ra
             setAllBlogs(limitBlogs);
 
             //Tăng view
@@ -64,6 +64,8 @@ const BlogDetail = () => {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
+                variant: "top-accent",
+                position: "top",
             });
         } finally {
             setLoading(false);

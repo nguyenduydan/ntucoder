@@ -5,18 +5,19 @@ import {
 } from '@chakra-ui/react';
 import CourseCard from 'views/user/Profile/components/CourseCard';
 import { getList } from '@/config/apiService';
-import MiniCalendar from 'components/calendar/MiniCalendar';
 
 const CourseLearning = ({ coderID }) => {
     const [courseAll, setCourseAll] = useState([]);
     const [courseList, setCourseList] = useState([]);
     const [courseCompleted, setCourseCompleted] = useState([]);
 
-    const fetchCourseEnrolled = useCallback(async () => {
+    const fetchCourseData = useCallback(async () => {
         try {
-            const res = await api.get(`/Enrollment/list-enroll/${coderID}`);
-            const enrolledCourses = res.data.map(e => e.courseID);
+            // Lấy danh sách courseID đã enroll
+            const enrolledRes = await api.get(`/Enrollment/list-enroll/${coderID}`);
+            const enrolledCourseIDs = enrolledRes.data.map(e => e.courseID);
 
+            // Lấy tất cả courses
             const response = await getList({
                 controller: "Course",
                 page: 1,
@@ -24,123 +25,47 @@ const CourseLearning = ({ coderID }) => {
                 ascending: true,
                 totalCount: 100
             });
+            const allCourses = response.data || [];
 
-            const activeCourses = response.data
-                .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
-                .slice(0, 4);
-
-            setCourseList(activeCourses);
-        } catch (err) {
-            console.log(err);
-        }
-    }, [coderID]);
-
-    const fetchCourseCompleted = useCallback(async () => {
-        try {
-            const response = await getList({
-                controller: "Course",
-                page: 1,
-                pageSize: 100,
-                ascending: true,
-                totalCount: 100,
-            });
-
-            const courses = response.data;
-
-            // Lấy progress cho từng course
             const coursesWithProgress = await Promise.all(
-                courses.map(async (course) => {
+                allCourses.map(async (course) => {
+                    const courseID = course?.courseID;
+                    if (!courseID) return { ...course, progress: 0 };
+
                     try {
-                        const progressRes = await api.get(`/Progress/course?courseId=${course.courseID}?coderId=${coderID}`);
-                        return {
-                            ...course,
-                            progress: progressRes.data.percent ?? 0,
-                        };
-                    } catch (error) {
-                        console.error(`Lỗi lấy progress courseId=${course.courseID}`, error);
-                        return {
-                            ...course,
-                            progress: 0,
-                        };
+                        const res = await api.get(`/Progress/course?courseId=${courseID}&coderId=${coderID}`);
+                        return { ...course, progress: res.data?.percent ?? 0 };
+                    } catch {
+                        // Không log lỗi nữa nếu courseID không hợp lệ
+                        return { ...course, progress: 0 };
                     }
                 })
             );
 
-            // Lọc course đã hoàn thành (progress 100%)
+            // Phân loại
+            const enrolledCourses = coursesWithProgress
+                .filter(c => enrolledCourseIDs.includes(c.courseID) && c.status === 1)
+                .slice(0, 4);
+
             const completedCourses = coursesWithProgress
                 .filter(c => c.progress === 100 && c.coderID === coderID)
                 .slice(0, 4);
 
-            setCourseCompleted(completedCourses);
-        } catch (err) {
-            console.error(err);
-        }
-    }, [coderID]);
-
-    const fetchCourseAll = useCallback(async () => {
-        try {
-            // Lấy danh sách course enrolled (trả về array courseID)
-            const enrolledRes = await api.get(`/Enrollment/list-enroll/${coderID}`);
-            const enrolledCourseIDs = enrolledRes.data.map(e => e.courseID);
-
-            // Lấy tất cả course (để lọc enrolled và completed)
-            const response = await getList({
-                controller: "Course",
-                page: 1,
-                pageSize: 100,
-                ascending: true,
-                totalCount: 100,
-            });
-            const courses = response.data;
-
-            // Lấy progress cho từng course
-            const coursesWithProgress = await Promise.all(
-                courses.map(async (course) => {
-                    try {
-                        const progressRes = await api.get(`/Progress/course?courseId=${course.objectID}`);
-                        return {
-                            ...course,
-                            progress: progressRes.data.percent ?? 0,
-                        };
-                    } catch (error) {
-                        console.error(`Lỗi lấy progress courseId=${course.objectID}`, error);
-                        return {
-                            ...course,
-                            progress: 0,
-                        };
-                    }
-                })
-            );
-
-            // Lọc course enrolled theo courseID và status 1 (active)
-            const enrolledCourses = coursesWithProgress.filter(
-                c => enrolledCourseIDs.includes(c.courseID) && c.status === 1
-            );
-
-            // Lọc course completed progress 100% và coderID đúng
-            const completedCourses = coursesWithProgress.filter(
-                c => c.progress === 100 && c.coderID === coderID
-            );
-
-            // Gộp 2 danh sách và loại bỏ trùng
             const allCoursesMap = new Map();
             enrolledCourses.forEach(c => allCoursesMap.set(c.courseID, c));
-            completedCourses.forEach(c => allCoursesMap.set(c.courseID, c)); // ghi đè nếu trùng
+            completedCourses.forEach(c => allCoursesMap.set(c.courseID, c));
 
-            const allCourses = Array.from(allCoursesMap.values());
-
-            setCourseAll(allCourses);
+            setCourseAll(Array.from(allCoursesMap.values()));
+            setCourseList(enrolledCourses);
+            setCourseCompleted(completedCourses);
         } catch (error) {
-            console.error(error);
+            console.error("Lỗi fetch course:", error);
         }
     }, [coderID]);
 
-
     useEffect(() => {
-        fetchCourseAll();
-        fetchCourseEnrolled();
-        fetchCourseCompleted();
-    }, [fetchCourseEnrolled, fetchCourseCompleted]);
+        fetchCourseData();
+    }, [fetchCourseData]);
 
     return (
         <Box mt={5} px={6} py={2}>

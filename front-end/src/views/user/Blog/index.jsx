@@ -37,6 +37,7 @@ const Blog = () => {
     const toast = useToast();
 
     const { coder, isAuthenticated } = useAuth();
+    const [newestBlogs, setNewestBlogs] = useState(null);
     const [latestBlogs, setLatestBlogs] = useState([]);
     const [topViewedBlogs, setTopViewedBlogs] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +65,7 @@ const Blog = () => {
 
 
     // Fetch top viewed blogs cố định 4 bài
-    const fetchTopViewedBlogs = async (count = 4) => {
+    const fetchTopViewedBlogs = async (count = 3) => {
         try {
             const res = await api.get(`/Blog/TopViewed?count=${count}`);
             return res.data;
@@ -103,7 +104,29 @@ const Blog = () => {
 
             setTotalPages(latestRes.totalPages);
             setTotalCount(latestRes.totalCount);
-            setLatestBlogs(latest);
+            if (latest.length > 0) {
+                setNewestBlogs(latest[0]);      // Bài mới nhất đầu tiên
+                // Loại bỏ phần tử đầu tiên
+                const remainingBlogs = latest.slice(1);
+
+                // Hàm shuffle mảng (Fisher-Yates shuffle)
+                const shuffleArray = (array) => {
+                    const arr = [...array];
+                    for (let i = arr.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                    }
+                    return arr;
+                };
+
+                const shuffledBlogs = shuffleArray(remainingBlogs);
+
+                setLatestBlogs(shuffledBlogs);
+
+            } else {
+                setNewestBlogs(null);           // hoặc undefined, nếu không có bài nào
+                setLatestBlogs([]);
+            }
         } catch (err) {
             toast({
                 title: 'Lỗi khi tải bài viết mới nhất',
@@ -183,7 +206,7 @@ const Blog = () => {
                             minW={{ base: '100%', md: '0' }}
                             mb={{ base: 6, md: 0 }}
                         >
-                            <Heading size="md" fontWeight="bold" mb={4} textTransform="uppercase">
+                            <Heading size={{ base: "sm", md: "md" }} fontWeight="bold" mb={4} textTransform="uppercase">
                                 Bài viết mới nhất
                             </Heading>
                             <Box
@@ -196,27 +219,29 @@ const Blog = () => {
                                     <Flex justify="center" align="center" height="70vh">
                                         <Spinner />
                                     </Flex>
-                                ) : topViewedBlogs.length > 0 ? (
-                                    <Box minH="74vh">
+                                ) : newestBlogs ? (
+                                    <Box minH="70vh">
                                         <Flex align="center" mb={5}>
                                             <AvatarLoadest
                                                 size="md"
-                                                name={topViewedBlogs[0].coderName || topViewedBlogs[0].CoderName || topViewedBlogs[0].author || 'Người dùng'}
-                                                src={topViewedBlogs[0].avatarCoder || ''}
+                                                name={newestBlogs.coderName || newestBlogs.CoderName || newestBlogs.author || 'Người dùng'}
+                                                src={newestBlogs.avatarCoder || ''}
                                                 mr={2}
                                             />
 
                                             <Box>
-                                                <Text fontWeight="bold" fontSize="lg">
-                                                    {topViewedBlogs[0].coderName || topViewedBlogs[0].CoderName || topViewedBlogs[0].author || 'Người dùng'}
-                                                </Text>
+                                                <Button variant="link" colorScheme='black' onClick={() => navigate(`/profile/${newestBlogs.coderID}`)}>
+                                                    <Text fontWeight="bold" fontSize="lg">
+                                                        {newestBlogs.coderName || newestBlogs.CoderName || newestBlogs.author || 'Người dùng'}
+                                                    </Text>
+                                                </Button>
                                                 <Flex align="center" gap={3} mt={1}>
                                                     <Text fontSize="sm" color="gray.500">
-                                                        {formatDateTime(topViewedBlogs[0].blogDate || topViewedBlogs[0].BlogDate)}
+                                                        {formatDateTime(newestBlogs.blogDate || newestBlogs.BlogDate)}
                                                     </Text>
                                                     <Badge colorScheme="blue" display="flex" alignItems="center" fontSize="0.75rem" px={2}>
                                                         <Icon as={FaRegEye} mr={2} />
-                                                        {formatNumber(topViewedBlogs[0].viewCount || topViewedBlogs[0].ViewCount || 0)} lượt xem
+                                                        {formatNumber(newestBlogs.viewCount || newestBlogs.ViewCount || 0)} lượt xem
                                                     </Badge>
                                                 </Flex>
                                             </Box>
@@ -225,12 +250,12 @@ const Blog = () => {
                                         <Box>
                                             <Image
                                                 size="md"
-                                                name={topViewedBlogs[0].title || topViewedBlogs[0].Title || 'Không có ảnh'}
-                                                src={topViewedBlogs[0].imageBlogUrl || './avatarSimmmple.png'}
+                                                name={newestBlogs.title || newestBlogs.Title || 'Không có ảnh'}
+                                                src={newestBlogs.imageBlogUrl || './avatarSimmmple.png'}
                                                 w="100%"
                                                 maxH="340px"
                                                 objectFit="cover"
-                                                alt={topViewedBlogs[0].title || topViewedBlogs[0].Title || 'Không có ảnh'}
+                                                alt={newestBlogs.title || newestBlogs.Title || 'Không có ảnh'}
                                                 fallbackSrc="./avatarSimmmple.png"
                                                 borderRadius="md"
                                                 mb={4}
@@ -238,13 +263,27 @@ const Blog = () => {
                                         </Box>
 
                                         <Flex direction="column">
-                                            <NavLink to={`/blogs/${toSlug(topViewedBlogs[0].title || topViewedBlogs[0].Title)}-${topViewedBlogs[0].blogID}`}>
-                                                <Button variant="link" colorScheme="black" fontSize="xl" fontWeight="bold" mb={2}>
-                                                    {topViewedBlogs[0].title || topViewedBlogs[0].Title}
+                                            <NavLink to={`/blogs/${toSlug(newestBlogs.title || newestBlogs.Title)}-${newestBlogs.blogID}`}>
+                                                <Button
+                                                    variant="link"
+                                                    colorScheme="black"
+                                                    fontSize={{ base: "md", md: "lg", xl: "xl" }}
+                                                    fontWeight="bold"
+                                                    mb={{ base: 2, md: 3 }}
+                                                    whiteSpace="normal"
+                                                    textAlign="left"
+                                                    px={0}
+                                                >
+                                                    {newestBlogs.title || newestBlogs.Title || 'Không có tiêu đề'}
                                                 </Button>
                                             </NavLink>
-                                            <Text whiteSpace="pre-wrap" fontSize="md" mb={4} wordBreak="break-word">
-                                                {getPlainText(topViewedBlogs[0].content || topViewedBlogs[0].Content)}
+                                            <Text
+                                                whiteSpace="pre-wrap"
+                                                fontSize={{ base: "sm", md: "md" }}
+                                                mb={{ base: 3, md: 4 }}
+                                                wordBreak="break-word"
+                                            >
+                                                {getPlainText(newestBlogs.content || newestBlogs.Content || '')}
                                             </Text>
                                         </Flex>
                                     </Box>
@@ -258,53 +297,70 @@ const Blog = () => {
 
                         {/* Bên phải - list blog nổi bật */}
                         <Box flex="1" maxHeight="max-content" display="flex" flexDirection="column">
-                            <Heading size="md" mb={4} textTransform="uppercase">Các bài viết nổi bật</Heading>
-                            <Box >
+                            <Heading size={{ base: "sm", md: "md" }} mb={4} textTransform="uppercase">
+                                Các bài viết nổi bật
+                            </Heading>
+
+                            <Box>
                                 <Stack spacing={5}>
                                     {loading ? (
-                                        <Flex justify="center" align="center" height="76vh" bg="white">
+                                        <Flex justify="center" align="center" height={{ base: "50vh", md: "76vh" }} bg="white">
                                             <Spinner />
                                         </Flex>
-                                    ) : topViewedBlogs.slice(1).length === 0 ? (
-                                        <Box minH="76vh" bg="white" display="flex" rounded="md" boxShadow="md" justifyContent="center" alignItems="center" >
+                                    ) : topViewedBlogs.length === 0 ? (
+                                        <Box
+                                            minH={{ base: "50vh", md: "76vh" }}
+                                            bg="white"
+                                            display="flex"
+                                            rounded="md"
+                                            boxShadow="md"
+                                            justifyContent="center"
+                                            alignItems="center"
+                                            px={4}
+                                            textAlign="center"
+                                        >
                                             <Text>Chưa có bài viết nào.</Text>
                                         </Box>
-
                                     ) : (
-                                        topViewedBlogs.slice(1).map(item => (
+                                        topViewedBlogs.map((item) => (
                                             <Flex
                                                 key={item.blogID}
-                                                p={3}
+                                                p={{ base: 2, md: 3 }}
                                                 borderRadius="md"
                                                 bg="white"
                                                 boxShadow="md"
+                                                flexDirection={{ base: "column", md: "row" }}
                                             >
-                                                <Box flex="0.6" mr={4}>
+                                                <Box flex={{ base: "unset", md: "0.6" }} mr={{ base: 0, md: 4 }} mb={{ base: 3, md: 0 }}>
                                                     <Image
                                                         size="md"
-                                                        name={item.title || item.Title || 'Không có ảnh'}
-                                                        src={item.imageBlogUrl || './avatarSimmmple.png'}
+                                                        name={item.title || item.Title || "Không có ảnh"}
+                                                        src={item.imageBlogUrl || "./avatarSimmmple.png"}
                                                         w="100%"
-                                                        maxH="22vh"
+                                                        maxH={{ base: "30vh", md: "22vh" }}
                                                         objectFit="cover"
-                                                        alt={item.title || item.Title || 'Không có ảnh'}
+                                                        alt={item.title || item.Title || "Không có ảnh"}
                                                         fallbackSrc="./avatarSimmmple.png"
-                                                        fallback={true}
                                                         borderRadius="md"
                                                     />
                                                 </Box>
-                                                <Box flex="1" mt={3}>
-                                                    <Button variant="link" colorScheme='black' onClick={() => navigate(`/blogs/${toSlug(item.title || item.Title)}-${item.blogID}`)}>
+                                                <Box flex="1" mt={{ base: 0, md: 3 }}>
+                                                    <Button
+                                                        variant="link"
+                                                        colorScheme="black"
+                                                        onClick={() => navigate(`/blogs/${toSlug(item.title || item.Title)}-${item.blogID}`)}
+                                                        fontSize={{ base: "md", md: "lg" }}
+                                                    >
                                                         <Text fontWeight="bold" mb={1}>
                                                             {item.title}
                                                         </Text>
                                                     </Button>
-                                                    <Text fontSize="sm" color="gray.600">
-                                                        {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 300)}...
+                                                    <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" noOfLines={5}>
+                                                        {sanitizeHtml(item.content).replace(/<[^>]*>/g, "").slice(0, 150)}...
                                                     </Text>
                                                     <InfoBlog
                                                         id={item.coderID || item.CoderID}
-                                                        coderName={item.coderName || item.CoderName || item.author || 'Người dùng'}
+                                                        coderName={item.coderName || item.CoderName || item.author || "Người dùng"}
                                                         date={item.blogDate || item.BlogDate}
                                                         view={item.viewCount || item.ViewCount || 0}
                                                     />

@@ -29,7 +29,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from '@/utils/formatReactQuill';
 import { createItem } from '@/config/apiService';
-import { useAuth } from '@/contexts/AuthContext';
+import ImageInput from '@/components/fields/ImageInput';
 import { useDisclosure } from '@chakra-ui/react';
 
 const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) => {
@@ -46,7 +46,6 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
     } = useDisclosure();
 
     const toast = useToast();
-    const { coder } = useAuth();
 
     const hasChanges = title.trim() || content.trim() !== '' || !published || pinHome;
 
@@ -158,6 +157,14 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
                     <ModalCloseButton />
                     <ModalBody>
                         <Box mb={3}>
+                            <FormControl mb={6}>
+                                <FormLabel textAlign="center" fontWeight="bold">Ảnh đại diện</FormLabel>
+                                <ImageInput
+                                    label="chọn ảnh đại diện"
+                                    previewWidth="80vh"
+                                    previewHeight="40vh"
+                                />
+                            </FormControl>
                             <FormControl>
                                 <FormLabel fontWeight="bold">Nội dung</FormLabel>
                                 <ReactQuill

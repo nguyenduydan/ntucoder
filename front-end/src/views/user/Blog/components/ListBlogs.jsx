@@ -32,8 +32,9 @@ const ListBlogs = ({ blogs, loading }) => {
                             bg="white"
                             boxShadow="md"
                         >
-                            <Box flex="0.3" mr={4}>
+                            <Box flex="0.3" mr={4} display={{ base: 'none', md: 'block' }}>
                                 <Image
+
                                     size="md"
                                     name={blog.title || blog.Title || 'Không có ảnh'}
                                     src={blog.imageBlogUrl || './avatarSimmmple.png'}
@@ -53,7 +54,7 @@ const ListBlogs = ({ blogs, loading }) => {
                                     </Text>
                                 </Button>
                                 <Text fontSize="sm" color="gray.600">
-                                    {sanitizeHtml(blog.content).replace(/<[^>]*>/g, '').slice(0, 250)}...
+                                    {sanitizeHtml(blog.content).replace(/<[^>]*>/g, '').slice(0, 300)}...
                                 </Text>
                                 <InfoBlog
                                     id={blog.coderID || blog.CoderID}
