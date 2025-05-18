@@ -25,7 +25,7 @@ import { formatDate, maskEmail } from '@/utils/utils';
 import { MdEdit } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import CoderAvatar from '../Course/components/CoderAvatar';
-import UpdateModal from './components/UpdateModal';
+import ModalEdit from '@/views/user/Profile/components/ModalEdit';
 import { FaArrowLeft, FaEdit, FaCheck, FaTimes, FaStar } from 'react-icons/fa';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
 
@@ -133,7 +133,7 @@ const Profile = () => {
                         Quay lại
                     </Button>
                 </Box>
-                <Grid templateColumns={{ base: "1fr", md: "0.6fr 2fr" }} gap={4} mx={5} p={4}>
+                <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap={4} mx={5} p={4}>
                     {/* Avatar and menu */}
                     <GridItem
                         bgGradient="linear(to-b, blue.600, purple.500)"
@@ -193,7 +193,7 @@ const Profile = () => {
                                         Chỉnh sửa thông tin
                                     </Button>
 
-                                    <UpdateModal
+                                    <ModalEdit
                                         coderID={coderID}
                                         isOpen={isOpen}
                                         onClose={onClose}

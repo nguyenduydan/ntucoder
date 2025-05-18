@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using api.Infrashtructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using api.Infrashtructure.Services;
 
 namespace api.Controllers
 {
@@ -12,10 +13,12 @@ namespace api.Controllers
     public class CoderController : ControllerBase
     {
         private readonly CoderRepository _coderRepository;
+        private readonly AuthService _authService;
 
-        public CoderController(CoderRepository coderRepository)
+        public CoderController(CoderRepository coderRepository, AuthService authService)
         {
             _coderRepository = coderRepository;
+            _authService = authService;
         }
 
         [HttpGet]
@@ -137,6 +140,8 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCoder(int id)
         {

@@ -199,7 +199,6 @@ export const login = async (data) => {
         const res = await api.post("/Auth/login", data);
         return res; // ✅ Trả về full axios response
     } catch (error) {
-        console.error("❌ Error logging in:", error);
         throw error;
     }
 };
@@ -209,7 +208,6 @@ export const register = async (data) => {
         const res = await api.post("/Coder", { ...data, role: 2 });
         return res;
     } catch (error) {
-        console.error("❌ Error registering:", error);
         throw error;
     }
 };

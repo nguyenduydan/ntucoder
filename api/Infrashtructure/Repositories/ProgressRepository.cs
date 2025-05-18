@@ -134,23 +134,30 @@ namespace api.Infrashtructure.Repositories
         }
 
 
-        // Lấy progress của course (lấy trực tiếp trong bảng progress)
-        public async Task<ProgressDTO> GetCourseProgressAsync(int courseId, int coderId)
+        public async Task<List<ProgressDTO>> GetCoursesProgressAsync(List<int> courseIds, int coderId)
         {
-            var progress = await _context.Progresses.FirstOrDefaultAsync(p =>
-                p.ObjectID == courseId &&
-                p.CoderID == coderId &&
-                p.ObjectType == ProgressObjectType.Course);
+            var progresses = await _context.Progresses
+                .Where(p => courseIds.Contains(p.ObjectID) &&
+                            p.CoderID == coderId &&
+                            p.ObjectType == ProgressObjectType.Course)
+                .ToListAsync();
 
-            return new ProgressDTO
+            // Map sang DTO, trả về mặc định 0 nếu không có progress cho khóa đó
+            var result = courseIds.Select(courseId =>
             {
-                ObjectID = courseId,
-                ObjectType = ProgressObjectType.Course,
-                OjectName = "Course",
-                CoderID = coderId,
-                Percent = progress?.Percent ?? 0.0,
-                LastUpdated = progress?.LastUpdated ?? DateTime.MinValue
-            };
+                var progress = progresses.FirstOrDefault(p => p.ObjectID == courseId);
+                return new ProgressDTO
+                {
+                    ObjectID = courseId,
+                    ObjectType = ProgressObjectType.Course,
+                    OjectName = "Course",
+                    CoderID = coderId,
+                    Percent = progress?.Percent ?? 0.0,
+                    LastUpdated = progress?.LastUpdated ?? DateTime.MinValue
+                };
+            }).ToList();
+
+            return result;
         }
 
         public async Task<List<object>> GetTopicProgressSummaryAsync(int courseId, int coderId)

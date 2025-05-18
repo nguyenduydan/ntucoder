@@ -20,6 +20,8 @@ namespace api.DTOs
         public string Password { get; set; }
       
     }
+
+
     public class CoderDetailDTO: CoderDTO
     {
         public int? TotalPoint { get; set; }

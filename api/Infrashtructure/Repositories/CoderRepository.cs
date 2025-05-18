@@ -6,8 +6,6 @@ using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -349,6 +347,9 @@ namespace api.Infrashtructure.Repositories
 
             return pagedResponse;
         }
+
+
+       
 
     }
 }

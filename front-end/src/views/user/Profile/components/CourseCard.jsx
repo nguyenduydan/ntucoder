@@ -9,21 +9,7 @@ import api from "@/config/apiConfig";
 const CourseCard = ({ course, isPlaceholder = false }) => {
     const bgCard = useColorModeValue("white", "navy.900");
     const navigate = useNavigate();
-    const [progress, setProgress] = React.useState(0);
 
-    const fetchProgress = async () => {
-        try {
-            const res = await api.get(`/Progress/course?courseId=${course.courseID}`);
-            setProgress(res.data);
-        } catch (error) {
-            console.error("❌ Error fetching progress:", error);
-            throw error;
-        }
-    };
-
-    useEffect(() => {
-        fetchProgress();
-    }, []);
 
     // Nếu là placeholder thì trả về thẻ Skeleton
     if (isPlaceholder) {
@@ -64,6 +50,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
         }, 100);
     };
 
+    console.log("course", course);
     return (
         <Box
             minW={{ md: "20vh", base: "100%" }}
@@ -71,7 +58,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
             bg={bgCard}
             _hover={{
                 transform: "translateY(-5px)",
-                boxShadow: "xl",
+                boxShadow: "md",
                 cursor: "pointer",
             }}
             transition="all .2s ease-in"
@@ -110,13 +97,13 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                         </Text>
                     </Flex>
                     <Text ml="1" fontSize="sm" fontWeight="medium">
-                        {(progress.percent?.toFixed(0)) || "0"}%
+                        {(course.progress?.toFixed(0)) || "0"}%
                     </Text>
                 </Flex>
             </Box>
             {/* Tiến độ hoàn thành */}
             <Progress
-                value={progress.percent}
+                value={course.progress}
                 size="sm"
                 colorScheme="green"
                 bg="blue.100"

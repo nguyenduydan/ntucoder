@@ -10,29 +10,21 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const token = Cookies.get('token');
-            if (!token) {
-                setIsLoading(false);
-                return;
-            }
-
             try {
-                const res = await api.get('/Auth/me', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                const res = await api.get('/Auth/me'); // cookie sẽ tự gửi đi
 
                 if (res.status === 200) {
                     setCoder(res.data);
                 }
             } catch (err) {
                 if (err.response?.status === 401) {
-                    // Handle unauthorized (token expired or invalid)
                     Cookies.remove('token');
                     setCoder(null);
-                    window.location.href = '/'; // Or redirect to login page
+                    if (window.location.pathname !== '/') {
+                        window.location.href = '/';
+                    }
                 }
+
                 console.log('Lỗi xác thực:', err);
             } finally {
                 setIsLoading(false);
@@ -42,16 +34,19 @@ export const AuthProvider = ({ children }) => {
         fetchUserInfo();
     }, []);
 
+
     const logout = async () => {
         try {
-            await api.post('/Auth/logout');
+            await api.post('/Auth/logout'); // xóa cookie token ở backend hoặc client nếu cần
         } catch (e) {
             console.log('Lỗi khi đăng xuất:', e);
+        } finally {
+            Cookies.remove('token'); // xóa JS cookie nếu có
+            setCoder(null);
+            window.location.href = '/'; // hoặc reload
         }
-        Cookies.remove('token');
-        setCoder(null);
-        window.location.reload();
     };
+
 
     const isAuthenticated = !!coder;
 

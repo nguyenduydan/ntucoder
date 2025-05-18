@@ -13,7 +13,6 @@ import { useState } from "react";
 import FlushedInput from "../../../components/fields/InputField";
 import { login } from "@/config/apiService";
 import api from "@/config/apiConfig";
-import Cookies from 'js-cookie';
 
 const Login = ({ onSuccess }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -22,36 +21,29 @@ const Login = ({ onSuccess }) => {
     const [errors, setErrors] = useState({ userName: "", password: "" });
 
     const toast = useToast();
+
     const handleLogin = async () => {
-        setErrors({ userName: "", password: "" }); // Reset errors
-        // Kiểm tra nếu tên đăng nhập hoặc mật khẩu bị bỏ trống
+        setErrors({ userName: "", password: "" });
+
         if (!loginData.userName || !loginData.password) {
-            setErrors(prevErrors => ({
-                ...prevErrors,
+            setErrors({
                 userName: !loginData.userName ? "Tên đăng nhập không thể bỏ trống." : "",
                 password: !loginData.password ? "Mật khẩu không thể bỏ trống." : ""
-            }));
-            return; // Dừng lại nếu có trường trống
+            });
+            return;
         }
 
-        setLoading(true); // Bắt đầu quá trình đăng nhập
+        setLoading(true);
         try {
-            const response = await login(loginData);
-            if (response.status === 200 && response.data && response.data.token) {
+            const response = await login(loginData); // login() gọi API login backend
 
-                // Luu token với thoi gian hieu luc
-                const { token, expires } = response.data;
-                Cookies.set('token', token, { expires: new Date(expires) });
+            if (response.status === 200) {
+                const resUser = await api.get('/Auth/me', { withCredentials: true });
 
-                const resUser = await api.get('/Auth/me',
-                    {
-                        withCredentials: true,
-                    }
-                );
                 if (resUser.status === 200) {
-                    onSuccess(resUser.data); // Gửi dữ liệu user lên Auth
-
+                    onSuccess(resUser.data);
                 }
+
                 toast({
                     title: "Đăng nhập thành công!",
                     status: "success",
@@ -62,24 +54,19 @@ const Login = ({ onSuccess }) => {
                 });
             } else {
                 const errorMessage = response.data?.message || "Vui lòng kiểm tra thông tin";
-                setErrors(prevErrors => ({
-                    ...prevErrors,
-                    userName: errorMessage,
-                    password: errorMessage,
-                }));
+                setErrors({ userName: errorMessage, password: errorMessage });
             }
         } catch (error) {
             console.error('Error:', error);
-            setErrors(prevErrors => ({
-                ...prevErrors,
+            setErrors({
                 userName: error.response?.data || "Tên đăng nhập hoặc mật khẩu không đúng",
                 password: error.response?.data || "Tên đăng nhập hoặc mật khẩu không đúng",
-            }));
+            });
         } finally {
             setLoading(false);
         }
-
     };
+
 
     return (
         <form

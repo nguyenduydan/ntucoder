@@ -1,23 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api from "@/config/apiConfig";
 import {
-    Box, Grid, Text, Divider, Flex, Tabs, Tab, TabList, TabPanels, TabPanel
+    Box, Grid, Text, Divider, Flex, Tabs, Tab, TabList, TabPanels, TabPanel,
+    Skeleton,
+    HStack
 } from '@chakra-ui/react';
-import CourseCard from 'views/user/Profile/components/CourseCard';
 import { getList } from '@/config/apiService';
+import CourseCarousel from './CourseCarousel';
 
 const CourseLearning = ({ coderID }) => {
     const [courseAll, setCourseAll] = useState([]);
     const [courseList, setCourseList] = useState([]);
     const [courseCompleted, setCourseCompleted] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [tabIndex, setTabIndex] = useState(0);
 
     const fetchCourseData = useCallback(async () => {
         try {
-            // Lấy danh sách courseID đã enroll
+            // 1. Lấy danh sách courseID đã enroll
             const enrolledRes = await api.get(`/Enrollment/list-enroll/${coderID}`);
             const enrolledCourseIDs = enrolledRes.data.map(e => e.courseID);
 
-            // Lấy tất cả courses
+            // 2. Lấy tất cả courses (vẫn lấy hết để hiển thị "tất cả khóa học")
             const response = await getList({
                 controller: "Course",
                 page: 1,
@@ -27,41 +31,46 @@ const CourseLearning = ({ coderID }) => {
             });
             const allCourses = response.data || [];
 
-            const coursesWithProgress = await Promise.all(
-                allCourses.map(async (course) => {
-                    const courseID = course?.courseID;
-                    if (!courseID) return { ...course, progress: 0 };
+            // Lọc khóa đã enroll
+            const enrolledCourses = allCourses.filter(c => enrolledCourseIDs.includes(c.courseID));
 
-                    try {
-                        const res = await api.get(`/Progress/course?courseId=${courseID}&coderId=${coderID}`);
-                        return { ...course, progress: res.data?.percent ?? 0 };
-                    } catch {
-                        // Không log lỗi nữa nếu courseID không hợp lệ
-                        return { ...course, progress: 0 };
-                    }
-                })
+            // Lấy progress hàng loạt
+            const progressRes = await api.get('/Progress/courses', {
+                params: { courseIds: enrolledCourseIDs, coderId: coderID },
+                paramsSerializer: params => {
+                    return params.courseIds.map(id => `courseIds=${id}`).join('&') + `&coderId=${params.coderId}`;
+                }
+            });
+
+            const progresses = progressRes.data;
+
+            // Gắn progress vào toàn bộ allCourses
+            const allCoursesWithProgress = allCourses.map(course => {
+                const progressObj = progresses.find(p => p.objectID === course.courseID);
+                return { ...course, progress: progressObj?.percent ?? 0 };
+            });
+
+            // Danh sách khóa học đã enroll (có progress)
+            const coursesWithProgress = allCoursesWithProgress.filter(c =>
+                enrolledCourseIDs.includes(c.courseID) && c.status === 1
             );
 
-            // Phân loại
-            const enrolledCourses = coursesWithProgress
-                .filter(c => enrolledCourseIDs.includes(c.courseID) && c.status === 1)
-                .slice(0, 4);
+            // Danh sách khóa học đã hoàn thành
+            const completedCourses = coursesWithProgress.filter(c => c.progress === 100);
 
-            const completedCourses = coursesWithProgress
-                .filter(c => c.progress === 100 && c.coderID === coderID)
-                .slice(0, 4);
-
-            const allCoursesMap = new Map();
-            enrolledCourses.forEach(c => allCoursesMap.set(c.courseID, c));
-            completedCourses.forEach(c => allCoursesMap.set(c.courseID, c));
-
-            setCourseAll(Array.from(allCoursesMap.values()));
-            setCourseList(enrolledCourses);
+            // Cập nhật state
+            setCourseAll(allCoursesWithProgress);
+            setCourseList(coursesWithProgress);
             setCourseCompleted(completedCourses);
+
+
         } catch (error) {
             console.error("Lỗi fetch course:", error);
+        } finally {
+            setLoading(false);
         }
     }, [coderID]);
+
 
     useEffect(() => {
         fetchCourseData();
@@ -69,7 +78,7 @@ const CourseLearning = ({ coderID }) => {
 
     return (
         <Box mt={5} px={6} py={2}>
-            <Tabs variant='soft-rounded' colorScheme='blue' isManual >
+            <Tabs variant='soft-rounded' colorScheme='blue' onChange={index => setTabIndex(index)} isLazy>
                 <Flex justifyContent="space-between">
                     <Text fontSize="xl" color="blue.600" fontWeight="bold">
                         Khóa học ({courseList.length})
@@ -85,50 +94,38 @@ const CourseLearning = ({ coderID }) => {
                 <TabPanels>
                     {/* Tab 1: Tất cả khóa học */}
                     <TabPanel>
-                        {courseAll.length === 0 ? (
-                            <Text align="center" fontSize="xl" my={5}>Không có khóa học nào.</Text>
+                        {loading ? (
+                            <HStack>
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                            </HStack>
                         ) : (
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} gap="6">
-                                {courseAll.map((course, idx) =>
-                                    course ? (
-                                        <CourseCard key={course.courseID} course={course} />
-                                    ) : (
-                                        <CourseCard key={`placeholder-${idx}`} isPlaceholder />
-                                    )
-                                )}
-                            </Grid>
+                            <CourseCarousel courses={courseAll} activeTabIndex={tabIndex} />
                         )}
                     </TabPanel>
                     {/* Tab 2: Đã đăng ký */}
                     <TabPanel>
-                        {courseList.length === 0 ? (
-                            <Text align="center" fontSize="xl" my={5}>Không có khóa học nào.</Text>
+                        {loading ? (
+                            <HStack>
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                            </HStack>
                         ) : (
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} gap="6">
-                                {courseList.map((course, idx) =>
-                                    course ? (
-                                        <CourseCard key={course.courseID} course={course} />
-                                    ) : (
-                                        <CourseCard key={`placeholder-${idx}`} isPlaceholder />
-                                    )
-                                )}
-                            </Grid>
+                            <CourseCarousel courses={courseList} activeTabIndex={tabIndex} />
                         )}
                     </TabPanel>
                     {/* Tab 3: Đã hoàn tất */}
                     <TabPanel>
-                        {courseCompleted.length === 0 ? (
-                            <Text align="center" fontSize="xl" my={5}>Không có khóa học nào.</Text>
+                        {loading ? (
+                            <HStack>
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                                <Skeleton height="200px" w="100%" />
+                            </HStack>
                         ) : (
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} gap="6">
-                                {courseCompleted.map((course, idx) =>
-                                    course ? (
-                                        <CourseCard key={course.courseID} course={course} />
-                                    ) : (
-                                        <CourseCard key={`placeholder-${idx}`} isPlaceholder />
-                                    )
-                                )}
-                            </Grid>
+                            <CourseCarousel courses={courseCompleted} activeTabIndex={tabIndex} />
                         )}
                     </TabPanel>
                 </TabPanels>

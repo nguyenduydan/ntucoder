@@ -132,3 +132,52 @@ option {
 }
 
 
+/* Edit caurosel */
+/* Ẩn icon mặc định của slick */
+.slick-prev::before,
+.slick-next::before {
+  display: block !important;
+}
+
+/* Tạo nút Prev custom bằng CSS */
+.slick-prev {
+  left: 8px !important;
+  z-index: 1000;
+  height: 30px !important;
+  background-color: #ffffff!important;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.slick-prev:hover {
+  background-color: #0056b3;
+}
+
+/* Tạo nút Next custom bằng CSS */
+.slick-next {
+  right: 8px !important;
+  z-index: 1000;
+  height: 30px !important;
+  background-color: #ffffff !important;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.slick-prev:before,
+.slick-next:before{
+  font-size: 40px !important;
+  color:#000000 !important;
+  opacity: 1 !important;
+  font-weight: bold !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

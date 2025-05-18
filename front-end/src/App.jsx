@@ -10,9 +10,8 @@ import ProgressBar from "@/components/loading/ProgressBar";
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import LoadingSpinner from "@/components/loading/loadingSpinner";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const MotionFlex = motion(Flex);
 

@@ -42,16 +42,15 @@ namespace api.Controllers
 
             var cookieOptions = new CookieOptions
             {
-                //HttpOnly = true,
-                //Secure = true,
-                SameSite = SameSiteMode.Strict,
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = expires.Value
             };
             Response.Cookies.Append("token", token, cookieOptions);
-            Console.WriteLine(expires.Value.ToString("o"));
             return Ok(new
             {
-                token,
+                //token,
                 AccountID = user.AccountID,
                 Username = user.UserName,
                 RoleID = user.RoleID,

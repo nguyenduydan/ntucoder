@@ -19,19 +19,20 @@ namespace api.Controllers
             _progressRepository = progressRepository;
         }
 
-        [HttpGet("course")]
-        public async Task<IActionResult> GetCourseProgress(int courseId, int? coderId = null)
+        [HttpGet("courses")]
+        public async Task<IActionResult> GetCoursesProgress([FromQuery] List<int> courseIds, int? coderId = null)
         {
             var currentUserId = _authService.GetUserIdFromToken();
-            if (currentUserId == -1) return Unauthorized(); // Bắt buộc phải đăng nhập
+            if (currentUserId == -1) return Unauthorized();
 
-            // Nếu không truyền coderId thì mặc định lấy của chính người dùng
+            if (courseIds == null || !courseIds.Any())
+                return BadRequest("CourseIds is required.");
+
             var targetCoderId = coderId ?? currentUserId;
 
-            var result = await _progressRepository.GetCourseProgressAsync(courseId, targetCoderId);
+            var result = await _progressRepository.GetCoursesProgressAsync(courseIds, targetCoderId);
             return Ok(result);
         }
-
 
         [HttpGet("topic-summary")]
         public async Task<IActionResult> GetTopicSummary(int courseId)

@@ -34,6 +34,19 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
+    // ✅ Cấu hình đọc token từ cookie
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["token"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
@@ -110,6 +123,7 @@ builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<ProgressRepository>();
 builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<BlogRepository>();
+builder.Services.AddScoped<AccountRepository>();
 //Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();

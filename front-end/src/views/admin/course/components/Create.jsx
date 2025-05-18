@@ -180,6 +180,7 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                             label="chọn ảnh đại diện"
                             previewWidth="40vh"
                             previewHeight="20vh"
+                            onImageChange={file => setCourse(prev => ({ ...prev, imageFile: file }))}
                         />
                     </FormControl>
                     <Divider my={3} />
