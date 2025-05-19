@@ -81,6 +81,29 @@ export const animateProgress = (setProgress, duration = 1000) => {
     });
 };
 
+export function LimitText(text, limit) {
+    const textEdit = text.slice(0, limit);
+    if (text.length > limit) {
+        return textEdit + ' ...';
+    } else {
+        return text;
+    }
+
+}
+
+export function formatViewCount(count) {
+    if (typeof count !== 'number') return count;
+
+    if (count >= 1_000_000) {
+        return (count / 1_000_000).toFixed(count >= 10_000_000 ? 0 : 1) + "M";
+    }
+    if (count >= 1_000) {
+        return (count / 1_000).toFixed(count >= 10_000 ? 0 : 1) + "K";
+    }
+    return count.toString();
+};
+
+
 // ------------------------ //
 export function validatePassword(password) {
     if (!password) return "Mật khẩu không thể bỏ trống.";

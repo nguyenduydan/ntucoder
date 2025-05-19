@@ -54,6 +54,7 @@ const AvatarLoadest = ({ src, name, onLoad, ...props }) => {
             transition="box-shadow 0.3s ease-in-out"
             filter="saturate(1.2)"
             {...props}
+            loading="lazy"
         />
     );
 };

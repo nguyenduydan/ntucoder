@@ -106,6 +106,36 @@ namespace api.Infrashtructure.Repositories
             return true; // xóa thành công
         }
 
+        public async Task<PagedResponse<CommentResponseDto>> GetListCommentsByCoderIdAsync(QueryObject query, int coderId)
+        {
+            var commentsQuery = _context.Comments
+                .Where(c => c.CoderID == coderId)
+                .Include(c => c.Coder)
+                .Include(c => c.Replies!)
+                    .ThenInclude(r => r.Coder)
+                .OrderByDescending(c => c.CommentTime)
+                .AsQueryable();
+
+            // Gọi CreateAsync với IQueryable<Comment> 
+            var pagedComments = await PagedResponse<Comment>.CreateAsync(
+                commentsQuery,
+                query.Page,
+                query.PageSize
+            );
+
+            // Map List<Comment> sang List<CommentResponseDto>
+            var mappedList = pagedComments.Data.Select(MapToDto).ToList();
+
+            // Trả về kết quả đã map với paging
+            return new PagedResponse<CommentResponseDto>(
+                mappedList,
+                pagedComments.CurrentPage,
+                pagedComments.PageSize,
+                pagedComments.TotalCount,
+                pagedComments.TotalPages
+            );
+        }
+
         private CommentResponseDto MapToDto(Comment comment)
         {
             return new CommentResponseDto

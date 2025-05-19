@@ -11,24 +11,21 @@ import {
     Textarea,
     IconButton,
     useToast,
-    Icon,
-    Badge
 } from '@chakra-ui/react';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, lazy } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { FaRegUser, FaMailBulk, FaPhone, FaCheckCircle, FaCalendar } from "react-icons/fa";
-import { PiWarningCircle } from "react-icons/pi";
 import { getDetail, updateItem } from '@/config/apiService';
 import { useTitle } from '@/contexts/TitleContext';
 import CourseLearning from './components/CourseLearning';
-import { formatDate, maskEmail } from '@/utils/utils';
-import { MdEdit } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
-import CoderAvatar from '../Course/components/CoderAvatar';
-import ModalEdit from '@/views/user/Profile/components/ModalEdit';
 import { FaArrowLeft, FaEdit, FaCheck, FaTimes, FaStar } from 'react-icons/fa';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
-import BlogBox from './components/BlogBox';
+
+import ProfileHeader from './components/ProfileHeader';
+import BasicInfo from './components/BasicInfo';
+
+const BlogBox = lazy(() => import('./components/BlogBox'));
+const ActionBox = lazy(() => import('./components/ActionBox'));
 
 
 const Profile = () => {
@@ -119,7 +116,7 @@ const Profile = () => {
 
     return (
         <ScrollToTop>
-            <Box maxW="180vh" minH="100vh" mx="auto">
+            <Box maxW="180vh" minH="100vh" mx="auto" mb={5}>
                 <Box mt={5} ms={10}>
                     <Button
                         colorScheme="blue"
@@ -146,187 +143,18 @@ const Profile = () => {
                         alignItems="left"
                         boxShadow="md"
                     >
-                        <Flex flexDirection="column" alignItems="center">
-                            <CoderAvatar
-                                size="2xl"
-                                name="Coder Name"
-                                src={info.avatar}
-                                alt="Coder Avatar"
-                                mb={4}
-                                border="4px solid white"
-                            />
-                            <Text fontSize="2xl" color="white" fontWeight="bold">
-                                {info?.coderName || "Coder Name"}
-                            </Text>
-                            <Flex
-                                my={2}
-                                align="center"
-                                p={3}
-                                borderRadius="md"
-                                boxShadow="lg"
-                                bgGradient="linear(to-r, #1a202c, #2d3748)"  // nền tối xám đậm
-                            >
-                                <Text
-                                    fontWeight="bold"
-                                    bgGradient="linear(to-r, teal.200, purple.300)"
-                                    bgClip="text"
-                                    fontSize="md"
-                                    userSelect="none"
-                                >
-                                    Tổng điểm:
-                                </Text>
-                                <Badge colorScheme="yellow" ms={2} fontSize="md" px={3} py={1} borderRadius="md" display="flex" alignItems="center" gap={1}>
-                                    {info?.totalPoint || 0}
-                                    <Icon as={FaStar} color="yellow.500" />
-                                </Badge>
-                            </Flex>
-
-                            {isAllowShow && (
-                                <Box>
-                                    <Button
-                                        bg="blue"
-                                        color="white"
-                                        size="md"
-                                        _hover={{ bg: "blue.500" }}
-                                        rightIcon={<MdEdit />}
-                                        onClick={onOpen}
-                                    >
-                                        Chỉnh sửa thông tin
-                                    </Button>
-
-                                    <ModalEdit
-                                        coderID={coderID}
-                                        isOpen={isOpen}
-                                        onClose={onClose}
-                                        onUpdated={fetchData}
-                                    />
-                                </Box>
-                            )}
-                        </Flex>
+                        <ProfileHeader
+                            info={info}
+                            isAllowShow={isAllowShow}
+                            isOpen={isOpen}
+                            onOpen={onOpen}
+                            onClose={onClose}
+                            fetchData={fetchData}
+                            coderID={coderID}
+                        />
                         <Divider my={2} />
-
                         {/* Thông tin cơ bản */}
-                        <Box textColor="white">
-                            <Text fontSize="xl" mt={2} textTransform="uppercase" fontWeight="bold">
-                                Thông tin
-                            </Text>
-                            <Flex flexDirection="column" gap={2}>
-                                {/* User Name */}
-                                <Flex align="center" mt={2} mr={2} justify="space-between">
-                                    <Flex align="center">
-                                        <FaRegUser style={{ marginRight: "8px" }} />
-                                        <Tooltip placement='top' label={info?.coderName ? info?.coderName : "Không có thông tin"} hasArrow fontSize="md">
-                                            <Text fontSize="md" >
-                                                {info?.coderName || ""}
-                                            </Text>
-                                        </Tooltip>
-                                    </Flex>
-                                    <Flex>
-                                        <Tooltip
-                                            placement="top"
-                                            label={isCoderNameValid ? "Đã xác thực" : "Chưa xác thực"}
-                                        >
-                                            <Flex align="center">
-                                                {isCoderNameValid ? (
-                                                    <Icon
-                                                        as={FaCheckCircle}
-                                                        color="green.300"
-                                                        boxSize={5}
-                                                    />
-
-                                                ) : (
-                                                    <PiWarningCircle
-                                                        cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
-                                                        style={{ color: "red", fontSize: "18px" }}
-                                                    />
-                                                )}
-                                            </Flex>
-                                        </Tooltip>
-                                    </Flex>
-                                </Flex>
-
-                                {/* Email */}
-                                <Flex align="center" mt={2} mr={2} justify="space-between">
-                                    <Flex align="center">
-                                        <FaMailBulk style={{ marginRight: "4px" }} />
-                                        <Tooltip placement="top" label={maskEmail(info?.coderEmail) || "Không có thông tin"} hasArrow fontSize="md">
-                                            <Text fontSize="md">
-                                                {maskEmail(info?.coderEmail)}
-                                            </Text>
-                                        </Tooltip>
-                                    </Flex>
-                                    <Flex>
-                                        <Tooltip
-                                            placement="top"
-                                            label={isEmailValid ? "Đã xác thực" : "Chưa xác thực"}
-
-                                        >
-                                            <Flex align="center">
-                                                {isEmailValid ? (
-                                                    <Icon
-                                                        as={FaCheckCircle}
-                                                        color="green.300"
-                                                        boxSize={5}
-                                                    />
-
-                                                ) : (
-                                                    <PiWarningCircle
-                                                        cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
-                                                        style={{ color: "red", fontSize: "18px" }}
-                                                    />
-                                                )}
-                                            </Flex>
-                                        </Tooltip>
-                                    </Flex>
-                                </Flex>
-
-                                {/* Phone */}
-                                {isAllowShow && (
-                                    <Flex align="center" mt={2} mr={2} justify="space-between">
-                                        <Flex align="center">
-                                            <FaPhone style={{ marginRight: "8px" }} />
-                                            <Tooltip placement='top' label={info?.phoneNumber || "Không có thông tin"} hasArrow fontSize="md">
-                                                <Text fontSize="md" >
-                                                    {info?.phoneNumber || ""}
-                                                </Text>
-                                            </Tooltip>
-                                        </Flex>
-                                        <Flex>
-                                            <Tooltip
-                                                placement="top"
-                                                label={isPhoneValid ? "Đã xác thực" : "Chưa xác thực"}
-
-                                            >
-                                                <Flex align="center">
-                                                    {isPhoneValid ? (
-                                                        <Icon
-                                                            as={FaCheckCircle}
-                                                            color="green.300"
-                                                            boxSize={5}
-                                                        />
-
-                                                    ) : (
-                                                        <PiWarningCircle
-                                                            cursor="pointer"  // Sử dụng cursor pointer cho dấu chấm than đỏ
-                                                            style={{ color: "red", fontSize: "18px" }}
-                                                        />
-                                                    )}
-                                                </Flex>
-                                            </Tooltip>
-                                        </Flex>
-                                    </Flex>
-                                )}
-                                {/* Ngày sinh */}
-                                <Flex align="center" mt={2} mr={2} justify="space-between">
-                                    <Flex align="center">
-                                        <FaCalendar style={{ marginRight: "8px" }} />
-                                        <Text fontSize="md" >
-                                            {info.birthDay ? formatDate(info.birthDay) : ""}
-                                        </Text>
-                                    </Flex>
-                                </Flex>
-                            </Flex>
-                        </Box>
+                        <BasicInfo info={info} isCoderNameValid={isCoderNameValid} isAllowShow={isAllowShow} isEmailValid={isEmailValid} isPhoneValid={isPhoneValid} />
                         <Divider my={2} />
 
                         {/* Giới thiệu */}
@@ -397,14 +225,22 @@ const Profile = () => {
                     </GridItem>
 
                     {/* Personal information */}
-                    <GridItem
-                        bg="white"
-                        borderRadius="md"
-                        boxShadow="md"
-                    >
+                    <GridItem>
                         {/* Course learning */}
                         <CourseLearning coderID={id || coderID} />
-                        <BlogBox coderID={id || coderID} />
+                        <Grid
+                            templateColumns={{ base: "1fr", md: "1fr 0.7fr" }}
+                            gap={4}
+                            h="75vh" // hoặc "80vh" tùy thiết kế
+                            mt={5}
+                        >
+                            <GridItem overflow="hidden">
+                                <BlogBox coderID={id || coderID} />
+                            </GridItem>
+                            <GridItem overflow="hidden">
+                                <ActionBox coderID={id || coderID} />
+                            </GridItem>
+                        </Grid>
                     </GridItem>
                 </Grid>
             </Box >

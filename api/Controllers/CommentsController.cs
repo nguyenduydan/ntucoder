@@ -1,4 +1,5 @@
 ﻿using api.DTOs;
+using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
 using api.Models.ERD;
@@ -43,6 +44,30 @@ namespace api.Controllers
             if (comment == null) return NotFound();
             return Ok(comment);
         }
+
+        [HttpGet("by-coder")]
+        [Authorize]
+        public async Task<IActionResult> GetCommentsByCoderId([FromQuery] QueryObject query, int coderId)
+        {
+            if (query == null)
+                return BadRequest("Query parameters are required.");
+
+            var coderToken = _authService.GetUserIdFromToken();
+            if (coderToken == -1)
+                return Unauthorized();
+
+            // Chỉ cho phép lấy comment của chính mình
+            if (coderId != coderToken)
+                return BadRequest("Bạn không có quyền xem bình luận của người khác.");
+
+            var result = await _commentRepository.GetListCommentsByCoderIdAsync(query, coderId);
+
+            if (result == null || !result.Data.Any())
+                return NotFound("Không tìm thấy bình luận nào.");
+
+            return Ok(result);
+        }
+
 
         [HttpPost]
         [Authorize]

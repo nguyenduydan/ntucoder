@@ -50,7 +50,7 @@ namespace api.Controllers
             Response.Cookies.Append("token", token, cookieOptions);
             return Ok(new
             {
-                //token,
+                token,
                 AccountID = user.AccountID,
                 Username = user.UserName,
                 RoleID = user.RoleID,

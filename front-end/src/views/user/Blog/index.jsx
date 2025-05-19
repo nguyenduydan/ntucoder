@@ -184,7 +184,7 @@ const Blog = () => {
                 <Container maxW="8xl" py={8} minH="86vh">
                     {/* Nút mở modal */}
                     {isAuthenticated && (
-                        <Flex align="center" justify="end" mb={4}>
+                        <Flex align="center" justify="end">
                             <Button colorScheme="blue" onClick={onOpen}>
                                 Đăng bài mới
                             </Button>
@@ -221,7 +221,7 @@ const Blog = () => {
                                         <Spinner />
                                     </Flex>
                                 ) : newestBlogs ? (
-                                    <Box minH="74vh">
+                                    <Box minH="80vh">
                                         <Flex align="center" mb={5}>
                                             <AvatarLoadest
                                                 size="md"
@@ -260,6 +260,7 @@ const Blog = () => {
                                                 fallbackSrc="./avatarSimmmple.png"
                                                 borderRadius="md"
                                                 mb={4}
+                                                loading="lazy"
                                             />
                                         </Box>
 

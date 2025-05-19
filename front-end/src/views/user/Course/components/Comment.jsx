@@ -56,6 +56,7 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
             setReplyText('');
             setShowReplyInput(false);
             setShowReplies(true);
+
         } catch (err) {
             console.error('Add reply error', err);
             toast({
@@ -80,11 +81,15 @@ const CommentItem = ({ comment, onReply, onDelete, globalExpand }) => {
     // Xử lý xóa comment khi xác nhận
     const handleConfirmDelete = async () => {
         try {
-            const token = coder?.token || localStorage.getItem('token');
-            await api.delete(`/comments/${comment.commentID}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await api.delete(`/comments/${comment.commentID}`);
             onDelete(comment.commentID);
+            toast({
+                title: "Bạn đã xóa bình luận này",
+                status: "success",
+                position: "top",
+                variant: "top-accent",
+                duration: "1000"
+            });
             closeAlert();
         } catch (err) {
             console.error('Delete comment error', err);

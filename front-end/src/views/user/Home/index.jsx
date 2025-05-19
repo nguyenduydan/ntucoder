@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import {
   Box as ChakraBox,
   Flex as ChakraFlex,
@@ -46,7 +46,7 @@ const fadeInUp = {
 const Home = () => {
   useTitle("Trang chủ");
   const [coursesEnrolled, setCoursesEnrolled] = useState([]);
-  const [courses, setCoursePopular] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
   const { isAuthenticated, coder } = useAuth();
@@ -54,32 +54,35 @@ const Home = () => {
   const [blogs, setBlogs] = useState([]);
   const [codersHighest, setCoderHighest] = useState([]);
 
+  const coursePopular = useMemo(() => {
+    return courses
+      .filter(course => course.totalReviews >= 0)
+      .sort((a, b) => b.totalReviews - a.totalReviews)
+      .slice(0, 4);
+  }, [courses]);
+
   const fetchCourses = useCallback(async () => {
     if (!coder?.coderID) return;
     setLoading(true);
     try {
       const enrolledRes = await api.get(`/Enrollment/list-enroll/${coder.coderID}`);
-      const enrolledCourses = enrolledRes.data.map(e => e.courseID); // Lấy danh sách courseID
+      const enrolledCourses = enrolledRes.data.map(e => e.courseID);
 
-      // Lấy danh sách tất cả course
       const response = await getList({
         controller: "Course",
         page: 1,
-        pageSize: 100, // để đảm bảo lấy hết nếu chỉ có phân trang
+        pageSize: 100,
         ascending: true,
         totalCount: 100
       });
-      const activeCourses = response.data
-        .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
-        .slice(0, 4); // chỉ lấy tối đa 4 khóa học
 
-      const coursePopular = response.data
-        .filter(course => course.totalReviews >= 0)
-        .sort((a, b) => b.totalReviews - a.totalReviews)
+      const allCourses = response.data;
+      const activeCourses = allCourses
+        .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
         .slice(0, 4);
 
       setCoursesEnrolled(activeCourses);
-      setCoursePopular(coursePopular);
+      setCourses(allCourses); // Lưu toàn bộ để dùng useMemo lọc top popular
     } catch (error) {
       console.error("Error fetching courses:", error);
       toast({
@@ -169,7 +172,7 @@ const Home = () => {
             )}
           </MotionBox>
 
-          <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
+          <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp} loading="lazy">
             <Heading size="lg" mb={4} color="blue.500">Khóa học phổ biến</Heading>
             {loading ? (
               <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
@@ -179,7 +182,7 @@ const Home = () => {
                 <SkeletonList />
               </SimpleGrid>
             ) : (
-              <CourseGrid courses={courses} />
+              <CourseGrid courses={coursePopular} />
             )}
           </MotionBox>
 
@@ -210,7 +213,7 @@ const Home = () => {
               <Box flex={1}>
                 {/* Top 3 học viên */}
                 <Box
-                  mb={5}
+                  mb={4}
                   initial="hidden"
                   whileInView="show"
                   viewport={{ once: true }}
@@ -251,7 +254,7 @@ const Home = () => {
                   >
                     <MiniCalendar
                       maxW="600px"
-                      fontSize="xs"
+                      fontSize="md"
                       boxShadow="md"
                     />
                   </MotionBox>

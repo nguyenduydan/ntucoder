@@ -35,7 +35,6 @@ import { useDisclosure } from '@chakra-ui/react';
 const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [published, setPublished] = useState(true);
     const [pinHome, setPinHome] = useState(false);
     const cancelRef = React.useRef();
 
@@ -47,12 +46,11 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
 
     const toast = useToast();
 
-    const hasChanges = title.trim() || content.trim() !== '' || !published || pinHome;
+    const hasChanges = title.trim() || content.trim() !== '' || pinHome;
 
     const resetForm = () => {
         setTitle('');
         setContent('');
-        setPublished(true);
         setPinHome(false);
     };
 
@@ -80,7 +78,7 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
         const newPost = {
             title: title,
             content: content,
-            published: published ? 1 : 0,
+            published: 1,
             pinHome: pinHome ? 1 : 0,
         };
 
@@ -181,14 +179,6 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
 
                     <ModalFooter justifyContent="space-between">
                         <Flex gap={4} flex={1}>
-                            <FormControl display="flex" alignItems="center">
-                                <FormLabel htmlFor="published" mb="0" fontWeight="bold">Công khai</FormLabel>
-                                <Switch
-                                    id="published"
-                                    isChecked={published}
-                                    onChange={(e) => setPublished(e.target.checked)}
-                                />
-                            </FormControl>
 
                             <FormControl display="flex" alignItems="center">
                                 <FormLabel htmlFor="pinHome" mb="0" fontWeight="bold">Ghim ở trang chủ</FormLabel>

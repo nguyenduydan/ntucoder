@@ -74,11 +74,12 @@ const CourseLearning = ({ coderID }) => {
     }, [fetchCourseData]);
 
     return (
-        <Box mt={5} px={6} py={2} minH="50vh">
+        <Box px={6} py={5} minH="50vh" bg="white" borderRadius="md" shadow="md">
             <Tabs variant='soft-rounded' colorScheme='blue' onChange={index => setTabIndex(index)} isLazy>
                 <Flex justifyContent="space-between">
                     <Text fontSize="xl" color="blue.600" fontWeight="bold">
                         Khóa học ({courseList.length})
+                        <Divider w="60px" h="3px" bg="blue" borderRadius="md" />
                     </Text>
 
                     <TabList>
@@ -87,12 +88,11 @@ const CourseLearning = ({ coderID }) => {
                         <Tab>Đã hoàn tất</Tab>
                     </TabList>
                 </Flex>
-                <Divider w="50px" h="3px" bg="blue" />
                 <TabPanels>
                     {/* Tab 1: Tất cả khóa học */}
                     <TabPanel>
                         {loading ? (
-                            <HStack>
+                            <HStack gap={4}>
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />
@@ -104,7 +104,7 @@ const CourseLearning = ({ coderID }) => {
                     {/* Tab 2: Đã đăng ký */}
                     <TabPanel>
                         {loading ? (
-                            <HStack>
+                            <HStack gap={4}>
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />
@@ -116,7 +116,7 @@ const CourseLearning = ({ coderID }) => {
                     {/* Tab 3: Đã hoàn tất */}
                     <TabPanel>
                         {loading ? (
-                            <HStack>
+                            <HStack gap={4}>
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />
                                 <Skeleton height="200px" w="100%" />

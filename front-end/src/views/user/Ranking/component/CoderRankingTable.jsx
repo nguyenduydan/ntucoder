@@ -19,7 +19,7 @@ const CoderRankingTable = ({ coders, loading }) => {
     return (
         <Box minH="40vh">
             <TableContainer>
-                <Table size="sm" colorScheme="blue">
+                <Table size="sm" colorScheme="blue" loading="lazy">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
                         <Tr>
                             <Th w="20px" py={3}>#</Th>

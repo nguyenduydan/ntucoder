@@ -73,6 +73,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                 objectFit="cover"
                 h="160px"
                 w="full"
+                loading="lazy"
             />
 
             <Box px={4} py={2}>

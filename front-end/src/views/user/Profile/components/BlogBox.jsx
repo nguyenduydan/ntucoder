@@ -1,4 +1,4 @@
-import { Box, Code, Heading } from '@chakra-ui/react';
+import { Box, Divider, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import Bloglist from "@/views/user/Blog/components/ListBlogs";
 import Pagination from '@/components/pagination/pagination';
@@ -50,12 +50,24 @@ const BlogBox = ({ coderID }) => {
     };
 
     return (
-        <Box px={6} py={5} minH="50vh">
-            <Heading fontSize="xl" fontWeight="bold" mb={4} textTransform="uppercase">
+        <Box
+            h="100%"
+            bg="white"
+            borderRadius="lg"
+            shadow="md"
+            display="flex"
+            flexDirection="column"
+            overflow="hidden"
+            px={5}
+            py={4}
+        >
+            <Text fontSize="xl" color="blue.600" fontWeight="bold" mb={3}>
                 Các bài viết đã đăng
-            </Heading>
-            <Box h="50vh" overflowY="auto">
-                <Bloglist blogs={blogs} loading={loading} />
+                <Divider mt={1} w="60px" h="3px" bg="blue" borderRadius="md" />
+            </Text>
+
+            <Box h="55vh" overflowY="auto">
+                <Bloglist blogs={blogs} loading={loading} limitContent={100} limitTitle={30} limitCoderName={10} limitNumber={5} />
             </Box>
             <Pagination
                 currentPage={currentPage}

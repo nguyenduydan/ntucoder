@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Text, Stack, Flex, Spinner, Heading, Image, Button } from '@chakra-ui/react';
-import { toSlug } from '@/utils/utils';
+import { LimitText, toSlug, formatViewCount } from '@/utils/utils';
 import InfoBlog from './InfoBlog';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import { useNavigate } from 'react-router-dom';
 
-const ListBlogs = ({ blogs, loading }) => {
+const ListBlogs = ({ blogs, loading, limitContent = 300, limitTitle = 100, limitCoderName = 30, limitNumber = 10 }) => {
     const navigate = useNavigate();
 
     return (
@@ -38,22 +38,23 @@ const ListBlogs = ({ blogs, loading }) => {
                                     objectFit="cover"
                                     alt={blog.title || blog.Title || 'Không có ảnh'}
                                     borderRadius="md"
+                                    loading="lazy"
                                 />
                             </Box>
                             <Box flex="1">
                                 <Button variant="link" colorScheme='black' onClick={() => navigate(`/blogs/${toSlug(blog.title || blog.Title)}-${blog.blogID}`)}>
                                     <Text fontWeight="bold" mb={1}>
-                                        {blog.title}
+                                        {LimitText(blog.title, limitTitle)}
                                     </Text>
                                 </Button>
                                 <Text fontSize="sm" color="gray.600">
-                                    {sanitizeHtml(blog.content).replace(/<[^>]*>/g, '').slice(0, 300)}...
+                                    {sanitizeHtml(blog.content).replace(/<[^>]*>/g, '').slice(0, limitContent)}...
                                 </Text>
                                 <InfoBlog
                                     id={blog.coderID || blog.CoderID}
-                                    coderName={blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
+                                    coderName={LimitText(blog.coderName, limitCoderName)}
                                     date={blog.blogDate || blog.BlogDate}
-                                    view={blog.viewCount || blog.ViewCount || 0}
+                                    view={formatViewCount(blog.viewCount || blog.ViewCount)}
                                 />
                             </Box>
                         </Flex>

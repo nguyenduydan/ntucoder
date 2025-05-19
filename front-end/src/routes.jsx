@@ -2,33 +2,32 @@ import { Icon } from '@chakra-ui/react';
 import {
   MdHome,
 } from 'react-icons/md';
-import React, { lazy } from 'react';
 
-// Admin Lazy Imports
-const MainDashboard = lazy(() => import('views/admin/dashboard'));
-const CoderTable = lazy(() => import('views/admin/coder/index'));
-const CoderCreate = lazy(() => import('@/views/admin/coder/components/Create'));
-const CoderDetail = lazy(() => import('@/views/admin/coder/components/Detail'));
-const BadgeTable = lazy(() => import('views/admin/badge/index'));
-const CourseCategoryTable = lazy(() => import('views/admin/categorycourse/index'));
-const CourseTable = lazy(() => import('views/admin/course/index'));
-const CourseDetail = lazy(() => import('@/views/admin/course/components/Detail'));
-const TopicTable = lazy(() => import('views/admin/topic/index'));
-const TopicDetail = lazy(() => import('@/views/admin/topic/components/Detail'));
-const LessonTable = lazy(() => import('views/admin/lesson/index'));
-const LessonDetail = lazy(() => import('@/views/admin/lesson/components/Detail'));
-const ProblemTable = lazy(() => import('views/admin/problem/index'));
-const ProblemDetail = lazy(() => import('@/views/admin/problem/components/Detail'));
+// Admin Imports
+import MainDashboard from 'views/admin/dashboard';
+import CoderTable from 'views/admin/coder/index';
+import CoderCreate from '@/views/admin/coder/components/Create';
+import CoderDetail from '@/views/admin/coder/components/Detail';
+import BadgeTable from 'views/admin/badge/index';
+import CourseCategoryTable from 'views/admin/categorycourse/index';
+import CourseTable from 'views/admin/course/index';
+import CourseDetail from '@/views/admin/course/components/Detail';
+import TopicTable from 'views/admin/topic/index';
+import TopicDetail from '@/views/admin/topic/components/Detail';
+import LessonTable from 'views/admin/lesson/index';
+import LessonDetail from '@/views/admin/lesson/components/Detail';
+import ProblemTable from 'views/admin/problem/index';
+import ProblemDetail from '@/views/admin/problem/components/Detail';
 
-// User Lazy Imports
-const Home = lazy(() => import('views/user/Home'));
-// const Problem = lazy(() => import('views/user/Problem'));
-const Course = lazy(() => import('@/views/user/Course'));
-const CourseDetailUser = lazy(() => import('@/views/user/Course/components/CourseDetail'));
-const Lesson = lazy(() => import('views/user/Lesson'));
-const Ranking = lazy(() => import('@/views/user/Ranking'));
-const Blog = lazy(() => import('@/views/user/Blog'));
-const BlogDetail = lazy(() => import('@/views/user/Blog/components/BlogDetail'));
+// User Imports
+import Home from 'views/user/Home';
+//import Problem from 'views/user/Problem';
+import Course from '@/views/user/Course';
+import CourseDetailUser from '@/views/user/Course/components/CourseDetail';
+import Lesson from 'views/user/Lesson';
+import Ranking from '@/views/user/Ranking';
+import Blog from '@/views/user/Blog';
+import BlogDetail from '@/views/user/Blog/components/BlogDetail';
 
 import { PersonIcon } from '@/components/icons/Icons';
 import { FaBookAtlas, FaFileCode, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";

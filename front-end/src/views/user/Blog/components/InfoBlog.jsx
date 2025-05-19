@@ -18,7 +18,7 @@ const InfoBlog = ({ id, coderName, date, view }) => {
             |
             <Badge colorScheme="blue" display="flex" alignItems="center" fontSize="0.75rem" px={2}>
                 <Icon as={FaRegEye} mr={1} />
-                {formatNumber(view)} lượt xem
+                {view || 0} lượt xem
             </Badge>
         </Flex>
     );

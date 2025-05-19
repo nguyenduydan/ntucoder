@@ -60,7 +60,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
             borderRadius="lg" overflow="hidden" boxShadow="md"
             onClick={handleNagvigate}
         >
-            <Image src={course.imageUrl || "/avatarSimmmple.png"} alt={course.title} objectFit="cover" h="160px" w="full" />
+            <Image src={course.imageUrl || "/avatarSimmmple.png"} alt={course.title} objectFit="cover" h="160px" w="full" loading="lazy" />
             <Box p="4">
                 <Badge bg={course.badgeColor} textTransform="capitalize" fontWeight="normal" textColor={textColor} px="2" borderRadius="md">
                     {course.badgeName}

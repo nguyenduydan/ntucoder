@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Spinner, Stack, Flex, Text, Button, Image, Tooltip } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { toSlug } from '@/utils/utils';
+import { formatNumber, LimitText, toSlug } from '@/utils/utils';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import InfoBlog from './InfoBlog';
 
@@ -39,17 +39,18 @@ const BlogTopViews = ({ blogs = [], loading, }) => {
                             boxShadow="md"
                             flexDirection={{ base: "column", md: "row" }}
                         >
-                            <Box flex={{ base: "unset", md: "0.6" }} mr={{ base: 0, md: 4 }} mb={{ base: 3, md: 0 }}>
+                            <Box flex={{ base: "unset", md: "0.5" }} mr={{ base: 0, md: 4 }} mb={{ base: 3, md: 0 }}>
                                 <Image
                                     size="md"
                                     name={item.title || item.Title || "Không có ảnh"}
                                     src={item.imageBlogUrl || "./avatarSimmmple.png"}
-                                    w="100%"
-                                    maxH={{ base: "30vh", md: "22vh" }}
+                                    minW={{ base: "100%", md: "300px" }}
+                                    maxH={{ base: "30vh", md: "24vh" }}
                                     objectFit="cover"
                                     alt={item.title || item.Title || "Không có ảnh"}
                                     fallbackSrc="./avatarSimmmple.png"
                                     borderRadius="md"
+                                    loading="lazy"
                                 />
                             </Box>
                             <Box flex="1" mt={{ base: 0, md: 3 }}>
@@ -65,14 +66,14 @@ const BlogTopViews = ({ blogs = [], loading, }) => {
                                         </Text>
                                     </Tooltip>
                                 </Button>
-                                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" noOfLines={5}>
-                                    {sanitizeHtml(item.content).replace(/<[^>]*>/g, "").slice(0, 150)}...
+                                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" noOfLines={3}>
+                                    <Box dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content || item.Content).replace(/<[^>]*>/g, "") }} />
                                 </Text>
                                 <InfoBlog
                                     id={item.coderID || item.CoderID}
-                                    coderName={item.coderName || item.CoderName || item.author || "Người dùng"}
+                                    coderName={LimitText(item.coderName, 15) || LimitText(item.CoderName, 15)}
                                     date={item.blogDate || item.BlogDate}
-                                    view={item.viewCount || item.ViewCount || 0}
+                                    view={formatNumber(item.viewCount || item.ViewCount)}
                                 />
                             </Box>
                         </Flex>

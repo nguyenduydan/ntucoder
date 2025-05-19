@@ -45,8 +45,9 @@ export default function HeroSection() {
             h={{ base: "auto", md: "100vh" }}
             display="flex"
             justifyContent="center"
-            alignItems="center">
-            <Container maxW="8xl" centerContent >
+            alignItems="center"
+        >
+            <Container maxW="8xl" centerContent loading="lazy">
                 <Stack
                     direction={["column", "row"]}
                     spacing={10}
@@ -61,7 +62,7 @@ export default function HeroSection() {
                         viewport={{ once: true }}
                         variants={fadeInUp}
                     >
-                        <Heading as="h1" size="2xl" mb={4} letterSpacing="2px" lineHeight="1.4">
+                        <Heading as="h1" size="2xl" mb={4} letterSpacing="2px" lineHeight="1.4" loading="lazy">
                             Chào mừng <Text color="blue.300" textDecoration="underline">{text}<Cursor cursorStyle="|" /></Text>
                             đến với{" "}
                             <Box as="span" color="teal.300" display="inline-block" textShadow="0 0 10px rgba(0, 255, 255, 0.7)">
@@ -91,8 +92,11 @@ export default function HeroSection() {
                             src={HeroImg}
                             alt="Online learning"
                             width="100%"
-                            height="100vh"
+                            height="auto"
                             objectFit="contain"
+                            loading="lazy" // Lazy load ảnh
+                            draggable={false}
+                            style={{ maxHeight: "70vh" }} // Giới hạn chiều cao ảnh
                         />
                     </MotionBox>
                 </Stack>
