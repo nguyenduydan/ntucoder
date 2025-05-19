@@ -66,9 +66,9 @@ const BlogTopViews = ({ blogs = [], loading, }) => {
                                         </Text>
                                     </Tooltip>
                                 </Button>
-                                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" noOfLines={3}>
+                                <Box fontSize={{ base: "sm", md: "md" }} color="gray.600" noOfLines={3}>
                                     <Box dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content || item.Content).replace(/<[^>]*>/g, "") }} />
-                                </Text>
+                                </Box>
                                 <InfoBlog
                                     id={item.coderID || item.CoderID}
                                     coderName={LimitText(item.coderName, 15) || LimitText(item.CoderName, 15)}

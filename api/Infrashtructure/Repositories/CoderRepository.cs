@@ -6,6 +6,7 @@ using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -14,7 +15,7 @@ namespace api.Infrashtructure.Repositories
         private readonly ApplicationDbContext _context;
         private readonly MinioService _minioService;
 
-        public CoderRepository(ApplicationDbContext context, MinioService minioService)
+        public CoderRepository(ApplicationDbContext context, MinioService minioService, IMemoryCache cache)
         {
             _context = context;
             _minioService = minioService;
@@ -126,6 +127,7 @@ namespace api.Infrashtructure.Repositories
             {
                 UserName = dto.UserName!,
                 Password = hashedPassword,
+                ReceiveEmail = dto.CoderEmail,
                 SaltMD5 = salt,
                 RoleID = dto.Role ?? 1,
             };
@@ -348,8 +350,70 @@ namespace api.Infrashtructure.Repositories
             return pagedResponse;
         }
 
+        public async Task<Account> GetAccountByCoderIdAsync(int coderId)
+        {
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountID == coderId);
 
-       
+            if (account == null)
+            {
+                throw new KeyNotFoundException("Không tìm thấy tài khoản.");
+            }
+
+            return account;
+        }
+
+
+        public async Task<CoderDetailDTO> GetCoderByEmailAsync(string email)
+        {
+            Coder existing = await _context.Coders.Include(c => c.Account).Where(c => c.CoderEmail == email).FirstOrDefaultAsync();
+            if (existing != null)
+            {
+                return new CoderDetailDTO
+                {
+                    CoderID = existing.CoderID,
+                    CoderName = existing.CoderName,
+                    Avatar = existing.Avatar,
+                    Description = existing.Description,
+                    BirthDay = existing.BirthDay,
+                    Gender = existing.Gender,
+                    PhoneNumber = existing.PhoneNumber,
+                    UpdatedAt = existing.UpdatedAt,
+                    UpdatedBy = existing.UpdatedBy,
+                    Role = existing.Account.RoleID,
+                };
+            }
+            return null;
+        }
+
+        // Cập nhật mật khẩu mới cho user
+        public async Task<(bool Success, string Message)> UpdatePasswordAsync(string email, string newPassword)
+        {
+            var user = await _context.Accounts.FirstOrDefaultAsync(u => u.ReceiveEmail == email);
+
+            if (user == null)
+                return (false, "Không tìm thấy người dùng với email này.");
+
+            // Tạo salt và hash password
+            var salt = PasswordHelper.GenerateSalt();
+            var hashedPassword = PasswordHelper.HashPassword(newPassword, salt);
+
+            user.Password = hashedPassword;
+            user.SaltMD5 = salt;
+
+            // Xóa mã reset mật khẩu
+            user.PwdResetCode = null;
+            user.PwdResetDate = null;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return (true, "Mật khẩu đã được đặt lại thành công.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Cập nhật mật khẩu thất bại: {ex.Message}");
+            }
+        }
 
     }
 }

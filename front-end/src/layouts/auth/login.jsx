@@ -7,14 +7,17 @@ import {
     IconButton,
     Button,
     useToast,
+    Text,
+    Link,
+    Box,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import FlushedInput from "../../../components/fields/InputField";
+import FlushedInput from "../../components/fields/InputField";
 import { login } from "@/config/apiService";
 import api from "@/config/apiConfig";
 
-const Login = ({ onSuccess }) => {
+const Login = ({ onSuccess, onForgotPassword }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [loginData, setLoginData] = useState({ userName: "", password: "" });
     const [loading, setLoading] = useState(false);
@@ -123,6 +126,21 @@ const Login = ({ onSuccess }) => {
             >
                 Đăng nhập
             </Button>
+
+            {/* Nút quên mật khẩu */}
+            <Box textAlign="right" mt={2}>
+                <Link
+                    color="blue.500"
+                    fontSize="sm"
+                    cursor="pointer"
+                    onClick={() => {
+                        if (onForgotPassword) onForgotPassword();
+                    }}
+                    _hover={{ textDecoration: "underline" }}
+                >
+                    Quên mật khẩu?
+                </Link>
+            </Box>
         </form>
     );
 };

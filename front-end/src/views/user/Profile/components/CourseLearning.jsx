@@ -77,10 +77,12 @@ const CourseLearning = ({ coderID }) => {
         <Box px={6} py={5} minH="50vh" bg="white" borderRadius="md" shadow="md">
             <Tabs variant='soft-rounded' colorScheme='blue' onChange={index => setTabIndex(index)} isLazy>
                 <Flex justifyContent="space-between">
-                    <Text fontSize="xl" color="blue.600" fontWeight="bold">
-                        Khóa học ({courseList.length})
-                        <Divider w="60px" h="3px" bg="blue" borderRadius="md" />
-                    </Text>
+                    <Box>
+                        <Text fontSize="xl" color="blue.600" fontWeight="bold">
+                            Khóa học ({courseList.length})
+                        </Text>
+                        <Divider w="60px" h="3px" bg="blue.600" borderRadius="md" mt={1} />
+                    </Box>
 
                     <TabList>
                         <Tab>Tất cả khóa học</Tab>

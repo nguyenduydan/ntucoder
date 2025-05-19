@@ -18,6 +18,7 @@ const CoderBoard = () => {
     useTitle('Ranking');
     const toast = useToast();
     const [isLoading, setIsLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
     const [codersHighest, setCoderHighest] = useState([]);
     const [coders, setCoders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +26,7 @@ const CoderBoard = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const [searchText, setSearchText] = useState("");
-    const debouncedSearchText = useDebounce(searchText, 100);
+    const debouncedSearchText = useDebounce(searchText, 500);
 
     const fetchTop3 = async () => {
         setIsLoading(true);
@@ -51,7 +52,7 @@ const CoderBoard = () => {
     };
 
     const fetchListCoder = async (page = 1, size = 10, keyword = "") => {
-        setIsLoading(true);
+        setSearchLoading(true);
         try {
             const res = await api.get('/Coder/list-ranking', {
                 params: {
@@ -77,7 +78,7 @@ const CoderBoard = () => {
                 position: 'top'
             });
         } finally {
-            setIsLoading(false);
+            setSearchLoading(false);
         }
     };
 
@@ -159,7 +160,7 @@ const CoderBoard = () => {
                         w="300px"
                     />
                 </Flex>
-                <CoderRankingTable coders={coders} loading={isLoading} />
+                <CoderRankingTable coders={coders} loading={searchLoading} />
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}

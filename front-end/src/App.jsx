@@ -5,53 +5,36 @@ import UserLayout from "./layouts/user";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
 import initialTheme from "./theme/theme";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import ProgressBar from "@/components/loading/ProgressBar";
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-import LoadingSpinner from "@/components/loading/loadingSpinner";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-const MotionFlex = motion(Flex);
+import LoadingScreen from "@/components/loading/ScreenLoading";
 
 
 export default function Main() {
-  // State theme
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
   const { isLoading } = useAuth();
-
-  // State để quản lý việc hiển thị loading với delay
-  const [showLoading, setShowLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(isLoading);
 
   useEffect(() => {
-    if (!isLoading) {
-      const timer = setTimeout(() => {
-        setShowLoading(false);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    } else {
+    let timer;
+    if (isLoading) {
       setShowLoading(true);
+    } else {
+      // Delay hide loading nếu isLoading = false
+      timer = setTimeout(() => setShowLoading(false), 1000);
     }
+    return () => clearTimeout(timer);
   }, [isLoading]);
 
-  if (showLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <ChakraProvider theme={currentTheme}>
       <ProgressBar />
-      <AnimatePresence>
-        <MotionFlex
-          key="content"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          direction="column"
-          width="100%"
-        >
+      {showLoading ? <LoadingScreen />
+        : (
           <Routes>
             <Route
               path="admin/*"
@@ -61,12 +44,12 @@ export default function Main() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/*" element={
-              <UserLayout theme={currentTheme} setTheme={setCurrentTheme} />
-            } />
+            <Route
+              path="/*"
+              element={<UserLayout theme={currentTheme} setTheme={setCurrentTheme} />}
+            />
           </Routes>
-        </MotionFlex>
-      </AnimatePresence>
+        )}
     </ChakraProvider>
   );
 }

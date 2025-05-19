@@ -61,11 +61,12 @@ const BlogBox = ({ coderID }) => {
             px={5}
             py={4}
         >
-            <Text fontSize="xl" color="blue.600" fontWeight="bold" mb={3}>
-                Các bài viết đã đăng
+            <Box>
+                <Text fontSize="xl" color="blue.600" fontWeight="bold" mb={3}>
+                    Các bài viết đã đăng
+                </Text>
                 <Divider mt={1} w="60px" h="3px" bg="blue" borderRadius="md" />
-            </Text>
-
+            </Box>
             <Box h="55vh" overflowY="auto">
                 <Bloglist blogs={blogs} loading={loading} limitContent={100} limitTitle={30} limitCoderName={10} limitNumber={5} />
             </Box>

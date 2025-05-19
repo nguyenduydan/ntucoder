@@ -7,7 +7,6 @@ import {
     useToast,
     Spinner,
     Container,
-    Stack,
     useDisclosure,
     Heading,
     Image,
@@ -22,12 +21,12 @@ import CreateBlog from './components/CreateBlog';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { toSlug, formatDateTime, formatNumber } from '@/utils/utils';
 import { useTitle } from '@/contexts/TitleContext';
-import ListBlogs from './components/ListBlogs';
 import AvatarLoadest from '@/components/fields/Avatar';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
 import { FaRegEye } from 'react-icons/fa';
-import InfoBlog from './components/InfoBlog';
 import Pagination from '@/components/pagination/pagination';
+
+import ListBlogs from './components/ListBlogs';
 import BlogTopViews from './components/BlogTopViews';
 
 const Blog = () => {

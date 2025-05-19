@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import CodingPng from "assets/img/profile/gummy-coding.png";
-import Slider from "react-slick";
 
 import { getList } from "@/config/apiService";
 import CourseGrid from "@/views/user/Course/components/CourseGrid";
@@ -28,12 +27,15 @@ import { FaArrowRight } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import ScrollToTop from "@/components/scroll/ScrollToTop";
+import api from "@/config/apiConfig";
+import BlogCaurosel from "./BlogCaurosel";
 
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
 const MotionHeading = motion(Heading);
 const MotionText = motion(Text);
+const MotionButton = motion(Button);
 
 const fadeInVariant = {
     hidden: { opacity: 0 },
@@ -111,7 +113,7 @@ const HomeNoLogin = () => {
     const navigate = useNavigate();
 
     const [courses, setCourses] = useState([]);
-
+    const [blogs, setBlogs] = useState([]);
     const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
     const handleMouseMove = (e) => {
@@ -152,6 +154,37 @@ const HomeNoLogin = () => {
         }
     }, []);
 
+    const fetchBlogs = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const res = await api.get(`/Blog`);
+            if (res.status === 200) {
+                setBlogs(Array.isArray(res.data.data) ? res.data.data : []);
+            }
+
+        } catch (error) {
+            console.log("Không có dữ liệu bài học");
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchBlogs();
+    }, [fetchBlogs]);
+
+
+    // Dùng useMemo để lọc & sắp xếp blog có pinHome và viewCount cao
+    const topPinnedBlogs = React.useMemo(() => {
+        if (!Array.isArray(blogs)) return [];
+
+        return blogs
+            .filter(b => b.pinHome === 1 && typeof b.viewCount === 'number')
+            .sort((a, b) => b.viewCount - a.viewCount)
+            .slice(0, 5);
+    }, [blogs]);
+
+
     useEffect(() => {
         fetchCourses();
     }, [fetchCourses]);
@@ -160,11 +193,7 @@ const HomeNoLogin = () => {
         navigate(path);
     };
 
-    const blogs = [
-        { id: 1, title: '10 Tips to Write Clean Code', author: 'John Doe', excerpt: 'Learn how to write clean and maintainable code...' },
-        { id: 2, title: 'Understanding React Hooks', author: 'Jane Smith', excerpt: 'Hooks simplify your React code and make it more readable...' },
-        { id: 3, title: 'JavaScript Performance Tricks', author: 'Chris Lee', excerpt: 'Boost your JS apps with these performance tricks...' },
-    ];
+
 
 
     return (
@@ -495,7 +524,7 @@ const HomeNoLogin = () => {
                                         Đa dạng các khóa học lập trình: Python, Java Script, C++,...
                                         Học viên được lập trình và chấm điểm trực tiếp trên web, đánh giá chính xác khả năng hiện tại của mình.
                                     </MotionText>
-                                    <Button
+                                    <MotionButton
                                         rightIcon={<FaArrowRight />}
                                         bg="blue.300"
                                         size="lg"
@@ -510,7 +539,7 @@ const HomeNoLogin = () => {
                                         _hover={{ transform: "translateY(-5px)" }}
                                     >
                                         Bắt đầu học
-                                    </Button>
+                                    </MotionButton>
                                 </Flex>
 
                                 <Box flex="1">
@@ -549,9 +578,13 @@ const HomeNoLogin = () => {
                         </Box>
                     </SimpleGrid>
                     <Container maxW="container.xl" mt={10} px={5} >
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="20" justify="center">
+                        <Grid
+                            templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
+                            gap="10"
+                            alignItems="stretch"   // <- quan trọng để 2 cột cùng cao
+                            h="600px" >
                             {/* Blog Section */}
-                            <GridItem colSpan={1} h="100%" maxW="700px" colStart={1} rowStart={1} w="100%">
+                            <GridItem colSpan={1} h="100%" maxW="600px" colStart={1} rowStart={1} w="100%">
                                 <Flex alignItems="center" justifyContent="space-between">
                                     <MotionHeading
                                         size="xl"
@@ -575,45 +608,15 @@ const HomeNoLogin = () => {
                                     whileInView="visible"
                                     viewport={{ once: true, amount: 0.3 }}
                                     bg="white"
-                                    p={4}
+                                    py={5}
+                                    px={4}
                                     borderRadius="md"
                                     shadow="md"
                                     w="100%"      // Thay maxWidth thành width 100%
-                                    h="100%"
+                                    position="relative"
+                                    overflow="hidden"
                                 >
-                                    <Slider
-                                        dots={true}
-                                        infinite={true}
-                                        speed={500}
-                                        slidesToShow={1}
-                                        slidesToScroll={1}
-                                        autoplay={true}
-                                        autoplaySpeed={5000}
-                                        arrows={false}
-                                    >
-                                        {blogs.map(({ id, title, author, excerpt }) => (
-                                            <Box
-                                                key={id}
-                                                borderWidth="1px"
-                                                borderRadius="md"
-                                                p={3}
-                                                bg="gray.50"
-                                                _hover={{ bg: "gray.300" }}
-                                                cursor="pointer"
-                                                height="380px"
-                                            >
-                                                <Text fontWeight="bold" fontSize="md" mb={1}>
-                                                    {title}
-                                                </Text>
-                                                <Text fontSize="sm" color="gray.600" mb={2}>
-                                                    By {author}
-                                                </Text>
-                                                <Text fontSize="sm" noOfLines={6}>
-                                                    {excerpt}
-                                                </Text>
-                                            </Box>
-                                        ))}
-                                    </Slider>
+                                    <BlogCaurosel blogs={topPinnedBlogs} />
                                 </MotionBox>
                             </GridItem>
 
@@ -621,8 +624,8 @@ const HomeNoLogin = () => {
                             <GridItem colSpan={1} w="100%" h="100%" colStart={2} rowStart={1}>
                                 <MotionHeading
                                     size="xl"
-                                    mb={7}
                                     align="start"
+                                    mb={7}
                                     variants={slideUpVariant}
                                     initial="hidden"
                                     whileInView="visible"
@@ -631,16 +634,15 @@ const HomeNoLogin = () => {
                                 >
                                     Hoạt động
                                 </MotionHeading>
-
                                 <MotionBox
+                                    mt={5}
                                     variants={zoomInVariant}
                                     initial="hidden"
                                     whileInView="visible"
                                     viewport={{ once: true, amount: 0.3 }}
-                                    w="100%"
-                                    h="100%"
                                 >
-                                    <MiniCalendar borderRadius="md" maxW="100%" h="100%" boxShadow="md" />
+
+                                    <MiniCalendar borderRadius="md" maxW="100%" minH="466px" textAlign="center" boxShadow="md" />
                                 </MotionBox>
                             </GridItem>
                         </Grid>

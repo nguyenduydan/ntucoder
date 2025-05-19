@@ -11,15 +11,17 @@ import {
     Badge,
     Box,
     Flex,
-    Skeleton
+    Skeleton,
+    SkeletonCircle,
+    SkeletonText,
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 
-const CoderRankingTable = ({ coders, loading }) => {
+const CoderRankingTable = ({ coders, loading, currentPage = 1, pageSize = 10 }) => {
     return (
         <Box minH="40vh">
             <TableContainer>
-                <Table size="sm" colorScheme="blue" loading="lazy">
+                <Table size="sm" colorScheme="blue">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>
                         <Tr>
                             <Th w="20px" py={3}>#</Th>
@@ -31,21 +33,20 @@ const CoderRankingTable = ({ coders, loading }) => {
                         {loading ? (
                             Array.from({ length: 5 }).map((_, idx) => (
                                 <Tr key={`skeleton-${idx}`}>
+                                    <Td py={4}><Skeleton height="20px" /></Td>
                                     <Td py={4}>
-                                        <Skeleton height="20px" width="100%" />
+                                        <Flex align="center" gap={3}>
+                                            <SkeletonCircle size="8" />
+                                            <SkeletonText noOfLines={1} width="120px" />
+                                        </Flex>
                                     </Td>
-                                    <Td py={4}>
-                                        <Skeleton height="20px" width="100%" />
-                                    </Td>
-                                    <Td py={4}>
-                                        <Skeleton height="20px" width="100%" />
-                                    </Td>
+                                    <Td py={4}><Skeleton height="20px" width="60px" /></Td>
                                 </Tr>
                             ))
                         ) : Array.isArray(coders) && coders.length > 0 ? (
                             coders.map((coder, idx) => (
                                 <Tr key={coder.coderID}>
-                                    <Td py={4} fontWeight="bold">{idx + 1}</Td>
+                                    <Td py={4} fontWeight="bold">{(currentPage - 1) * pageSize + idx + 1}</Td>
                                     <Td py={4}>
                                         <NavLink to={`/profile/${coder.coderID}`}>
                                             <Flex
@@ -54,7 +55,7 @@ const CoderRankingTable = ({ coders, loading }) => {
                                                 _hover={{ color: "blue.600", transform: "scale(1.02)" }}
                                                 transition="all .2s ease-in-out"
                                             >
-                                                <Avatar name={coder.coderName} src={coder.avatar} size="sm" />
+                                                <Avatar name={coder.coderName || "Coder"} src={coder.avatar} size="sm" loading="lazy" />
                                                 <Text fontWeight="bold">{coder.coderName}</Text>
                                             </Flex>
                                         </NavLink>
@@ -67,7 +68,9 @@ const CoderRankingTable = ({ coders, loading }) => {
                         ) : (
                             <Tr>
                                 <Td colSpan={3} py={6} textAlign="center">
-                                    <Text fontStyle="italic" color="gray.500" fontSize="md">Không có dữ liệu để hiển thị.</Text>
+                                    <Text fontStyle="italic" color="gray.500" fontSize="md">
+                                        Không có dữ liệu để hiển thị.
+                                    </Text>
                                 </Td>
                             </Tr>
                         )}

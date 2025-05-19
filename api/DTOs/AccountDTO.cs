@@ -9,7 +9,7 @@ namespace api.DTOs
 
     }
 
-    public class AccountDetailDTO: AccountDTO
+    public class AccountDetailDTO : AccountDTO
     {
         public int AccountID { get; set; }
         public string SaltMD5 { get; set; }
@@ -19,6 +19,15 @@ namespace api.DTOs
         public int RoleID { get; set; }
     }
 
+    // DTOs cho request
+    public class ForgetPasswordDTO
+    {
+        public string? Email { get; set; }
+        public string? Code { get; set; }
+        public string? NewPassword { get; set; }
+
+    }
+
     public class RePasswordDTO
     {
         public string OldPassword { get; set; }
@@ -26,4 +35,8 @@ namespace api.DTOs
         public string Repassword { get; set; }
     }
 
+    public class GoogleAuthDTO
+    {
+        public string Token { get; set; }
+    }
 }

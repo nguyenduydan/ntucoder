@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using api.Infrashtructure.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,7 +129,10 @@ builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MinioService>();
+//Helpers
+builder.Services.AddSingleton<EmailHelper>();
 
+//Server
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
@@ -148,11 +152,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseAuthentication();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseCors("AllowMyOrigin");
 app.UseHttpsRedirection();
+app.UseCors("AllowMyOrigin");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.MapControllers();
 
 app.Run();

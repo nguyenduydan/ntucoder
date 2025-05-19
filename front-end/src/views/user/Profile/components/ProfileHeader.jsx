@@ -9,7 +9,7 @@ const ProfileHeader = ({ info, isAllowShow, onOpen, isOpen, onClose, fetchData, 
         <Flex flexDirection="column" alignItems="center">
             <CoderAvatar size="2xl" name="Coder Name" src={info.avatar} mb={4} border="4px solid white" />
             <Text fontSize="2xl" color="white" fontWeight="bold">
-                {info?.coderName || "Coder Name"}
+                {info?.coderName || info?.coderEmail || "Coder Name"}
             </Text>
             <Flex my={2} align="center" p={3} borderRadius="md" boxShadow="lg" bgGradient="linear(to-r, #1a202c, #2d3748)">
                 <Text fontWeight="bold" bgGradient="linear(to-r, teal.200, purple.300)" bgClip="text" fontSize="md">

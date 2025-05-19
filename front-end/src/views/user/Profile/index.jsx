@@ -11,19 +11,21 @@ import {
     Textarea,
     IconButton,
     useToast,
+    Spinner,
+    Skeleton
 } from '@chakra-ui/react';
-import React, { useEffect, useState, useCallback, lazy } from 'react';
+import React, { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDetail, updateItem } from '@/config/apiService';
 import { useTitle } from '@/contexts/TitleContext';
-import CourseLearning from './components/CourseLearning';
 import { useParams } from 'react-router-dom';
-import { FaArrowLeft, FaEdit, FaCheck, FaTimes, FaStar } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
 
 import ProfileHeader from './components/ProfileHeader';
 import BasicInfo from './components/BasicInfo';
 
+const CourseBox = lazy(() => import('./components/CourseLearning'));
 const BlogBox = lazy(() => import('./components/BlogBox'));
 const ActionBox = lazy(() => import('./components/ActionBox'));
 
@@ -142,6 +144,7 @@ const Profile = () => {
                         flexDirection="column"
                         alignItems="left"
                         boxShadow="md"
+                        maxW="345px"
                     >
                         <ProfileHeader
                             info={info}
@@ -154,7 +157,12 @@ const Profile = () => {
                         />
                         <Divider my={2} />
                         {/* Thông tin cơ bản */}
-                        <BasicInfo info={info} isCoderNameValid={isCoderNameValid} isAllowShow={isAllowShow} isEmailValid={isEmailValid} isPhoneValid={isPhoneValid} />
+                        <BasicInfo
+                            info={info}
+                            isCoderNameValid={isCoderNameValid}
+                            isAllowShow={isAllowShow}
+                            isEmailValid={isEmailValid}
+                            isPhoneValid={isPhoneValid} />
                         <Divider my={2} />
 
                         {/* Giới thiệu */}
@@ -225,20 +233,26 @@ const Profile = () => {
                     </GridItem>
 
                     {/* Personal information */}
-                    <GridItem>
+                    <GridItem minW="980px">
                         {/* Course learning */}
-                        <CourseLearning coderID={id || coderID} />
+                        <Suspense fallback={<Skeleton height="393px" w="100%" />}>
+                            <CourseBox coderID={id || coderID} />
+                        </Suspense>
                         <Grid
                             templateColumns={{ base: "1fr", md: "1fr 0.7fr" }}
                             gap={4}
-                            h="75vh" // hoặc "80vh" tùy thiết kế
+                            h="75vh"
                             mt={5}
                         >
                             <GridItem overflow="hidden">
-                                <BlogBox coderID={id || coderID} />
+                                <Suspense fallback={<Skeleton height="100%" w="100%" />}>
+                                    <BlogBox coderID={id || coderID} />
+                                </Suspense>
                             </GridItem>
                             <GridItem overflow="hidden">
-                                <ActionBox coderID={id || coderID} />
+                                <Suspense fallback={<Skeleton height="100%" w="100%" />}>
+                                    <ActionBox coderID={id || coderID} />
+                                </Suspense>
                             </GridItem>
                         </Grid>
                     </GridItem>

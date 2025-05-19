@@ -188,22 +188,21 @@ const Home = () => {
 
           <Flex direction={{ base: "column", md: "row" }} gap={6} align="stretch">
             {/* Bên trái: Bài viết nổi bật */}
-            <ChakraBox
+            <MotionFlex
               flex={1}
               minH={{ base: "60vh", md: "90vh" }}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
               variants={fadeInUp}
-              display="flex"
               flexDirection="column"
             >
               <Heading size="lg" mb={10} color="blue.500">Bài viết nổi bật</Heading>
               <BlogTopViews blogs={blogs} loading={loading} />
-            </ChakraBox>
+            </MotionFlex>
 
             {/* Bên phải: Hoạt động */}
-            <ChakraBox
+            <MotionFlex
               flex={1}
               minH={{ base: "60vh", md: "90vh" }}
               display="flex"
@@ -212,7 +211,7 @@ const Home = () => {
               <Heading size="lg" mb={4} color="blue.500">Hoạt động</Heading>
               <Box flex={1}>
                 {/* Top 3 học viên */}
-                <Box
+                <MotionBox
                   mb={4}
                   initial="hidden"
                   whileInView="show"
@@ -243,9 +242,9 @@ const Home = () => {
                       </HStack>
                     ))}
                   </VStack>
-                </Box>
+                </MotionBox>
 
-                <Box mt="auto" transform="scale(0.9)" transformOrigin="top center" w="100%">
+                <Box mt="auto" transform="scale(0.85)" transformOrigin="top center" w="100%">
                   <MotionBox
                     initial={{ opacity: 0, scale: 0.4 }}
                     whileInView={{ opacity: 1, scale: 1 }}
@@ -254,13 +253,13 @@ const Home = () => {
                   >
                     <MiniCalendar
                       maxW="600px"
-                      fontSize="md"
+                      fontSize="lg"
                       boxShadow="md"
                     />
                   </MotionBox>
                 </Box>
               </Box>
-            </ChakraBox>
+            </MotionFlex>
           </Flex>
         </Container>
       </ChakraBox>

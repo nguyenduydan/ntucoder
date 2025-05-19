@@ -1,107 +1,99 @@
-import React, { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { useColorModeValue } from '@chakra-ui/react';
-import routes from '@/routes';
+import React, { lazy, Suspense, useMemo } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { useColorModeValue, Box } from "@chakra-ui/react";
+import routes from "@/routes";
 
-// Import layouts
-import Navbar from '@/layouts/user/components/navbar';
-import { Box } from '@chakra-ui/react';
-import NotFound from 'views/user/NotFound';
-import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-import ScrollToTop from '@/components/scroll/ScrollToTop';
-import Profile from 'views/user/Profile';
+// Import layouts/components
+import Navbar from "@/layouts/user/components/navbar";
+import NotFound from "views/user/NotFound";
+import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
+import ScrollToTop from "@/components/scroll/ScrollToTop";
+import Profile from "views/user/Profile";
 
 export default function Home(props) {
     const { ...rest } = props;
-    // Áp dụng màu theo hệ thống (light/dark) từ Chakra UI
     const bg = useColorModeValue("gray.200", "navy.800");
     const textColor = useColorModeValue("black", "white");
+    const location = useLocation();
 
-    // Kiểm tra nếu không đang ở trang full-screen maps
-    const getRoute = () => window.location.pathname !== '/user/full-screen-maps';
+    // Kiểm tra xem có phải route full screen map hay không
+    const isFullScreenMap = location.pathname === "/user/full-screen-maps";
 
-    // Lọc ra các route thuộc user (layout: "/user")
-    const userRoutes = routes.filter((route) => route.layout === '/user');
+    // Lọc route thuộc layout user
+    const userRoutes = useMemo(() => routes.filter((r) => r.layout === "/user"), []);
 
-    // Hàm sinh các Route từ mảng userRoutes
-    const getRoutes = (routes) => {
-        return routes.map((route, key) => {
-            if (route.layout === '/user') {
-                const routeKey = `route-${key}-${route.path}`;
+    // Tạo flat list các Route element từ userRoutes
+    const renderRoutes = () => {
+        const allRoutes = [];
 
-                return (
-                    <React.Fragment key={routeKey}>
-                        {/* Route chính không bảo vệ */}
-                        <Route path={`${route.path}`} element={route.component} />
+        userRoutes.forEach((route, idx) => {
+            // Route chính
+            const mainElement = route.protected
+                ? <ProtectedRoute key={`route-${idx}`}>{route.component}</ProtectedRoute>
+                : React.cloneElement(route.component, { key: `route-${idx}` });
 
-                        {/* Route con: bảo vệ dựa vào field `protected` */}
-                        {route.item && route.item.map((subRoute, subKey) => {
-                            const fullPath = `${route.path}/${subRoute.path}`;
-                            const element = subRoute.protected
-                                ? <ProtectedRoute>{subRoute.component}</ProtectedRoute>
-                                : subRoute.component;
+            allRoutes.push(
+                <Route
+                    key={`route-${idx}`}
+                    path={route.path}
+                    element={mainElement}
+                />
+            );
 
-                            return (
-                                <Route
-                                    key={`subroute-${key}-${subKey}`}
-                                    path={fullPath}
-                                    element={element}
-                                />
-                            );
-                        })}
-                    </React.Fragment>
-                );
+            // Route con (nếu có)
+            if (route.item && Array.isArray(route.item)) {
+                route.item.forEach((subRoute, sIdx) => {
+                    const fullPath = `${route.path}/${subRoute.path}`;
+                    const subElement = subRoute.protected
+                        ? <ProtectedRoute key={`subroute-${idx}-${sIdx}`}>{subRoute.component}</ProtectedRoute>
+                        : React.cloneElement(subRoute.component, { key: `subroute-${idx}-${sIdx}` });
+
+                    allRoutes.push(
+                        <Route
+                            key={`subroute-${idx}-${sIdx}`}
+                            path={fullPath}
+                            element={subElement}
+                        />
+                    );
+                });
             }
-            return null;
         });
+
+        // Routes đặc biệt ngoài map
+        allRoutes.push(
+            <Route key="profile-main" path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />,
+            <Route key="profile-id" path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />,
+            <Route key="not-found" path="*" element={<NotFound />} />
+        );
+
+        return allRoutes;
     };
-
-
 
     return (
         <ScrollToTop>
             <Box bg={bg} color={textColor} h="100vh" display="flex" flexDirection="column">
                 <Navbar routes={userRoutes} {...rest} />
 
-                <Box
-                    flex="1" // chiếm phần còn lại sau Navbar
-                    w="100%"
-                    overflowX="hidden"
-                    overflowY="auto"
-                    position="relative"
-                    bg={bg}
-                    color={textColor}
-                    mx={{ lg: "auto", md: "0" }}
-                    transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-                    transitionDuration=".2s, .2s, .35s"
-                    transitionProperty="top, bottom, width"
-                    transitionTimingFunction="linear, linear, ease"
-                >
-                    {getRoute() && (
-                        <Box
-                            mx="auto"
-                            w="100%"
-                            minH="100%" // đảm bảo chiều cao
-                        >
-                            <Routes>
-                                {getRoutes(userRoutes)}
-                                {routes.map((route) => (
-
-                                    <Route
-                                        key={`${route.path}-${route.name}`}
-                                        path={route.path}
-                                        element={<ProtectedRoute>{route.component}</ProtectedRoute>}
-                                    />
-
-                                ))}
-
-                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                                <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                                <Route path="*" element={<NotFound />} />
-                            </Routes>
-                        </Box>
-                    )}
-                </Box>
+                {!isFullScreenMap && (
+                    <Box
+                        flex="1"
+                        w="100%"
+                        overflowX="hidden"
+                        overflowY="auto"
+                        position="relative"
+                        bg={bg}
+                        color={textColor}
+                        mx={{ lg: "auto", md: "0" }}
+                        transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+                        transitionDuration=".2s, .2s, .35s"
+                        transitionProperty="top, bottom, width"
+                        transitionTimingFunction="linear, linear, ease"
+                    >
+                        <Suspense fallback={<Box>Loading...</Box>}>
+                            <Routes>{renderRoutes()}</Routes>
+                        </Suspense>
+                    </Box>
+                )}
             </Box>
         </ScrollToTop>
     );

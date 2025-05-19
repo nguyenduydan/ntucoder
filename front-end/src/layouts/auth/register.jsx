@@ -13,7 +13,7 @@ import {
     SimpleGrid,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import FlushedInput from "../../../components/fields/InputField";
+import FlushedInput from "../../components/fields/InputField";
 import { useNavigate } from "react-router-dom";
 import { register } from "@/config/apiService";
 import { validatePassword } from "@/utils/utils";
@@ -79,6 +79,7 @@ const Register = ({ onSuccess }) => {
                     duration: 3000,
                     isClosable: true,
                     position: "top",
+                    variant: "top-accent"
                 });
                 onSuccess(response.data);
                 navigate("/");
@@ -89,6 +90,7 @@ const Register = ({ onSuccess }) => {
                     duration: 3000,
                     isClosable: true,
                     position: "top",
+                    variant: "top-accent"
                 });
             }
         } catch (error) {

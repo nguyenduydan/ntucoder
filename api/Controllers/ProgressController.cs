@@ -20,7 +20,7 @@ namespace api.Controllers
         }
 
         [HttpGet("courses")]
-        public async Task<IActionResult> GetCoursesProgress([FromQuery] List<int> courseIds, int? coderId = null)
+        public async Task<IActionResult> GetCoursesProgress([FromQuery] List<int>? courseIds, int? coderId = null)
         {
             var currentUserId = _authService.GetUserIdFromToken();
             if (currentUserId == -1) return Unauthorized();

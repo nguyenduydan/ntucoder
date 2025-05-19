@@ -1,24 +1,33 @@
 import { useEffect } from 'react';
 import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ProgressBar = () => {
     const location = useLocation();
+    const { isLoading } = useAuth();
 
     useEffect(() => {
-        // Start the progress bar whenever location changes
-        NProgress.start();
-
-        // Stop the progress bar when the navigation ends
-        const timer = setTimeout(() => {
+        if (isLoading) {
+            NProgress.start();
+        } else {
             NProgress.done();
-        }, 300); // This will stop the progress bar after 300ms (you can adjust the timeout)
+        }
+    }, [isLoading]);
+
+    // Nếu muốn vẫn kích hoạt khi route đổi, giữ cái này
+    useEffect(() => {
+        NProgress.start();
+        const timer = setTimeout(() => {
+            if (!isLoading) {
+                NProgress.done();
+            }
+        }, 300);
 
         return () => {
-            clearTimeout(timer); // Clean up timeout if the component unmounts
+            clearTimeout(timer);
         };
-    }, [location]); // Dependency on location ensures it triggers on route change
+    }, [location]);
 
     return null;
 };
