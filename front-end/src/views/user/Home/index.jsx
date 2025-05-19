@@ -250,7 +250,7 @@ const Home = () => {
                     viewport={{ once: true }}
                   >
                     <MiniCalendar
-                      maxW="400px"
+                      maxW="600px"
                       fontSize="xs"
                       boxShadow="md"
                     />

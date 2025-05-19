@@ -12,7 +12,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import LoadingSpinner from "@/components/loading/loadingSpinner";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
 const MotionFlex = motion(Flex);
 
 

@@ -11,12 +11,12 @@ export default function NeonRunButton({ children, onClick }) {
         const length = pathRef.current.getTotalLength();
 
         // Dash dài 30, gap là phần còn lại (tạo dải sáng nhỏ chạy vòng quanh)
-        pathRef.current.style.strokeDasharray = `100 ${length - 30}`;
+        pathRef.current.style.strokeDasharray = `60 50`;
         pathRef.current.style.strokeDashoffset = 0;
 
         animate(pathRef.current, {
-            strokeDashoffset: [-length, 0], // stroke chạy liên tục vòng quanh
-            duration: 3000,
+            strokeDashoffset: [0, length + 35], // stroke chạy liên tục vòng quanh
+            duration: 2000,
             loop: true,
             easing: "linear",
         });
@@ -49,23 +49,23 @@ export default function NeonRunButton({ children, onClick }) {
                 </linearGradient>
                 <rect
                     ref={pathRef}
-                    x="2"
-                    y="2"
+                    x="3"
+                    y="3"
                     width="150"
                     height="48px"
-                    rx="12"
-                    ry="12"
+                    rx="15"
+                    ry="15"
                     stroke="url(#neonGradient)"
                     strokeWidth="3"
                     strokeLinecap="round"
-                    filter="drop-shadow(0 0 6px #00f)"
+                    filter="drop-shadow(0 0 2px #0ff)"
                 />
             </svg>
 
             <Button
                 variant="outline"
                 size="lg"
-                colorScheme="blue"
+                colorScheme="white"
                 onClick={onClick}
                 style={{
                     width: "150px",
@@ -75,7 +75,7 @@ export default function NeonRunButton({ children, onClick }) {
                     borderRadius: "12px",
                     fontWeight: "bold",
                 }}
-                _hover={{ color: "white" }}
+                _hover={{ color: "blue.200" }}
                 border="none"
             >
                 {children}

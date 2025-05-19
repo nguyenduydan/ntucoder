@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import CodingPng from "assets/img/profile/gummy-coding.png";
+import Slider from "react-slick";
 
 import { getList } from "@/config/apiService";
 import CourseGrid from "@/views/user/Course/components/CourseGrid";
@@ -171,7 +172,7 @@ const HomeNoLogin = () => {
             <Box bg="gray.200" minH="100%" pb={10}>
                 {/* Hero Section */}
                 <Box
-                    bgGradient="linear(to-r, rgb(14, 35, 192), rgb(120, 230, 255))"
+                    bgGradient="linear(to-b, rgb(1, 6, 56),rgb(10, 22, 159), rgb(9, 112, 175),rgb(63, 153, 202),gray.200)"
                     minH="95vh"
                 >
                     <MotionVStack
@@ -550,7 +551,7 @@ const HomeNoLogin = () => {
                     <Container maxW="container.xl" mt={10} px={5} >
                         <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="20" justify="center">
                             {/* Blog Section */}
-                            <GridItem colSpan={1} w="100%" h="100%" colStart={1} rowStart={1}>
+                            <GridItem colSpan={1} h="100%" maxW="700px" colStart={1} rowStart={1} w="100%">
                                 <Flex alignItems="center" justifyContent="space-between">
                                     <MotionHeading
                                         size="xl"
@@ -560,13 +561,12 @@ const HomeNoLogin = () => {
                                         initial="hidden"
                                         whileInView="visible"
                                         viewport={{ once: true, amount: 0.4 }}
-                                        color="blue.500">
+                                        color="blue.500"
+                                    >
                                         Bài viết
                                     </MotionHeading>
                                     <NavLink to="/blogs">
-                                        <Button variant="link">
-                                            Xem tất cả
-                                        </Button>
+                                        <Button variant="link">Xem tất cả</Button>
                                     </NavLink>
                                 </Flex>
                                 <MotionBox
@@ -578,10 +578,19 @@ const HomeNoLogin = () => {
                                     p={4}
                                     borderRadius="md"
                                     shadow="md"
-                                    w="100%"
-                                    h="410px"
+                                    w="100%"      // Thay maxWidth thành width 100%
+                                    h="100%"
                                 >
-                                    <VStack spacing={4} overflowY="auto" align="stretch" >
+                                    <Slider
+                                        dots={true}
+                                        infinite={true}
+                                        speed={500}
+                                        slidesToShow={1}
+                                        slidesToScroll={1}
+                                        autoplay={true}
+                                        autoplaySpeed={5000}
+                                        arrows={false}
+                                    >
                                         {blogs.map(({ id, title, author, excerpt }) => (
                                             <Box
                                                 key={id}
@@ -589,8 +598,9 @@ const HomeNoLogin = () => {
                                                 borderRadius="md"
                                                 p={3}
                                                 bg="gray.50"
-                                                _hover={{ bg: 'gray.300' }}
+                                                _hover={{ bg: "gray.300" }}
                                                 cursor="pointer"
+                                                height="380px"
                                             >
                                                 <Text fontWeight="bold" fontSize="md" mb={1}>
                                                     {title}
@@ -598,14 +608,15 @@ const HomeNoLogin = () => {
                                                 <Text fontSize="sm" color="gray.600" mb={2}>
                                                     By {author}
                                                 </Text>
-                                                <Text fontSize="sm" noOfLines={3}>
+                                                <Text fontSize="sm" noOfLines={6}>
                                                     {excerpt}
                                                 </Text>
                                             </Box>
                                         ))}
-                                    </VStack>
+                                    </Slider>
                                 </MotionBox>
                             </GridItem>
+
                             {/* Time action Section */}
                             <GridItem colSpan={1} w="100%" h="100%" colStart={2} rowStart={1}>
                                 <MotionHeading
@@ -616,7 +627,8 @@ const HomeNoLogin = () => {
                                     initial="hidden"
                                     whileInView="visible"
                                     viewport={{ once: true, amount: 0.4 }}
-                                    color="blue.500">
+                                    color="blue.500"
+                                >
                                     Hoạt động
                                 </MotionHeading>
 
@@ -625,11 +637,14 @@ const HomeNoLogin = () => {
                                     initial="hidden"
                                     whileInView="visible"
                                     viewport={{ once: true, amount: 0.3 }}
+                                    w="100%"
+                                    h="100%"
                                 >
                                     <MiniCalendar borderRadius="md" maxW="100%" h="100%" boxShadow="md" />
                                 </MotionBox>
                             </GridItem>
                         </Grid>
+
                     </Container>
                 </Box>
             </Box >

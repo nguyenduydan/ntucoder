@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { useColorModeValue } from '@chakra-ui/react';
 import routes from '@/routes';
@@ -10,7 +10,7 @@ import { Box } from '@chakra-ui/react';
 import Profile from 'views/user/Profile/index';
 import NotFound from 'views/user/NotFound';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-
+import LoadingSpinner from '@/components/loading/spinner';
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -60,15 +60,14 @@ export default function Home(props) {
 
 
     return (
-        <Box bg={bg} color={textColor} minHeight="100vh" display="flex" flexDirection="column">
+        <Box bg={bg} color={textColor} h="100vh" display="flex" flexDirection="column">
             <Navbar routes={userRoutes} {...rest} />
 
             <Box
+                flex="1" // chiếm phần còn lại sau Navbar
                 w="100%"
-                h="100%"
                 overflowX="hidden"
                 overflowY="auto"
-                overflow="auto"
                 position="relative"
                 bg={bg}
                 color={textColor}
@@ -82,31 +81,26 @@ export default function Home(props) {
                     <Box
                         mx="auto"
                         w="100%"
-                        h="100%"
+                        minH="100%" // đảm bảo chiều cao
                     >
-                        <Routes>
-                            {getRoutes(userRoutes)}
-                            {routes.map((route) => (
-                                <Route
-                                    key={`${route.path}-${route.name}`}
-                                    path={route.path}
-                                    element={<ProtectedRoute>{route.component}</ProtectedRoute>}
-                                />
-                            ))}
-
-                            {/* ➕ Thêm route không xuất hiện trong menu ở đây */}
-                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                            <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                            {/* <Route path="/course/:slug?topicId=:topicId?lessonId=:lessonId" element={<ProtectedRoute><Lesson /></ProtectedRoute>} /> */}
-                            {/* Optional: route 404 */}
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
+                        <Suspense fallback={<LoadingSpinner />}>
+                            <Routes>
+                                {getRoutes(userRoutes)}
+                                {routes.map((route) => (
+                                    <Route
+                                        key={`${route.path}-${route.name}`}
+                                        path={route.path}
+                                        element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+                                    />
+                                ))}
+                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                                <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                                <Route path="*" element={<NotFound />} />
+                            </Routes>
+                        </Suspense>
                     </Box>
                 )}
             </Box>
-
-            <Footer />
         </Box>
-
     );
 }

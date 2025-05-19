@@ -5,7 +5,7 @@ import { toSlug } from '@/utils/utils';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import InfoBlog from './InfoBlog';
 
-const BlogTopViews = ({ blogs = [], loading }) => {
+const BlogTopViews = ({ blogs = [], loading, }) => {
     const navigate = useNavigate();
 
     return (

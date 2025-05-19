@@ -221,7 +221,7 @@ const Blog = () => {
                                         <Spinner />
                                     </Flex>
                                 ) : newestBlogs ? (
-                                    <Box minH="70vh">
+                                    <Box minH="74vh">
                                         <Flex align="center" mb={5}>
                                             <AvatarLoadest
                                                 size="md"

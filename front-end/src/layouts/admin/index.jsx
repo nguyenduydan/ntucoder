@@ -5,12 +5,14 @@ import Footer from '@/components/footer/FooterAdmin';
 import Navbar from '@/components/navbar/NavbarAdmin';
 import Sidebar from '@/components/sidebar/Sidebar';
 import { SidebarContext } from '@/contexts/SidebarContext';
-import React, { useState } from 'react';
+import React, { Suspense, useState, lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes';
-import NotFound from 'views/user/NotFound';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-import TestCase from 'views/admin/testcase/index';
+const TestCase = lazy(() => import('@/views/admin/testCase/index'));
+const NotFound = lazy(() => import('@/views/user/NotFound'));
+import SpinnerLoading from '@/components/loading/spinner';
+
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -184,13 +186,15 @@ export default function Dashboard(props) {
                 pt="50px"
 
               >
-                <Routes>
-                  {getRoutes(routes)}
-                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="testcase/:problemId" element={<TestCase />} />
-                  {/* Optional: route 404 */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                <Suspense fallback={<SpinnerLoading />}>
+                  <Routes>
+                    {getRoutes(routes)}
+                    <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route path="testcase/:problemId" element={<TestCase />} />
+                    {/* Optional: route 404 */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
               </Box>
             ) : null}
             <Box>

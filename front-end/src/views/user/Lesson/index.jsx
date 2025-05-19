@@ -65,81 +65,82 @@ export default function Lesson() {
 
     return (
         <ScrollToTop>
-            <Box minH="100%" w='100%'>
+            <Box h="712px" w="100%" display="flex" flexDirection="column">
                 {isLoading ? (
                     <Flex justify="center" align="center" height="100vh">
                         <Spinner size="xl" color="blue.500" />
                     </Flex>
                 ) : lesson ? (
-                    <Box>
+                    <Box flex="1" display="flex" flexDirection="column" overflow="hidden">
                         <LessonHeader lesson={lesson} />
-                        <Split className="split-container" sizes={[45, 55]} minSize={0} gutterSize={5}>
-                            {/* Sidebar Tabs */}
-                            <Box bg="white" minH="100%" maxW="100%">
-                                <Tabs
-                                    orientation="vertical"
-                                    h="100%"
-                                    variant="unstyled"
-                                    index={activeTab}
-                                    onChange={(index) => setActiveTab(index)}
-                                >
-                                    <Box display="flex" h="100%" w="100%" overflow="auto" overflowX="hidden">
-                                        <TabList bg="blue.600" color="white" display="flex" flexDirection="column" alignItems="center">
-                                            <Tooltip label="Mô tả" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                    <Icon as={FaRegFileAlt} boxSize={5} />
-                                                </Tab>
-                                            </Tooltip>
-                                            <Tooltip label="Giáo trình" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                    <Icon as={FaBars} boxSize={5} />
-                                                </Tab>
-                                            </Tooltip>
-                                            <Tooltip label="Bài tập" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                    <Icon as={FaBook} boxSize={5} />
-                                                </Tab>
-                                            </Tooltip>
+                        <Box flex="1" overflow="hidden">
+                            <Split className="split-container" sizes={[45, 55]} minSize={0} gutterSize={5} style={{ height: '100%' }}>
+                                {/* Sidebar Tabs */}
+                                <Box bg="white" h="100%" overflow="hidden">
+                                    <Tabs
+                                        orientation="vertical"
+                                        h="100%"
+                                        variant="unstyled"
+                                        index={activeTab}
+                                        onChange={(index) => setActiveTab(index)}
+                                    >
+                                        <Flex h="100%" w="100%" overflow="hidden">
+                                            <TabList
+                                                bg="blue.600"
+                                                color="white"
+                                                display="flex"
+                                                flexDirection="column"
+                                                alignItems="center"
+                                                h="100%"
+                                            >
+                                                <Tooltip label="Mô tả" placement="right" hasArrow>
+                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                        <Icon as={FaRegFileAlt} boxSize={5} />
+                                                    </Tab>
+                                                </Tooltip>
+                                                <Tooltip label="Giáo trình" placement="right" hasArrow>
+                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                        <Icon as={FaBars} boxSize={5} />
+                                                    </Tab>
+                                                </Tooltip>
+                                                <Tooltip label="Bài tập" placement="right" hasArrow>
+                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                        <Icon as={FaBook} boxSize={5} />
+                                                    </Tab>
+                                                </Tooltip>
+                                                <Tooltip label="Lịch sử" placement="right" hasArrow>
+                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                        <Icon as={FaQuestionCircle} boxSize={5} />
+                                                    </Tab>
+                                                </Tooltip>
+                                            </TabList>
 
-                                            <Tooltip label="Lịch sử" placement="right" hasArrow>
-                                                <Tab py={4} _selected={{ bg: "blue.800" }} position="relative">
-                                                    <Icon as={FaQuestionCircle} boxSize={5} />
-                                                </Tab>
-                                            </Tooltip>
-                                        </TabList>
-
-                                        <TabPanels flex="1" display="flex" flexDirection="column">
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1" ps={2} pe={0}>
-                                                <Box maxWidth="100%" >
+                                            <TabPanels flex="1" h="100%" overflow="hidden">
+                                                <TabPanel p={0} h="100%" overflowY="auto">
                                                     <LessonContent lesson={lesson} />
-                                                </Box>
-                                            </TabPanel>
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box maxWidth="100%">
-                                                    <Text fontWeight="bold" fontSize="lg"> Giáo Trình</Text>
+                                                </TabPanel>
+                                                <TabPanel p={0} h="100%" overflowY="auto">
+                                                    <Text fontWeight="bold" fontSize="lg" px={4} pt={2}>Giáo Trình</Text>
                                                     <LessonList onSelectLesson={handleSelectLesson} />
-                                                </Box>
-                                            </TabPanel>
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box>
+                                                </TabPanel>
+                                                <TabPanel p={0} h="100%" overflowY="auto">
                                                     <ProblemList lessonID={lessonId} />
-                                                </Box>
-                                            </TabPanel>
-                                            <TabPanel overflowY="auto" maxHeight="calc(100vh - 50px)" flex="1">
-                                                <Box maxWidth="100%">
-                                                    <Text fontWeight="bold" fontSize="lg"> Lịch sử</Text>
+                                                </TabPanel>
+                                                <TabPanel p={0} h="100%" overflowY="auto">
+                                                    <Text fontWeight="bold" fontSize="lg" px={4} pt={2}>Lịch sử</Text>
                                                     <History />
-                                                </Box>
-                                            </TabPanel>
-                                        </TabPanels>
-                                    </Box>
-                                </Tabs>
-                            </Box>
-                            {/* Code Editor */}
-                            <Box bg="black" minH="100%" color="white">
-                                <Problem />
-                            </Box>
-                        </Split>
+                                                </TabPanel>
+                                            </TabPanels>
+                                        </Flex>
+                                    </Tabs>
+                                </Box>
+
+                                {/* Editor Right Side */}
+                                <Box bg="black" h="100%" overflow="auto" color="white">
+                                    <Problem />
+                                </Box>
+                            </Split>
+                        </Box>
                     </Box>
                 ) : (
                     <Flex justify="center" align="center" height="70vh">
@@ -154,5 +155,6 @@ export default function Lesson() {
                 )}
             </Box>
         </ScrollToTop>
+
     );
 }
