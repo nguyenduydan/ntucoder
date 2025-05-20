@@ -15,6 +15,10 @@ const BlogBox = ({ coderID }) => {
     const fetchBlogs = async (page = 1, size = 10) => {
         setLoading(true);
         try {
+            if (!coderID) {
+                setBlogs([]);
+                return;
+            }
             const res = await getList({
                 controller: "Blog",
                 page,
@@ -54,7 +58,6 @@ const BlogBox = ({ coderID }) => {
             h="100%"
             bg="white"
             borderRadius="lg"
-            shadow="md"
             display="flex"
             flexDirection="column"
             overflow="hidden"

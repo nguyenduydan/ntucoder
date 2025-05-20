@@ -1,6 +1,4 @@
 import axios from "axios";
-import NProgress from 'nprogress';
-import Cookies from 'js-cookie';
 import 'nprogress/nprogress.css'; // Import NProgress styles
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7015/api";

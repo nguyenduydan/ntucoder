@@ -225,7 +225,6 @@ const CourseDetail = () => {
         }
     };
 
-    console.log(isEnrolled);
     return (
         <ScrollToTop>
             <Box p={6} maxW="100%" minH="100vh" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>

@@ -141,6 +141,8 @@ builder.Services.AddScoped<ProgressRepository>();
 builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<BlogRepository>();
 builder.Services.AddScoped<AccountRepository>();
+builder.Services.AddScoped<SearchAllService>();
+
 //Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();

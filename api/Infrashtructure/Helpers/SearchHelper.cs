@@ -38,23 +38,26 @@ namespace api.Infrastructure.Helpers
             foreach (var token in tokens)
             {
                 Expression<Func<T, bool>> tokenPredicate = item => false;
+                var efFunctions = Expression.Constant(EF.Functions);
+                var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
 
                 foreach (var selector in selectors)
                 {
-                    // Build predicate expression: EF.Functions.Like(selector(item).ToLower(), $"%{token}%")
                     var parameter = selector.Parameters[0];
 
-                    // Expression: selector.Body.ToLower()
-                    var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
-                    var toLowerCall = Expression.Call(selector.Body, toLowerMethod!);
+                    Expression selectorBody = selector.Body;
+                    if (selectorBody.Type != typeof(string))
+                    {
+                        selectorBody = Expression.Convert(selectorBody, typeof(string));
+                    }
 
-                    // EF.Functions.Like(selector.Body.ToLower(), $"%{token}%")
-                    var efFunctionsProperty = Expression.Property(null, typeof(EF).GetProperty(nameof(EF.Functions))!);
-                    var likeMethod = typeof(DbFunctionsExtensions).GetMethod("Like", new[] { typeof(DbFunctions), typeof(string), typeof(string) })!;
+                    var toLowerCall = Expression.Call(selectorBody, toLowerMethod!);
 
                     var likeCall = Expression.Call(
-                        likeMethod,
-                        efFunctionsProperty,
+                        typeof(DbFunctionsExtensions),
+                        nameof(DbFunctionsExtensions.Like),
+                        Type.EmptyTypes,
+                        efFunctions,
                         toLowerCall,
                         Expression.Constant($"%{token}%")
                     );

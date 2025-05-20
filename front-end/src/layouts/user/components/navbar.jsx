@@ -26,10 +26,14 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import NTULogo from "assets/img/logo.png";
 import Auth from "./auth";
 import { useNavigate } from "react-router-dom";
+import SearchModal from "@/components/fields/Search";
+import { useTypewriter } from "react-simple-typewriter";
+import { useEffect } from "react";
 
 function Navbar(props) {
     const { routes } = props;
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isOpenSearch, onOpen: onOpenSearch, onClose: onCloseSearch } = useDisclosure();
     const btnRef = React.useRef();
     const navigate = useNavigate();
 
@@ -39,6 +43,32 @@ function Navbar(props) {
 
     const bg = useColorModeValue("white", "blue.200");
     const textColor = useColorModeValue("black", "white");
+
+
+    const words = [
+        "Nhập từ khóa...",
+        "Phím tắt Ctrl + K",
+        "Tìm kiếm bài viết...",
+        "Tìm kiếm bài học...",
+    ];
+
+    const [text] = useTypewriter({
+        words,
+        loop: true,
+        delaySpeed: 1000,
+    });
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.ctrlKey && event.key === "K" || event.key === "k") {
+                event.preventDefault();
+                onOpenSearch(); // Mở modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onOpenSearch]);
 
     return (
         <Box position="sticky" top="0" left="0" right="0" bg={bg} color={textColor} px={{ base: '10px', md: '15px' }} py={4} zIndex='2' boxShadow="lg">
@@ -59,7 +89,14 @@ function Navbar(props) {
                     <Links direction="row" routes={routes} />
                 </Flex>
                 <Box display={{ base: "none", lg: "flex" }} gap={5}>
-                    <SearchInput placeholder="Tìm kiếm... (Ctrl+K)" boxShadow="lg" borderRadius="full" />
+                    <SearchInput
+                        placeholder={text}
+                        boxShadow="lg"
+                        borderRadius="full"
+                        onClick={onOpenSearch}
+                        readOnly
+                    />
+                    <SearchModal isOpen={isOpenSearch} onClose={onCloseSearch} />
                     <Auth />
                 </Box>
                 {/* Mobile Hamburger Menu */}
