@@ -1,5 +1,6 @@
 ﻿using api.DTOs;
 using api.Infrashtructure.Helpers;
+using api.Infrastructure.Helpers;
 using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
@@ -200,6 +201,45 @@ namespace api.Infrashtructure.Repositories
             _context.Lessons.Remove(lesson);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+
+        public async Task<PagedResponse<LessonDetailDTO>> SearchAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Lessons
+                   .AsNoTracking()
+                   .Include(l => l.Topic)
+                   .Include(l => l.LessonProblems)
+                   .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = SearchHelper<Lesson>.ApplySearchMultiField(query, keyword, useAnd: true,
+                    l => l.LessonTitle,
+                    l => l.Topic.TopicName);
+            }
+
+            var paged = await PagedResponse<Lesson>.CreateAsync(query, page, pageSize);
+
+            var dtoList = paged.Data.Select(l => new LessonDetailDTO
+            {
+                LessonID = l.LessonID,
+                LessonTitle = l.LessonTitle,
+                LessonContent = l.LessonContent,
+                Status = l.Status,
+                CreatedAt = l.CreatedAt,
+                UpdatedAt = l.UpdatedAt,
+                TopicID = l.Topic?.TopicID ?? 0,
+                TopicName = l.Topic?.TopicName,
+            }).ToList();
+
+            return new PagedResponse<LessonDetailDTO>(
+                dtoList,
+                paged.CurrentPage,
+                paged.PageSize,
+                paged.TotalCount,
+                paged.TotalPages
+            );
         }
     }
 }

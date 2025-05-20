@@ -27,21 +27,21 @@ export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const queryKey = ["testcases", currentPage, pageSize, ascending, sortField];
+  const queryKey = ["testcases", problemId, currentPage, pageSize, ascending, sortField];
 
   // Query load problem list
-  const { data, isLoading, } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey,
     queryFn: () =>
       getListTestCase({
-        problemId: problemId,
+        problemId,
         page: currentPage,
         pageSize,
         ascending,
         sortField,
       }),
     keepPreviousData: true,
-    staleTime: 9999, // cache in 1 minute
+    staleTime: 9999,
     retry: 1,
     onError: () => {
       toast({
@@ -58,27 +58,24 @@ export default function Index() {
 
   // Prefetch next page data
   useEffect(() => {
-    if (data?.totalPages) {
-      if (currentPage < data.totalPages) {
-        queryClient.prefetchQuery({
-          queryKey: ["testcases", currentPage + 1, pageSize, ascending, sortField],
-          queryFn: () =>
-            getListTestCase({
-              problemId: problemId,
-              page: currentPage + 1,
-              pageSize,
-              ascending,
-              sortField,
-            }),
-        });
-      }
+    if (data?.totalPages && currentPage < data.totalPages) {
+      queryClient.prefetchQuery({
+        queryKey: ["testcases", problemId, currentPage + 1, pageSize, ascending, sortField],
+        queryFn: () =>
+          getListTestCase({
+            problemId,
+            page: currentPage + 1,
+            pageSize,
+            ascending,
+            sortField,
+          }),
+      });
     }
   }, [data, problemId, currentPage, pageSize, ascending, sortField, queryClient]);
 
   const handleSort = (field) => {
-    if (sortField === field) {
-      setAscending(!ascending);
-    } else {
+    if (sortField === field) setAscending(!ascending);
+    else {
       setSortField(field);
       setAscending(true);
     }
@@ -100,7 +97,7 @@ export default function Index() {
   };
 
   const refreshTable = () => {
-    queryClient.invalidateQueries({ queryKey: ["testcases"] });
+    queryClient.invalidateQueries({ queryKey: ["testcases", problemId] });
   };
 
   return (

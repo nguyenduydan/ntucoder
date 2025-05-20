@@ -185,3 +185,16 @@ export const register = async (data) => {
         throw error;
     }
 };
+
+export async function Search({ controller, keyword = "", page = 1, pageSize = 10 }) {
+    if (!controller) {
+        throw new Error("Controller và keyword là bắt buộc.");
+    }
+
+    const response = await api.get(`/${controller}/search`, {
+        params: { keyword, page, pageSize },
+    });
+
+    // axios không có response.ok, lỗi sẽ ném ra ở catch, nên không cần check ok
+    return response.data;
+}

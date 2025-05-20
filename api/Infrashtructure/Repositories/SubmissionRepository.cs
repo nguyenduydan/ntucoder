@@ -27,6 +27,7 @@ namespace api.Infrashtructure.Repositories
                 .Include(a => a.Problem)
                 .Include(a => a.Coder)
                 .Include(a => a.Compiler)
+                .AsSplitQuery()
                 .Select(a => new SubmissionDTO
                 {
                     SubmissionID = a.SubmissionID,

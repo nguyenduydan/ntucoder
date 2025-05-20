@@ -8,28 +8,41 @@ import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 import Create from "@/views/admin/coder/components/Create";
 
-import { getList } from "@/config/apiService";
+import { getList, Search } from "@/config/apiService"; // bổ sung import Search
 import { columnsData } from "views/admin/coder/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
+import useDebounce from "@/hooks/useDebounce"; // hook debounce
 
 export default function Index() {
-  useTitle("Quản lý nhãn");
+  useTitle("Quản lý người dùng");
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
 
-  // State for filter
+  // State lọc, phân trang
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const queryKey = ["coders", currentPage, pageSize, ascending, sortField];
+  // State tìm kiếm và debounce từ khóa
+  const [keyword, setKeyword] = useState("");
+  const debouncedKeyword = useDebounce(keyword, 600);
 
-  // Query load coder list
-  const { data, isLoading, } = useQuery({
-    queryKey,
+  // Hàm kiểm tra keyword có hợp lệ
+  const isKeywordValid = (k) => typeof k === "string" && k.trim() !== "";
+
+  // Query keys
+  const listQueryKey = ["coders", currentPage, pageSize, ascending, sortField];
+  const searchQueryKey = ["codersSearch", debouncedKeyword, currentPage, pageSize];
+
+  // Query danh sách bình thường (không search)
+  const {
+    data: listData,
+    isLoading: isListLoading,
+  } = useQuery({
+    queryKey: listQueryKey,
     queryFn: () =>
       getList({
         controller: "Coder",
@@ -38,8 +51,9 @@ export default function Index() {
         ascending,
         sortField,
       }),
+    enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 9999, // cache in 1 minute
+    staleTime: 60000,
     retry: 1,
     onError: () => {
       toast({
@@ -54,25 +68,83 @@ export default function Index() {
     },
   });
 
-  // Prefetch next page data
+  // Query tìm kiếm (có keyword)
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+  } = useQuery({
+    queryKey: searchQueryKey,
+    queryFn: () =>
+      Search({
+        controller: "Coder",
+        keyword: debouncedKeyword,
+        page: currentPage,
+        pageSize,
+      }),
+    enabled: isKeywordValid(debouncedKeyword),
+    keepPreviousData: true,
+    staleTime: 60000,
+    retry: 1,
+    onError: (error) => {
+      toast({
+        title: "Lỗi khi tìm kiếm",
+        description: error.message || "Không thể tìm kiếm. Vui lòng thử lại sau.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+      });
+    },
+  });
+
+  // Prefetch trang kế tiếp (dù search hay không)
   useEffect(() => {
-    if (data?.totalPages) {
-      if (currentPage < data.totalPages) {
+    const sourceData = isKeywordValid(debouncedKeyword) ? searchData : listData;
+
+    if (sourceData?.totalPages && currentPage < sourceData.totalPages) {
+      const nextPage = currentPage + 1;
+      if (isKeywordValid(debouncedKeyword)) {
         queryClient.prefetchQuery({
-          queryKey: ["coders", currentPage + 1, pageSize, ascending, sortField],
+          queryKey: ["codersSearch", debouncedKeyword, nextPage, pageSize],
+          queryFn: () =>
+            Search({
+              controller: "Coder",
+              keyword: debouncedKeyword,
+              page: nextPage,
+              pageSize,
+            }),
+          staleTime: 60000,
+          retry: 1,
+        });
+      } else {
+        queryClient.prefetchQuery({
+          queryKey: ["coders", nextPage, pageSize, ascending, sortField],
           queryFn: () =>
             getList({
               controller: "Coder",
-              page: currentPage + 1,
+              page: nextPage,
               pageSize,
               ascending,
               sortField,
             }),
+          staleTime: 60000,
+          retry: 1,
         });
       }
     }
-  }, [data, currentPage, pageSize, ascending, sortField, queryClient]);
+  }, [
+    debouncedKeyword,
+    searchData,
+    listData,
+    currentPage,
+    pageSize,
+    ascending,
+    sortField,
+    queryClient,
+  ]);
 
+  // Xử lý sắp xếp
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -83,12 +155,18 @@ export default function Index() {
     setCurrentPage(1);
   };
 
+  // Xử lý thay đổi trang
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= data?.totalPages) {
+    const totalPages = isKeywordValid(debouncedKeyword)
+      ? searchData?.totalPages || 0
+      : listData?.totalPages || 0;
+
+    if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
+  // Xử lý thay đổi page size
   const handlePageSizeChange = (value) => {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
@@ -97,20 +175,42 @@ export default function Index() {
     }
   };
 
+  // Xử lý tìm kiếm từ Toolbar
+  const handleSearch = (newKeyword) => {
+    setKeyword(newKeyword);
+    setCurrentPage(1);
+  };
+
+  // Refresh dữ liệu
   const refreshTable = () => {
     queryClient.invalidateQueries({ queryKey: ["coders"] });
+    queryClient.invalidateQueries({ queryKey: ["codersSearch"] });
   };
+
+  // Dữ liệu hiển thị tùy search hay không
+  const tableData = isKeywordValid(debouncedKeyword) ? searchData?.data : listData?.data;
+
+  const totalPages = isKeywordValid(debouncedKeyword)
+    ? searchData?.totalPages || 0
+    : listData?.totalPages || 0;
+
+  const totalRows = isKeywordValid(debouncedKeyword)
+    ? searchData?.totalCount || 0
+    : listData?.totalCount || 0;
+
+  const loading = isKeywordValid(debouncedKeyword) ? isSearchLoading : isListLoading;
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch={(keyword) => console.log(keyword)} />
+        <Toolbar onAdd={onOpen} onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
+
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
 
         <ColumnsTable
           columnsData={columnsData}
-          tableData={data?.data || []}
-          loading={isLoading}
+          tableData={tableData || []}
+          loading={loading}
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
@@ -119,8 +219,8 @@ export default function Index() {
 
         <Pagination
           currentPage={currentPage}
-          totalPages={data?.totalPages || 0}
-          totalRows={data?.totalCount || 0}
+          totalPages={totalPages}
+          totalRows={totalRows}
           onPageChange={handlePageChange}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}

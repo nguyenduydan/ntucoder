@@ -12,21 +12,37 @@ namespace api.Controllers
     [ApiController]
     public class CoderController : ControllerBase
     {
-        private readonly CoderRepository _coderRepository;
+        private readonly CoderRepository _repo;
         private readonly AuthService _authService;
 
         public CoderController(CoderRepository coderRepository, AuthService authService)
         {
-            _coderRepository = coderRepository;
+            _repo = coderRepository;
             _authService = authService;
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            try
+            {
+                var result = await _repo.SearchAsync(keyword, page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> GetAllCoders([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
         {
             try
             {
-                var result = await _coderRepository.GetAllCoderAsync(query, sortField, ascending);
+                var result = await _repo.GetAllCoderAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -40,7 +56,7 @@ namespace api.Controllers
         {
             try
             {
-                var coder = await _coderRepository.GetCoderByIdAsync(id);
+                var coder = await _repo.GetCoderByIdAsync(id);
 
                 if (coder == null)
                 {
@@ -60,7 +76,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _coderRepository.GetTop3HighestAsync();
+                var result = await _repo.GetTop3HighestAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -75,7 +91,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _coderRepository.GetListCoderRakingAsync(query, q);
+                var result = await _repo.GetListCoderRakingAsync(query, q);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -94,7 +110,7 @@ namespace api.Controllers
             }
             try
             {
-                var result = await _coderRepository.CreateCoderAsync(dto);
+                var result = await _repo.CreateCoderAsync(dto);
                 return CreatedAtAction(nameof(CreateCoder), new { id = result.CoderID }, result);
             }
             catch (ValidationException ex)
@@ -116,7 +132,7 @@ namespace api.Controllers
             }
             try
             {
-                var result = await _coderRepository.UpdateCoderAsync(id, dto);
+                var result = await _repo.UpdateCoderAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
@@ -147,7 +163,7 @@ namespace api.Controllers
         {
             try
             {
-                var isDeleted = await _coderRepository.DeleteCoderAsync(id);
+                var isDeleted = await _repo.DeleteCoderAsync(id);
 
                 if (isDeleted)
                 {

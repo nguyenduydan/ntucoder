@@ -21,17 +21,11 @@ export const columnsData = [
     sortable: true,
   },
   {
-    Header: "Giá hiện tại",
-    accessor: "fee",
+    Header: "Người tạo",
+    accessor: "creatorName",
     sortable: true,
-    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
-  },
-  {
-    Header: "Giá gốc",
-    accessor: "originalFee",
-    Cell: ({ value }) => value === 0 ? "Miễn phí" : value,
-  },
 
+  },
   {
     Header: "Nhãn",
     accessor: "badgeName",

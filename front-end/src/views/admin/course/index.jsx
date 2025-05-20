@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, useToast, useDisclosure } from "@chakra-ui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import useDebounce from "@/hooks/useDebounce";
 
 import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Pagination from "@/components/pagination/pagination";
@@ -8,28 +9,39 @@ import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 import Create from "@/views/admin/course/components/Create";
 
-import { getList } from "@/config/apiService";
+import { getList, Search } from "@/config/apiService";
 import { columnsData } from "views/admin/course/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
 
 export default function Index() {
-  useTitle("Quản lý nhãn");
+  useTitle("Quản lý khóa học");
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
 
-  // State for filter
+  // State filter + search
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [keyword, setKeyword] = useState("");
+  const debouncedKeyword = useDebounce(keyword, 600);
 
-  const queryKey = ["courses", currentPage, pageSize, ascending, sortField];
+  const isKeywordValid = (k) => typeof k === "string" && k.trim() !== "";
 
-  // Query load course list
-  const { data, isLoading, } = useQuery({
-    queryKey,
+  // Query key cho danh sách thường (không tìm kiếm)
+  const listQueryKey = ["courses", currentPage, pageSize, ascending, sortField];
+  // Query key cho tìm kiếm
+  const searchQueryKey = ["courseSearch", debouncedKeyword, currentPage, pageSize];
+
+  // Query lấy danh sách bình thường khi không có từ khóa tìm kiếm
+  const {
+    data: listData,
+    isFetching: isListFetching,
+    isError: isListError,
+  } = useQuery({
+    queryKey: listQueryKey,
     queryFn: () =>
       getList({
         controller: "Course",
@@ -38,16 +50,16 @@ export default function Index() {
         ascending,
         sortField,
       }),
+    enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 9999, // cache in 1 minute
-    retry: false,
+    staleTime: 9999,
+    retry: 1,
     onError: (error) => {
-      console.log("Đã bắt lỗi từ useQuery:", error);
       toast({
         title: "Lỗi khi tải dữ liệu",
         description: error.message || "Không thể tải dữ liệu. Vui lòng thử lại sau.",
         status: "error",
-        duration: 2000,
+        duration: 3000,
         isClosable: true,
         position: "top",
         variant: "left-accent",
@@ -55,16 +67,60 @@ export default function Index() {
     },
   });
 
-  // Prefetch next page data
+  // Query tìm kiếm khi có từ khóa
+  const {
+    data: searchData,
+    isFetching: isSearchFetching,
+    isError: isSearchError,
+  } = useQuery({
+    queryKey: searchQueryKey,
+    queryFn: () =>
+      Search({
+        controller: "Course",
+        keyword: debouncedKeyword,
+        page: currentPage,
+        pageSize,
+      }),
+    enabled: isKeywordValid(debouncedKeyword),
+    keepPreviousData: true,
+    staleTime: 9999,
+    retry: 1,
+    onError: (error) => {
+      toast({
+        title: "Lỗi khi tìm kiếm",
+        description: error.message || "Không thể tìm kiếm. Vui lòng thử lại sau.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+      });
+    },
+  });
+
+  // Prefetch trang kế tiếp tùy theo có từ khóa hay không
   useEffect(() => {
-    if (data?.totalPages) {
-      if (currentPage < data.totalPages) {
+    const sourceData = isKeywordValid(debouncedKeyword) ? searchData : listData;
+    if (sourceData?.totalPages && currentPage < sourceData.totalPages) {
+      const nextPage = currentPage + 1;
+      if (isKeywordValid(debouncedKeyword)) {
         queryClient.prefetchQuery({
-          queryKey: ["courses", currentPage + 1, pageSize, ascending, sortField],
+          queryKey: ["courseSearch", debouncedKeyword, nextPage, pageSize],
+          queryFn: () =>
+            Search({
+              controller: "Course",
+              keyword: debouncedKeyword,
+              page: nextPage,
+              pageSize,
+            }),
+        });
+      } else {
+        queryClient.prefetchQuery({
+          queryKey: ["courses", nextPage, pageSize, ascending, sortField],
           queryFn: () =>
             getList({
               controller: "Course",
-              page: currentPage + 1,
+              page: nextPage,
               pageSize,
               ascending,
               sortField,
@@ -72,7 +128,22 @@ export default function Index() {
         });
       }
     }
-  }, [data, currentPage, pageSize, ascending, sortField, queryClient]);
+  }, [
+    debouncedKeyword,
+    searchData,
+    listData,
+    currentPage,
+    pageSize,
+    ascending,
+    sortField,
+    queryClient,
+  ]);
+
+  // Các handler cập nhật state
+  const handleSearch = (newKeyword) => {
+    setKeyword(newKeyword);
+    setCurrentPage(1);
+  };
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -85,8 +156,13 @@ export default function Index() {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= data?.totalPages) {
-      setCurrentPage(newPage);
+    if (newPage > 0) {
+      const totalPages = isKeywordValid(debouncedKeyword)
+        ? searchData?.totalPages || 0
+        : listData?.totalPages || 0;
+      if (newPage <= totalPages) {
+        setCurrentPage(newPage);
+      }
     }
   };
 
@@ -98,20 +174,30 @@ export default function Index() {
     }
   };
 
+  // Hàm làm mới bảng
   const refreshTable = () => {
     queryClient.invalidateQueries({ queryKey: ["courses"] });
+    queryClient.invalidateQueries({ queryKey: ["courseSearch"] });
   };
+
+  // Dữ liệu hiển thị dựa trên keyword có hợp lệ hay không
+  const tableData = isKeywordValid(debouncedKeyword) ? searchData?.data : listData?.data;
+  const totalPages = isKeywordValid(debouncedKeyword) ? searchData?.totalPages || 0 : listData?.totalPages || 0;
+  const totalRows = isKeywordValid(debouncedKeyword) ? searchData?.totalCount || 0 : listData?.totalCount || 0;
+  const loading = isKeywordValid(keyword)
+    ? isSearchFetching || debouncedKeyword !== keyword
+    : isListFetching;
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch={(keyword) => console.log(keyword)} />
+        <Toolbar onAdd={onOpen} onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
 
         <ColumnsTable
           columnsData={columnsData}
-          tableData={data?.data || []}
-          loading={isLoading}
+          tableData={tableData || []}
+          loading={loading}
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
@@ -120,8 +206,8 @@ export default function Index() {
 
         <Pagination
           currentPage={currentPage}
-          totalPages={data?.totalPages || 0}
-          totalRows={data?.totalCount || 0}
+          totalPages={totalPages}
+          totalRows={totalRows}
           onPageChange={handlePageChange}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}

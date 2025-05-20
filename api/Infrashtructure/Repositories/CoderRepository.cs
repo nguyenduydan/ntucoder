@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using api.Infrashtructure.Services;
 using Microsoft.Extensions.Caching.Memory;
+using api.Infrastructure.Helpers;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -24,17 +25,20 @@ namespace api.Infrashtructure.Repositories
         public async Task<PagedResponse<CoderDTO>> GetAllCoderAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
             // Sử dụng AsNoTracking nếu chỉ đọc để tối ưu hiệu năng
-            var coderQuery = _context.Accounts
+            var coderQuery = _context.Coders
                 .AsNoTracking()
-                .Include(a => a.Coder)
+                .AsSplitQuery()
+                .Include(a => a.Account)
+                    .ThenInclude(a => a.Role)
                 .Select(a => new CoderDTO
                 {
-                    CoderID = a.Coder.CoderID,
-                    UserName = a.UserName,
-                    CoderName = a.Coder.CoderName,
-                    CoderEmail = a.Coder.CoderEmail,
-                    PhoneNumber = a.Coder.PhoneNumber,
-                    Role = a.RoleID,
+                    CoderID = a.CoderID,
+                    UserName = a.Account.UserName,
+                    CoderName = a.CoderName,
+                    CoderEmail = a.CoderEmail,
+                    PhoneNumber = a.PhoneNumber,
+                    Role = a.Account.RoleID,
+                    RoleName = a.Account.Role.Name,
                 });
 
             coderQuery = ApplySorting(coderQuery, sortField, ascending);
@@ -413,6 +417,45 @@ namespace api.Infrashtructure.Repositories
             {
                 return (false, $"Cập nhật mật khẩu thất bại: {ex.Message}");
             }
+        }
+
+        public async Task<PagedResponse<CoderDTO>> SearchAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Coders
+                .Include(t => t.Account)
+                    .ThenInclude(t => t.Role)
+                .AsNoTracking()
+                .AsSplitQuery();
+
+            query = SearchHelper<Coder>.ApplySearchMultiField(query, keyword, useAnd: true,
+                    t => t.CoderName,
+                    t => t.CoderEmail,
+                    t => t.Account.UserName,
+                    t => t.PhoneNumber,
+                    t => t.Account.Role.Name
+                );
+
+            query = query.OrderByDescending(t => t.CoderName);
+
+            var pagedTopics = await PagedResponse<Coder>.CreateAsync(query, page, pageSize);
+
+            var dtoList = pagedTopics.Data.Select(t => new CoderDTO
+            {
+                CoderID = t.CoderID,
+                UserName = t.Account.UserName,
+                CoderName = t.CoderName,
+                CoderEmail = t.CoderEmail,
+                PhoneNumber = t.PhoneNumber,
+                Role = t.Account.RoleID,
+            }).ToList();
+
+            return new PagedResponse<CoderDTO>(
+                dtoList,
+                pagedTopics.CurrentPage,
+                pagedTopics.PageSize,
+                pagedTopics.TotalCount,
+                pagedTopics.TotalPages
+            );
         }
 
     }

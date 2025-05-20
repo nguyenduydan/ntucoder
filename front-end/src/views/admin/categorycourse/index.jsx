@@ -8,9 +8,10 @@ import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
 import Create from "views/admin/categorycourse/components/Create";
 
-import { getList } from "@/config/apiService";
+import { getList, Search } from "@/config/apiService";
 import { columnsData } from "views/admin/categorycourse/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
+import useDebounce from "@/hooks/useDebounce";
 
 export default function Index() {
   useTitle("Quản lý nhãn");
@@ -19,17 +20,27 @@ export default function Index() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
 
-  // State for filter
+  // States
   const [sortField, setSortField] = useState("name");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [keyword, setKeyword] = useState("");
+  const debouncedKeyword = useDebounce(keyword, 600);
 
-  const queryKey = ["categorycourses", currentPage, pageSize, ascending, sortField];
+  const isKeywordValid = (k) => typeof k === "string" && k.trim() !== "";
 
-  // Query load categorycourse list
-  const { data, isLoading, } = useQuery({
-    queryKey,
+  // Query keys
+  const listQueryKey = ["categorycourses", currentPage, pageSize, ascending, sortField];
+  const searchQueryKey = ["categorycoursesSearch", debouncedKeyword, currentPage, pageSize];
+
+  // Fetch list (no keyword)
+  const {
+    data: listData,
+    isFetching: isListFetching,
+    isError: isListError,
+  } = useQuery({
+    queryKey: listQueryKey,
     queryFn: () =>
       getList({
         controller: "CourseCategory",
@@ -38,8 +49,9 @@ export default function Index() {
         ascending,
         sortField,
       }),
+    enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 9999, // cache in 1 minute
+    staleTime: 9999,
     retry: 1,
     onError: () => {
       toast({
@@ -54,16 +66,61 @@ export default function Index() {
     },
   });
 
-  // Prefetch next page data
+  // Fetch search (with keyword)
+  const {
+    data: searchData,
+    isFetching: isSearchFetching,
+    isError: isSearchError,
+  } = useQuery({
+    queryKey: searchQueryKey,
+    queryFn: () =>
+      Search({
+        controller: "CourseCategory",
+        keyword: debouncedKeyword,
+        page: currentPage,
+        pageSize,
+      }),
+    enabled: isKeywordValid(debouncedKeyword),
+    keepPreviousData: true,
+    staleTime: 9999,
+    retry: 1,
+    onError: (error) => {
+      toast({
+        title: "Lỗi khi tìm kiếm",
+        description: error.message || "Không thể tìm kiếm. Vui lòng thử lại sau.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+        variant: "left-accent",
+      });
+    },
+  });
+
+  // Prefetch next page
   useEffect(() => {
-    if (data?.totalPages) {
-      if (currentPage < data.totalPages) {
+    const sourceData = isKeywordValid(debouncedKeyword) ? searchData : listData;
+    if (sourceData?.totalPages && currentPage < sourceData.totalPages) {
+      const nextPage = currentPage + 1;
+
+      if (isKeywordValid(debouncedKeyword)) {
         queryClient.prefetchQuery({
-          queryKey: ["categorycourses", currentPage + 1, pageSize, ascending, sortField],
+          queryKey: ["categorycoursesSearch", debouncedKeyword, nextPage, pageSize],
+          queryFn: () =>
+            Search({
+              controller: "CourseCategory",
+              keyword: debouncedKeyword,
+              page: nextPage,
+              pageSize,
+            }),
+        });
+      } else {
+        queryClient.prefetchQuery({
+          queryKey: ["categorycourses", nextPage, pageSize, ascending, sortField],
           queryFn: () =>
             getList({
               controller: "CourseCategory",
-              page: currentPage + 1,
+              page: nextPage,
               pageSize,
               ascending,
               sortField,
@@ -71,8 +128,18 @@ export default function Index() {
         });
       }
     }
-  }, [data, currentPage, pageSize, ascending, sortField, queryClient]);
+  }, [
+    debouncedKeyword,
+    searchData,
+    listData,
+    currentPage,
+    pageSize,
+    ascending,
+    sortField,
+    queryClient,
+  ]);
 
+  // Handlers
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -84,7 +151,7 @@ export default function Index() {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= data?.totalPages) {
+    if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
@@ -97,20 +164,41 @@ export default function Index() {
     }
   };
 
+  const handleSearch = (newKeyword) => {
+    setKeyword(newKeyword);
+    setCurrentPage(1);
+  };
+
   const refreshTable = () => {
     queryClient.invalidateQueries({ queryKey: ["categorycourses"] });
+    queryClient.invalidateQueries({ queryKey: ["categorycoursesSearch"] });
   };
+
+  // Data to render
+  const tableData = isKeywordValid(debouncedKeyword) ? searchData?.data : listData?.data;
+
+  const totalPages = isKeywordValid(debouncedKeyword)
+    ? searchData?.totalPages || 0
+    : listData?.totalPages || 0;
+
+  const totalRows = isKeywordValid(debouncedKeyword)
+    ? searchData?.totalCount || 0
+    : listData?.totalCount || 0;
+
+  const loading = isKeywordValid(debouncedKeyword)
+    ? isSearchFetching || debouncedKeyword !== keyword
+    : isListFetching;
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch={(keyword) => console.log(keyword)} />
+        <Toolbar onAdd={onOpen} onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
 
         <ColumnsTable
           columnsData={columnsData}
-          tableData={data?.data || []}
-          loading={isLoading}
+          tableData={tableData || []}
+          loading={loading}
           onSort={handleSort}
           sortField={sortField}
           ascending={ascending}
@@ -119,8 +207,8 @@ export default function Index() {
 
         <Pagination
           currentPage={currentPage}
-          totalPages={data?.totalPages || 0}
-          totalRows={data?.totalCount || 0}
+          totalPages={totalPages}
+          totalRows={totalRows}
           onPageChange={handlePageChange}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}

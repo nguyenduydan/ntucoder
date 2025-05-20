@@ -1,5 +1,6 @@
 ﻿using api.DTOs;
 using api.Infrashtructure.Helpers;
+using api.Infrastructure.Helpers;
 using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
@@ -205,5 +206,42 @@ namespace api.Infrashtructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<PagedResponse<TopicDTO>> SearchAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Topics
+                .Include(t => t.Course)
+                .AsNoTracking();
+
+            query = SearchHelper<Topic>.ApplySearchMultiField(query, keyword, useAnd: true,
+                    t => t.TopicName,
+                    t => t.Course.CourseName
+                );
+
+            query = query.OrderByDescending(t => t.CreatedAt);
+
+            var pagedTopics = await PagedResponse<Topic>.CreateAsync(query, page, pageSize);
+
+            var dtoList = pagedTopics.Data.Select(t => new TopicDTO
+            {
+                TopicID = t.TopicID,
+                CourseID = t.CourseID,
+                CourseName = t.Course.CourseName,
+                TopicName = t.TopicName,
+                TopicDescription = t.TopicDescription,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt,
+                Status = t.Status
+            }).ToList();
+
+            return new PagedResponse<TopicDTO>(
+                dtoList,
+                pagedTopics.CurrentPage,
+                pagedTopics.PageSize,
+                pagedTopics.TotalCount,
+                pagedTopics.TotalPages
+            );
+        }
+
     }
 }

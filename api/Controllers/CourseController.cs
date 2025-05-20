@@ -23,6 +23,9 @@ namespace api.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
         {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
             try
             {
                 var result = await _courseRepository.SearchCourseAsync(keyword, page, pageSize);

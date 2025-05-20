@@ -22,6 +22,7 @@ namespace api.Infrashtructure.Repositories
                 .Include(p => p.Coder)
                 .Include(p => p.ProblemCategories)
                     .ThenInclude(pc => pc.Category)
+                .AsSplitQuery()
                 .Select(p => new ProblemDTO
                 {
                     ProblemID = p.ProblemID,

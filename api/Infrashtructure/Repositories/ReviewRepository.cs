@@ -80,7 +80,8 @@ namespace api.Infrashtructure.Repositories
                     CoderName = rc.coder.CoderName, 
                     CreatedAt = rc.review.CreatedAt
                 })
-                .ToListAsync();
+                .ToListAsync()
+                ;
         }
 
         // Cập nhật điểm trung bình rating trong bảng Courses

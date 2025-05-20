@@ -5,6 +5,8 @@ using api.Models;
 using api.Infrashtructure.Services;
 using Microsoft.Extensions.Caching.Memory;
 using api.Infrashtructure.Helpers;
+using api.Infrastructure.Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -26,8 +28,7 @@ namespace api.Infrashtructure.Repositories
         {
             var queryData = _context.Blogs
                .Include(b => b.Coder)
-               .AsNoTracking()
-               .Where(b => b.Published == 1);
+               .AsNoTracking();
 
             if (coderID.HasValue)
             {
@@ -58,24 +59,16 @@ namespace api.Infrashtructure.Repositories
         // Lấy blog theo ID
         public async Task<BlogDTO?> GetByIdAsync(int id)
         {
-            return await _context.Blogs
-                .Include(b => b.Coder)
-                .Where(b => b.BlogID == id)
-                .Select(b => new BlogDTO
-                {
-                    BlogID = b.BlogID,
-                    Title = b.Title,
-                    BlogDate = b.BlogDate,
-                    Content = b.Content,
-                    Published = b.Published,
-                    PinHome = b.PinHome,
-                    CoderID = b.CoderID,
-                    CoderName = b.Coder.CoderName,
-                    AvatarCoder = b.Coder.Avatar,
-                    ImageBlogUrl= b.BlogImage,
-                    ViewCount = b.ViewCount,
-                }).FirstOrDefaultAsync();
+            var blog = await _context.Blogs
+                        .Include(b => b.Coder)
+                        .Include(b => b.Comments)
+                        .FirstOrDefaultAsync(b => b.BlogID == id);
+
+            if (blog == null) return null;
+
+            return MapToBlogDto(blog);
         }
+
 
         // Tạo blog mới
         public async Task<Blog> CreateAsync(BlogDTO dto)
@@ -93,7 +86,7 @@ namespace api.Infrashtructure.Repositories
             {
                 using (var stream = dto.ImageFile.OpenReadStream())
                 {
-                    var fileName = $"imgCourse/{dto.BlogID + "_" + dto.BlogDate + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
+                    var fileName = $"imgBlog/{dto.BlogID + "_" + dto.BlogDate + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
                     var bucketName = "ntucoder"; // Tên bucket MinIO
 
                     // Upload file lên MinIO
@@ -141,6 +134,24 @@ namespace api.Infrashtructure.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        //update published and pinHome
+        public async Task<bool> UpdateStatusAsync(int id, UpdateStatusDTO dto)
+        {
+            var blog = await _context.Blogs.FindAsync(id);
+            if (blog == null) return false;
+
+            if (dto.Published.HasValue)
+                blog.Published = dto.Published.Value;
+
+            if (dto.PinHome.HasValue)
+                blog.PinHome = dto.PinHome.Value;
+
+            _context.Blogs.Update(blog); // optional but explicit
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
         // Xóa blog
         public async Task<bool> DeleteAsync(int id)
@@ -237,6 +248,71 @@ namespace api.Infrashtructure.Repositories
             var pagedResult = await PagedResponse<BlogDTO>.CreateAsync(projected, query.Page, query.PageSize);
             return pagedResult;
         }
+
+        public async Task<PagedResponse<BlogDTO>> SearchAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Blogs
+                .Include(b => b.Coder)
+                .Include(b => b.Comments)  // Nếu cần load comments
+                .AsNoTracking();
+
+            query = SearchHelper<Blog>.ApplySearchMultiField(query, keyword, useAnd: true,
+                    b => b.Title,
+                    b => b.Coder.CoderName,
+                    b => b.ViewCount.ToString()
+                    );
+
+            query = query.OrderByDescending(b => b.Title);
+
+            // Lấy phân trang dữ liệu Blog entity
+            var pagedBlogs = await PagedResponse<Blog>.CreateAsync(query, page, pageSize);
+
+            // Map từng Blog sang BlogDTO
+            var dtoList = pagedBlogs.Data.Select(MapToBlogDto).ToList();
+
+            // Tạo PagedResponse<BlogDTO> mới
+            var pagedDto = new PagedResponse<BlogDTO>(
+                dtoList,
+                pagedBlogs.CurrentPage,
+                pagedBlogs.PageSize,
+                pagedBlogs.TotalCount,
+                pagedBlogs.TotalPages);
+
+            return pagedDto;
+        }
+
+
+        private BlogDTO MapToBlogDto(Blog blog)
+        {
+            if (blog == null) return null;
+            
+
+            return new BlogDTO
+            {
+                BlogID = blog.BlogID,
+                Title = blog.Title,
+                BlogDate = blog.BlogDate,
+                Content = blog.Content,
+                Published = blog.Published,
+                PinHome = blog.PinHome,
+                CoderID = blog.CoderID,
+                CoderName = blog.Coder?.CoderName,
+                AvatarCoder = blog.Coder?.Avatar,
+                ImageBlogUrl = blog.BlogImage,
+                ViewCount = blog.ViewCount,
+                Comments = blog.Comments?.Select(c => new CommentDTO
+                {
+                    BlogID = c.BlogID,
+                    CoderID = c.CoderID,
+                    CommentTime = c.CommentTime,
+                    Content = c.Content,
+                }).ToList(),
+
+                // Lưu ý: ImageFile là input, không map từ entity ra DTO
+                ImageFile = null
+            };
+        }
+
 
     }
 }

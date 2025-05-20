@@ -9,11 +9,28 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class LessonController : ControllerBase
     {
-        private readonly LessonRepository _lessonRepository;
+        private readonly LessonRepository _repo;
 
         public LessonController(LessonRepository lessonRepository)
         {
-            _lessonRepository = lessonRepository;
+            _repo = lessonRepository;
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            try
+            {
+                var result = await _repo.SearchAsync(keyword, page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -21,7 +38,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _lessonRepository.GetListAsync(query, sortField, ascending);
+                var result = await _repo.GetListAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -35,7 +52,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _lessonRepository.GetByIdAsync(id);
+                var result = await _repo.GetByIdAsync(id);
                 if (result == null)
                 {
                     return NotFound(new { message = $"Không tìm thấy bài học với ID {id}" });
@@ -58,7 +75,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _lessonRepository.CreateAsync(dto);
+                var result = await _repo.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = result.LessonID }, result);
             }
             catch (InvalidOperationException ex)
@@ -81,7 +98,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _lessonRepository.UpdateAsync(id, dto);
+                var result = await _repo.UpdateAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
@@ -103,7 +120,7 @@ namespace api.Controllers
         {
             try
             {
-                await _lessonRepository.DeleteAsync(id);
+                await _repo.DeleteAsync(id);
                 return NoContent();
             }
             catch (KeyNotFoundException)

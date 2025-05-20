@@ -14,6 +14,14 @@
         public string Content { get; set; }
         public int Published { get; set; } = 0;
         public int PinHome { get; set; } = 0;
-        
+
+        public List<CommentDTO> Comments { get; set; } = new List<CommentDTO>();
+
+    }
+
+    public class UpdateStatusDTO
+    {
+        public int? Published { get; set; }
+        public int? PinHome { get; set; } 
     }
 }

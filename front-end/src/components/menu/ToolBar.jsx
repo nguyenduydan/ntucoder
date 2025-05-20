@@ -14,8 +14,9 @@ import {
 } from "@chakra-ui/react";
 import { MdAdd, MdClear } from "react-icons/md";
 import SearchInput from "@/components/fields/searchInput";
+import { useTypewriter } from "react-simple-typewriter";
 
-const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
+const Toolbar = ({ onSearch, onFilterChange, onAdd, valueSearch, title }) => {
     const { colorMode } = useColorMode(); // Lấy trạng thái chế độ màu
     const textColor = colorMode === "light" ? "black" : "white"; // Đổi màu text
     const bgColor = colorMode === "light" ? "white" : "gray.600";
@@ -46,6 +47,26 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
         if (onFilterChange) onFilterChange([]);
     };
 
+    const handleInputChange = (e) => {
+        if (onSearch) onSearch(e.target.value);
+    };
+
+    const titles = Array.isArray(title)
+        ? title.slice(1).map(col => col?.Header).filter(Boolean)
+        : [];
+
+    const words = [
+        "Nhập từ khóa...",
+        "Phím tắt Ctrl + K",
+        ...titles.map(t => `Tìm kiếm ${t}...`)
+    ];
+
+    const [text] = useTypewriter({
+        words,
+        loop: true,
+        delaySpeed: 1000,
+    });
+
     return (
         <Box w="100%">
             <Flex
@@ -58,7 +79,7 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
                 px={{ base: "15px", md: "25px" }}
                 gap={{ base: 4, md: 0, lg: 5 }}
             >
-                <Box
+                {/* <Box
                     display="flex"
                     flexDirection={{ base: "column", md: "row" }}
                     gap={2}
@@ -121,7 +142,7 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
                             ))}
                         </Flex>
                     )}
-                </Box>
+                </Box> */}
                 <Box
                     display="flex"
                     flexDirection={{ base: "column", md: "row" }}
@@ -131,13 +152,20 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd }) => {
                     alignItems="center"
                 >
                     <SearchInput
-                        placeholder="Tìm kiếm...(Phím tắt: Ctrl+K)"
+                        type="text"
+                        placeholder={text}
                         color={textColor}
-                        onChange={onSearch}
+                        value={valueSearch}
+                        onChange={handleInputChange}
+                        bg={bgColor}
+                        borderRadius="full"
+                        boxShadow="md"
+                        w={{ base: "100%", md: "300px", lg: "400px" }}
                     />
                     <Button
                         variant="solid"
                         size="lg"
+
                         colorScheme="blackAlpha"
                         bgGradient="linear(to-l, green.500, green.300)"
                         borderRadius="xl"

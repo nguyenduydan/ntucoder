@@ -95,10 +95,10 @@ export function formatViewCount(count) {
     if (typeof count !== 'number') return count;
 
     if (count >= 1_000_000) {
-        return (count / 1_000_000).toFixed(count >= 10_000_000 ? 0 : 1) + "M";
+        return (count / 1_000_000).toFixed(count >= 10_000_000 ? 0 : 1) + " M";
     }
     if (count >= 1_000) {
-        return (count / 1_000).toFixed(count >= 10_000 ? 0 : 1) + "K";
+        return (count / 1_000).toFixed(count >= 10_000 ? 0 : 1) + " K";
     }
     return count.toString();
 };

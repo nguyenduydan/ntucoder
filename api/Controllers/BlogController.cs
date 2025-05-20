@@ -21,6 +21,23 @@ namespace api.Controllers
             _authService = authService;
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            try
+            {
+                var result = await _repository.SearchAsync(keyword, page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<PagedResponse<BlogDTO>>> GetAll([FromQuery] QueryObject query, int? coderID)
         {
@@ -93,6 +110,14 @@ namespace api.Controllers
             }
         }
 
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDTO dto)
+        {
+            var success = await _repository.UpdateStatusAsync(id, dto);
+            if (!success) return NotFound();
+
+            return Ok();
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

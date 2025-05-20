@@ -9,19 +9,37 @@ namespace api.Controllers
     [ApiController]
     public class TopicController : ControllerBase
     {
-        private readonly TopicRepository _Repository;
+        private readonly TopicRepository _repo;
 
         public TopicController(TopicRepository Repository)
         {
-            _Repository = Repository;
+            _repo = Repository;
           
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            try
+            {
+                var result = await _repo.SearchAsync(keyword, page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> getList([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
         {
             try
             {
-                var result = await _Repository.GetListAsync(query, sortField, ascending);
+                var result = await _repo.GetListAsync(query, sortField, ascending);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -35,7 +53,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _Repository.GetById(id);
+                var result = await _repo.GetById(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -49,7 +67,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _Repository.CreateAsync(topic);
+                var result = await _repo.CreateAsync(topic);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -63,7 +81,7 @@ namespace api.Controllers
         {
             try
             {
-                var result = await _Repository.UpdateAsync(id, topic);
+                var result = await _repo.UpdateAsync(id, topic);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -77,7 +95,7 @@ namespace api.Controllers
         {
             try
             {
-                await _Repository.DeleteAsync(id);
+                await _repo.DeleteAsync(id);
                 return Ok();
             }
             catch (Exception ex)

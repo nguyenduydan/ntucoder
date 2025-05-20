@@ -18,6 +18,7 @@ import LessonTable from 'views/admin/lesson/index';
 import LessonDetail from '@/views/admin/lesson/components/Detail';
 import ProblemTable from 'views/admin/problem/index';
 import ProblemDetail from '@/views/admin/problem/components/Detail';
+import BlogTable from 'views/admin/blogs/index';
 
 // User Imports
 import Home from 'views/user/Home';
@@ -29,24 +30,22 @@ import Ranking from '@/views/user/Ranking';
 import Blog from '@/views/user/Blog';
 import BlogDetail from '@/views/user/Blog/components/BlogDetail';
 
-import { PersonIcon } from '@/components/icons/Icons';
-import { FaBookAtlas, FaFileCode, FaBook, FaBookmark, FaBookOpen, FaBookBookmark } from "react-icons/fa6";
-
+import { FcHome, FcReading, FcLibrary, FcBookmark, FcConferenceCall, FcOpenedFolder, FcApproval, FcFile, FcKindle } from "react-icons/fc";
 
 const routes = [
-  //Admin Routes
+  // Admin Routes
   {
     name: 'Main Dashboard',
     layout: '/admin',
     path: '/dashboard',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <FcHome size={20} />,
     component: <MainDashboard />,
     allowedRoles: [1, 3],
   },
   {
     name: 'Loại khóa học',
     layout: '/admin',
-    icon: <Icon as={FaBookBookmark} width="20px" height="20px" color="inherit" />,
+    icon: <FcBookmark size={20} />,
     path: '/category-course',
     component: <CourseCategoryTable />,
     allowedRoles: [1],
@@ -54,7 +53,7 @@ const routes = [
   {
     name: 'Khóa học',
     layout: '/admin',
-    icon: <Icon as={FaBookAtlas} width="20px" height="20px" color="inherit" />,
+    icon: <FcReading size={20} />,
     path: '/course',
     component: <CourseTable />,
     allowedRoles: [1, 3],
@@ -69,7 +68,7 @@ const routes = [
   {
     name: 'Chủ đề',
     layout: '/admin',
-    icon: <Icon as={FaBookOpen} width="20px" height="20px" color="inherit" />,
+    icon: <FcLibrary size={20} />,
     path: '/topic',
     component: <TopicTable />,
     allowedRoles: [1, 3],
@@ -84,7 +83,7 @@ const routes = [
   {
     name: 'Bài học',
     layout: '/admin',
-    icon: <Icon as={FaBook} width="20px" height="20px" color="inherit" />,
+    icon: <FcOpenedFolder size={20} />,
     path: '/lesson',
     component: <LessonTable />,
     allowedRoles: [1, 3],
@@ -99,7 +98,7 @@ const routes = [
   {
     name: 'Nhãn',
     layout: '/admin',
-    icon: <Icon as={FaBookmark} width="20px" height="20px" color="inherit" />,
+    icon: <FcApproval size={20} />,
     path: '/badge',
     component: <BadgeTable />,
     allowedRoles: [1],
@@ -114,7 +113,7 @@ const routes = [
   {
     name: 'Quản lý bài tập',
     layout: '/admin',
-    icon: <Icon as={FaFileCode} width="20px" height="20px" color="inherit" />,
+    icon: <FcFile size={20} />,
     path: '/problem',
     component: <ProblemTable />,
     allowedRoles: [1, 3],
@@ -128,9 +127,18 @@ const routes = [
   },
 
   {
+    name: 'Quản lý bài viết',
+    layout: '/admin',
+    icon: <FcKindle size={20} />,
+    path: '/blog',
+    component: <BlogTable />,
+    allowedRoles: [1, 3],
+  },
+
+  {
     name: 'Người dùng',
     layout: '/admin',
-    icon: <Icon as={PersonIcon} width="20px" height="20px" color="inherit" />,
+    icon: <FcConferenceCall size={20} />,
     path: '/coder',
     component: <CoderTable />,
     allowedRoles: [1],
@@ -143,21 +151,12 @@ const routes = [
     ]
   },
 
-  // //Auth Routes
-  // {
-  //   name: 'Sign In',
-  //   layout: '/auth',
-  //   path: '/login',
-  //   component: <Login />,
-  // },
-
-
   // User Routes
   {
     name: 'TRANG CHỦ',
     layout: '/user',
     path: '/',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <FcHome size={20} />,
     component: <Home />,
     protected: false
   },
@@ -165,6 +164,7 @@ const routes = [
     name: 'HỌC TẬP',
     layout: '/user',
     path: '/course',
+    icon: <FcReading size={20} />,
     component: <Course />,
     item: [
       {
@@ -181,11 +181,11 @@ const routes = [
       }
     ]
   },
-
   {
     name: 'XÊP HẠNG',
     layout: '/user',
     path: '/ranking',
+    icon: <FcApproval size={20} />,
     component: <Ranking />,
     protected: false
   },
@@ -193,6 +193,7 @@ const routes = [
     name: 'BÀI VIẾT',
     layout: '/user',
     path: '/blogs',
+    icon: <FcKindle size={20} />,
     component: <Blog />,
     protected: false,
     item: [
@@ -204,7 +205,5 @@ const routes = [
       }
     ]
   }
-
 ];
-
 export default routes;

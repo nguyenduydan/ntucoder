@@ -31,7 +31,8 @@ namespace api.Infrashtructure.Repositories
                 .Include(c => c.Coder)
                 .Include(c => c.Replies!)
                     .ThenInclude(r => r.Coder)
-                .AsQueryable();
+                .AsQueryable()
+                .AsSplitQuery();
 
             if (!string.IsNullOrEmpty(sortBy))
             {

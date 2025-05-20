@@ -3,6 +3,7 @@ using api.DTOs;
 using api.Models;
 using api.Models.ERD;
 using Microsoft.EntityFrameworkCore;
+using api.Infrastructure.Helpers;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -83,6 +84,36 @@ namespace api.Infrashtructure.Repositories
             return true;
         }
 
+        public async Task<PagedResponse<BadgeDTO>> SearchAsync(string? keyword, int page, int pageSize)
+        {
+            var query = _context.Badges
+                .AsNoTracking();
 
+            query = SearchHelper<Badge>.ApplySearchMultiField(query, keyword, useAnd: true,
+                    t => t.Name,
+                    t => t.Color,
+                    t => t.Description
+                );
+
+            query = query.OrderByDescending(t => t.Name);
+
+            var paged = await PagedResponse<Badge>.CreateAsync(query, page, pageSize);
+
+            var dtoList = paged.Data.Select(t => new BadgeDTO
+            {
+               Name = t.Name,
+               Color = t.Color,
+               Description = t.Description,
+
+            }).ToList();
+
+            return new PagedResponse<BadgeDTO>(
+                dtoList,
+                paged.CurrentPage,
+                paged.PageSize,
+                paged.TotalCount,
+                paged.TotalPages
+            );
+        }
     }
 }
