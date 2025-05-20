@@ -1,8 +1,9 @@
-﻿using System.Net.Mail;
-using System.Net;
-using MimeKit;
+﻿using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 
-namespace api.Infrashtructure.Helpers
+namespace api.Infrastructure.Helpers
 {
     public class EmailHelper
     {
@@ -15,34 +16,27 @@ namespace api.Infrashtructure.Helpers
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
+            var smtpHost = _config["Smtp:Host"] ?? "smtp.gmail.com";
+            var smtpPort = int.TryParse(_config["Smtp:Port"], out var port) ? port : 587;
             var email = _config["Smtp:User"];
             var password = _config["Smtp:Pass"];
+            var from = _config["Smtp:From"] ?? email;
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                throw new InvalidOperationException("Missing SMTP credentials.");
 
             var message = new MimeMessage();
-            message.From.Add(MailboxAddress.Parse(_config["Smtp:From"]));
+            message.From.Add(MailboxAddress.Parse(from));
             message.To.Add(MailboxAddress.Parse(toEmail));
             message.Subject = subject;
 
-            message.Body = new TextPart("html") // hoặc "plain" nếu body thuần text
-            {
-                Text = body
-            };
+            message.Body = new TextPart("html") { Text = body };
 
-            using var smtp = new MailKit.Net.Smtp.SmtpClient();
-
-            // Kết nối đến SMTP server với SSL trên port 
-            await smtp.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-
-            // Xác thực với email và mật khẩu (app password)
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
             await smtp.AuthenticateAsync(email, password);
-
-            // Gửi email
             await smtp.SendAsync(message);
-
-            // Ngắt kết nối
             await smtp.DisconnectAsync(true);
         }
-
-
     }
 }

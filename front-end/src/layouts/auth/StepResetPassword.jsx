@@ -12,6 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import api from "@/config/apiConfig";
+import { validatePassword } from "@/utils/utils";
+import useDynamicPlaceholder from "@/hooks/useDynamicPlaceholder";
 
 const StepResetPassword = ({ email, code, onResetSuccess }) => {
     const [password, setPassword] = useState("");
@@ -22,18 +24,20 @@ const StepResetPassword = ({ email, code, onResetSuccess }) => {
 
     const handleReset = async () => {
         setError("");
-        if (!password) {
-            setError("Vui lòng nhập mật khẩu mới.");
-            return;
-        }
-        if (password.length < 6) {
-            setError("Mật khẩu ít nhất 6 ký tự.");
-            return;
+
+        const validationError = validatePassword(password);
+        if (validationError) {
+            setError(validationError);  // hiển thị lỗi
+            return;                     // dừng lại, không gọi API
         }
 
         setLoading(true);
         try {
-            const res = await api.post("/auth/reset-password", { email, code, newPassword: password });
+            const res = await api.post("/auth/reset-password", {
+                email,
+                code,
+                newPassword: password,
+            });
 
             if (res.status === 200) {
                 toast({
@@ -50,6 +54,18 @@ const StepResetPassword = ({ email, code, onResetSuccess }) => {
             setLoading(false);
         }
     };
+    const placeholder = useDynamicPlaceholder(
+        [
+            "Mật khẩu mới",
+            "Ít nhất 8 ký tự",
+            "Ít nhất 1 chữ cái viết hoa",
+            "Ít nhất 1 chữ cái viết thường",
+            "Ít nhất 1 số",
+            "Ít nhất 1 ký tự đặc biệt",
+            "Mật khẩu không được chứa khoảng trắng.",
+        ],
+        { delaySpeed: 500 } // đổi thời gian delay ở đây
+    );
 
     return (
         <>
@@ -58,7 +74,7 @@ const StepResetPassword = ({ email, code, onResetSuccess }) => {
                 <InputGroup>
                     <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu mới"
+                        placeholder={placeholder}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         autoFocus

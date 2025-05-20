@@ -76,6 +76,7 @@ export default function HeaderLinks(props) {
         colorScheme="blue"
         mx={2}
         onClick={() => navigate('/')}
+        display={{ base: 'none', md: 'block' }}
       >
         Trang người dùng
       </Button>
@@ -198,8 +199,9 @@ export default function HeaderLinks(props) {
               _hover={{ bg: 'gray.200' }}
               borderRadius="8px"
               px="14px"
+              onClick={() => navigate('/')}
             >
-              <Text fontSize="sm">Profile Settings</Text>
+              Trang người dùng
             </MenuItem>
             <MenuItem
               _hover={{ bg: 'gray.200' }}

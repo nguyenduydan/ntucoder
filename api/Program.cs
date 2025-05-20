@@ -11,6 +11,7 @@ using api.Infrashtructure.Services;
 using api.Models;
 using api.Infrashtructure.Middlewares;
 using api.Infrashtructure.Helpers;
+using api.Infrastructure.Helpers;
 
 
 // 1. Load biến môi trường từ file .env (ở root project)
@@ -37,6 +38,13 @@ var audience = config["JwtSettings:Audience"] ?? "ntucoder-frontend";
 
 var googleClientId = config["GoogleAuthSettings:ClientId"];
 var googleClientSecret = config["GoogleAuthSettings:ClientSecret"];
+
+// Mail Setting
+var email = config["Smtp:User"];
+var password = config["Smtp:Pass"];
+var host = config["Smtp:Host"];
+var from = config["Smtp:From"];
+var port = int.Parse(config["Smtp:Port"]);
 
 // 4. Đăng ký dịch vụ Authentication JWT
 builder.Services.AddAuthentication(options =>

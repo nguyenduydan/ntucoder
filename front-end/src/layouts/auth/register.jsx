@@ -225,7 +225,7 @@ const Register = ({ onSuccess }) => {
             <Button
                 colorScheme="green"
                 width="full"
-                mt={6}
+                mt={7}
                 type="submit"
                 isLoading={loading}
                 loadingText="Đang đăng ký..."

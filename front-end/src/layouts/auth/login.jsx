@@ -119,7 +119,7 @@ const Login = ({ onSuccess, onForgotPassword }) => {
                 type="submit"
                 colorScheme="blue"
                 width="full"
-                mt={4}
+                mt={7}
                 isLoading={loading}
                 loadingText="Đang đăng nhập.."
                 _hover={{ boxShadow: "0px 4px 10px rgb(74, 168, 222)" }}

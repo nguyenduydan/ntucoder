@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Net.Mail;
+using api.Infrastructure.Helpers;
 
 
 namespace api.Infrashtructure.Services
@@ -139,10 +140,19 @@ namespace api.Infrashtructure.Services
 
             var subject = "Mã đặt lại mật khẩu của bạn";
             var body = $@"
-                <p>Bạn đã yêu cầu đặt lại mật khẩu.</p>
-                <p>Mã xác nhận của bạn là: <b>{code}</b></p>
-                <p>Mã có hiệu lực trong 30 phút.</p>
-            ";
+                <div style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+                    <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);'>
+                        <h2 style='color: #333333; text-align: center;'>Yêu cầu đặt lại mật khẩu</h2>
+                        <p style='font-size: 16px; color: #555;'>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
+                        <p style='font-size: 16px; color: #555;'>Mã xác nhận của bạn là:</p>
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <span style='display: inline-block; font-size: 32px; font-weight: bold; color: #ffffff; background-color: #007bff; padding: 15px 30px; border-radius: 8px; letter-spacing: 4px;'>{code}</span>
+                        </div>
+                        <p style='font-size: 14px; color: #888;'>Mã xác nhận có hiệu lực trong vòng <strong>5 phút</strong>.</p>
+                        <p style='font-size: 14px; color: #888;'>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>
+                    </div>
+                </div>";
+
 
             try
             {

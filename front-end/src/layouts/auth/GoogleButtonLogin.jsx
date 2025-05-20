@@ -1,10 +1,9 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { FcGoogle } from "react-icons/fc";
 import { Box } from "@chakra-ui/react";
 
 const GoogleLoginButton = ({ onSuccess, onError }) => {
     return (
-        <Box display="inline-block">
+        <Box display="inline-block" width="100%">
             <GoogleLogin
                 onSuccess={(credentialResponse) => {
                     onSuccess(credentialResponse);
@@ -16,7 +15,8 @@ const GoogleLoginButton = ({ onSuccess, onError }) => {
                 text="signin_with"
                 shape="pill"
                 logo_alignment="left"
-                width="280"
+                width="100%"
+
             />
         </Box>
     );

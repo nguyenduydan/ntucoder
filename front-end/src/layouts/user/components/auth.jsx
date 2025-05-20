@@ -237,29 +237,31 @@ const Auth = () => {
                         )}
 
                         {!isForgotPassword && (
-                            <Button variant="link" mt={5} onClick={handleToggle}>
+                            <Button variant="link" mt={3} onClick={handleToggle}>
                                 {isLogin
                                     ? "Chưa có tài khoản? Đăng ký"
                                     : "Đã có tài khoản? Đăng nhập"}
                             </Button>
                         )}
 
-                        <Divider my={5} />
-                        <GoogleLoginButton
-                            onSuccess={handleGoogleLoginSuccess}
-                            onError={(error) => {
-                                console.error("Lỗi Google Login:", error);
-                                toast({
-                                    title: "Lỗi đăng nhập Google",
-                                    description: error?.message || "Đã xảy ra lỗi.",
-                                    status: "error",
-                                    duration: 3000,
-                                    isClosable: true,
-                                    position: "top",
-                                    variant: "top-accent",
-                                });
-                            }}
-                        />
+                        <Divider my={3} />
+                        {!isForgotPassword && (
+                            <GoogleLoginButton
+                                onSuccess={handleGoogleLoginSuccess}
+                                onError={(error) => {
+                                    console.error("Lỗi Google Login:", error);
+                                    toast({
+                                        title: "Lỗi đăng nhập Google",
+                                        description: error?.message || "Đã xảy ra lỗi.",
+                                        status: "error",
+                                        duration: 3000,
+                                        isClosable: true,
+                                        position: "top",
+                                        variant: "top-accent",
+                                    });
+                                }}
+                            />
+                        )}
                     </ModalBody>
                 </ModalContent>
             </Modal>

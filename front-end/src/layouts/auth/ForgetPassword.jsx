@@ -7,7 +7,6 @@ import {
     Text,
     Button,
     Step,
-    StepDescription,
     StepIcon,
     StepIndicator,
     StepNumber,
@@ -16,7 +15,9 @@ import {
     StepTitle,
     Stepper,
     useSteps,
+    useToast,
 } from "@chakra-ui/react";
+import api from "@/config/apiConfig"; // nhớ import api
 
 const steps = [
     { title: "Gửi mã", description: "Nhập email để nhận mã" },
@@ -26,11 +27,14 @@ const steps = [
 ];
 
 const ForgotPassword = () => {
+    const toast = useToast();
     const [email, setEmail] = useState("");
     const [code, setCode] = useState("");
-    const [step, setStep] = useState(0); // dùng index 0-based cho useSteps
+    const [step, setStep] = useState(0);
+    const [resendLoading, setResendLoading] = useState(false);
+    const [verifyKey, setVerifyKey] = useState(0);
 
-    const { activeStep, setActiveStep, nextStep, prevStep } = useSteps({
+    const { activeStep, setActiveStep } = useSteps({
         index: step,
         count: steps.length,
     });
@@ -52,10 +56,53 @@ const ForgotPassword = () => {
         setStep(3);
     };
 
+    const handleResendCode = async () => {
+        if (!email) {
+            toast({
+                title: "Email không hợp lệ.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                variant: "top-accent",
+                position: "top",
+            });
+            return;
+        }
+
+        setResendLoading(true);
+        try {
+            await api.post("/auth/send-reset-code", { email });
+            toast({
+                title: "Mã xác thực đã được gửi lại.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                variant: "top-accent",
+                position: "top",
+            });
+
+            // Reset lại code đã nhập (để clear input ở StepVerifyCode)
+            setCode("");
+            setVerifyKey(prev => prev + 1);
+        } catch (error) {
+            toast({
+                title: "Gửi lại mã thất bại.",
+                description: error.response?.data?.message || "Lỗi không xác định.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                variant: "top-accent",
+                position: "top",
+            });
+        } finally {
+            setResendLoading(false);
+        }
+    };
+
     return (
         <Box maxWidth="100%" mx="auto" p={5}>
             <Stepper index={activeStep} orientation="horizontal" mb={8}>
-                {steps.map(({ title, description }, index) => (
+                {steps.map(({ title }, index) => (
                     <Step key={title}>
                         <StepIndicator>
                             <StepStatus
@@ -77,20 +124,25 @@ const ForgotPassword = () => {
             {step === 0 && <StepSendCode onCodeSent={handleCodeSent} />}
             {step === 1 && (
                 <>
-                    <StepVerifyCode email={email} onCodeVerified={handleCodeVerified} />
+                    <StepVerifyCode
+                        key={verifyKey}  // key thay đổi sẽ làm React tạo lại component mới hoàn toàn
+                        email={email}
+                        onCodeVerified={handleCodeVerified}
+                    />
                     <Text mt={4}>
                         Chưa nhận được mã?{" "}
                         <Button
                             variant="link"
                             colorScheme="blue"
-                            onClick={() => {
-                                setActiveStep(0);
-                                setStep(0);
-                            }}
+                            onClick={handleResendCode}
                             width="30%"
+                            isLoading={resendLoading}
                         >
                             Gửi lại
                         </Button>
+                    </Text>
+                    <Text ml={2} fontSize="sm" color="red" mt={2} fontStyle={"italic"}>
+                        Nếu bạn không nhận được mã, hãy kiểm tra thư mục spam hoặc thử lại.
                     </Text>
                 </>
             )}

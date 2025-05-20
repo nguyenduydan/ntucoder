@@ -23,6 +23,8 @@ const StepSendCode = ({ onCodeSent }) => {
                     status: "success",
                     duration: 3000,
                     isClosable: true,
+                    variant: "top-accent",
+                    position: "top",
                 });
                 onCodeSent(email);
             }
