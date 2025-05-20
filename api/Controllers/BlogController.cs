@@ -63,7 +63,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] BlogDTO dto)
+        public async Task<IActionResult> Create([FromForm] BlogDTO dto)
         {
             try
             {

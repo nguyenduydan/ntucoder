@@ -86,7 +86,7 @@ namespace api.Infrashtructure.Repositories
             {
                 using (var stream = dto.ImageFile.OpenReadStream())
                 {
-                    var fileName = $"imgBlog/{dto.BlogID + "_" + dto.BlogDate + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
+                    var fileName = $"imgBlog/{dto.BlogID + "_" + dto.BlogDate.ToString() + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
                     var bucketName = "ntucoder"; // Tên bucket MinIO
 
                     // Upload file lên MinIO

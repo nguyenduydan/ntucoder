@@ -9,7 +9,7 @@ import {
     Heading,
     useToast,
     Button,
-    Container,
+    Container, Image
 } from '@chakra-ui/react';
 import api from '@/config/apiConfig';
 import sanitizeHtml from '@/utils/sanitizedHTML';
@@ -115,6 +115,19 @@ const BlogDetail = () => {
                                         </Text>
                                     </Box>
                                 </Flex>
+                                <Image
+                                    size="md"
+                                    name={blog.title || blog.Title || 'Không có ảnh'}
+                                    src={blog.imageBlogUrl || './avatarSimmmple.png'}
+                                    w="100%"
+                                    maxH="40vh"
+                                    objectFit="cover"
+                                    alt={blog.title || blog.Title || 'Không có ảnh'}
+                                    borderRadius="md"
+                                    loading="lazy"
+                                    mb={4}
+                                    fallbackSrc="./avatarSimmmple.png"
+                                />
                                 <Box
                                     px={5}
                                     sx={{ wordBreak: "break-word" }}

@@ -13,6 +13,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
 
     const navigate = useNavigate();
     const inputRef = useRef(null);
@@ -48,6 +49,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (!query.trim()) {
             setSuggestions([]);
+            setHasSearched(false);
             return;
         }
 
@@ -76,9 +78,11 @@ const SearchModal = ({ isOpen, onClose }) => {
                 });
 
                 setSuggestions(formatted);
+                setHasSearched(true); // ✅ Chỉ set true khi gọi xong API
             } catch (error) {
                 console.error("Search API error:", error);
                 setSuggestions([]);
+                setHasSearched(true);
             } finally {
                 setLoading(false);
             }
@@ -190,8 +194,8 @@ const SearchModal = ({ isOpen, onClose }) => {
     return (
         <Modal isOpen={isOpen} size="2xl" onClose={onClose} isCentered>
             <ModalOverlay />
-            <ModalContent bg={modalBg}>
-                <ModalBody px={2} onKeyDown={handleKeyDown} tabIndex={-1}>
+            <ModalContent bg={modalBg} >
+                <ModalBody px={2} onKeyDown={handleKeyDown} tabIndex={-1} minH="40vh">
                     <Input
                         ref={inputRef}
                         placeholder={text}
@@ -203,16 +207,23 @@ const SearchModal = ({ isOpen, onClose }) => {
                         color={textColor}
                     />
                     {loading ? (
-                        <Flex justify="center" align="center" py={6}>
+                        <Flex justify="center" align="center" py={6} minH="20vh">
                             <Spinner size="lg" />
                         </Flex>
-                    ) : (
+                    ) : suggestions.length > 0 ? (
                         <List ps={4} maxH="50vh" overflowY="auto" minH="20vh">
                             {renderGroup("📚 Khóa học", groupedSuggestions.course, "course")}
                             {renderGroup("👤 Người dùng", groupedSuggestions.coder, "coder")}
                             {renderGroup("📝 Bài viết", groupedSuggestions.blog, "blog")}
                         </List>
-                    )}
+                    ) : hasSearched && query.trim() !== "" ? (
+                        <Flex justify="center" align="center" py={6} minH="20vh">
+                            <Text fontSize="md" color="gray.500" textAlign="center">
+                                ❌ Không tìm thấy kết quả phù hợp với "{query}"
+                            </Text>
+                        </Flex>
+                    ) : null}
+
                     <Flex gap="5" px={5} justify="space-evenly" align="center" my={2}>
                         <Text fontSize="sm" color="gray.600" mt={2}>
                             Để chọn mục nhấn <Kbd fontWeight="bold" px={3} py={1} ml={1}>↲</Kbd>

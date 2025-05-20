@@ -36,7 +36,9 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [pinHome, setPinHome] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
     const cancelRef = React.useRef();
+    const [loading, setLoading] = useState(false);
 
     const {
         isOpen: isConfirmOpen,
@@ -75,16 +77,19 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
             return;
         }
 
-        const newPost = {
-            title: title,
-            content: content,
-            published: 1,
-            pinHome: pinHome ? 1 : 0,
-        };
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('published', '1');
+        formData.append('pinHome', pinHome ? '1' : '0');
+
+        if (imageFile) {
+            formData.append('imageFile', imageFile);
+        }
 
         try {
-            await createItem({ controller: 'Blog', data: newPost });
-
+            setLoading(true);
+            await createItem({ controller: 'Blog', data: formData });
             toast({
                 title: 'Đăng bài thành công!',
                 status: 'success',
@@ -107,6 +112,8 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
                 variant: 'left-accent',
                 isClosable: true,
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -161,6 +168,7 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
                                     label="chọn ảnh đại diện"
                                     previewWidth="80vh"
                                     previewHeight="40vh"
+                                    onImageChange={file => setImageFile(file)}
                                 />
                             </FormControl>
                             <FormControl>
@@ -193,7 +201,7 @@ const CreateBlog = ({ isOpen, onClose, onSuccess, authorName, authorAvatar }) =>
                             <Button variant="ghost" mr={3} onClick={handleClose}>
                                 Hủy
                             </Button>
-                            <Button colorScheme="blue" onClick={handlePost}>
+                            <Button colorScheme="blue" onClick={handlePost} isLoading={loading} loadingText="Đang đăng bài...">
                                 Đăng bài
                             </Button>
                         </Box>

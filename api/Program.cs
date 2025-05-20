@@ -148,7 +148,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MinioService>();
 //Helpers
-builder.Services.AddSingleton<EmailHelper>();
+builder.Services.AddScoped<EmailHelper>();
 
 //Server
 builder.Services.AddHttpClient();

@@ -20,10 +20,10 @@ namespace api.Infrastructure.Helpers
         // useAnd = true: tất cả token phải match (AND)
         // useAnd = false: ít nhất 1 token match (OR)
         public static IQueryable<T> ApplySearchMultiField(
-             IQueryable<T> query,
-             string? keyword,
-             bool useAnd,
-             params Expression<Func<T, string>>[] selectors)
+     IQueryable<T> query,
+     string? keyword,
+     bool useAnd,
+     params Expression<Func<T, string>>[] selectors)
         {
             if (string.IsNullOrWhiteSpace(keyword) || selectors == null || selectors.Length == 0)
                 return query;
@@ -35,11 +35,13 @@ namespace api.Infrastructure.Helpers
 
             var predicate = useAnd ? PredicateBuilder.True<T>() : PredicateBuilder.False<T>();
 
+            var efFunctions = Expression.Constant(EF.Functions);
+            var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+
             foreach (var token in tokens)
             {
-                Expression<Func<T, bool>> tokenPredicate = item => false;
-                var efFunctions = Expression.Constant(EF.Functions);
-                var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+                // Mỗi token ghép các trường OR với nhau
+                var tokenPredicate = PredicateBuilder.False<T>();
 
                 foreach (var selector in selectors)
                 {
@@ -53,6 +55,15 @@ namespace api.Infrastructure.Helpers
 
                     var toLowerCall = Expression.Call(selectorBody, toLowerMethod!);
 
+                    // Exact match: selector.ToLower() == token
+                    var exactMatch = Expression.Equal(
+                        toLowerCall,
+                        Expression.Constant(token)
+                    );
+
+                    var exactLambda = Expression.Lambda<Func<T, bool>>(exactMatch, parameter);
+
+                    // Like match: LIKE %token%
                     var likeCall = Expression.Call(
                         typeof(DbFunctionsExtensions),
                         nameof(DbFunctionsExtensions.Like),
@@ -61,10 +72,12 @@ namespace api.Infrastructure.Helpers
                         toLowerCall,
                         Expression.Constant($"%{token}%")
                     );
+                    var likeLambda = Expression.Lambda<Func<T, bool>>(likeCall, parameter);
 
-                    var lambda = Expression.Lambda<Func<T, bool>>(likeCall, parameter);
+                    // Kết hợp exact OR like để tăng độ chính xác (exact match ưu tiên vì là OR)
+                    var combinedTokenLambda = exactLambda.Or(likeLambda);
 
-                    tokenPredicate = tokenPredicate.Or(lambda);
+                    tokenPredicate = tokenPredicate.Or(combinedTokenLambda);
                 }
 
                 if (useAnd)
@@ -75,6 +88,7 @@ namespace api.Infrastructure.Helpers
 
             return query.Where(predicate);
         }
+
 
 
         private static string GetPropertyName(Expression<Func<T, string>> selector)

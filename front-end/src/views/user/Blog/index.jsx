@@ -19,7 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import CreateBlog from './components/CreateBlog';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { toSlug, formatDateTime, formatNumber } from '@/utils/utils';
+import { toSlug, formatDateTime, formatNumber, LimitText } from '@/utils/utils';
 import { useTitle } from '@/contexts/TitleContext';
 import AvatarLoadest from '@/components/fields/Avatar';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
@@ -169,12 +169,9 @@ const Blog = () => {
     };
 
 
-    const getPlainText = (html) => {
-        const clean = sanitizeHtml(html);
-        const div = document.createElement('div');
-        div.innerHTML = clean;
-        const text = div.textContent || div.innerText || '';
-        return text.length > 300 ? text.slice(0, 300) + '...' : text;
+    const reloadLatestBlogs = () => {
+        setCurrentPage(1);
+        loadLatestBlogs(1, pageSize);
     };
 
     return (
@@ -193,7 +190,7 @@ const Blog = () => {
                     <CreateBlog
                         isOpen={isOpen}
                         onClose={onClose}
-                        onSuccess={fetchLatestBlogs}
+                        onSuccess={loadLatestBlogs}
                         authorName={coder?.coderName || 'Nguyễn Thiết Duy Đan'}
                         authorAvatar={coder?.avatar || 'https://i.pravatar.cc/150?img=10'}
                     />
@@ -278,14 +275,15 @@ const Blog = () => {
                                                     {newestBlogs.title || newestBlogs.Title || 'Không có tiêu đề'}
                                                 </Button>
                                             </NavLink>
-                                            <Text
+                                            <Box
                                                 whiteSpace="pre-wrap"
                                                 fontSize={{ base: "sm", md: "md" }}
                                                 mb={{ base: 3, md: 4 }}
                                                 wordBreak="break-word"
-                                            >
-                                                {getPlainText(newestBlogs.content || newestBlogs.Content || '')}
-                                            </Text>
+                                                dangerouslySetInnerHTML={{
+                                                    __html: sanitizeHtml(LimitText(newestBlogs.content || newestBlogs.Content || '', 200))
+                                                }}
+                                            />
                                         </Flex>
                                     </Box>
                                 ) : (

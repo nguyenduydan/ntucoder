@@ -51,8 +51,7 @@ namespace api.Infrashtructure.Services
                 var coderQuery = _context.Coders
                     .Include(c => c.Account)
                     .ThenInclude(a => a.Role)
-                    .AsNoTracking()
-                    .AsSplitQuery();
+                    .AsNoTracking();
 
                 coderQuery = SearchHelper<Coder>.ApplySearchMultiField(coderQuery, keyword, useAnd: false,
                     c => c.CoderName,

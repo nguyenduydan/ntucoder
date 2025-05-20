@@ -189,15 +189,21 @@ namespace api.Infrashtructure.Repositories
                 .GroupBy(e => e.CourseID)
                 .Select(g => new { CourseID = g.Key, Count = g.Count() });
 
-            var reviewAvgs = _context.Reviews
-                .GroupBy(r => r.CourseID)
-                .Select(g => new { CourseID = g.Key, AvgRating = g.Average(r => r.Rating) });
+            // Đây là chỗ mới - thống kê review theo CoderID
+            var reviewStatsByCoder = _context.Reviews
+                .GroupBy(r => r.Course.CoderID)
+                .Select(g => new
+                {
+                    CoderID = g.Key,
+                    AvgRating = g.Average(r => r.Rating),
+                    TotalReviews = g.Count()
+                });
 
             var query = _context.Courses
                 .Include(c => c.Creator)
                 .Include(c => c.CourseCategory)
                 .Include(c => c.Badge)
-                .AsSplitQuery()
+                .Include(c => c.Reviews)
                 .AsNoTracking()
                 .GroupJoin(enrollCounts,
                     c => c.CourseID,
@@ -206,13 +212,19 @@ namespace api.Infrashtructure.Repositories
                 .SelectMany(
                     temp => temp.ec.DefaultIfEmpty(),
                     (temp, ec) => new { temp.c, EnrollCount = ec != null ? ec.Count : 0 })
-                .GroupJoin(reviewAvgs,
-                    temp => temp.c.CourseID,
-                    ra => ra.CourseID,
-                    (temp, ra) => new { temp.c, temp.EnrollCount, ra })
+                .GroupJoin(reviewStatsByCoder,
+                    temp => temp.c.CoderID,
+                    rs => rs.CoderID,
+                    (temp, rs) => new { temp.c, temp.EnrollCount, rs })
                 .SelectMany(
-                    temp => temp.ra.DefaultIfEmpty(),
-                    (temp, ra) => new { temp.c, temp.EnrollCount, AvgRating = ra != null ? (double?)ra.AvgRating : null })
+                    temp => temp.rs.DefaultIfEmpty(),
+                    (temp, rs) => new
+                    {
+                        temp.c,
+                        temp.EnrollCount,
+                        AvgRating = rs != null ? (double?)rs.AvgRating : null,
+                        TotalReviews = rs != null ? rs.TotalReviews : 0
+                    })
                 .Select(x => new CourseDTO
                 {
                     CourseID = x.c.CourseID,
@@ -230,7 +242,7 @@ namespace api.Infrashtructure.Repositories
                     ImageUrl = x.c.ImageUrl,
                     Status = x.c.Status,
                     Rating = x.AvgRating,
-                    TotalReviews = x.EnrollCount
+                    TotalReviews = x.c.Reviews != null ? x.c.Reviews.Count() : 0,
                 });
 
             return query;
@@ -264,38 +276,41 @@ namespace api.Infrashtructure.Repositories
             return new CourseDetailDTO
             {
                 CourseID = course.CourseID,
-                CourseName = course.CourseName,
+                CourseName = course.CourseName ?? string.Empty,
                 CoderID = course.CoderID,
                 CreatorName = course.Creator?.CoderName ?? string.Empty,
                 CourseCategoryID = course.CourseCategoryID,
                 CourseCategoryName = course.CourseCategory?.Name ?? string.Empty,
-                Fee = course.Fee,
-                OriginalFee = course.OriginalFee,
+                Fee = course.Fee, // decimal? nên gán thẳng
+                OriginalFee = course.OriginalFee, // decimal? nên gán thẳng
                 IsCombo = course.IsCombo,
                 BadgeID = course.BadgeID,
                 BadgeName = course.Badge?.Name ?? string.Empty,
-                BadgeColor = course.Badge?.Color,
+                BadgeColor = course.Badge?.Color, // string? ok
                 ImageUrl = course.ImageUrl,
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt,
                 Description = course.Description,
                 Overview = course.Overview,
-                Rating = course.Reviews.Any() ? course.Reviews.Average(r => r.Rating) : 0,
-                TotalReviews = course.Enrollments?.Count,
-                Topics = course.Topics.Select(t => new TopicDTO
+                Rating = course.Reviews.Any()
+                        ? course.Reviews.Average(r => r.Rating)
+                        : 0,
+
+                TotalReviews = course.Enrollments?.Count ?? 0,
+                Topics = course.Topics?.Select(t => new TopicDTO
                 {
                     TopicID = t.TopicID,
-                    TopicName = t.TopicName
-                }).ToList(),
-                Enrollments = course.Enrollments.Select(e => new EnrollmentDTO
+                    TopicName = t.TopicName ?? string.Empty
+                }).ToList() ?? new List<TopicDTO>(),
+                Enrollments = course.Enrollments?.Select(e => new EnrollmentDTO
                 {
                     EnrollmentID = e.EnrollmentID,
                     CoderID = e.CoderID,
-                    CoderName = e.Coder?.CoderName,
+                    CoderName = e.Coder?.CoderName ?? string.Empty,
                     EnrolledAt = e.EnrolledAt
-                }).ToList(),
-                Reviews = course.Reviews.Select(r => new ReviewDTO
+                }).ToList() ?? new List<EnrollmentDTO>(),
+                Reviews = course.Reviews?.Select(r => new ReviewDTO
                 {
                     ReviewID = r.ReviewID,
                     CourseID = r.CourseID,
@@ -304,9 +319,10 @@ namespace api.Infrashtructure.Repositories
                     Rating = r.Rating,
                     Content = r.Content,
                     CreatedAt = r.CreatedAt
-                }).ToList(),
-                Comments = new List<CommentDTO>() // Nếu chưa load comments
+                }).ToList() ?? new List<ReviewDTO>(),
+                Comments = new List<CommentDTO>() // nếu chưa load, giữ như vậy
             };
         }
+
     }
 }

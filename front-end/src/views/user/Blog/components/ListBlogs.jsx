@@ -47,9 +47,7 @@ const ListBlogs = ({ blogs, loading, limitContent = 300, limitTitle = 100, limit
                                         {LimitText(blog.title, limitTitle)}
                                     </Text>
                                 </Button>
-                                <Text fontSize="sm" color="gray.600">
-                                    {sanitizeHtml(blog.content).replace(/<[^>]*>/g, '').slice(0, limitContent)}...
-                                </Text>
+                                <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(LimitText(blog.content, limitContent)) }} />
                                 <InfoBlog
                                     id={blog.coderID || blog.CoderID}
                                     coderName={LimitText(blog.coderName, limitCoderName)}

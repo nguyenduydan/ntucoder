@@ -52,12 +52,14 @@ const CourseLearning = ({ coderID }) => {
                 enrolledCourseIDs.includes(c.courseID) && c.status === 1
             );
 
+            const incompleteCourses = coursesWithProgress.filter(c => c.progress < 100);
+
             // Danh sách khóa học đã hoàn thành
             const completedCourses = coursesWithProgress.filter(c => c.progress === 100);
 
             // Cập nhật state
-            setCourseAll(allCoursesWithProgress);
-            setCourseList(coursesWithProgress);
+            setCourseAll(coursesWithProgress);
+            setCourseList(incompleteCourses);
             setCourseCompleted(completedCourses);
 
 
