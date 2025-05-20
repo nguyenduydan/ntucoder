@@ -9,15 +9,34 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using api.Infrashtructure.Helpers;
+using DotNetEnv;
+
+// 1. Load biến môi trường từ file .env (ở root project)
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
+// 2. Load config file json + biến môi trường (env sẽ ghi đè json nếu trùng key)
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-// Đọc cấu hình JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
+// 3. Truy cập config từ IConfiguration (KHÔNG cần dùng Environment.GetEnvironmentVariable nữa)
+var config = builder.Configuration;
 
+var secretKey = config["JwtSettings:SecretKey"];
+if (string.IsNullOrEmpty(secretKey))
+{
+    throw new Exception("JwtSettings:SecretKey not found");
+}
+
+var issuer = config["JwtSettings:Issuer"] ?? "ntucoder";
+var audience = config["JwtSettings:Audience"] ?? "ntucoder-frontend";
+
+var googleClientId = config["GoogleAuthSettings:ClientId"];
+var googleClientSecret = config["GoogleAuthSettings:ClientSecret"];
+
+// 4. Đăng ký dịch vụ Authentication JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -31,11 +50,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = issuer,
+        ValidAudience = audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
-    // ✅ Cấu hình đọc token từ cookie
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -50,9 +68,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// 5. Các service, middleware khác
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -77,10 +95,9 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", jwtSecurityScheme);
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        {jwtSecurityScheme,Array.Empty<string>() }
+        { jwtSecurityScheme, Array.Empty<string>() }
     });
 });
-
 
 builder.Services.AddCors(options =>
 {
@@ -93,10 +110,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-//check connectionstring
-var conString = builder.Configuration.GetConnectionString("connecString") ??
-     throw new InvalidOperationException("Connection string 'connecString'" +
-    " not found.");
+var conString = builder.Configuration.GetConnectionString("connecString") ?? throw new InvalidOperationException("Connection string 'connecString' not found.");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure())
@@ -136,7 +150,6 @@ builder.Services.AddSingleton<EmailHelper>();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -145,8 +158,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.EnsureCreated();
 }
 
-
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -120,7 +120,6 @@ const Home = () => {
       console.error('Failed to fetch top 3 coders:', error);
       toast({
         title: 'Failed to fetch data',
-        description: error.message,
         status: 'error',
         duration: 2000,
         isClosable: true,

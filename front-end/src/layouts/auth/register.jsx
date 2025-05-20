@@ -86,7 +86,7 @@ const Register = ({ onSuccess }) => {
             } else {
                 toast({
                     title: "Đã xảy ra lỗi. Vui lòng thử lại.",
-                    description: response.data?.message,
+                    status: "error",
                     duration: 3000,
                     isClosable: true,
                     position: "top",

@@ -193,9 +193,6 @@ const HomeNoLogin = () => {
         navigate(path);
     };
 
-
-
-
     return (
         <ScrollToTop>
             <Box bg="gray.200" minH="100%" pb={10}>

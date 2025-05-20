@@ -113,6 +113,7 @@ namespace api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Đã xảy ra lỗi." });
             }
         }
+        
         [AllowAnonymous]
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDTO model)

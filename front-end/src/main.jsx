@@ -5,6 +5,7 @@ import './assets/css/App.css';
 import { TitleProvider } from "@/contexts/TitleContext";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import App from './App';
 import dayjs from 'dayjs';
@@ -20,9 +21,11 @@ root.render(
   <AuthProvider>
     <BrowserRouter future={{ v7_relativeSplatPath: true }}>
       <QueryClientProvider client={queryClient}>  {/* Bao quanh ứng dụng trong QueryClientProvider */}
-        <TitleProvider>
-          <App />
-        </TitleProvider>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_API_CLIENT_ID}>
+          <TitleProvider>
+            <App />
+          </TitleProvider>
+        </GoogleOAuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </AuthProvider>

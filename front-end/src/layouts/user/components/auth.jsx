@@ -26,7 +26,7 @@ const Auth = () => {
 
     const handleToggle = () => {
         setIsForgotPassword(false);
-        setIsLogin(!isLogin);
+        setIsLogin(prev => !prev);
     };
 
     const handleLoginSuccess = (userData) => {
@@ -38,10 +38,21 @@ const Auth = () => {
         }
     };
 
-    const handleRegisterSuccess = () => {
-        setIsLogin(true);
-        setIsForgotPassword(false);
-        onOpen();
+    const handleRegisterSuccess = (userData) => {
+        if (userData) {
+            setCoder(userData);
+            toast({
+                title: "Đăng ký thành công!",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
+            });
+            setIsLogin(true);
+            setIsForgotPassword(false);
+            onOpen();
+        }
     };
 
     const handleForgotPasswordClick = () => {
@@ -61,21 +72,29 @@ const Auth = () => {
         return "md";
     };
 
+    // 1. Định nghĩa hàm xử lý ở component cha (hoặc nơi bạn muốn)
     const handleGoogleLoginSuccess = async (response) => {
-        setIsGoogleLoading(true);
-        try {
-            const googleToken = response.credential;
-            const res = await api.post("/auth/google-login", { token: googleToken }, {
-                withCredentials: true
+        if (!response?.credential) {
+            toast({
+                title: "Token không hợp lệ.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
             });
+            return;
+        }
 
-            const data = res.data;
+        try {
+            const res = await api.post("/auth/google-login", { token: response.credential });
+            const data = res?.data;
 
             if (data?.token) {
                 setCoder({
-                    accountID: data.AccountID,
-                    roleID: data.RoleID,
-                    coderName: data.CoderName,
+                    accountID: data.accountID,
+                    roleID: data.roleID,
+                    coderName: data.coderName,
                     token: data.token,
                 });
 
@@ -93,16 +112,32 @@ const Auth = () => {
                 onClose();
                 loginSuccessHandler();
             } else {
-                console.error("Đăng nhập thất bại: Không có token trả về.");
+                toast({
+                    title: "Đăng nhập thất bại!",
+                    description: "Token không hợp lệ hoặc thiếu thông tin.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                    variant: "top-accent",
+                });
             }
         } catch (error) {
-            console.error("Lỗi khi đăng nhập Google:", error.response?.data || error.message);
-        } finally {
-            setIsGoogleLoading(false);
+            console.error("Lỗi khi đăng nhập Google:", error);
+            toast({
+                title: "Lỗi đăng nhập Google",
+                description: error?.response?.data?.message || error.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+                variant: "top-accent",
+            });
         }
     };
 
-    const isOnline = Boolean(coder);
+
+    const isOnline = !!coder;
 
     return (
         <Box bg="transparent">
@@ -212,7 +247,18 @@ const Auth = () => {
                         <Divider my={5} />
                         <GoogleLoginButton
                             onSuccess={handleGoogleLoginSuccess}
-                            isLoading={isGoogleLoading}
+                            onError={(error) => {
+                                console.error("Lỗi Google Login:", error);
+                                toast({
+                                    title: "Lỗi đăng nhập Google",
+                                    description: error?.message || "Đã xảy ra lỗi.",
+                                    status: "error",
+                                    duration: 3000,
+                                    isClosable: true,
+                                    position: "top",
+                                    variant: "top-accent",
+                                });
+                            }}
                         />
                     </ModalBody>
                 </ModalContent>

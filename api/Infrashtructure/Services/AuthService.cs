@@ -43,8 +43,19 @@ namespace api.Infrashtructure.Services
 
         public (string token, DateTime? expires) GenerateJwtToken(Account user)
         {
-            var key = Encoding.UTF8.GetBytes(_config["JwtSettings:SecretKey"]);
-            var expireMinutes = Convert.ToDouble(_config["JwtSettings:ExpireMinutes"]);
+            var secretKey = _config["JwtSettings:SecretKey"];
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                throw new Exception("JWT SecretKey is missing in configuration.");
+            }
+
+            var key = Encoding.UTF8.GetBytes(secretKey);
+
+            if (!double.TryParse(_config["JwtSettings:ExpireMinutes"], out var expireMinutes))
+            {
+                expireMinutes = 1440; // mặc định 1 ngày
+            }
+
             var expires = DateTime.UtcNow.AddMinutes(expireMinutes);
 
             var claims = new[]
