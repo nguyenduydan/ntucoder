@@ -144,7 +144,13 @@ function Navbar(props) {
                                 <Stack spacing={3} p={3} my="30px">
                                     <Auth />
                                     <Links direction="column" routes={routes} />
-                                    <SearchInput width="100px" placeholder="Tìm kiếm... (Ctrl+K)" />
+                                    <SearchInput
+                                        placeholder={text}
+                                        boxShadow="lg"
+                                        borderRadius="full"
+                                        onClick={onOpenSearch}
+                                        readOnly
+                                    />
 
                                 </Stack>
                             </Scrollbars>

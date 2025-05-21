@@ -28,6 +28,7 @@ import BasicInfo from './components/BasicInfo';
 const CourseBox = lazy(() => import('./components/CourseLearning'));
 const BlogBox = lazy(() => import('./components/BlogBox'));
 const ActionBox = lazy(() => import('./components/ActionBox'));
+const HistoryBox = lazy(() => import('./components/HistorySubmission'));
 
 
 const Profile = () => {
@@ -255,6 +256,12 @@ const Profile = () => {
                                 </Suspense>
                             </GridItem>
                         </Grid>
+                        <GridItem mt={5} overflow="hidden">
+                            <Suspense fallback={<Skeleton height="393px" w="100%" />}>
+                                <HistoryBox coderId={id || coderID} />
+                            </Suspense>
+                        </GridItem>
+
                     </GridItem>
                 </Grid>
             </Box >

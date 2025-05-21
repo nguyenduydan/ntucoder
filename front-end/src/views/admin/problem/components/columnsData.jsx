@@ -5,6 +5,7 @@ import { deleteItem, updateStatus } from "@/config/apiService";
 import { Badge, useToast } from "@chakra-ui/react";
 import { useMutation } from '@tanstack/react-query';
 import TestCaseCountCell from "./TestcaseCountCell";
+import api from "@/config/apiConfig";
 
 export const columnsData = [
   {
@@ -45,7 +46,9 @@ export const columnsData = [
             console.error("Lỗi: Không có problemId");
             return;
           }
-          return updateStatus({ controller: "Problem", id: problemId, newStatus: newStatus });
+          return api.put(`/Problem/${problemId}`, {
+            published: newStatus,
+          });
         },
         onSuccess: () => {
           toast({

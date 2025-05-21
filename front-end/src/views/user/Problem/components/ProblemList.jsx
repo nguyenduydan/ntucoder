@@ -103,7 +103,7 @@ const ProblemList = ({ lessonID }) => {
     };
 
     return (
-        <Box>
+        <Box p={5} >
             {!problemID || !problemContent ? (
                 <Box>
                     <Box fontSize="xl" fontWeight="bold" mb={4}>

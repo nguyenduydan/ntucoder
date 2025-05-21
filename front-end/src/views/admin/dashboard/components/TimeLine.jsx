@@ -24,8 +24,7 @@ const TimeDisplay = () => {
         "bạn thành công",
         "bạn sức khỏe",
         "bạn hạnh phúc",
-    ], 2000); // Lấy giá trị đầu tiên từ mảng typing
-
+    ], 5000);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -37,7 +36,7 @@ const TimeDisplay = () => {
 
     return (
         <Flex justify="space-between" align="center" mb={8} display={{ base: "none", md: "flex" }}>
-            <Text fontSize="md" color="gray.600">
+            <Text fontSize="md" color="gray.600" fontWeight="bold">
                 Chào {typing}<Cursor cursorColor="black" /> , hôm nay là ngày {formatDateTime(now)}
             </Text>
         </Flex>

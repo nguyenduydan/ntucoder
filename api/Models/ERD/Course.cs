@@ -19,7 +19,6 @@
 
         // Thông tin đánh giá
         public double Rating { get; set; }
-        public int TotalReviews { get; set; }
 
         // Nhãn và combo
         public bool IsCombo { get; set; }

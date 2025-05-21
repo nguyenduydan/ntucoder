@@ -7,7 +7,7 @@ import sanitizeHtml from "@/utils/sanitizedHTML";
 
 const ProblemDetail = ({ problem, onBack }) => {
     return (
-        <Box>
+        <Box px={4} py={5}>
             <Button
                 leftIcon={<MdArrowBackIos />}
                 color="blue.500"

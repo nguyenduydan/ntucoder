@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
     Box, Flex, Button, useDisclosure, Modal, ModalOverlay,
     ModalContent, ModalHeader, ModalBody, ModalCloseButton,
-    Menu, MenuButton, MenuList, MenuItem, Divider,
+    Menu, MenuButton, MenuList, MenuItem, Divider, Image
 } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -21,8 +21,12 @@ const Auth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const { coder, setCoder, logout, loginSuccessHandler } = useAuth();
-    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const toast = useToast();
+
+    const isGif = /\.gif(\?.*)?$/i.test(coder.avatar || '');
+
+    const staticAvatar = isGif ? coder.avatar.replace(/\.gif(\?.*)?$/i, '.png') : coder.avatar;
+
 
     const handleToggle = () => {
         setIsForgotPassword(false);
@@ -158,11 +162,14 @@ const Auth = () => {
                         )}
                         <Menu>
                             <MenuButton as={Button} variant="none">
-                                <AvatarLoadest
-                                    size="sm"
-                                    src={coder.avatar || null}
-                                    name={coder.coderName || 'coder'}
-                                    alt="avatar"
+                                <Image
+                                    borderRadius="full"
+                                    boxSize="40px"
+                                    objectFit="cover"
+                                    loading="lazy"
+                                    border="3px solid blue"
+                                    src={staticAvatar}
+                                    alt={coder.coderName || "coder"}
                                 />
                             </MenuButton>
                             <MenuList p={2}>

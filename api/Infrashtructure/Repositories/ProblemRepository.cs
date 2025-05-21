@@ -16,7 +16,7 @@ namespace api.Infrashtructure.Repositories
         }
 
         // Lấy tất cả bài tập với phân trang và tìm kiếm
-        public async Task<PagedResponse<ProblemDTO>> GetAllProblemsAsync(QueryObject query, string? sortField = null, bool ascending = true, bool published = false)
+        public async Task<PagedResponse<ProblemDTO>> GetAllProblemsAsync(QueryObject query, string? sortField = null, bool ascending = true, bool? publishedFilter = null)
         {
             var problemQuery = _context.Problems
                 .Include(p => p.Coder)
@@ -38,10 +38,11 @@ namespace api.Infrashtructure.Repositories
                     SelectedCategoryNames = p.ProblemCategories.Select(pc => pc.Category.CatName).ToList()
                 });
 
-            // Lọc bài tập theo trạng thái công bố
-            if (published)
+            // Lọc theo Published nếu có filter
+            if (publishedFilter.HasValue)
             {
-                problemQuery = problemQuery.Where(p => p.Published == 1);
+                var val = publishedFilter.Value ? 1 : 0;
+                problemQuery = problemQuery.Where(p => p.Published == val);
             }
 
             // Áp dụng sắp xếp
@@ -56,6 +57,7 @@ namespace api.Infrashtructure.Repositories
             return problems;
         }
 
+
         // Áp dụng sắp xếp theo trường và hướng
         public IQueryable<ProblemDTO> ApplySorting(IQueryable<ProblemDTO> query, string? sortField, bool ascending)
         {
@@ -63,6 +65,7 @@ namespace api.Infrashtructure.Repositories
             {
                 "problemcode" => ascending ? query.OrderBy(p => p.ProblemCode) : query.OrderByDescending(p => p.ProblemCode),
                 "problemname" => ascending ? query.OrderBy(p => p.ProblemName) : query.OrderByDescending(p => p.ProblemName),
+                "published" => ascending ? query.OrderBy(p => p.Published) : query.OrderByDescending(p => p.Published),
                 _ => query.OrderBy(p => p.ProblemID),
             };
         }

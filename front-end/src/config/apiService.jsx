@@ -6,7 +6,6 @@ export const getList = async ({
     page = 1,
     pageSize = 10,
     ascending = true,
-    sortField = "id",
     params = {}, // ✨ hỗ trợ truyền params tùy ý
 }) => {
     if (!controller) throw new Error("Controller không được xác định.");
@@ -17,7 +16,6 @@ export const getList = async ({
                 Page: page,
                 PageSize: pageSize,
                 ascending,
-                sortField,
                 ...params, // ✨ merge thêm điều kiện lọc
             },
         });

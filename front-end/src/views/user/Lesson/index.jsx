@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
     Box, useToast, Flex, Image, Tabs, TabList, Tab, TabPanels,
     Text, Tooltip, TabPanel, Icon, Spinner
@@ -14,15 +14,20 @@ import History from "../Problem/components/History";
 import Problem from "../Problem/index";
 import ProblemList from "../Problem/components/ProblemList";
 import { FaRegFileAlt, FaBook, FaQuestionCircle, FaBars } from "react-icons/fa";
-import { IoIosChatbubbles } from "react-icons/io";
-
 import { getDetail } from "@/config/apiService";
+
+
 export default function Lesson() {
     const { lessonId } = useParams();
     const toast = useToast();
     const [lesson, setLesson] = useState(null);
     const [activeTab, setActiveTab] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const problemID = searchParams.get("problemID");
+
 
     const handleSelectLesson = () => {
         setActiveTab(0); // chuyển về tab ProblemList
@@ -108,11 +113,13 @@ export default function Lesson() {
                                                         <Icon as={FaBook} boxSize={5} />
                                                     </Tab>
                                                 </Tooltip>
-                                                <Tooltip label="Lịch sử" placement="right" hasArrow>
-                                                    <Tab py={4} _selected={{ bg: "blue.800" }}>
-                                                        <Icon as={FaQuestionCircle} boxSize={5} />
-                                                    </Tab>
-                                                </Tooltip>
+                                                {problemID && (
+                                                    <Tooltip label="Lịch sử" placement="right" hasArrow>
+                                                        <Tab py={4} _selected={{ bg: "blue.800" }}>
+                                                            <Icon as={FaQuestionCircle} boxSize={5} />
+                                                        </Tab>
+                                                    </Tooltip>
+                                                )}
                                             </TabList>
 
                                             <TabPanels flex="1" h="100%" overflow="hidden">
@@ -126,11 +133,14 @@ export default function Lesson() {
                                                 <TabPanel p={0} h="100%" overflowY="auto">
                                                     <ProblemList lessonID={lessonId} />
                                                 </TabPanel>
-                                                <TabPanel p={0} h="100%" overflowY="auto">
-                                                    <Text fontWeight="bold" fontSize="lg" px={4} pt={2}>Lịch sử</Text>
-                                                    <History />
-                                                </TabPanel>
+                                                {problemID && (
+                                                    <TabPanel p={0} h="100%" overflowY="auto">
+                                                        <Text fontWeight="bold" fontSize="lg" px={4} pt={2}>Lịch sử</Text>
+                                                        <History />
+                                                    </TabPanel>
+                                                )}
                                             </TabPanels>
+
                                         </Flex>
                                     </Tabs>
                                 </Box>

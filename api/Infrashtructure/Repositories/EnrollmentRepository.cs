@@ -17,8 +17,14 @@ namespace api.Infrashtructure.Repositories
 
         public async Task<PagedResponse<EnrollmentDTO>> GetListAsync(QueryObject query, string? sortField = null, bool ascending = true)
         {
+            var latestEnrollmentsPerCoder = await _context.Enrollments
+                .GroupBy(e => e.CoderID)
+                .Select(g => g.OrderByDescending(e => e.EnrolledAt).First().EnrollmentID)
+                .ToListAsync();
+
             var queryData = _context.Enrollments
                 .AsNoTracking()
+                .Where(e => latestEnrollmentsPerCoder.Contains(e.EnrollmentID))
                 .Include(e => e.Coder)
                 .Include(e => e.Course)
                 .Select(e => new EnrollmentDTO
@@ -29,13 +35,17 @@ namespace api.Infrashtructure.Repositories
                 });
 
             queryData = ApplySorting(queryData, sortField, ascending);
+
             var enrollment = await PagedResponse<EnrollmentDTO>.CreateAsync(
                 queryData,
                 query.Page,
                 query.PageSize
-                );
+            );
+
             return enrollment;
         }
+
+
         public IQueryable<EnrollmentDTO> ApplySorting(IQueryable<EnrollmentDTO> query, string? sortField, bool ascending)
         {
             return sortField?.ToLower() switch
@@ -50,23 +60,17 @@ namespace api.Infrashtructure.Repositories
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            // ✅ Kiểm tra Coder và Course có tồn tại không
             var coderExists = await _context.Coders.AnyAsync(c => c.CoderID == dto.CoderID);
             if (!coderExists)
                 throw new ArgumentException("Mã coder không hợp lệ hoặc không tồn tại.");
 
-            var courseExists = await _context.Courses.AnyAsync(c => c.CourseID == dto.CourseID);
-            if (!courseExists)
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseID == dto.CourseID);
+            if (course == null)
                 throw new ArgumentException("Mã khóa học không hợp lệ hoặc không tồn tại.");
-
-            // ✅ Kiểm tra trùng lặp đăng ký
-            var alreadyEnrolled = await _context.Enrollments
-                .AnyAsync(e => e.CoderID == dto.CoderID && e.CourseID == dto.CourseID);
 
             if (await CheckCoderEnrolledAsync(dto.CoderID, dto.CourseID))
                 throw new InvalidOperationException("Coder này đã đăng ký khóa học này.");
 
-            // ✅ Nếu mọi thứ hợp lệ → thêm mới
             var enrollment = new Enrollment
             {
                 CourseID = dto.CourseID,
@@ -75,13 +79,19 @@ namespace api.Infrashtructure.Repositories
             };
 
             await _context.Enrollments.AddAsync(enrollment);
+
+            // Cập nhật UpdatedAt cho Course
+            course.UpdatedAt = DateTime.Now;
+
+            // Lưu tất cả thay đổi cùng lúc
             await _context.SaveChangesAsync();
 
             dto.EnrollmentID = enrollment.EnrollmentID;
-            dto.EnrolledAt = enrollment.EnrolledAt; // cập nhật lại cho DTO
+            dto.EnrolledAt = enrollment.EnrolledAt;
 
             return dto;
         }
+
 
         public async Task<EnrollmentDTO?> GetByIdAsync(int id)
         {

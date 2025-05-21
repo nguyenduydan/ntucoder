@@ -103,13 +103,34 @@ const CoderBoard = () => {
         fetchListCoder(1, size);
     };
 
+    const handlefetchAll = () => {
+        fetchTop3();
+        fetchListCoder(1, pageSize);
+    };
+
+    useEffect(() => {
+        handlefetchAll();
+    }, []);
+
     return (
-        <Container maxW="container.xl" minH="90vh" p={6} bg="gray.200">
-            <Box bgGradient="linear(to-r, purple.500, blue.500)" p={4} borderRadius="md" mb={8} boxShadow="md">
+        <Container
+            maxW={["100vw", "container.md", "container.xl"]}
+            minH="90vh"
+            p={[6, 0]}
+            bg="gray.200"
+            overflowX="hidden" // tránh scroll ngang nếu có overflow
+        >
+            <Box
+                bgGradient="linear(to-r, purple.500, blue.500)"
+                p={[4, 6]}
+                borderRadius="md"
+                mb={8}
+                boxShadow="md"
+            >
                 <Heading
                     mb={8}
                     textAlign="center"
-                    fontSize="5xl"
+                    fontSize={["3xl", "4xl", "5xl"]}  // responsive font size
                     fontWeight="extrabold"
                     letterSpacing="wide"
                     textTransform="uppercase"
@@ -120,32 +141,54 @@ const CoderBoard = () => {
                 </Heading>
 
                 {/* Top 3 Coders */}
-                <Flex justify="center" align="flex-end" gap={10}>
+                <Flex
+                    justify="center"
+                    align="flex-end"
+                    gap={[4, 6, 10]}
+                    flexDirection={["column", "row"]} // stacked on mobile, row on bigger
+                >
                     <TopCoderCard
                         coder={top2}
                         rank={2}
                         gradient="linear(to-br, green.800, green.500, green.300)"
                         isLoading={isLoading}
+                        size={["md", "lg", "xl"]}
                     />
                     <TopCoderCard
                         coder={top1}
                         rank={1}
                         gradient="linear(to-br, yellow.800, yellow.500, yellow.300)"
                         crown
-                        size="2xl"
+                        size={["lg", "2xl", "3xl"]}
                         isLoading={isLoading}
+                        mt={[4, 0]} // margin top on mobile for spacing
                     />
                     <TopCoderCard
                         coder={top3}
                         rank={3}
                         gradient="linear(to-br, blue.800, blue.500, blue.300)"
                         isLoading={isLoading}
+                        size={["md", "lg", "xl"]}
                     />
                 </Flex>
             </Box>
-            {/* Listranking */}
-            <Box bg="white" p={4} borderRadius="md" shadow="md" mb={8} minH="50vh">
-                <Flex justify="flex-start" mb={8}>
+
+            {/* List ranking */}
+            <Box
+                bg="white"
+                p={[4, 6]}
+                borderRadius="md"
+                shadow="md"
+                mb={8}
+                minH="50vh"
+            >
+                <Flex
+                    justify="flex-start"
+                    mb={8}
+                    flexDirection={["column", "row"]} // stack input on small screens
+                    alignItems={["stretch", "center"]}
+                    gap={[4, 0]}
+                >
                     <SearchInput
                         type="text"
                         placeholder="Tìm người dùng..."
@@ -157,10 +200,12 @@ const CoderBoard = () => {
                         borderRadius="full"
                         boxShadow="md"
                         borderWidth="1px"
-                        w="300px"
+                        w={["100%", "300px"]}  // full width on mobile, fixed width on desktop
                     />
                 </Flex>
-                <CoderRankingTable coders={coders} loading={searchLoading} />
+
+                <CoderRankingTable coders={coders} loading={searchLoading} onReset={handlefetchAll} />
+
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
@@ -168,11 +213,9 @@ const CoderBoard = () => {
                     onPageChange={handlePageChange}
                     pageSize={pageSize}
                     onPageSizeChange={handlePageSizeChange}
+                    mt={4}
                 />
-
             </Box>
-
-
         </Container>
     );
 };

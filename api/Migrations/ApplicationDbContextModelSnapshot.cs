@@ -331,11 +331,6 @@ namespace api.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalReviews")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
 

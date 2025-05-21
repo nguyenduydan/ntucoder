@@ -14,7 +14,8 @@ import {
     GridItem,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import CodingPng from "assets/img/profile/gummy-coding.png";
+import Programing from "@/assets/img/avatars/programing.png";
+import CodingPng from "@/assets/img/codingImg.png";
 
 import { getList } from "@/config/apiService";
 import CourseGrid from "@/views/user/Course/components/CourseGrid";
@@ -114,25 +115,7 @@ const HomeNoLogin = () => {
 
     const [courses, setCourses] = useState([]);
     const [blogs, setBlogs] = useState([]);
-    const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = -(y - centerY) / 10;
-        const rotateY = (x - centerX) / 10;
-
-        setRotate({ x: rotateX, y: rotateY });
-    };
-
-    const handleMouseLeave = () => {
-        setRotate({ x: 0, y: 0 });
-    };
 
     // Show list course popular
     const fetchCourses = useCallback(async () => {
@@ -198,7 +181,7 @@ const HomeNoLogin = () => {
             <Box bg="gray.200" minH="100%" pb={10}>
                 {/* Hero Section */}
                 <Box
-                    bgGradient="linear(to-b, rgb(1, 6, 56),rgb(10, 22, 159), rgb(9, 112, 175),rgb(63, 153, 202),gray.200)"
+                    bgGradient="linear(to-b, rgb(1, 6, 56),rgb(10, 22, 159), rgb(9, 53, 175),rgb(63, 153, 202),gray.200)"
                     minH="95vh"
                 >
                     <MotionVStack
@@ -343,7 +326,7 @@ const HomeNoLogin = () => {
                             />
                         </motion.svg>
                         <HStack
-                            spacing={{ base: 4, md: 12 }}  // Điều chỉnh khoảng cách giữa các phần tử khi màn hình nhỏ
+                            spacing={{ base: 4, md: 12 }}
                             align="center"
                             justifyContent="space-between"
                             flexWrap="wrap"
@@ -352,7 +335,7 @@ const HomeNoLogin = () => {
                             flexDirection={{ base: "column", md: "row" }}
                         >
                             {/* Cột trái: Danh sách tiêu đề */}
-                            <VStack align="start" spacing={6} flex="1" px={{ base: "40px", md: "240px" }}>
+                            <VStack align="start" spacing={6} flex="1" px={{ base: "40px", md: "100px" }}>
                                 <MotionHeading
                                     size={{ base: "xl", md: "2xl" }}
                                     lineHeight={{ base: "1.2", md: "1.2" }}
@@ -407,33 +390,16 @@ const HomeNoLogin = () => {
                             </VStack>
 
                             {/* Cột phải: Nội dung tương ứng */}
-                            <VStack align="start" spacing={6} flex="1" >
-                                <MotionBox
-                                    flex="1"
-                                    onMouseMove={handleMouseMove}
-                                    onMouseLeave={handleMouseLeave}
-                                    style={{
-                                        perspective: 1000,
-                                        transformStyle: "preserve-3d",
-                                    }}
-                                    animate={{
-                                        rotateX: rotate.x,
-                                        rotateY: rotate.y,
-                                        scale: 1.05,
-                                    }}
-                                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                                    flexWrap="wrap"
-                                >
-                                    <motion.div variants={zoomInVariant}>
-                                        <Image
-                                            mt={20}
-                                            src={CodingPng}
-                                            alt="Lập trình viên đang code"
-                                            borderRadius="xl"
-                                            maxW={{ base: "100%", sm: "100%" }}  // Điều chỉnh chiều rộng ảnh theo màn hình
-                                        />
-                                    </motion.div>
-                                </MotionBox>
+                            <VStack align="start" spacing={0} flex="1" >
+                                <motion.div variants={zoomInVariant}>
+                                    <Image
+                                        mt={20}
+                                        src={Programing}
+                                        alt="Lập trình viên đang code"
+                                        borderRadius="xl"
+                                        maxW={{ base: "100%", sm: "100%" }}  // Điều chỉnh chiều rộng ảnh theo màn hình
+                                    />
+                                </motion.div>
                             </VStack>
                         </HStack>
 

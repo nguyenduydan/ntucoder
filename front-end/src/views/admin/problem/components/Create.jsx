@@ -21,15 +21,17 @@ import {
     Checkbox, Box,
     Flex
 } from "@chakra-ui/react";
-import JoditEditor from "jodit-react";
-import Editor from "@/utils/configEditor";
 import CodeEditor from "@monaco-editor/react";
+
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { modules, formats } from '@/utils/formatReactQuill';
+
 import FlushedInput from "@/components/fields/InputField";
 import { createItem, getList } from "@/config/apiService";
 import { getMonacoLanguage } from "@/utils/utils";
 
 export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
-    const editor = useRef(null);
     const [problem, setProblem] = useState({
         problemCode: "",
         problemName: "",
@@ -224,13 +226,14 @@ export default function CreateProblemModal({ isOpen, onClose, fetchData }) {
                             <FormControl isInvalid={errors.problemContent} mb={4}>
                                 <FormLabel fontWeight="bold">Nội dung bài toán</FormLabel>
                                 <Box maxH="600px" overflowY="auto">
-                                    <JoditEditor
+                                    <ReactQuill
                                         key={problem.problemID + "-content"}
-                                        ref={editor}
+                                        modules={modules}
+                                        formats={formats}
+                                        theme="snow"
+                                        placeholder="Chia sẻ cảm nghĩ của bạn hoặc thêm hình ảnh vào nội dung..."
                                         value={problem.problemContent}
-                                        config={Editor}
                                         onChange={(newContent) => handleEditorChange('problemContent', newContent)}
-                                        onBlur={(newContent) => handleEditorChange('problemContent', newContent)}
                                     />
                                 </Box>
                                 <FormErrorMessage>{errors.problemContent}</FormErrorMessage>

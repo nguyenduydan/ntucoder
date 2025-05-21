@@ -16,6 +16,7 @@
         public string? BadgeColor {  get; set; }
         public IFormFile? ImageFile { get; set; }
         public string? ImageUrl { get; set; }
+        public int EnrollCount { get; set; }
         public int Status { get; set; }
 
         // Tự động tính % giảm giá
@@ -24,6 +25,8 @@
              : 0;
         public double? Rating { get; set; }
         public int? TotalReviews { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 
     public class CourseCreateDTO: CourseDTO
@@ -36,8 +39,6 @@
     {
         public string? Description { get; set; }
         public string? Overview { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
 
         public List<TopicDTO> Topics { get; set; } = new List<TopicDTO>();
         public List<EnrollmentDTO> Enrollments { get; set; } = new List<EnrollmentDTO>();

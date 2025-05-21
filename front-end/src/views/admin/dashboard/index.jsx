@@ -14,9 +14,9 @@ import {
     TagCloseButton,
     Tooltip,
     Divider,
+    Button,
 } from "@chakra-ui/react";
 import { MdClear } from "react-icons/md";
-import { formatDateTime } from "@/utils/utils";
 import TimeDisplay from "./components/TimeLine";
 
 // Lazy load các component
@@ -25,41 +25,44 @@ const Courses = lazy(() => import("views/admin/dashboard/components/Course"));
 const Blogs = lazy(() => import("views/admin/dashboard/components/Blogs"));
 const CodersRanking = lazy(() => import("views/admin/dashboard/components/CodersRanking"));
 const Problems = lazy(() => import("views/admin/dashboard/components/Problems"));
-const Lessons = lazy(() => import("views/admin/dashboard/components/Lesson"));
-const Topics = lazy(() => import("views/admin/dashboard/components/Topic"));
-const TopCourseEnrolls = lazy(() => import("views/admin/dashboard/components/TopCourseEnrolls"));
-const TopBlogViewers = lazy(() => import("views/admin/dashboard/components/TopBlogViewers"));
 
 const sectionColorMap = {
     stats: "blue",
     courses: "green",
-    blogs: "purple",
     coders: "orange",
     problems: "red",
-    lessons: "teal",
-    topics: "cyan",
-    topCourses: "yellow",
-    topBlogs: "pink",
+    blogs: "purple",
 };
 const sectionOptions = Object.keys(sectionColorMap);
 
-const MainDashBoard = () => {
-    const initialVisibleSections = ["stats", "courses", "topCourses"];
-    const [visibleSections, setVisibleSections] = useState(initialVisibleSections);
+const sectionTitles = {
+    stats: "Tổng quan",
+    courses: "Khóa học",
+    blogs: "Bài viết",
+    coders: "Xếp hạng",
+    problems: "Bài tập",
+};
 
+const MainDashBoard = () => {
+    const initialVisibleSections = ["stats", "courses", "coders"];
+    const [visibleSections, setVisibleSections] = useState(initialVisibleSections);
+    const [loading, setLoading] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(Date.now());
+
+    const handleRefresh = () => {
+        setLoading(true);
+        setRefreshKey(Date.now());
+    };
 
     const handleSelectChange = (e) => {
         const value = e.target.value;
-
         if (value === "all") {
-            setVisibleSections(sectionOptions); // Chọn tất cả
+            setVisibleSections(sectionOptions);
         } else if (value && !visibleSections.includes(value)) {
             setVisibleSections([...visibleSections, value]);
         }
-
-        e.target.value = ""; // Reset Select về placeholder
+        e.target.value = "";
     };
-
 
     const removeSection = (section) => {
         setVisibleSections(visibleSections.filter((s) => s !== section));
@@ -68,12 +71,6 @@ const MainDashBoard = () => {
     const clearAllSections = () => {
         setVisibleSections([]);
     };
-
-    const stats = [
-        { label: "Người dùng", value: 1245, change: "+8.5%" },
-        { label: "Khóa học", value: "₫120,000,000", change: "+12%" },
-        { label: "Bài tập", value: 320, change: "-3%" },
-    ];
 
     const courses = [
         { id: 1, title: "React cơ bản", enrolls: 1200 },
@@ -87,68 +84,107 @@ const MainDashBoard = () => {
         { id: 3, title: "Chakra UI đẹp thế nào?", views: 2800 },
     ];
 
-    const coders = [
-        { id: 1, name: "Nguyen Van A", rank: 1, points: 1500 },
-        { id: 2, name: "Tran Thi B", rank: 2, points: 1400 },
-        { id: 3, name: "Le Van C", rank: 3, points: 1300 },
-    ];
-
     const problems = [
         { id: 1, title: "Tính tổng dãy số", difficulty: "Dễ" },
         { id: 2, title: "Tìm chuỗi con dài nhất", difficulty: "Trung bình" },
         { id: 3, title: "Thuật toán Dijkstra", difficulty: "Khó" },
     ];
 
-    const lessons = [
-        { id: 1, title: "JS Basics" },
-        { id: 2, title: "React Hooks" },
-        { id: 3, title: "Node Express" },
-    ];
-
-    const topics = [
-        { id: 1, name: "Frontend" },
-        { id: 2, name: "Backend" },
-        { id: 3, name: "Algorithm" },
-    ];
-
-    const topCourseEnrolls = courses.sort((a, b) => b.enrolls - a.enrolls).slice(0, 3);
-    const topBlogViews = blogs.sort((a, b) => b.views - a.views).slice(0, 3);
-
     const Section = ({ title, children }) => (
-        <Box mb={10} transition="all 0.3s ease">
-            <Heading fontSize="xl" color="gray.700">
+        <Box
+            transition="all 0.3s ease"
+            mb={5}
+            height="100%"
+            display="flex"
+            flexDirection="column"
+        >
+            <Heading fontSize="xl" color="gray.700" mb={2}>
                 {title}
             </Heading>
-            <Divider mb={4} mt={2} w="60px" h="5px" borderRadius="full" bg="brand.500" />
-            <Box>
+            <Divider mb={4} mt={2} w="60px" h="5px" borderRadius="full" bg="blue" />
+            <Box flex="1" overflow="auto">
                 {children}
             </Box>
         </Box>
     );
 
+    const renderSectionComponent = (section) => {
+        switch (section) {
+            case "courses":
+                return (
+                    <Courses
+                        courses={courses}
+                        refreshKey={refreshKey}
+                        onFinishRefresh={() => setLoading(false)}
+                        height="400px"
+                    />
+                );
+            case "blogs":
+                return <Blogs height="400px" refreshKey={refreshKey} onFinishRefresh={() => setLoading(false)} />;
+            case "coders":
+                return (
+                    <CodersRanking
+                        refreshKey={refreshKey}
+                        onFinishRefresh={() => setLoading(false)}
+                        height="400px"
+                    />
+                );
+            case "problems":
+                return <Problems problems={problems} height="400px" />;
+            default:
+                return null;
+        }
+    };
+
+    const otherSections = visibleSections.filter((s) => s !== "stats");
 
     return (
         <ScrollToTop>
             <Container maxW="container.xl" mt={{ base: 40, md: 20 }} pb={10}>
                 <TimeDisplay />
                 {/* UI Select để chọn hiển thị */}
-                <Box mb={10} p={5} shadow="md" borderWidth="1px" borderRadius="lg" bg="gray.50">
-                    <Heading fontSize="lg" mb={4} color="gray.700">🎛️ Tùy chọn hiển thị</Heading>
+                <Box mb={10} p={5} shadow="md" borderRadius="lg" bgGradient="linear(to-r, blue.200, purple.300)">
+                    <Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} alignItems="center" mb={4}>
+                        <Heading fontSize="lg" mb={4} color="black">🎛️ Tùy chọn hiển thị</Heading>
+                        <Button
+                            size="md"
+                            w={["100%", "150px"]}
+                            boxShadow="md"
+                            colorScheme="green"
+                            isLoading={loading}
+                            borderRadius="full"
+                            _hover={{
+                                transform: "scale(1.05)",
+                                boxShadow: "2px 5px 10px rgb(15, 245, 69)",
+                            }}
+                            _active={{
+                                transform: "scale(0.95)",
+                            }}
+                            onClick={handleRefresh}
+                        >
+                            Refresh
+                        </Button>
+                    </Flex>
 
                     <Flex direction={{ base: "column", md: "row" }} gap={4} align="center" flexWrap="wrap">
                         <Select
-                            placeholder="📂 Chọn phần..."
+                            placeholder="📂 Chọn hiển thị"
                             onChange={handleSelectChange}
                             maxW="220px"
                             bg="white"
                             borderColor="gray.300"
-                            _hover={{ borderColor: "blue.400" }}
-                            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+                            color="black"
+                            sx={{
+                                option: {
+                                    color: "black",
+                                    bg: "white",
+                                },
+                            }}
                         >
                             <option value="all">🟢 Chọn tất cả</option>
                             {sectionOptions.map((key) => (
                                 <option key={key} value={key}>
-                                    {`📌 ${key}`}
+                                    📌 {sectionTitles[key]}
                                 </option>
                             ))}
                         </Select>
@@ -176,7 +212,7 @@ const MainDashBoard = () => {
                                     variant="solid"
                                     colorScheme={sectionColorMap[section] || "gray"}
                                 >
-                                    <TagLabel color="white">{section}</TagLabel>
+                                    <TagLabel color="white">{sectionTitles[section]}</TagLabel>
                                     <TagCloseButton onClick={() => removeSection(section)} />
                                 </Tag>
                             ))}
@@ -184,64 +220,43 @@ const MainDashBoard = () => {
                     </Flex>
                 </Box>
 
-
                 <Suspense fallback={<Flex justify="center" py={10}><Spinner size="xl" /></Flex>}>
+                    {/* Section thống kê riêng */}
                     {visibleSections.includes("stats") && (
-                        <Section title="Thống kê tổng quan">
-                            <Stats />
-                        </Section>
+                        <Box height="100%" mb={10}>
+                            <Section title="Thống kê tổng quan">
+                                <Stats
+                                    refreshKey={refreshKey}
+                                    onFinishRefresh={() => setLoading(false)}
+                                    height="100%"
+                                />
+                            </Section>
+                        </Box>
                     )}
 
-                    {visibleSections.includes("courses") && (
-                        <Section title="Khóa học">
-                            <Courses courses={courses} />
-                        </Section>
-                    )}
+                    {/* Các section còn lại */}
+                    <Flex wrap="wrap" gap={6} mb={10}>
+                        {otherSections.map((section, index, arr) => {
+                            const isLast = index === arr.length - 1;
+                            const isOddCount = arr.length % 2 !== 0;
+                            const isLastAlone = isOddCount && isLast;
 
-                    {visibleSections.includes("blogs") && (
-                        <Section title="Blog nổi bật">
-                            <Blogs blogs={blogs} />
-                        </Section>
-                    )}
+                            const width = isLastAlone
+                                ? "100%"
+                                : { base: "100%", md: "calc(50% - 12px)" };
 
-                    {visibleSections.includes("coders") && (
-                        <Section title="Top Coders">
-                            <CodersRanking coders={coders} />
-                        </Section>
-                    )}
-
-                    {visibleSections.includes("problems") && (
-                        <Section title="Bài tập gần đây">
-                            <Problems problems={problems} />
-                        </Section>
-                    )}
-
-                    {visibleSections.includes("lessons") && (
-                        <Section title="Bài giảng">
-                            <Lessons lessons={lessons} />
-                        </Section>
-                    )}
-
-                    {visibleSections.includes("topCourses") && (
-                        <Section title="Top khóa học theo lượt đăng ký">
-                            <TopCourseEnrolls courses={topCourseEnrolls} />
-                        </Section>
-                    )}
-
-                    {visibleSections.includes("topBlogs") && (
-                        <Section title="Top blog theo lượt xem">
-                            <TopBlogViewers blogs={topBlogViews} />
-                        </Section>
-                    )}
-
-                    {visibleSections.includes("topics") && (
-                        <Section title="Chủ đề nổi bật">
-                            <Topics topics={topics} />
-                        </Section>
-                    )}
+                            return (
+                                <Box key={section} w={width} minH="300px">
+                                    <Section title={sectionTitles[section]}>
+                                        {renderSectionComponent(section)}
+                                    </Section>
+                                </Box>
+                            );
+                        })}
+                    </Flex>
                 </Suspense>
             </Container>
-        </ScrollToTop >
+        </ScrollToTop>
     );
 };
 

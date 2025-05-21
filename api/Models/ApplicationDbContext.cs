@@ -318,10 +318,6 @@ namespace api.Models
                       .IsRequired()
                       .HasDefaultValue(0);
 
-                entity.Property(c => c.TotalReviews)
-                      .IsRequired()
-                      .HasDefaultValue(0);
-
                 entity.HasOne(c => c.Creator)
                       .WithMany(coder => coder.Courses)
                       .HasForeignKey(c => c.CoderID)

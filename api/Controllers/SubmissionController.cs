@@ -170,30 +170,23 @@ namespace api.Controllers
                 });
             }
         }
-        [Authorize]
+
         [HttpGet("history")]
-        public async Task<IActionResult> GetHistoryListSubmission(int problemId, string? sortField = null, bool ascending = true)
+        public async Task<IActionResult> GetHistoryListSubmission(
+                [FromQuery] QueryObject query,
+                [FromQuery] int? problemId=null,
+                [FromQuery] string? sortField = null,
+                [FromQuery] bool ascending = true,
+                [FromQuery] int? coderId = null)
         {
-            var coderId = _authService.GetUserIdFromToken();
-            if (coderId == -1)
-            {
-                return Unauthorized();
-            }
-            List<SubmissionDTO> list = await _submissionRepository.GetListSubmissionFromCoderIdAsync(problemId, coderId, sortField, ascending);
-            return Ok(list);
-        }
-        [HttpGet("profile")]
-        public async Task<IActionResult> GetListProblemByCoderId(int coderID)
-        {
-            try
-            {
-                List<SubmissionDTO> list = await _submissionRepository.GetListSubmissionByCoderId(coderID);
-                return Ok(list);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-            }
+            var result = await _submissionRepository.GetSubmissionHistoryAsync(
+                     query,
+                     problemId,
+                     sortField,
+                     ascending,
+                      coderId);
+
+            return Ok(result);
         }
     }
 }

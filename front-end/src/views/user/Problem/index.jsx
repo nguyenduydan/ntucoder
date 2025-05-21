@@ -14,12 +14,13 @@ import {
 } from "@chakra-ui/react";
 import Editor from "@monaco-editor/react";
 import TestRunPanel from "./components/TestRunPanel";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getDetail } from "@/config/apiService";
 import api from "@/config/apiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { FaHandPointUp } from "react-icons/fa";
 import { getList } from "@/config/apiService";
+
 
 export default function Problem() {
   const location = useLocation();
@@ -29,7 +30,7 @@ export default function Problem() {
   const [loading, setLoading] = useState({ status: false, type: "" });
 
   const toast = useToast();
-
+  const navigate = useNavigate();
   const [compilers, setCompiler] = useState([]);
   const [selectCompiler, setSelectCompiler] = useState("cpp");
   const searchParams = new URLSearchParams(location.search);
@@ -47,6 +48,7 @@ export default function Problem() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [isTestRunSuccess, setIsTestRunSuccess] = useState(false);
+  const [isSubmissionSuccess, setIsSubmissionSuccess] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,8 +175,9 @@ export default function Problem() {
       if (res.status === 200) {
         ResultModal(res.data.testRuns[0].result);
         onOpen();
+        setIsSubmissionSuccess(true);
       }
-      window.location.reload();
+
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu nộp bài:", error);
 
@@ -205,6 +208,17 @@ export default function Problem() {
       setSelectCompiler(compiler);
     }
   };
+  const handleNextProblem = () => {
+    if (!problemID) return;
+    const nextProblemID = parseInt(problemID) + 1;
+
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("problemID", nextProblemID);
+
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+    onClose();
+  };
+
 
   const handleThemeChange = (e) => {
     setTheme(e.target.value);
@@ -316,12 +330,18 @@ export default function Problem() {
           <ModalHeader textAlign="center">{modalTitle || ""}</ModalHeader>
           <ModalBody textAlign="center" fontSize="lg">{modalMessage || ""}</ModalBody>
           <ModalFooter>
-            <Flex w="100%" justify="center">
+            <Flex w="100%" justify="center" gap={2}>
               <Button colorScheme={modalStyles.colorScheme} onClick={onClose}>
                 Đóng
               </Button>
+              {isSubmissionSuccess && (
+                <Button colorScheme="teal" onClick={handleNextProblem}>
+                  Bài tiếp theo
+                </Button>
+              )}
             </Flex>
           </ModalFooter>
+
         </ModalContent>
       </Modal>
 

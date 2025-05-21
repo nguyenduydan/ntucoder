@@ -424,8 +424,7 @@ namespace api.Infrashtructure.Repositories
             var query = _context.Coders
                 .Include(t => t.Account)
                     .ThenInclude(t => t.Role)
-                .AsNoTracking()
-                .AsSplitQuery();
+                .AsNoTracking();
 
             query = SearchHelper<Coder>.ApplySearchMultiField(query, keyword, useAnd: true,
                     t => t.CoderName,

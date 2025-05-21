@@ -18,21 +18,24 @@ export default function LessonContent({ lesson }) {
     // console.log(coder);
 
     return (
-        <Box>
+        <Box px={4} py={5}>
             {/* Thông tin về bài học */}
-            <Flex px={5} alignItems="center" gap={4} justifyContent="start">
-                <AvatarLoadest
-                    size="md"
-                    src={coder?.avatar || ""}
-                    alt="Coder Avatar"
-                    borderRadius="full"
-                    boxSize="50px"
-                    objectFit="cover"
-                />
-                <NavLink to={`/profile/${coder?.coderID}`}>
-                    <Text maxW="100px" _hover={{ color: "blue" }} fontWeight="bold">{(coder?.coderName || 'Ẩn danh').replace(/(.{3}).*(@.*)/, "$1******$2")}</Text>
-                </NavLink>
-                <Flex alignItems="center">
+            <Flex px={5} alignItems="center" gap={4} justifyContent="space-between">
+                <Flex flex="1" alignItems="center" gap={4}>
+                    <AvatarLoadest
+                        size="md"
+                        src={coder?.avatar || ""}
+                        alt="Coder Avatar"
+                        borderRadius="full"
+                        boxSize="50px"
+                        objectFit="cover"
+                        loading="lazy"
+                    />
+                    <NavLink to={`/profile/${coder?.coderID}`}>
+                        <Text maxW="200px" _hover={{ color: "blue" }} fontWeight="bold">{(coder?.coderName || 'Ẩn danh').replace(/(.{3}).*(@.*)/, "$1******$2")}</Text>
+                    </NavLink>
+                </Flex>
+                <Flex alignItems="center" >
                     <Icon as={FaHeart} color="red" />
                     <Text ms={1} fontWeight="bold" fontSize="lg"> 100 điểm</Text>
                 </Flex>

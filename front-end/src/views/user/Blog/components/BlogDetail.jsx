@@ -115,19 +115,21 @@ const BlogDetail = () => {
                                         </Text>
                                     </Box>
                                 </Flex>
-                                <Image
-                                    size="md"
-                                    name={blog.title || blog.Title || 'Không có ảnh'}
-                                    src={blog.imageBlogUrl || './avatarSimmmple.png'}
-                                    w="100%"
-                                    maxH="40vh"
-                                    objectFit="cover"
-                                    alt={blog.title || blog.Title || 'Không có ảnh'}
-                                    borderRadius="md"
-                                    loading="lazy"
-                                    mb={4}
-                                    fallbackSrc="./avatarSimmmple.png"
-                                />
+                                <Flex justify="center" align="center">
+                                    <Image
+                                        size="md"
+                                        name={blog.title || blog.Title || 'Không có ảnh'}
+                                        src={blog.imageBlogUrl || './avatarSimmmple.png'}
+                                        w="70%"
+                                        maxH="50vh"
+                                        objectFit="cover"
+                                        alt={blog.title || blog.Title || 'Không có ảnh'}
+                                        borderRadius="md"
+                                        loading="lazy"
+                                        mb={4}
+                                        fallbackSrc="./avatarSimmmple.png"
+                                    />
+                                </Flex>
                                 <Box
                                     px={5}
                                     sx={{ wordBreak: "break-word" }}

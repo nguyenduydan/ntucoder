@@ -136,11 +136,11 @@ namespace api.Controllers
         }
 
         [HttpGet("TopViewed")]
-        public async Task<IActionResult> GetTopViewed([FromQuery] int count = 4)
+        public async Task<IActionResult> GetTopViewed([FromQuery] int count = 4, bool ascingSort = false) //false là giảm dần
         {
             try
             {
-                var result = await _repository.GetTopViewedBlogsAsync(count);
+                var result = await _repository.GetTopViewedBlogsAsync(count, ascingSort);
                 return Ok(result);
             }
             catch (Exception ex)

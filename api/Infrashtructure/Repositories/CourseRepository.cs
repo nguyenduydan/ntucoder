@@ -28,15 +28,19 @@ namespace api.Infrashtructure.Repositories
 
         public IQueryable<CourseDTO> ApplySorting(IQueryable<CourseDTO> query, string? sortField, bool ascending)
         {
-            return sortField?.ToLower() switch
+            if (string.IsNullOrEmpty(sortField))
+                return query.OrderBy(c => c.CourseID);
+
+            return sortField.ToLower() switch
             {
                 "coursename" => ascending ? query.OrderBy(c => c.CourseName) : query.OrderByDescending(c => c.CourseName),
-                "status" => ascending ? query.OrderBy(c => c.Status) : query.OrderByDescending(c => c.Status),
-                "fee" => ascending ? query.OrderBy(c => c.Fee) : query.OrderByDescending(c => c.Fee),
-                "iscombo" => ascending ? query.OrderBy(c => c.IsCombo) : query.OrderByDescending(c => c.IsCombo),
+                "enrollcount" => ascending ? query.OrderBy(c => c.EnrollCount) : query.OrderByDescending(c => c.EnrollCount),
+                "createdat" => ascending ? query.OrderBy(c => c.CreatedAt) : query.OrderByDescending(c => c.CreatedAt),
+                "updatedat" => ascending ? query.OrderBy(c => c.UpdatedAt) : query.OrderByDescending(c => c.UpdatedAt),
                 _ => query.OrderBy(c => c.CourseID)
             };
         }
+
 
         public async Task<CourseCreateDTO> CreateCourseAsync(CourseCreateDTO dto)
         {
@@ -209,9 +213,10 @@ namespace api.Infrashtructure.Repositories
                     c => c.CourseID,
                     ec => ec.CourseID,
                     (c, ec) => new { c, ec })
-                .SelectMany(
+               .SelectMany(
                     temp => temp.ec.DefaultIfEmpty(),
-                    (temp, ec) => new { temp.c, EnrollCount = ec != null ? ec.Count : 0 })
+                    (temp, ec) => new { temp.c, EnrollCount = ec != null ? (int?)ec.Count : null })
+
                 .GroupJoin(reviewStatsByCoder,
                     temp => temp.c.CoderID,
                     rs => rs.CoderID,
@@ -242,7 +247,10 @@ namespace api.Infrashtructure.Repositories
                     ImageUrl = x.c.ImageUrl,
                     Status = x.c.Status,
                     Rating = x.AvgRating,
+                    EnrollCount = ((int?)x.EnrollCount).GetValueOrDefault(),
                     TotalReviews = x.c.Reviews != null ? x.c.Reviews.Count() : 0,
+                    CreatedAt = x.c.CreatedAt,
+                    UpdatedAt = x.c.UpdatedAt,
                 });
 
             return query;

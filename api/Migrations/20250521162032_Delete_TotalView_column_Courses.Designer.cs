@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250518132832_updateDB")]
-    partial class updateDB
+    [Migration("20250521162032_Delete_TotalView_column_Courses")]
+    partial class Delete_TotalView_column_Courses
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -333,11 +333,6 @@ namespace api.Migrations
                     b.Property<int>("Status")
                         .HasMaxLength(3)
                         .HasColumnType("int");
-
-                    b.Property<int>("TotalReviews")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");

@@ -191,13 +191,19 @@ namespace api.Infrashtructure.Repositories
         }
 
         // Lấy top view cao nhất
-        public async Task<List<BlogDTO>> GetTopViewedBlogsAsync(int count)
+        public async Task<List<BlogDTO>> GetTopViewedBlogsAsync(int count, bool ascingSort)
         {
-            return await _context.Blogs
+            var query = _context.Blogs
                 .Include(b => b.Coder)
                 .AsNoTracking()
-                .Where(b => b.Published == 1)
-                .OrderByDescending(b => b.ViewCount)
+                .Where(b => b.Published == 1);
+
+            // Sắp xếp theo ViewCount tăng hoặc giảm dựa trên ascingSort
+            query = ascingSort
+                ? query.OrderBy(b => b.ViewCount)
+                : query.OrderByDescending(b => b.ViewCount);
+
+            return await query
                 .Take(count)
                 .Select(b => new BlogDTO
                 {
@@ -215,6 +221,7 @@ namespace api.Infrashtructure.Repositories
                 })
                 .ToListAsync();
         }
+
 
         public async Task<PagedResponse<BlogDTO>> GetLatestAsync(QueryObject query, List<int> excludedIds = null)
         {

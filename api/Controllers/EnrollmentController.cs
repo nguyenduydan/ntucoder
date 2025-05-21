@@ -1,4 +1,5 @@
 ﻿using api.DTOs;
+using api.Infrashtructure.Helpers;
 using api.Infrashtructure.Repositories;
 using api.Infrashtructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,13 @@ namespace api.Controllers
             _authService = authService;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
+        {
+            var result = await _enrollmentRepository.GetListAsync(query, sortField, ascending);
+            return Ok(result);
+        }
 
         [Authorize]
         [HttpPost]
