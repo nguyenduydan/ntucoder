@@ -71,7 +71,7 @@ const BlogBox = ({ coderID }) => {
                 <Divider mt={1} w="60px" h="3px" bg="blue" borderRadius="md" />
             </Box>
             <Box h="55vh" overflowY="auto">
-                <Bloglist blogs={blogs} loading={loading} limitContent={100} limitTitle={30} limitCoderName={10} limitNumber={5} />
+                <Bloglist blogs={blogs} loading={loading} limitContent={100} limitTitle={30} />
             </Box>
             <Pagination
                 currentPage={currentPage}

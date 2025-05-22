@@ -9,15 +9,17 @@ import {
     Heading,
     useToast,
     Button,
-    Container, Image
+    Container, Image,
+    Badge
 } from '@chakra-ui/react';
 import api from '@/config/apiConfig';
 import sanitizeHtml from '@/utils/sanitizedHTML';
-import { formatDateTime, formatDate, toSlug } from '@/utils/utils';
+import { formatDateTime, toSlug, formatViewCount, LimitText, formatNumber } from '@/utils/utils';
 import { useTitle } from '@/contexts/TitleContext';
 import { FaArrowLeft } from 'react-icons/fa';
 import CoderAvatar from '@/views/user/Course/components/CoderAvatar';
 import ScrollToTop from '@/components/scroll/ScrollToTop';
+import InfoBlog from './InfoBlog';
 
 const BlogDetail = () => {
     const { slugId } = useParams();
@@ -94,8 +96,12 @@ const BlogDetail = () => {
                 <Flex maxW="200vh" gap={8} px={4} mb={8}>
                     {/* Nội dung blog */}
                     <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
-                        <Heading mb={4}>{blog?.title || "Tiêu đề bài viết"}</Heading>
-
+                        <Flex align="center" mb={4} justify="space-between" flexWrap="wrap" gap={4} alignItems="center">
+                            <Heading mb={4}>{blog?.title || "Tiêu đề bài viết"}</Heading>
+                            <Badge fontSize="md" colorScheme='blue' mb={4}>
+                                {formatNumber(blog?.viewCount || "0")} lượt xem
+                            </Badge>
+                        </Flex>
                         {loading ? (
                             <Flex justify="center" align="center" height="80vh">
                                 <Spinner />
@@ -181,9 +187,12 @@ const BlogDetail = () => {
                                             <Text fontSize="sm" color="gray.600">
                                                 {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 100)}...
                                             </Text>
-                                            <Text fontSize="xs" color="gray.500" mt={2}>
-                                                {formatDate(item.blogDate)}
-                                            </Text>
+                                            <InfoBlog
+                                                id={item.coderID || item.CoderID}
+                                                coderName={item.coderName}
+                                                date={item.blogDate}
+                                                view={formatViewCount(item.viewCount || item.ViewCount)}
+                                            />
                                         </Box>
                                     ))
                                 )}

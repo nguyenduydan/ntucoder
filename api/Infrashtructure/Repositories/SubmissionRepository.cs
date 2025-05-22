@@ -104,7 +104,6 @@ namespace api.Infrashtructure.Repositories
             return dto;
         }
 
-       
         public async Task<bool> DeleteSubmissionAsync(int id)
         {
             var obj = await _context.Submissions.FirstOrDefaultAsync(o => o.SubmissionID == id);
@@ -237,91 +236,91 @@ namespace api.Infrashtructure.Repositories
         }
 
         public async Task<PagedResponse<SubmissionDTO>> GetSubmissionHistoryAsync(
-      QueryObject queryable,
-      int? problemId = null,
-      string? sortField = null,
-      bool ascending = true,
-      int? coderId = null)
-        {
-            var query = _context.Submissions
-                .Include(s => s.Compiler)
-                .Include(s => s.Coder)
-                .Include(s => s.Problem)
-                .AsQueryable();
-
-            if (problemId.HasValue)
+              QueryObject queryable,
+              int? problemId = null,
+              string? sortField = null,
+              bool ascending = true,
+              int? coderId = null)
             {
-                query = query.Where(s => s.ProblemID == problemId.Value);
-            }
+                var query = _context.Submissions
+                    .Include(s => s.Compiler)
+                    .Include(s => s.Coder)
+                    .Include(s => s.Problem)
+                    .AsQueryable();
 
-            if (coderId.HasValue)
-            {
-                query = query.Where(s => s.CoderID == coderId.Value);
-            }
-
-            var projectedQuery = query.Select(s => new SubmissionDTO
-            {
-                SubmissionID = s.SubmissionID,
-                CompilerID = s.CompilerID,
-                CompilerName = s.Compiler.CompilerName,
-                SubmissionCode = s.SubmissionCode,
-                SubmitTime = s.SubmitTime,
-                SubmissionStatus = s.SubmissionStatus,
-                TestRunCount = s.TestRunCount,
-                TestResult = s.TestResult,
-                MaxTimeDuration = s.MaxTimeDuration,
-                ProblemID = s.ProblemID,
-                ProblemName = s.Problem.ProblemName,
-                CoderID = s.CoderID,
-                CoderName = s.Coder.CoderName,
-                Point = 0
-            });
-
-            var sortedQuery = ApplySorting(projectedQuery, sortField, ascending);
-
-            var pagedResult = await PagedResponse<SubmissionDTO>.CreateAsync(sortedQuery, queryable.Page, queryable.PageSize);
-
-            // Lấy tất cả các ProblemID hiện có trong page
-            var problemIdsInPage = pagedResult.Data.Select(d => d.ProblemID).Distinct().ToList();
-            var coderIdsInPage = pagedResult.Data.Select(d => d.CoderID).Distinct().ToList();
-
-            // Lấy LessonProblems cho các ProblemID này
-            var lessonProblems = await _context.LessonProblems
-                .Where(lp => problemIdsInPage.Contains(lp.ProblemID))
-                .ToListAsync();
-
-            if (lessonProblems.Count > 0)
-            {
-                // Lấy tất cả Matches tương ứng với coderId và LessonProblemID
-                var lessonProblemIds = lessonProblems.Select(lp => lp.ID).ToList();
-
-                var matchesQuery = _context.Matches
-                    .Where(m => lessonProblemIds.Contains(m.LessonProblemID) && coderIdsInPage.Contains(m.CoderID));
+                if (problemId.HasValue)
+                {
+                    query = query.Where(s => s.ProblemID == problemId.Value);
+                }
 
                 if (coderId.HasValue)
                 {
-                    matchesQuery = matchesQuery.Where(m => m.CoderID == coderId.Value);
+                    query = query.Where(s => s.CoderID == coderId.Value);
                 }
 
-                var matches = await matchesQuery.ToListAsync();
-
-                // Tạo dictionary theo cặp (CoderID, ProblemID) để dễ lookup điểm
-                var lessonProblemDict = lessonProblems.ToDictionary(lp => lp.ID, lp => lp.ProblemID);
-                var matchesDict = matches.ToLookup(m => (m.CoderID, lessonProblemDict[m.LessonProblemID]));
-
-                foreach (var sub in pagedResult.Data)
+                var projectedQuery = query.Select(s => new SubmissionDTO
                 {
-                    var key = (sub.CoderID, sub.ProblemID);
-                    var matched = matchesDict[key].FirstOrDefault();
-                    if (matched != null)
+                    SubmissionID = s.SubmissionID,
+                    CompilerID = s.CompilerID,
+                    CompilerName = s.Compiler.CompilerName,
+                    SubmissionCode = s.SubmissionCode,
+                    SubmitTime = s.SubmitTime,
+                    SubmissionStatus = s.SubmissionStatus,
+                    TestRunCount = s.TestRunCount,
+                    TestResult = s.TestResult,
+                    MaxTimeDuration = s.MaxTimeDuration,
+                    ProblemID = s.ProblemID,
+                    ProblemName = s.Problem.ProblemName,
+                    CoderID = s.CoderID,
+                    CoderName = s.Coder.CoderName,
+                    Point = 0
+                });
+
+                var sortedQuery = ApplySorting(projectedQuery, sortField, ascending);
+
+                var pagedResult = await PagedResponse<SubmissionDTO>.CreateAsync(sortedQuery, queryable.Page, queryable.PageSize);
+
+                // Lấy tất cả các ProblemID hiện có trong page
+                var problemIdsInPage = pagedResult.Data.Select(d => d.ProblemID).Distinct().ToList();
+                var coderIdsInPage = pagedResult.Data.Select(d => d.CoderID).Distinct().ToList();
+
+                // Lấy LessonProblems cho các ProblemID này
+                var lessonProblems = await _context.LessonProblems
+                    .Where(lp => problemIdsInPage.Contains(lp.ProblemID))
+                    .ToListAsync();
+
+                if (lessonProblems.Count > 0)
+                {
+                    // Lấy tất cả Matches tương ứng với coderId và LessonProblemID
+                    var lessonProblemIds = lessonProblems.Select(lp => lp.ID).ToList();
+
+                    var matchesQuery = _context.Matches
+                        .Where(m => lessonProblemIds.Contains(m.LessonProblemID) && coderIdsInPage.Contains(m.CoderID));
+
+                    if (coderId.HasValue)
                     {
-                        sub.Point = matched.Point;
+                        matchesQuery = matchesQuery.Where(m => m.CoderID == coderId.Value);
+                    }
+
+                    var matches = await matchesQuery.ToListAsync();
+
+                    // Tạo dictionary theo cặp (CoderID, ProblemID) để dễ lookup điểm
+                    var lessonProblemDict = lessonProblems.ToDictionary(lp => lp.ID, lp => lp.ProblemID);
+                    var matchesDict = matches.ToLookup(m => (m.CoderID, lessonProblemDict[m.LessonProblemID]));
+
+                    foreach (var sub in pagedResult.Data)
+                    {
+                        var key = (sub.CoderID, sub.ProblemID);
+                        var matched = matchesDict[key].FirstOrDefault();
+                        if (matched != null)
+                        {
+                            sub.Point = matched.Point;
+                        }
                     }
                 }
-            }
 
-            return pagedResult;
-        }
+                return pagedResult;
+            }
 
         //Tính điểm và lưu vào trong Solved
         public async Task ProcessSolvedAndMatchAsync(SubmissionDTO dto)

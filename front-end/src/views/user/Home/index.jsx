@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import BlogTopViews from "../Blog/components/BlogTopViews";
 import CoderAvatar from "../Course/components/CoderAvatar";
 import MiniCalendar from "@/components/calendar/MiniCalendar";
+import { formatNumber } from "@/utils/utils";
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);
@@ -236,7 +237,7 @@ const Home = () => {
                         <CoderAvatar src={coder.avatar} size="lg" name={coder.coderName} />
                         <Flex direction="column">
                           <Text fontWeight="bold">{coder.coderName}</Text>
-                          <Badge colorScheme="green" width="fit-content">{coder.point || "0"} điểm</Badge>
+                          <Badge colorScheme="green" width="fit-content">{formatNumber(coder.totalPoint) || "0"} điểm</Badge>
                         </Flex>
                       </HStack>
                     ))}

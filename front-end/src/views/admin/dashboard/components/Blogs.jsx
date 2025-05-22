@@ -97,13 +97,13 @@ const Blogs = ({ height, refreshKey, onFinishRefresh }) => {
                 index={tabIndex}
                 onChange={(index) => setTabIndex(index)}
             >
-                <Flex justify="space-between" align="center" mb={4} mx={5}>
+                <Flex justify="space-between" align="center" mb={4} mx={0}>
                     <TabList>
                         <Tab>Danh sách</Tab>
                         <Tab>Biểu đồ cột</Tab>
                     </TabList>
                     <Select
-                        maxW="120px"
+                        maxW="150px"
                         value={ascendingSort}
                         onChange={handleSortChange}
                         placeholder="Sắp xếp theo lượt xem"
@@ -112,11 +112,9 @@ const Blogs = ({ height, refreshKey, onFinishRefresh }) => {
                         <option value="false">Giảm dần</option>
                     </Select>
                     <Select
-                        w="fit-content"
-                        size="sm"
                         value={count}
                         onChange={handleCountChange}
-                        width="120px"
+                        maxW="150px"
                         placeholder="Chọn số lượng"
                     >
                         <option value={10}>10</option>

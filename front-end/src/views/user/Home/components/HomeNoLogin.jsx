@@ -450,7 +450,7 @@ const HomeNoLogin = () => {
                     <Box
                         bgGradient="linear(to-br, blue.900,blue.700, blue.400)"
                         mt={6}
-                        h="max-content"
+                        h="800px"
                         py={20}
                         px={6}
                         boxShadow="lg"
@@ -506,7 +506,7 @@ const HomeNoLogin = () => {
                                 </Flex>
 
                                 <Box flex="1">
-                                    <Image src={CodingPng} alt="Lập trình viên đang code" borderRadius="xl" maxW={{ base: "100%", sm: "500px" }} />
+                                    <Image src={CodingPng} alt="Lập trình viên đang code" borderRadius="xl" maxW={{ base: "100%", sm: "600px" }} />
                                 </Box>
                             </Flex>
                         </Container>

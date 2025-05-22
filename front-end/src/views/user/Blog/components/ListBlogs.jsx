@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Text, Stack, Flex, Spinner, Heading, Image, Button } from '@chakra-ui/react';
-import { LimitText, toSlug, formatViewCount } from '@/utils/utils';
+import { Box, Text, Stack, Flex, Spinner, Image, Button } from '@chakra-ui/react';
+import { LimitText, toSlug, formatViewCount, formatNumber } from '@/utils/utils';
 import InfoBlog from './InfoBlog';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import { useNavigate } from 'react-router-dom';
 
-const ListBlogs = ({ blogs, loading, limitContent = 300, limitTitle = 100, limitCoderName = 30, limitNumber = 10 }) => {
+const ListBlogs = ({ blogs, loading, limitContent = 300, limitTitle = 100 }) => {
     const navigate = useNavigate();
 
     return (
@@ -50,9 +50,9 @@ const ListBlogs = ({ blogs, loading, limitContent = 300, limitTitle = 100, limit
                                 <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(LimitText(blog.content, limitContent)) }} />
                                 <InfoBlog
                                     id={blog.coderID || blog.CoderID}
-                                    coderName={LimitText(blog.coderName, limitCoderName)}
+                                    coderName={blog.coderName}
                                     date={blog.blogDate || blog.BlogDate}
-                                    view={formatViewCount(blog.viewCount || blog.ViewCount)}
+                                    view={formatNumber(blog.viewCount || blog.ViewCount || 0)}
                                 />
                             </Box>
                         </Flex>

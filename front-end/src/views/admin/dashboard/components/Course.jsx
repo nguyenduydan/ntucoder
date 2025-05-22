@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Box, Text, Spinner, Center, Select, Flex } from "@chakra-ui/react";
 import LineChart from "@/components/charts/LineChart";
 import { getList } from "@/config/apiService";
+import { formatDateTime } from "@/utils/utils";
 
 const Courses = ({ refreshKey, onFinishRefresh, height }) => {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [count, setCount] = useState(10);
     const [sortField, setSortField] = useState("enrollCount");
     const [ascending, setAscending] = useState(false);
 
@@ -18,9 +19,11 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
             const response = await getList({
                 controller: "Course",
                 page: 1,
-                pageSize: 100,
-                sortField,
+                pageSize: count,
                 ascending,
+                params: {
+                    sortField,
+                }
             });
 
             if (Array.isArray(response?.data)) {
@@ -40,7 +43,7 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
             setLoading(false);
             if (onFinishRefresh) onFinishRefresh();
         }
-    }, [sortField, ascending, onFinishRefresh]);
+    }, [sortField, ascending, onFinishRefresh, count]);
 
     useEffect(() => {
         fetchCourses();
@@ -49,7 +52,14 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
     const chartData = [
         {
             name: "Số lượt đăng ký",
-            data: courses.map((course) => course.enrolls),
+            data: courses.map((course) => ({
+                x: course.title || "Không tên",
+                y: course.enrolls,
+                date:
+                    sortField === "createdAt" || sortField === "updatedAt"
+                        ? course[sortField]
+                        : course["updatedAt"],
+            })),
         },
     ];
 
@@ -67,7 +77,17 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
         tooltip: {
             enabled: true,
             intersect: false,
-            y: { formatter: (val) => `${val} lượt` },
+            custom: function ({ seriesIndex, dataPointIndex }) {
+                const point = chartData[seriesIndex].data[dataPointIndex];
+                const formattedDate = formatDateTime(point.date); // Sử dụng hàm đã có
+                return `
+                    <div style="padding: 8px;">
+                        <strong>${point.x}</strong><br />
+                        Lượt đăng ký: <strong>${point.y}</strong><br />
+                        Thời gian: <span>${formattedDate}</span>
+                    </div>
+                `;
+            },
         },
         colors: ["#3182ce"],
     };
@@ -103,7 +123,7 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
                     value={ascending ? "asc" : "desc"}
                     onChange={(e) => setAscending(e.target.value === "asc")}
                 >
-                    {sortField === "createdAt" || "updatedAt" ? (
+                    {(sortField === "createdAt" || sortField === "updatedAt") ? (
                         <>
                             <option value="desc">Mới nhất</option>
                             <option value="asc">Cũ nhất</option>
@@ -119,6 +139,17 @@ const Courses = ({ refreshKey, onFinishRefresh, height }) => {
                             <option value="asc">A-Z</option>
                         </>
                     )}
+                </Select>
+                <Select
+                    maxW="150px"
+                    value={count}
+                    onChange={(e) => setCount(e.target.value)}
+                >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
                 </Select>
             </Flex>
 

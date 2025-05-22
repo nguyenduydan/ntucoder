@@ -90,9 +90,9 @@ const HistorySubmission = ({ coderId }) => {
                 </Stack>
             ) : (
                 <Box overflowX="auto" mt={5}>
-                    <Table variant="striped" colorScheme="blue">
+                    <Table variant="simple">
                         <Thead>
-                            <Tr>
+                            <Tr position="sticky" top={0} zIndex={1} bg="gray.200">
                                 <Th textAlign="center">STT</Th>
                                 <Th textAlign="center">Thời gian nộp</Th>
                                 <Th textAlign="center">Ngôn ngữ</Th>
