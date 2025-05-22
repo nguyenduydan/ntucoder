@@ -11,10 +11,10 @@ import Login from "../../auth/login";
 import Register from "../../auth/register";
 import ForgotPassword from "@/layouts/auth/ForgetPassword";
 import { useAuth } from "@/contexts/AuthContext";
-import AvatarLoadest from "@/components/fields/Avatar";
 import GoogleLoginButton from "layouts/auth/GoogleButtonLogin";
 import api from "@/config/apiConfig";
 import { useToast } from "@chakra-ui/react";
+import LoginImg from "@/assets/img/codingImg.png";
 
 const Auth = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,11 +22,11 @@ const Auth = () => {
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const { coder, setCoder, logout, loginSuccessHandler } = useAuth();
     const toast = useToast();
+    const isGif = coder?.avatar ? /\.gif(\?.*)?$/i.test(coder.avatar) : false;
 
-    const isGif = /\.gif(\?.*)?$/i.test(coder.avatar || '');
-
-    const staticAvatar = isGif ? coder.avatar.replace(/\.gif(\?.*)?$/i, '.png') : coder.avatar;
-
+    const staticAvatar = isGif
+        ? coder.avatar.replace(/\.gif(\?.*)?$/i, '.png')
+        : coder?.avatar || '';
 
     const handleToggle = () => {
         setIsForgotPassword(false);
@@ -168,7 +168,7 @@ const Auth = () => {
                                     objectFit="cover"
                                     loading="lazy"
                                     border="3px solid blue"
-                                    src={staticAvatar}
+                                    src={staticAvatar || { LoginImg }}
                                     alt={coder.coderName || "coder"}
                                 />
                             </MenuButton>

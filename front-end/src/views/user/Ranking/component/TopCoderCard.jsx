@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { FaCrown } from "react-icons/fa";
 import CoderAvatar from "@/views/user/Course/components/CoderAvatar";
 
-const TopCoderCard = ({ coder, rank, gradient, crown = false, size = "lg", isLoading = false }) => {
+const TopCoderCard = ({ coder, rank, gradient, crown = false, isLoading = false }) => {
     const hasCoder = !!coder;
 
     // Width và padding
@@ -73,7 +73,7 @@ const TopCoderCard = ({ coder, rank, gradient, crown = false, size = "lg", isLoa
 
             {isLoading ? (
                 <>
-                    <SkeletonCircle size={avatarSize} mb={2} />
+                    <SkeletonCircle size="100px" mb={2} />
                     <SkeletonText noOfLines={1} width="80px" mb={2} />
                 </>
             ) : hasCoder ? (
