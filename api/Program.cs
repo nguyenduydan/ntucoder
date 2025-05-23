@@ -134,7 +134,7 @@ var connectionLocal = builder.Configuration.GetConnectionString("connecString") 
     throw new InvalidOperationException("Connection string ''connecString' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseMySql(connectionLocal, new MySqlServerVersion(new Version(8, 0)),
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure())
     .EnableDetailedErrors(true)
     .EnableSensitiveDataLogging(false)
