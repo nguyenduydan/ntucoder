@@ -7,7 +7,6 @@ import routes from "@/routes";
 import Navbar from "@/layouts/user/components/navbar";
 import NotFound from "views/user/NotFound";
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
-import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Profile from "views/user/Profile";
 
 export default function Home(props) {
@@ -70,31 +69,29 @@ export default function Home(props) {
     };
 
     return (
-        <ScrollToTop>
-            <Box bg={bg} color={textColor} h="100vh" display="flex" flexDirection="column">
-                <Navbar routes={userRoutes} {...rest} />
+        <Box bg={bg} color={textColor} h="100vh" display="flex" flexDirection="column">
+            <Navbar routes={userRoutes} {...rest} />
 
-                {!isFullScreenMap && (
-                    <Box
-                        flex="1"
-                        w="100%"
-                        overflowX="hidden"
-                        overflowY="auto"
-                        position="relative"
-                        bg={bg}
-                        color={textColor}
-                        mx={{ lg: "auto", md: "0" }}
-                        transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-                        transitionDuration=".2s, .2s, .35s"
-                        transitionProperty="top, bottom, width"
-                        transitionTimingFunction="linear, linear, ease"
-                    >
-                        <Suspense fallback={<Box>Loading...</Box>}>
-                            <Routes>{renderRoutes()}</Routes>
-                        </Suspense>
-                    </Box>
-                )}
-            </Box>
-        </ScrollToTop>
+            {!isFullScreenMap && (
+                <Box
+                    flex="1"
+                    w="100%"
+                    overflowX="hidden"
+                    overflowY="auto"
+                    position="relative"
+                    bg={bg}
+                    color={textColor}
+                    mx={{ lg: "auto", md: "0" }}
+                    transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+                    transitionDuration=".2s, .2s, .35s"
+                    transitionProperty="top, bottom, width"
+                    transitionTimingFunction="linear, linear, ease"
+                >
+                    <Suspense fallback={<Box>Loading...</Box>}>
+                        <Routes>{renderRoutes()}</Routes>
+                    </Suspense>
+                </Box>
+            )}
+        </Box>
     );
 }

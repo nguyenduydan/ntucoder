@@ -44,7 +44,7 @@ var email = config["Smtp:User"];
 var password = config["Smtp:Pass"];
 var host = config["Smtp:Host"];
 var from = config["Smtp:From"];
-var port = int.Parse(config["Smtp:Port"]);
+var port = int.Parse(config["Smtp:Port"] ?? "587");
 
 // 4. Đăng ký dịch vụ Authentication JWT
 builder.Services.AddAuthentication(options =>
@@ -113,7 +113,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigin", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("https://ntucoder.vercel.app")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();

@@ -1,8 +1,3 @@
-import { Icon } from '@chakra-ui/react';
-import {
-  MdHome,
-} from 'react-icons/md';
-
 // Admin Imports
 import MainDashboard from 'views/admin/dashboard';
 import CoderTable from 'views/admin/coder/index';
