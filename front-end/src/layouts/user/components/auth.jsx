@@ -169,6 +169,8 @@ const Auth = () => {
                                     loading="lazy"
                                     border="3px solid blue"
                                     src={staticAvatar || { LoginImg }}
+                                    fallbackSrc={LoginImg}
+                                    fallback={<Image src={LoginImg} boxSize="40px" />}
                                     alt={coder.coderName || "coder"}
                                 />
                             </MenuButton>
