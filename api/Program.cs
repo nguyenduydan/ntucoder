@@ -111,7 +111,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var allowedOrigins = new[] {
     "http://localhost:3000",
-    "https://ntucoder.vercel.app"
+    "https://ntucoder-nguyenduydans-projects.vercel.app"
 };
 
 
