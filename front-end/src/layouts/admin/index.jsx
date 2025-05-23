@@ -9,7 +9,7 @@ import React, { Suspense, useState, lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes';
 import ProtectedRoute from 'components/protectedRouter/ProtectedRoute';
-const TestCase = lazy(() => import('@/views/admin/testCase/index'));
+const TestCase = lazy(() => import('@/views/admin/testcase/index'));
 const NotFound = lazy(() => import('@/views/user/NotFound'));
 import SpinnerLoading from '@/components/loading/spinner';
 
