@@ -109,20 +109,28 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+var allowedOrigins = new[] {
+    "http://localhost:3000",
+    "https://ntucoder.vercel.app"
+};
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigin", builder =>
     {
-        builder.WithOrigins("https://ntucoder.vercel.app")
+        builder.WithOrigins(allowedOrigins)
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
     });
 });
 
-var conString = builder.Configuration.GetConnectionString("connecString") ?? throw new InvalidOperationException("Connection string 'connecString' not found.");
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("connecString");
+
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseMySql(conString, new MySqlServerVersion(new Version(8, 0)),
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure())
     .EnableDetailedErrors(true)
     .EnableSensitiveDataLogging(false)
