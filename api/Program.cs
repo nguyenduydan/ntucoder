@@ -133,7 +133,7 @@ var connectionLocal = builder.Configuration.GetConnectionString("connecString") 
     throw new InvalidOperationException("Connection string ''connecString' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)),
+    options.UseMySql(connectionLocal, new MySqlServerVersion(new Version(8, 0)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure())
     .EnableDetailedErrors(true)
     .EnableSensitiveDataLogging(false)
@@ -182,10 +182,14 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
-    app.UseSwagger();
-    app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowMyOrigin");
 
 app.UseAuthentication();
