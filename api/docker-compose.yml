@@ -1,6 +1,7 @@
 ﻿services:
   app:
     image: nguyenthietduydan/ntucoder:1.0
+    container_name: api_app
     build:
         context: .
         dockerfile: Dockerfile
