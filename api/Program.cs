@@ -126,8 +126,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-    ?? builder.Configuration.GetConnectionString("connecString");
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
+    ?? throw new InvalidOperationException("Connection string 'DB_CONNECTION_STRING'not found.");
+
+var connectionLocal = builder.Configuration.GetConnectionString("connecString") ??
+    throw new InvalidOperationException("Connection string ''connecString' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)),
@@ -179,11 +182,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Middleware pipeline
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 app.UseHttpsRedirection();
 app.UseCors("AllowMyOrigin");
 
