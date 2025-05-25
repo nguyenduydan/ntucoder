@@ -2,7 +2,8 @@ import { useState } from "react";
 import {
     Box, Flex, Button, useDisclosure, Modal, ModalOverlay,
     ModalContent, ModalHeader, ModalBody, ModalCloseButton,
-    Menu, MenuButton, MenuList, MenuItem, Divider, Image
+    Menu, MenuButton, MenuList, MenuItem, Divider, Image,
+    Avatar
 } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -162,7 +163,7 @@ const Auth = () => {
                         )}
                         <Menu>
                             <MenuButton as={Button} variant="none">
-                                <Image
+                                <Avatar
                                     borderRadius="full"
                                     boxSize="40px"
                                     objectFit="cover"
