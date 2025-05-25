@@ -28,25 +28,4 @@ export default defineConfig({
     optimizeDeps: {
         include: ['moment', 'moment/locale/vi'],
     },
-    build: {
-        chunkSizeWarningLimit: 600,
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        if (id.includes('apexcharts')) {
-                            return 'charts-vendor';
-                        }
-                        if (id.includes('lodash')) {
-                            return 'lodash-vendor';
-                        }
-                        if (id.includes('axios')) return 'axios-vendor';
-                        if (id.includes('moment')) return 'moment-vendor';
-                        // Không tách react, react-dom → Tất cả vào 'vendor'
-                        return 'vendor';
-                    }
-                },
-            },
-        },
-    }
 });
