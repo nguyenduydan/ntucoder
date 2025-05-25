@@ -23,9 +23,6 @@ export default defineConfig({
             'routes': path.resolve(__dirname, './src/routes'),
             'theme': path.resolve(__dirname, './src/theme'),
             'hooks': path.resolve(__dirname, './src/hooks'),
-            // Optional: Uncomment if you suspect duplicate React issues:
-            // 'react': path.resolve(__dirname, './node_modules/react'),
-            // 'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
         },
     },
     optimizeDeps: {
