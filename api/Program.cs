@@ -184,10 +184,26 @@ using (var scope = app.Services.CreateScope())
 
 // Middleware pipeline
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-if (!app.Environment.IsProduction())
+app.Use(async (context, next) =>
+{
+    if (app.Environment.IsProduction() &&
+        context.Request.Path.StartsWithSegments("/swagger"))
+    {
+        context.Response.StatusCode = 404;
+        await context.Response.WriteAsync("Not found");
+        return;
+    }
+    await next();
+});
+
+
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
@@ -196,7 +212,7 @@ app.UseCors("AllowMyOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<IpMiddleware>();
+//app.UseMiddleware<IpMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
