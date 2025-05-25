@@ -23,16 +23,18 @@ export default defineConfig({
             'routes': path.resolve(__dirname, './src/routes'),
             'theme': path.resolve(__dirname, './src/theme'),
             'hooks': path.resolve(__dirname, './src/hooks'),
+            // Optional: Uncomment if you suspect duplicate React issues:
+            // 'react': path.resolve(__dirname, './node_modules/react'),
+            // 'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
         },
     },
     optimizeDeps: {
-        include: ['moment', 'moment/locale/vi'], // ép bundler giữ lại locale vi
+        include: ['moment', 'moment/locale/vi'],
     },
     build: {
-        chunkSizeWarningLimit: 600, // Tăng cảnh báo chunk nếu cần
+        chunkSizeWarningLimit: 600,
         rollupOptions: {
             output: {
-                // Tách các thư viện lớn ra khỏi bundle chính
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
                         if (id.includes('react') || id.includes('react-dom')) {
@@ -46,7 +48,6 @@ export default defineConfig({
                         }
                         if (id.includes('axios')) return 'axios-vendor';
                         if (id.includes('moment')) return 'moment-vendor';
-                        // Thêm các thư viện khác nếu muốn tách riêng
                         return 'vendor';
                     }
                 },
