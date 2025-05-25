@@ -47,7 +47,7 @@ function Navbar(props) {
 
     const words = [
         "Nhập từ khóa...",
-        "Phím tắt Ctrl + K",
+        "Phím tắt Ctrl + /",
         "Tìm kiếm bài viết...",
         "Tìm kiếm bài học...",
     ];
@@ -60,7 +60,7 @@ function Navbar(props) {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
-            if (event.ctrlKey && event.key === "K" || event.key === "k") {
+            if (event.ctrlKey && event.key === "/") {
                 event.preventDefault();
                 onOpenSearch(); // Mở modal
             }

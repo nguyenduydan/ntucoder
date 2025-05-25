@@ -91,7 +91,7 @@ export default function Lesson() {
                                     >
                                         <Flex h="100%" w="100%" overflow="hidden">
                                             <TabList
-                                                bg="blue.600"
+                                                bgGradient="linear(to-b,rgb(8, 84, 156),purple.800)"
                                                 color="white"
                                                 display="flex"
                                                 flexDirection="column"

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import {
     Box,
     Heading,
@@ -14,23 +14,20 @@ import {
     GridItem,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import Programing from "@/assets/img/avatars/programing.png";
-import CodingPng from "@/assets/img/codingImg.png";
-
-import { getList } from "@/config/apiService";
-import CourseGrid from "@/views/user/Course/components/CourseGrid";
-import SkeletonList from "@/views/user/Course/components/SkeletonList";
-
-import AnimateText from "components/animate/AnimateText";
-import Counter from "components/animate/Count";
-
 import { FaArrowRight } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
+
+import Programing from "@/assets/img/avatars/programing.png";
+import CodingPng from "@/assets/img/codingImg.png";
+import { getList } from "@/config/apiService";
+import api from "@/config/apiConfig";
+import CourseGrid from "@/views/user/Course/components/CourseGrid";
+import SkeletonList from "@/views/user/Course/components/SkeletonList";
+import AnimateText from "components/animate/AnimateText";
+import Counter from "components/animate/Count";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import ScrollToTop from "@/components/scroll/ScrollToTop";
-import api from "@/config/apiConfig";
 import BlogCaurosel from "./BlogCaurosel";
-
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
@@ -38,64 +35,14 @@ const MotionHeading = motion(Heading);
 const MotionText = motion(Text);
 const MotionButton = motion(Button);
 
-const fadeInVariant = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: { duration: 0.5, ease: "easeInOut" },
-    },
-};
-
-const slideUpVariant = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.5, ease: "easeInOut" },
-    },
-};
-
-const zoomInVariant = {
-    hidden: { opacity: 0, scale: 0.5 },
-    visible: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.5, ease: "easeInOut" },
-    },
-};
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.2,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-};
-
+const fadeInVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, ease: "easeInOut" } } };
+const slideUpVariant = { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } } };
+const zoomInVariant = { hidden: { opacity: 0, scale: 0.5 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeInOut" } } };
+const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.2 } } };
+const itemVariants = { hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } };
 const draw = {
-    hidden: {
-        pathLength: 0,
-        opacity: 0,
-        transition: {
-            pathLength: {
-                duration: 1.5,
-                ease: "easeInOut"
-            },
-            opacity: {
-                duration: 1.5,
-                ease: "easeInOut"
-            }
-        }
-    },
-
-    visible: (i) => {
+    hidden: { pathLength: 0, opacity: 0, transition: { pathLength: { duration: 1.5, ease: "easeInOut" }, opacity: { duration: 1.5, ease: "easeInOut" } } },
+    visible: i => {
         const delay = i * 0.5;
         return {
             pathLength: 1,
@@ -107,7 +54,6 @@ const draw = {
         };
     }
 };
-
 
 const HomeNoLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -158,7 +104,7 @@ const HomeNoLogin = () => {
 
 
     // Dùng useMemo để lọc & sắp xếp blog có pinHome và viewCount cao
-    const topPinnedBlogs = React.useMemo(() => {
+    const topPinnedBlogs = useMemo(() => {
         if (!Array.isArray(blogs)) return [];
 
         return blogs

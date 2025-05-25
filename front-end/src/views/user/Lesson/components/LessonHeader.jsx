@@ -6,7 +6,7 @@ const LessonHeader = ({ lesson }) => {
   const navigate = useNavigate();
   const location = useLocation();
   return (
-    <Box background="rgb(14 38 67)" h="8vh">
+    <Box bgGradient="linear(to-r,rgb(8, 84, 156),rgb(10, 35, 75),rgb(1, 2, 40))" h="8vh">
       <Flex justifyContent="space-between" h="100%" py={2} px={4} alignItems="center">
         {/* Nút quay lại */}
         <Flex textColor="white" fontSize="xl" align="center">

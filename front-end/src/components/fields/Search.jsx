@@ -171,7 +171,7 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     const words = [
         "Nhập từ khóa...",
-        "Phím tắt Ctrl + K",
+        "Phím tắt Ctrl + /",
         "Tìm kiếm người dùng...",
         "Tìm kiếm bài viết...",
         "Tìm kiếm bài học...",

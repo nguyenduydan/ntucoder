@@ -48,7 +48,7 @@ const SearchInput = ({
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "/") {
                 e.preventDefault();
                 inputRef.current?.focus();
             }
