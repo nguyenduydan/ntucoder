@@ -34,9 +34,6 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
-                        if (id.includes('react') || id.includes('react-dom')) {
-                            return 'react-vendor';
-                        }
                         if (id.includes('apexcharts')) {
                             return 'charts-vendor';
                         }
@@ -45,10 +42,11 @@ export default defineConfig({
                         }
                         if (id.includes('axios')) return 'axios-vendor';
                         if (id.includes('moment')) return 'moment-vendor';
+                        // Không tách react, react-dom → Tất cả vào 'vendor'
                         return 'vendor';
                     }
                 },
             },
         },
-    },
+    }
 });
