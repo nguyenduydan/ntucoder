@@ -1,3 +1,4 @@
+import React from 'react';
 // Admin Imports
 import MainDashboard from 'views/admin/dashboard';
 import CoderTable from 'views/admin/coder/index';
@@ -16,14 +17,14 @@ import ProblemDetail from '@/views/admin/problem/components/Detail';
 import BlogTable from 'views/admin/blogs/index';
 
 // User Imports
-import Home from 'views/user/Home';
-//import Problem from 'views/user/Problem';
-import Course from '@/views/user/Course';
-import CourseDetailUser from '@/views/user/Course/components/CourseDetail';
-import Lesson from 'views/user/Lesson';
-import Ranking from '@/views/user/Ranking';
-import Blog from '@/views/user/Blog';
-import BlogDetail from '@/views/user/Blog/components/BlogDetail';
+const Home = React.lazy(() => import('views/user/Home/index'));
+const Course = React.lazy(() => import('@/views/user/Course'));
+const CourseDetailUser = React.lazy(() => import('@/views/user/Course/components/CourseDetail'));
+const Lesson = React.lazy(() => import('views/user/Lesson'));
+const Ranking = React.lazy(() => import('@/views/user/Ranking'));
+const Blog = React.lazy(() => import('@/views/user/Blog'));
+const BlogDetail = React.lazy(() => import('@/views/user/Blog/components/BlogDetail'));
+
 
 import { FcHome, FcReading, FcLibrary, FcBookmark, FcConferenceCall, FcOpenedFolder, FcApproval, FcFile, FcKindle } from "react-icons/fc";
 

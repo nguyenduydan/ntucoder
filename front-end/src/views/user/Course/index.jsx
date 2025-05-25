@@ -49,7 +49,7 @@ export default function Course() {
         <ScrollToTop>
             <Box pt={{ base: "130px", md: "80px", xl: "0" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
                 <Box mb={10} borderRadius="md">
-                    <Image src={Banner} alt="NO IMG" rounded="md"></Image>
+                    <Image src={Banner} alt="NO IMG" rounded="md" loading="lazy"></Image>
                 </Box>
                 <Tabs variant="unstyled">
                     <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>

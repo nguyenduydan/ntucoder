@@ -28,4 +28,29 @@ export default defineConfig({
     optimizeDeps: {
         include: ['moment', 'moment/locale/vi'], // ép bundler giữ lại locale vi
     },
+    build: {
+        chunkSizeWarningLimit: 600, // Tăng cảnh báo chunk nếu cần
+        rollupOptions: {
+            output: {
+                // Tách các thư viện lớn ra khỏi bundle chính
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('react') || id.includes('react-dom')) {
+                            return 'react-vendor';
+                        }
+                        if (id.includes('apexcharts')) {
+                            return 'charts-vendor';
+                        }
+                        if (id.includes('lodash')) {
+                            return 'lodash-vendor';
+                        }
+                        if (id.includes('axios')) return 'axios-vendor';
+                        if (id.includes('moment')) return 'moment-vendor';
+                        // Thêm các thư viện khác nếu muốn tách riêng
+                        return 'vendor';
+                    }
+                },
+            },
+        },
+    },
 });

@@ -1,13 +1,14 @@
 import React, { lazy, Suspense, useMemo } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { useColorModeValue, Box } from "@chakra-ui/react";
+import { useColorModeValue, Box, Spinner } from "@chakra-ui/react";
 import routes from "@/routes";
 
 // Import layouts/components
 import Navbar from "@/layouts/user/components/navbar";
-import NotFound from "views/user/NotFound";
+const NotFound = React.lazy(() => import('views/user/NotFound.jsx'));
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
 import Profile from "views/user/Profile";
+import LoadingScreen from "@/components/loading/ScreenLoading";
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -87,7 +88,7 @@ export default function Home(props) {
                     transitionProperty="top, bottom, width"
                     transitionTimingFunction="linear, linear, ease"
                 >
-                    <Suspense fallback={<Box>Loading...</Box>}>
+                    <Suspense fallback={<LoadingScreen />}>
                         <Routes>{renderRoutes()}</Routes>
                     </Suspense>
                 </Box>

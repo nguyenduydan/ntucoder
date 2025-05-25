@@ -397,6 +397,7 @@ const HomeNoLogin = () => {
                                         src={Programing}
                                         alt="Lập trình viên đang code"
                                         borderRadius="xl"
+                                        loading="lazy"
                                         maxW={{ base: "100%", sm: "100%" }}  // Điều chỉnh chiều rộng ảnh theo màn hình
                                     />
                                 </motion.div>
