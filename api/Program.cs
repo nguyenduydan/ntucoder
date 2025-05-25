@@ -110,8 +110,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var allowedOrigins = new[] {
+    "https://ntucoder.vercel.app",
     "https://ntucoder-nguyenduydans-projects.vercel.app",
-    "https://ntucoder-2ajacnfw4-nguyenduydans-projects.vercel.app",
      "http://localhost:3000",
 };
 
