@@ -70,15 +70,15 @@ export default function Home(props) {
     };
 
     return (
-        <Box bg={bg} color={textColor} h="100vh" display="flex" flexDirection="column">
+        <Box bg={bg} color={textColor} minH="100vh" display="flex" flexDirection="column">
             <Navbar routes={userRoutes} {...rest} />
 
             {!isFullScreenMap && (
                 <Box
                     flex="1"
                     w="100%"
-                    overflowX="hidden"
-                    overflowY="auto"
+                    // overflowX="hidden"
+                    // overflowY="auto"
                     position="relative"
                     bg={bg}
                     color={textColor}

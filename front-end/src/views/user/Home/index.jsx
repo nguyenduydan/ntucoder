@@ -22,7 +22,6 @@ import { getList } from "@/config/apiService";
 import HeroSection from "./components/HeroSection";
 import { useAuth } from "@/contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
-import ScrollToTop from "@/components/scroll/ScrollToTop";
 import api from "@/config/apiConfig";
 import { useNavigate } from "react-router-dom";
 import BlogTopViews from "../Blog/components/BlogTopViews";
@@ -155,120 +154,118 @@ const Home = () => {
   }
 
   return (
-    <ScrollToTop>
-      <ChakraBox maxW="full" minH="100%" overflow="auto" overflowY="hidden">
-        <HeroSection />
-        <Container maxW="7xl" >
-          <MotionBox mt={10} mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
-            <Flex>
-              <Heading size="lg" mb={4} color="blue.500">Khóa học đang học</Heading>
-              <Button ml="auto" colorScheme="teal" variant="link" onClick={() => navigate("/course")}>Xem thêm</Button>
-            </Flex>
-
-            {loading ? (
-              <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                <SkeletonList />
-                <SkeletonList />
-                <SkeletonList />
-                <SkeletonList />
-              </SimpleGrid>
-            ) : (
-              <CourseGrid courses={coursesEnrolled} />
-            )}
-          </MotionBox>
-
-          <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp} loading="lazy">
-            <Heading size="lg" mb={4} color="blue.500">Khóa học phổ biến</Heading>
-            {loading ? (
-              <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                <SkeletonList />
-                <SkeletonList />
-                <SkeletonList />
-                <SkeletonList />
-              </SimpleGrid>
-            ) : (
-              <CourseGrid courses={coursePopular} />
-            )}
-          </MotionBox>
-
-          <Flex direction={{ base: "column", md: "row" }} gap={6} align="stretch">
-            {/* Bên trái: Bài viết nổi bật */}
-            <MotionFlex
-              flex={1}
-              minH={{ base: "60vh", md: "90vh" }}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              variants={fadeInUp}
-              flexDirection="column"
-            >
-              <Heading size="lg" mb={10} color="blue.500">Bài viết nổi bật</Heading>
-              <BlogTopViews blogs={blogs} loading={loading} />
-            </MotionFlex>
-
-            {/* Bên phải: Hoạt động */}
-            <MotionFlex
-              flex={1}
-              minH={{ base: "60vh", md: "90vh" }}
-              display="flex"
-              flexDirection="column"
-            >
-              <Heading size="lg" mb={4} color="blue.500">Hoạt động</Heading>
-              <Box flex={1}>
-                {/* Top 3 học viên */}
-                <MotionBox
-                  mb={4}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true }}
-                  variants={fadeInUp}
-                >
-                  <Heading size="md" mb={5}>Top 3 Học Viên Xuất Sắc</Heading>
-                  <VStack spacing={3} align="flex-start">
-                    {codersHighest.map((coder, index) => (
-                      <HStack
-                        key={index}
-                        bg="white"
-                        w="100%"
-                        px={4}
-                        py={3}
-                        borderRadius="full"
-                        boxShadow="md"
-                        onClick={() => navigate(`/profile/${coder.coderID}`)}
-                        cursor="pointer"
-                        _hover={{ bg: "navy.300" }}
-                        transition="all 0.2s ease-in-out"
-                      >
-                        <CoderAvatar src={coder.avatar} size="lg" name={coder.coderName} />
-                        <Flex direction="column">
-                          <Text fontWeight="bold">{coder.coderName}</Text>
-                          <Badge colorScheme="green" width="fit-content">{formatNumber(coder.totalPoint) || "0"} điểm</Badge>
-                        </Flex>
-                      </HStack>
-                    ))}
-                  </VStack>
-                </MotionBox>
-
-                <Box mt="auto" transform="scale(0.85)" transformOrigin="top center" w="100%">
-                  <MotionBox
-                    initial={{ opacity: 0, scale: 0.4 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6 }}
-                    viewport={{ once: true }}
-                  >
-                    <MiniCalendar
-                      maxW="600px"
-                      fontSize="lg"
-                      boxShadow="md"
-                    />
-                  </MotionBox>
-                </Box>
-              </Box>
-            </MotionFlex>
+    <ChakraBox maxW="full" minH="100%" overflow="auto" overflowY="hidden">
+      <HeroSection />
+      <Container maxW="7xl" >
+        <MotionBox mt={10} mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
+          <Flex>
+            <Heading size="lg" mb={4} color="blue.500">Khóa học đang học</Heading>
+            <Button ml="auto" colorScheme="teal" variant="link" onClick={() => navigate("/course")}>Xem thêm</Button>
           </Flex>
-        </Container>
-      </ChakraBox>
-    </ScrollToTop>
+
+          {loading ? (
+            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+              <SkeletonList />
+              <SkeletonList />
+              <SkeletonList />
+              <SkeletonList />
+            </SimpleGrid>
+          ) : (
+            <CourseGrid courses={coursesEnrolled} />
+          )}
+        </MotionBox>
+
+        <MotionBox mb={12} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp} loading="lazy">
+          <Heading size="lg" mb={4} color="blue.500">Khóa học phổ biến</Heading>
+          {loading ? (
+            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+              <SkeletonList />
+              <SkeletonList />
+              <SkeletonList />
+              <SkeletonList />
+            </SimpleGrid>
+          ) : (
+            <CourseGrid courses={coursePopular} />
+          )}
+        </MotionBox>
+
+        <Flex direction={{ base: "column", md: "row" }} gap={6} align="stretch">
+          {/* Bên trái: Bài viết nổi bật */}
+          <MotionFlex
+            flex={1}
+            minH={{ base: "60vh", md: "90vh" }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            flexDirection="column"
+          >
+            <Heading size="lg" mb={10} color="blue.500">Bài viết nổi bật</Heading>
+            <BlogTopViews blogs={blogs} loading={loading} />
+          </MotionFlex>
+
+          {/* Bên phải: Hoạt động */}
+          <MotionFlex
+            flex={1}
+            minH={{ base: "60vh", md: "90vh" }}
+            display="flex"
+            flexDirection="column"
+          >
+            <Heading size="lg" mb={4} color="blue.500">Hoạt động</Heading>
+            <Box flex={1}>
+              {/* Top 3 học viên */}
+              <MotionBox
+                mb={4}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                variants={fadeInUp}
+              >
+                <Heading size="md" mb={5}>Top 3 Học Viên Xuất Sắc</Heading>
+                <VStack spacing={3} align="flex-start">
+                  {codersHighest.map((coder, index) => (
+                    <HStack
+                      key={index}
+                      bg="white"
+                      w="100%"
+                      px={4}
+                      py={3}
+                      borderRadius="full"
+                      boxShadow="md"
+                      onClick={() => navigate(`/profile/${coder.coderID}`)}
+                      cursor="pointer"
+                      _hover={{ bg: "navy.300" }}
+                      transition="all 0.2s ease-in-out"
+                    >
+                      <CoderAvatar src={coder.avatar} size="lg" name={coder.coderName} />
+                      <Flex direction="column">
+                        <Text fontWeight="bold">{coder.coderName}</Text>
+                        <Badge colorScheme="green" width="fit-content">{formatNumber(coder.totalPoint) || "0"} điểm</Badge>
+                      </Flex>
+                    </HStack>
+                  ))}
+                </VStack>
+              </MotionBox>
+
+              <Box mt="auto" transform="scale(0.85)" transformOrigin="top center" w="100%">
+                <MotionBox
+                  initial={{ opacity: 0, scale: 0.4 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  <MiniCalendar
+                    maxW="600px"
+                    fontSize="lg"
+                    boxShadow="md"
+                  />
+                </MotionBox>
+              </Box>
+            </Box>
+          </MotionFlex>
+        </Flex>
+      </Container>
+    </ChakraBox>
   );
 };
 

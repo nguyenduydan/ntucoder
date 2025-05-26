@@ -134,10 +134,9 @@ const SearchModal = ({ isOpen, onClose }) => {
 
         return (
             <React.Fragment key={typeKey}>
-                <Text px={4} pt={2} pb={1} bg="blue.300" fontWeight="semibold" color="black" fontSize="sm">
+                <Text px={4} pt={2} pb={1} mb={2} bgGradient="linear(to-r, blue.200, purple.300)" fontWeight="semibold" borderRadius="lg" color="black" fontSize="sm">
                     {title}
                 </Text>
-                <Divider mb={2} />
                 {items.map((item, i) => {
                     const index = baseIndex + i;
                     return (

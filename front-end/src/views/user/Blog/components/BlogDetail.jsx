@@ -18,7 +18,6 @@ import { formatDateTime, toSlug, formatViewCount, LimitText, formatNumber } from
 import { useTitle } from '@/contexts/TitleContext';
 import { FaArrowLeft } from 'react-icons/fa';
 import CoderAvatar from '@/views/user/Course/components/CoderAvatar';
-import ScrollToTop from '@/components/scroll/ScrollToTop';
 import InfoBlog from './InfoBlog';
 
 const BlogDetail = () => {
@@ -81,127 +80,125 @@ const BlogDetail = () => {
     useTitle(blog?.title || '');
 
     return (
-        <ScrollToTop>
-            <Container maxW="8xl" mx="auto" minH="85vh" mt={8}>
-                <Button
-                    leftIcon={<FaArrowLeft />}
-                    mb={2}
-                    mt={3}
-                    colorScheme='blue' variant='ghost'
-                    onClick={() => navigate(-1)}
-                >
-                    Trở về trước
-                </Button>
+        <Container maxW="8xl" mx="auto" minH="85vh" mt={8}>
+            <Button
+                leftIcon={<FaArrowLeft />}
+                mb={2}
+                mt={3}
+                colorScheme='blue' variant='ghost'
+                onClick={() => navigate(-1)}
+            >
+                Trở về trước
+            </Button>
 
-                <Flex maxW="200vh" gap={8} px={4} mb={8}>
-                    {/* Nội dung blog */}
-                    <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
-                        <Flex align="center" mb={4} justify="space-between" flexWrap="wrap" gap={4} alignItems="center">
-                            <Heading mb={4}>{blog?.title || "Tiêu đề bài viết"}</Heading>
-                            <Badge fontSize="md" colorScheme='blue' mb={4}>
-                                {formatNumber(blog?.viewCount || "0")} lượt xem
-                            </Badge>
+            <Flex maxW="200vh" gap={8} px={4} mb={8}>
+                {/* Nội dung blog */}
+                <Box flex="2" bg="white" p={6} borderRadius="md" boxShadow="md">
+                    <Flex align="center" mb={4} justify="space-between" flexWrap="wrap" gap={4} alignItems="center">
+                        <Heading mb={4}>{blog?.title || "Tiêu đề bài viết"}</Heading>
+                        <Badge fontSize="md" colorScheme='blue' mb={4}>
+                            {formatNumber(blog?.viewCount || "0")} lượt xem
+                        </Badge>
+                    </Flex>
+                    {loading ? (
+                        <Flex justify="center" align="center" height="80vh">
+                            <Spinner />
                         </Flex>
-                        {loading ? (
-                            <Flex justify="center" align="center" height="80vh">
-                                <Spinner />
-                            </Flex>
-                        ) : !blog ? (
-                            <Text>Không tìm thấy bài viết</Text>
-                        ) : (
-                            <>
-                                <Flex align="center" mb={5}>
-                                    <CoderAvatar coderID={blog.coderID || blog.CoderID} size="sm" mr={3} />
-                                    <Box>
-                                        <Text fontWeight="bold" fontSize="lg">
-                                            {blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
-                                        </Text>
-                                        <Text fontSize="sm" color="gray.500">
-                                            {formatDateTime(blog.blogDate || blog.BlogDate)}
-                                        </Text>
-                                    </Box>
-                                </Flex>
-                                <Flex justify="center" align="center">
-                                    <Image
-                                        size="md"
-                                        name={blog.title || blog.Title || 'Không có ảnh'}
-                                        src={blog.imageBlogUrl || './avatarSimmmple.png'}
-                                        w="70%"
-                                        maxH="50vh"
-                                        objectFit="cover"
-                                        alt={blog.title || blog.Title || 'Không có ảnh'}
-                                        borderRadius="md"
-                                        loading="lazy"
-                                        mb={4}
-                                        fallbackSrc="./avatarSimmmple.png"
-                                    />
-                                </Flex>
-                                <Box
-                                    px={5}
-                                    sx={{ wordBreak: "break-word" }}
-                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
-                                />
-                            </>
-                        )}
-                    </Box>
-
-                    {/* Sidebar: danh sách blog khác */}
-                    <Box flex="0.8" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" display="flex" flexDirection="column">
-                        <Flex
-                            align="center"
-                            justify="space-between"
-                            mb={4}
-                            py={2}
-                        >
-                            <Heading size="md">Bài viết khác</Heading>
-                            <Button colorScheme="blue" variant="link" size="sm" onClick={() => navigate("/blogs")}>
-                                Xem tất cả
-                            </Button>
-                        </Flex>
-
-                        <Box overflowY="auto">
-                            <Stack spacing={4}>
-                                {loading ? (
-                                    <Flex justify="center" align="center" height="80vh">
-                                        <Spinner />
-                                    </Flex>
-                                ) : allBlogs.length === 0 ? (
-                                    <Text fontSize="sm" color="gray.600">
-                                        Không có bài viết khác
+                    ) : !blog ? (
+                        <Text>Không tìm thấy bài viết</Text>
+                    ) : (
+                        <>
+                            <Flex align="center" mb={5}>
+                                <CoderAvatar coderID={blog.coderID || blog.CoderID} size="sm" mr={3} />
+                                <Box>
+                                    <Text fontWeight="bold" fontSize="lg">
+                                        {blog.coderName || blog.CoderName || blog.author || 'Người dùng'}
                                     </Text>
-                                ) : (
-                                    allBlogs.map(item => (
-                                        <Box
-                                            key={item.blogID}
-                                            p={3}
-                                            borderRadius="md"
-                                            bg="white"
-                                            boxShadow="sm"
-                                            cursor="pointer"
-                                            _hover={{ bg: "blue.50" }}
-                                            onClick={() => navigate(`/blogs/${toSlug(item.title)}-${item.blogID}`)}
-                                        >
-                                            <Text fontWeight="bold" mb={1}>
-                                                {item.title}
-                                            </Text>
-                                            <Text fontSize="sm" color="gray.600">
-                                                {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 100)}...
-                                            </Text>
-                                            <InfoBlog
-                                                id={item.coderID || item.CoderID}
-                                                coderName={item.coderName}
-                                                date={item.blogDate}
-                                                view={formatViewCount(item.viewCount || item.ViewCount)}
-                                            />
-                                        </Box>
-                                    ))
-                                )}
-                            </Stack>
-                        </Box>
+                                    <Text fontSize="sm" color="gray.500">
+                                        {formatDateTime(blog.blogDate || blog.BlogDate)}
+                                    </Text>
+                                </Box>
+                            </Flex>
+                            <Flex justify="center" align="center">
+                                <Image
+                                    size="md"
+                                    name={blog.title || blog.Title || 'Không có ảnh'}
+                                    src={blog.imageBlogUrl || './avatarSimmmple.png'}
+                                    w="70%"
+                                    maxH="50vh"
+                                    objectFit="cover"
+                                    alt={blog.title || blog.Title || 'Không có ảnh'}
+                                    borderRadius="md"
+                                    loading="lazy"
+                                    mb={4}
+                                    fallbackSrc="./avatarSimmmple.png"
+                                />
+                            </Flex>
+                            <Box
+                                px={5}
+                                sx={{ wordBreak: "break-word" }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
+                            />
+                        </>
+                    )}
+                </Box>
+
+                {/* Sidebar: danh sách blog khác */}
+                <Box flex="0.8" bg="gray.50" p={6} borderRadius="md" boxShadow="sm" maxHeight="80vh" display="flex" flexDirection="column">
+                    <Flex
+                        align="center"
+                        justify="space-between"
+                        mb={4}
+                        py={2}
+                    >
+                        <Heading size="md">Bài viết khác</Heading>
+                        <Button colorScheme="blue" variant="link" size="sm" onClick={() => navigate("/blogs")}>
+                            Xem tất cả
+                        </Button>
+                    </Flex>
+
+                    <Box overflowY="auto">
+                        <Stack spacing={4}>
+                            {loading ? (
+                                <Flex justify="center" align="center" height="80vh">
+                                    <Spinner />
+                                </Flex>
+                            ) : allBlogs.length === 0 ? (
+                                <Text fontSize="sm" color="gray.600">
+                                    Không có bài viết khác
+                                </Text>
+                            ) : (
+                                allBlogs.map(item => (
+                                    <Box
+                                        key={item.blogID}
+                                        p={3}
+                                        borderRadius="md"
+                                        bg="white"
+                                        boxShadow="sm"
+                                        cursor="pointer"
+                                        _hover={{ bg: "blue.50" }}
+                                        onClick={() => navigate(`/blogs/${toSlug(item.title)}-${item.blogID}`)}
+                                    >
+                                        <Text fontWeight="bold" mb={1}>
+                                            {item.title}
+                                        </Text>
+                                        <Text fontSize="sm" color="gray.600">
+                                            {sanitizeHtml(item.content).replace(/<[^>]*>/g, '').slice(0, 100)}...
+                                        </Text>
+                                        <InfoBlog
+                                            id={item.coderID || item.CoderID}
+                                            coderName={item.coderName}
+                                            date={item.blogDate}
+                                            view={formatViewCount(item.viewCount || item.ViewCount)}
+                                        />
+                                    </Box>
+                                ))
+                            )}
+                        </Stack>
                     </Box>
-                </Flex>
-            </Container>
-        </ScrollToTop>
+                </Box>
+            </Flex>
+        </Container>
     );
 };
 

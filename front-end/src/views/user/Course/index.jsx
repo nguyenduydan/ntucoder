@@ -7,7 +7,6 @@ import NodataPng from "assets/img/nodata.png";
 import { getList } from "@/config/apiService";
 import SkeletonList from "./components/SkeletonList";
 import CourseGrid from "./components/CourseGrid";
-import ScrollToTop from "@/components/scroll/ScrollToTop";
 import { useTitle } from "@/contexts/TitleContext";
 import Banner from "assets/img/bannerCourse.png";
 
@@ -46,62 +45,60 @@ export default function Course() {
 
 
     return (
-        <ScrollToTop>
-            <Box pt={{ base: "130px", md: "80px", xl: "0" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
-                <Box mb={10} borderRadius="md">
-                    <Image src={Banner} alt="NO IMG" rounded="md" loading="lazy"></Image>
-                </Box>
-                <Tabs variant="unstyled">
-                    <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>
-                        <Tab px={2} _selected={{ color: textSelect, fontWeight: "bold" }}>Tất cả khóa học</Tab>
-                        {categories.map((category, index) => (
-                            <Tab px={2} key={index} _selected={{ color: textSelect, fontWeight: "bold" }}>{category}</Tab>
-                        ))}
-                    </TabList>
-                    <TabIndicator mt='-3vh' height='2px' bg='blue.500' borderRadius='full' />
-                    <TabPanels>
-                        <TabPanel>
-                            {loading ? (
-                                <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                    <SkeletonList />
-                                </SimpleGrid>
-                            ) : courses.length === 0 ? (
-                                <Center>
-                                    <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
-                                </Center>
-                            ) : (
-                                <CourseGrid courses={courses} />
-                            )}
-                        </TabPanel>
-
-                        {categories.map((category, index) => {
-                            const filtered = courses.filter(course => course.courseCategoryName === category);
-                            return (
-                                <TabPanel key={index}>
-                                    {loading ? (
-                                        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-                                            <SkeletonList />
-                                            <SkeletonList />
-                                            <SkeletonList />
-                                            <SkeletonList />
-                                        </SimpleGrid>
-                                    ) : filtered.length === 0 ? (
-                                        <Center>
-                                            <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
-                                        </Center>
-                                    ) : (
-                                        <CourseGrid courses={filtered} />
-                                    )}
-                                </TabPanel>
-                            );
-                        })}
-                    </TabPanels>
-
-                </Tabs>
+        <Box pt={{ base: "130px", md: "80px", xl: "0" }} w={{ lg: "calc(100% - 360px)", md: "100%" }} mx='auto' px="6">
+            <Box mb={10} borderRadius="md">
+                <Image src={Banner} alt="NO IMG" rounded="md" loading="lazy"></Image>
             </Box>
-        </ScrollToTop>
+            <Tabs variant="unstyled">
+                <TabList mb="4" borderRadius="md" shadow="lg" bg={bg} gap={5} py={2} px={10}>
+                    <Tab px={2} _selected={{ color: textSelect, fontWeight: "bold" }}>Tất cả khóa học</Tab>
+                    {categories.map((category, index) => (
+                        <Tab px={2} key={index} _selected={{ color: textSelect, fontWeight: "bold" }}>{category}</Tab>
+                    ))}
+                </TabList>
+                <TabIndicator mt='-3vh' height='2px' bg='blue.500' borderRadius='full' />
+                <TabPanels>
+                    <TabPanel>
+                        {loading ? (
+                            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+                                <SkeletonList />
+                                <SkeletonList />
+                                <SkeletonList />
+                                <SkeletonList />
+                            </SimpleGrid>
+                        ) : courses.length === 0 ? (
+                            <Center>
+                                <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
+                            </Center>
+                        ) : (
+                            <CourseGrid courses={courses} />
+                        )}
+                    </TabPanel>
+
+                    {categories.map((category, index) => {
+                        const filtered = courses.filter(course => course.courseCategoryName === category);
+                        return (
+                            <TabPanel key={index}>
+                                {loading ? (
+                                    <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+                                        <SkeletonList />
+                                        <SkeletonList />
+                                        <SkeletonList />
+                                        <SkeletonList />
+                                    </SimpleGrid>
+                                ) : filtered.length === 0 ? (
+                                    <Center>
+                                        <Image src={NodataPng} alt="Không có dữ liệu" boxSize="200px" />
+                                    </Center>
+                                ) : (
+                                    <CourseGrid courses={filtered} />
+                                )}
+                            </TabPanel>
+                        );
+                    })}
+                </TabPanels>
+
+            </Tabs>
+        </Box>
     );
 }

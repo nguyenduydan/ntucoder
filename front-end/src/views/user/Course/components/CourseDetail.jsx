@@ -11,7 +11,6 @@ import {
     AlertDialogContent,
     AlertDialogOverlay,
 } from "@chakra-ui/react";
-import ScrollToTop from "@/components/scroll/ScrollToTop";
 import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight, FaClipboardList, FaFingerprint, FaBookOpen } from "react-icons/fa";
 import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { FaRegFileCode } from "react-icons/fa";
@@ -226,397 +225,395 @@ const CourseDetail = () => {
     };
 
     return (
-        <ScrollToTop>
-            <Box p={6} maxW="100%" minH="100vh" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
-                <Button
-                    leftIcon={<ArrowBackIcon />}
-                    mb={2}
-                    colorScheme='blue' variant='ghost'
-                    onClick={() => navigate('/course')}
-                >
-                    Trở về trước
-                </Button>
-                <Flex direction={{ base: "column", md: "row" }} gap={5}>
-                    {/* Left Content */}
-                    <Box flex={3} minH={570} overflowY="auto" position="static">
-                        <Flex
-                            direction={{ base: "column", md: "row" }}
-                            gap={6}
-                            bgGradient="linear(to-r, blue.900, blue.700)"
-                            p={8}
-                            borderRadius="md"
-                            boxShadow="lg"
-                        >
-                            {/* Course Image */}
-                            <Box flex={3}>
-                                {loading ? (
-                                    <Skeleton height="250px" borderRadius="md" />
-                                ) : (
-                                    <Image
-                                        alt="Course Avatar"
-                                        w="100%"
-                                        h={{ base: "200px", md: "250px" }}
-                                        borderRadius="md"
-                                        objectFit="cover"
-                                        boxShadow="lg"
-                                        src={course?.imageUrl || "/avatarSimmmple.png"}
-                                    />
-                                )}
-                            </Box>
-                            {/* Course Details */}
-                            <Box flex={3} color="white" borderRadius="lg">
-                                {loading ? (
-                                    <SkeletonText noOfLines={3} spacing={4} />
-                                ) : (
-                                    <Box>
-                                        <Text fontSize="3xl" letterSpacing={1.2} fontWeight="bold">{course?.courseName}</Text>
-                                        <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
-                                        <HStack mt={4} spacing={4}>
-                                            <Text>Tác giả: <Text as="span" color="blue.300">{course?.creatorName}</Text></Text>
-                                            <Icon as={FaUsers} /><Text>{course?.totalReviews || "0"} Học viên</Text>
-                                            <Icon as={FaStar} color="yellow.400" /> <Text> {course.rating ? course.rating.toFixed(1) : "0"}</Text>
-                                        </HStack>
-                                    </Box>
-                                )}
-                            </Box>
-                            {/* Right Sidebar */}
-                            <Box
-                                w={{ base: "100%", md: "300px" }}
-                                display={{ base: "block", lg: "none" }}
-                            >
-                                <Box
-                                    color="white"
-                                    borderRadius="lg"
-                                    w="full"
-                                >
-                                    <Flex mt="1" pb={3} align="center" justify="space-between" borderBottomWidth={2} borderBottomColor="gray.600">
-                                        {course?.fee >= 0 && (
-                                            <Flex alignItems="left" direction="column">
-                                                <Text fontSize="4xl" fontWeight="bold">
-                                                    {course?.fee === 0 ? "Miễn phí" : formatCurrency(course?.fee || 0)}
-                                                </Text>
-                                                <Text ml="2" fontSize="md" textDecoration="line-through" color="gray.400">
-                                                    {course?.originalFee === 0 ? "" : formatCurrency(course?.originalFee || 0)}
-                                                </Text>
-                                            </Flex>
-                                        )}
-                                        {course?.originalFee > 0 && (
-                                            <Badge colorScheme="red"
-                                                ml="2"
-                                                px="2"
-                                                py="1"
-                                                mb={10}
-                                                fontSize="sm"
-                                                bg="red.500"
-                                                color="white"
-                                                borderRadius="md">
-                                                -{course?.discountPercent || 0}%
-                                            </Badge>
-                                        )}
-                                    </Flex>
-
-                                    <VStack align="start" mt={4} spacing={3}>
-                                        <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
-                                        <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
-                                        <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
-                                        <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
-                                        <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
-                                    </VStack>
-                                    {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
-                                        <Flex direction="column" gap={4}>
-                                            <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
-                                                <Button
-                                                    colorScheme="blue"
-                                                    mt={4}
-                                                    w="full"
-                                                    fontSize="18px"
-                                                    display="flex"
-                                                    alignItems="center"
-                                                    justifyContent="center"
-                                                    _hover={{
-                                                        transform: "translateY(-3px)",
-                                                        boxShadow: "0px 4px 10px rgb(39, 87, 246)",
-                                                        transition: "transform 0.3s ease",
-                                                    }}
-                                                >
-                                                    Vào học <Icon as={FaArrowRight} ml={2} />
-                                                </Button>
-
-                                            </NavLink>
-                                            <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
-                                                Hủy đăng ký
-                                            </Button>
-                                        </Flex>
-
-
-                                    ) : (
-                                        // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
-                                        <Button
-                                            colorScheme={course?.fee === 0 ? "green" : "red"}
-                                            mt={4}
-                                            w="full"
-                                            fontSize="18px"
-                                            onClick={handleEnroll}
-                                        >
-                                            {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
-                                        </Button>
-                                    )}
-                                </Box>
-                            </Box>
-                        </Flex>
-
-                        {/* Tabs */}
-                        <Tabs mt={6} colorScheme="blue" bg="white" borderRadius="md">
-                            <StickyTabList offsetTop={0}>
-                                <Tab>Giới thiệu</Tab>
-                                <Tab>Giáo trình</Tab>
-                                <Tab>Đánh giá</Tab>
-                                <Tab>Bình luận</Tab>
-                            </StickyTabList>
-                            <TabPanels>
-                                <TabPanel>
-                                    {loading ?
-                                        <SkeletonText noOfLines={4} spacing={3} />
-                                        :
-                                        <Text mt={2}> <Box px={5} py={2} sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }} /></Text>
-                                    }
-                                </TabPanel>
-                                {/* Nội dung giáo trình */}
-                                <TabPanel>
-                                    {loading ? (
-                                        <SkeletonText noOfLines={5} spacing={4} />
-                                    ) : (
-                                        <List spacing={0}>
-                                            {Array.isArray(course?.topics) && course.topics.length > 0 ? (
-                                                course.topics.map((topic, index) => (
-                                                    <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md">
-                                                        <Accordion allowToggle>
-                                                            <AccordionItem key={topic?.topicID} border="none">
-                                                                {({ isExpanded }) => (
-                                                                    <>
-                                                                        <h2>
-                                                                            <AccordionButton _expanded={{ bg: "gray.200" }} borderRadius="sm">
-                                                                                <Box flex="1" textAlign="left" borderBottomWidth={2} borderStyle="dashed" py={2}>
-                                                                                    <Text fontSize="lg">
-                                                                                        <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
-                                                                                    </Text>
-                                                                                    <Flex alignItems='center' gap={2} fontSize="sm">
-                                                                                        <Text as='span'><FaRegFileCode /></Text>Tổng số bài học: {topic?.lessons?.length || 0}
-                                                                                    </Flex>
-                                                                                </Box>
-                                                                                {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
-                                                                            </AccordionButton>
-                                                                        </h2>
-                                                                        <AccordionPanel pb={4}>
-                                                                            {topic.lessons?.length ? (
-                                                                                <List spacing={2}>
-                                                                                    {topic.lessons.map((lesson) => {
-                                                                                        const isLoggedIn = isAuthenticated.isAuthenticated;
-                                                                                        const key = lesson.lessonID || Math.random(); // đảm bảo key duy nhất
-
-                                                                                        const LessonItem = (
-                                                                                            <ListItem
-                                                                                                cursor="pointer"
-                                                                                                _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
-                                                                                                transition="all .2s ease-in-out"
-                                                                                                pl={2}
-                                                                                                bg="gray.50"
-                                                                                                borderRadius="sm"
-                                                                                                p={2}
-                                                                                                onClick={() => {
-                                                                                                    if (!isLoggedIn) {
-                                                                                                        toast({
-                                                                                                            title: "Bạn cần đăng nhập để truy cập trang này.",
-                                                                                                            status: "warning",
-                                                                                                            duration: 2000,
-                                                                                                            isClosable: true,
-                                                                                                            position: "top",
-                                                                                                            variant: "top-accent",
-                                                                                                        });
-                                                                                                    }
-                                                                                                }}
-                                                                                            >
-                                                                                                <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
-                                                                                            </ListItem>
-                                                                                        );
-
-                                                                                        // Nếu chưa enroll
-                                                                                        if (!isEnrolled) {
-                                                                                            return (
-                                                                                                <Box key={key}>
-                                                                                                    <Box cursor="default" >
-                                                                                                        {LessonItem}
-                                                                                                    </Box>
-                                                                                                </Box>
-                                                                                            );
-                                                                                        }
-
-                                                                                        // Nếu đã đăng nhập
-                                                                                        if (isLoggedIn) {
-                                                                                            return (
-                                                                                                <Box key={key}>
-                                                                                                    <NavLink
-                                                                                                        to={`${location.pathname}/${lesson.lessonID}`}
-                                                                                                        style={({ isActive }) => ({
-                                                                                                            textDecoration: 'none',
-                                                                                                            color: isActive ? 'blue.500' : 'inherit',
-                                                                                                        })}
-                                                                                                    >
-                                                                                                        {LessonItem}
-                                                                                                    </NavLink>
-                                                                                                </Box>
-                                                                                            );
-                                                                                        }
-
-                                                                                        // Nếu chưa đăng nhập
-                                                                                        return (
-                                                                                            <Box key={key}>
-                                                                                                {LessonItem}
-                                                                                            </Box>
-                                                                                        );
-                                                                                    })}
-                                                                                </List>
-                                                                            ) : (
-                                                                                <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>
-                                                                            )}
-                                                                        </AccordionPanel>
-
-                                                                    </>
-                                                                )}
-                                                            </AccordionItem>
-                                                        </Accordion>
-                                                    </ListItem>
-                                                ))
-                                            ) : (
-                                                <Text fontSize="md" color="gray.500">Không có chủ đề nào.</Text>
-                                            )}
-                                        </List>
-                                    )}
-                                </TabPanel>
-                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Review courseId={courseID} />}</TabPanel>
-                                <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Comment courseId={courseID} />}</TabPanel>
-                            </TabPanels>
-                        </Tabs>
-                    </Box>
-                    {/* Right Sidebar */}
-                    <Box display={{ base: "none", lg: "block" }} position="relative" w="300px">
-                        <Box
-                            bg="blue.900"
-                            color="white"
-                            p={4}
-                            borderRadius="lg"
-                            w="300px"
-                            maxH="max-content"
-                            position={{ base: "static", md: "fixed" }}
-                            right="200px"
-                            top="135px"
-                            boxShadow="lg"
-                        >
-                            <Flex mt="1" pb={3} align="center" justify="space-between" borderBottomWidth={2} borderBottomColor="gray.600">
-                                {course?.fee >= 0 && (
-                                    <Flex alignItems="left" direction="column">
-                                        <Text fontSize="4xl" fontWeight="bold">
-                                            {course?.fee === 0 ? "Miễn phí" : formatCurrency(course?.fee || 0)}
-                                        </Text>
-                                        <Text ml="2" fontSize="md" textDecoration="line-through" color="gray.400">
-                                            {course?.originalFee === 0 ? "" : formatCurrency(course?.originalFee || 0)}
-                                        </Text>
-
-                                    </Flex>
-                                )}
-                                {course?.originalFee > 0 && (
-                                    <Badge colorScheme="red"
-                                        ml="2"
-                                        px="2"
-                                        py="1"
-                                        mb={10}
-                                        fontSize="sm"
-                                        bg="red.500"
-                                        color="white"
-                                        borderRadius="md">
-                                        -{course?.discountPercent || 0}%
-                                    </Badge>
-                                )}
-                            </Flex>
-                            <VStack align="start" mt={4} spacing={3}>
-                                <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
-                                <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
-                                <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
-                                <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
-                                <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
-                            </VStack>
-                            {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
-                                <Flex direction="column" gap={4}>
-                                    <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
-                                        <Button
-                                            colorScheme="blue"
-                                            mt={4}
-                                            w="full"
-                                            fontSize="18px"
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            _hover={{
-                                                transform: "translateY(-3px)",
-                                                boxShadow: "0px 4px 10px rgb(39, 87, 246)",
-                                                transition: "transform 0.3s ease",
-                                            }}
-                                        >
-                                            Vào học <Icon as={FaArrowRight} ml={2} />
-                                        </Button>
-                                    </NavLink>
-                                    <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
-                                        Hủy đăng ký
-                                    </Button>
-                                </Flex>
+        <Box p={6} maxW="100%" minH="100vh" mx="auto" w={{ lg: "calc(100% - 360px)", md: "100%" }}>
+            <Button
+                leftIcon={<ArrowBackIcon />}
+                mb={2}
+                colorScheme='blue' variant='ghost'
+                onClick={() => navigate('/course')}
+            >
+                Trở về trước
+            </Button>
+            <Flex direction={{ base: "column", md: "row" }} gap={5}>
+                {/* Left Content */}
+                <Box flex={3} minH={570} overflowY="auto" position="static">
+                    <Flex
+                        direction={{ base: "column", md: "row" }}
+                        gap={6}
+                        bgGradient="linear(to-r, blue.900, blue.700)"
+                        p={8}
+                        borderRadius="md"
+                        boxShadow="lg"
+                    >
+                        {/* Course Image */}
+                        <Box flex={3}>
+                            {loading ? (
+                                <Skeleton height="250px" borderRadius="md" />
                             ) : (
-                                // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
-                                <Button
-                                    colorScheme={course?.fee === 0 ? "green" : "red"}
-                                    mt={4}
-                                    w="full"
-                                    fontSize="18px"
-                                    onClick={handleEnroll}
-                                >
-                                    {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
-                                </Button>
+                                <Image
+                                    alt="Course Avatar"
+                                    w="100%"
+                                    h={{ base: "200px", md: "250px" }}
+                                    borderRadius="md"
+                                    objectFit="cover"
+                                    boxShadow="lg"
+                                    src={course?.imageUrl || "/avatarSimmmple.png"}
+                                />
                             )}
                         </Box>
+                        {/* Course Details */}
+                        <Box flex={3} color="white" borderRadius="lg">
+                            {loading ? (
+                                <SkeletonText noOfLines={3} spacing={4} />
+                            ) : (
+                                <Box>
+                                    <Text fontSize="3xl" letterSpacing={1.2} fontWeight="bold">{course?.courseName}</Text>
+                                    <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
+                                    <HStack mt={4} spacing={4}>
+                                        <Text>Tác giả: <Text as="span" color="blue.300">{course?.creatorName}</Text></Text>
+                                        <Icon as={FaUsers} /><Text>{course?.totalReviews || "0"} Học viên</Text>
+                                        <Icon as={FaStar} color="yellow.400" /> <Text> {course.rating ? course.rating.toFixed(1) : "0"}</Text>
+                                    </HStack>
+                                </Box>
+                            )}
+                        </Box>
+                        {/* Right Sidebar */}
+                        <Box
+                            w={{ base: "100%", md: "300px" }}
+                            display={{ base: "block", lg: "none" }}
+                        >
+                            <Box
+                                color="white"
+                                borderRadius="lg"
+                                w="full"
+                            >
+                                <Flex mt="1" pb={3} align="center" justify="space-between" borderBottomWidth={2} borderBottomColor="gray.600">
+                                    {course?.fee >= 0 && (
+                                        <Flex alignItems="left" direction="column">
+                                            <Text fontSize="4xl" fontWeight="bold">
+                                                {course?.fee === 0 ? "Miễn phí" : formatCurrency(course?.fee || 0)}
+                                            </Text>
+                                            <Text ml="2" fontSize="md" textDecoration="line-through" color="gray.400">
+                                                {course?.originalFee === 0 ? "" : formatCurrency(course?.originalFee || 0)}
+                                            </Text>
+                                        </Flex>
+                                    )}
+                                    {course?.originalFee > 0 && (
+                                        <Badge colorScheme="red"
+                                            ml="2"
+                                            px="2"
+                                            py="1"
+                                            mb={10}
+                                            fontSize="sm"
+                                            bg="red.500"
+                                            color="white"
+                                            borderRadius="md">
+                                            -{course?.discountPercent || 0}%
+                                        </Badge>
+                                    )}
+                                </Flex>
+
+                                <VStack align="start" mt={4} spacing={3}>
+                                    <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
+                                    <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
+                                    <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
+                                    <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
+                                    <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
+                                </VStack>
+                                {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
+                                    <Flex direction="column" gap={4}>
+                                        <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                            <Button
+                                                colorScheme="blue"
+                                                mt={4}
+                                                w="full"
+                                                fontSize="18px"
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                _hover={{
+                                                    transform: "translateY(-3px)",
+                                                    boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                                    transition: "transform 0.3s ease",
+                                                }}
+                                            >
+                                                Vào học <Icon as={FaArrowRight} ml={2} />
+                                            </Button>
+
+                                        </NavLink>
+                                        <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
+                                            Hủy đăng ký
+                                        </Button>
+                                    </Flex>
+
+
+                                ) : (
+                                    // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
+                                    <Button
+                                        colorScheme={course?.fee === 0 ? "green" : "red"}
+                                        mt={4}
+                                        w="full"
+                                        fontSize="18px"
+                                        onClick={handleEnroll}
+                                    >
+                                        {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
+                                    </Button>
+                                )}
+                            </Box>
+                        </Box>
+                    </Flex>
+
+                    {/* Tabs */}
+                    <Tabs mt={6} colorScheme="blue" bg="white" borderRadius="md">
+                        <StickyTabList offsetTop={0}>
+                            <Tab>Giới thiệu</Tab>
+                            <Tab>Giáo trình</Tab>
+                            <Tab>Đánh giá</Tab>
+                            <Tab>Bình luận</Tab>
+                        </StickyTabList>
+                        <TabPanels>
+                            <TabPanel>
+                                {loading ?
+                                    <SkeletonText noOfLines={4} spacing={3} />
+                                    :
+                                    <Text mt={2}> <Box px={5} py={2} sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }} /></Text>
+                                }
+                            </TabPanel>
+                            {/* Nội dung giáo trình */}
+                            <TabPanel>
+                                {loading ? (
+                                    <SkeletonText noOfLines={5} spacing={4} />
+                                ) : (
+                                    <List spacing={0}>
+                                        {Array.isArray(course?.topics) && course.topics.length > 0 ? (
+                                            course.topics.map((topic, index) => (
+                                                <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md">
+                                                    <Accordion allowToggle>
+                                                        <AccordionItem key={topic?.topicID} border="none">
+                                                            {({ isExpanded }) => (
+                                                                <>
+                                                                    <h2>
+                                                                        <AccordionButton _expanded={{ bg: "gray.200" }} borderRadius="sm">
+                                                                            <Box flex="1" textAlign="left" borderBottomWidth={2} borderStyle="dashed" py={2}>
+                                                                                <Text fontSize="lg">
+                                                                                    <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
+                                                                                </Text>
+                                                                                <Flex alignItems='center' gap={2} fontSize="sm">
+                                                                                    <Text as='span'><FaRegFileCode /></Text>Tổng số bài học: {topic?.lessons?.length || 0}
+                                                                                </Flex>
+                                                                            </Box>
+                                                                            {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
+                                                                        </AccordionButton>
+                                                                    </h2>
+                                                                    <AccordionPanel pb={4}>
+                                                                        {topic.lessons?.length ? (
+                                                                            <List spacing={2}>
+                                                                                {topic.lessons.map((lesson) => {
+                                                                                    const isLoggedIn = isAuthenticated.isAuthenticated;
+                                                                                    const key = lesson.lessonID || Math.random(); // đảm bảo key duy nhất
+
+                                                                                    const LessonItem = (
+                                                                                        <ListItem
+                                                                                            cursor="pointer"
+                                                                                            _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
+                                                                                            transition="all .2s ease-in-out"
+                                                                                            pl={2}
+                                                                                            bg="gray.50"
+                                                                                            borderRadius="sm"
+                                                                                            p={2}
+                                                                                            onClick={() => {
+                                                                                                if (!isLoggedIn) {
+                                                                                                    toast({
+                                                                                                        title: "Bạn cần đăng nhập để truy cập trang này.",
+                                                                                                        status: "warning",
+                                                                                                        duration: 2000,
+                                                                                                        isClosable: true,
+                                                                                                        position: "top",
+                                                                                                        variant: "top-accent",
+                                                                                                    });
+                                                                                                }
+                                                                                            }}
+                                                                                        >
+                                                                                            <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
+                                                                                        </ListItem>
+                                                                                    );
+
+                                                                                    // Nếu chưa enroll
+                                                                                    if (!isEnrolled) {
+                                                                                        return (
+                                                                                            <Box key={key}>
+                                                                                                <Box cursor="default" >
+                                                                                                    {LessonItem}
+                                                                                                </Box>
+                                                                                            </Box>
+                                                                                        );
+                                                                                    }
+
+                                                                                    // Nếu đã đăng nhập
+                                                                                    if (isLoggedIn) {
+                                                                                        return (
+                                                                                            <Box key={key}>
+                                                                                                <NavLink
+                                                                                                    to={`${location.pathname}/${lesson.lessonID}`}
+                                                                                                    style={({ isActive }) => ({
+                                                                                                        textDecoration: 'none',
+                                                                                                        color: isActive ? 'blue.500' : 'inherit',
+                                                                                                    })}
+                                                                                                >
+                                                                                                    {LessonItem}
+                                                                                                </NavLink>
+                                                                                            </Box>
+                                                                                        );
+                                                                                    }
+
+                                                                                    // Nếu chưa đăng nhập
+                                                                                    return (
+                                                                                        <Box key={key}>
+                                                                                            {LessonItem}
+                                                                                        </Box>
+                                                                                    );
+                                                                                })}
+                                                                            </List>
+                                                                        ) : (
+                                                                            <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>
+                                                                        )}
+                                                                    </AccordionPanel>
+
+                                                                </>
+                                                            )}
+                                                        </AccordionItem>
+                                                    </Accordion>
+                                                </ListItem>
+                                            ))
+                                        ) : (
+                                            <Text fontSize="md" color="gray.500">Không có chủ đề nào.</Text>
+                                        )}
+                                    </List>
+                                )}
+                            </TabPanel>
+                            <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Review courseId={courseID} />}</TabPanel>
+                            <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Comment courseId={courseID} />}</TabPanel>
+                        </TabPanels>
+                    </Tabs>
+                </Box>
+                {/* Right Sidebar */}
+                <Box display={{ base: "none", lg: "block" }} position="relative" w="300px">
+                    <Box
+                        bg="blue.900"
+                        color="white"
+                        p={4}
+                        borderRadius="lg"
+                        w="300px"
+                        maxH="max-content"
+                        position={{ base: "static", md: "fixed" }}
+                        right="200px"
+                        top="135px"
+                        boxShadow="lg"
+                    >
+                        <Flex mt="1" pb={3} align="center" justify="space-between" borderBottomWidth={2} borderBottomColor="gray.600">
+                            {course?.fee >= 0 && (
+                                <Flex alignItems="left" direction="column">
+                                    <Text fontSize="4xl" fontWeight="bold">
+                                        {course?.fee === 0 ? "Miễn phí" : formatCurrency(course?.fee || 0)}
+                                    </Text>
+                                    <Text ml="2" fontSize="md" textDecoration="line-through" color="gray.400">
+                                        {course?.originalFee === 0 ? "" : formatCurrency(course?.originalFee || 0)}
+                                    </Text>
+
+                                </Flex>
+                            )}
+                            {course?.originalFee > 0 && (
+                                <Badge colorScheme="red"
+                                    ml="2"
+                                    px="2"
+                                    py="1"
+                                    mb={10}
+                                    fontSize="sm"
+                                    bg="red.500"
+                                    color="white"
+                                    borderRadius="md">
+                                    -{course?.discountPercent || 0}%
+                                </Badge>
+                            )}
+                        </Flex>
+                        <VStack align="start" mt={4} spacing={3}>
+                            <HStack><Icon as={FaCheckCircle} /><Text>{totalTopics} chủ đề</Text></HStack>
+                            <HStack><Icon as={FaBookOpen} /><Text>{totalLessons} bài học</Text></HStack>
+                            <HStack><Icon as={FaClipboardList} /><Text>{problems} bài tập</Text></HStack>
+                            <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
+                            <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
+                        </VStack>
+                        {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
+                            <Flex direction="column" gap={4}>
+                                <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
+                                    <Button
+                                        colorScheme="blue"
+                                        mt={4}
+                                        w="full"
+                                        fontSize="18px"
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        _hover={{
+                                            transform: "translateY(-3px)",
+                                            boxShadow: "0px 4px 10px rgb(39, 87, 246)",
+                                            transition: "transform 0.3s ease",
+                                        }}
+                                    >
+                                        Vào học <Icon as={FaArrowRight} ml={2} />
+                                    </Button>
+                                </NavLink>
+                                <Button colorScheme="red" w="full" fontSize="18px" onClick={openDialog}>
+                                    Hủy đăng ký
+                                </Button>
+                            </Flex>
+                        ) : (
+                            // Ngược lại, hiển thị nút Đăng ký hoặc Mua ngay
+                            <Button
+                                colorScheme={course?.fee === 0 ? "green" : "red"}
+                                mt={4}
+                                w="full"
+                                fontSize="18px"
+                                onClick={handleEnroll}
+                            >
+                                {course?.fee === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
+                            </Button>
+                        )}
                     </Box>
-                </Flex>
-                {/* Dialog hủy đăng ký */}
-                <AlertDialog
-                    isOpen={isOpen}
-                    leastDestructiveRef={cancelRef}
-                    onClose={closeDialog}
-                    isCentered
-                >
-                    <AlertDialogOverlay>
-                        <AlertDialogContent>
-                            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                Xác nhận hủy đăng ký
-                            </AlertDialogHeader>
+                </Box>
+            </Flex>
+            {/* Dialog hủy đăng ký */}
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={closeDialog}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Xác nhận hủy đăng ký
+                        </AlertDialogHeader>
 
-                            <AlertDialogBody textAlign="center" fontSize="xl">
-                                Bạn có chắc chắn muốn hủy đăng ký khóa học này? Hành động này không thể hoàn tác.
-                            </AlertDialogBody>
+                        <AlertDialogBody textAlign="center" fontSize="xl">
+                            Bạn có chắc chắn muốn hủy đăng ký khóa học này? Hành động này không thể hoàn tác.
+                        </AlertDialogBody>
 
-                            <AlertDialogFooter>
-                                <Button ref={cancelRef} onClick={closeDialog}>
-                                    Hủy
-                                </Button>
-                                <Button colorScheme="red" onClick={() => {
-                                    closeDialog();
-                                    handleUnenroll();
-                                }} ml={3}>
-                                    Xác nhận
-                                </Button>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialogOverlay>
-                </AlertDialog>
-            </Box>
-        </ScrollToTop >
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={closeDialog}>
+                                Hủy
+                            </Button>
+                            <Button colorScheme="red" onClick={() => {
+                                closeDialog();
+                                handleUnenroll();
+                            }} ml={3}>
+                                Xác nhận
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </Box>
     );
 };
 

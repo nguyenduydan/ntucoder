@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import LoadingScreen from "@/components/loading/ScreenLoading";
+import ScrollToTop from "./components/scroll/ScrollToTop";
 
 
 export default function Main() {
@@ -35,20 +36,22 @@ export default function Main() {
       <ProgressBar />
       {showLoading ? <LoadingScreen />
         : (
-          <Routes>
-            <Route
-              path="admin/*"
-              element={
-                <ProtectedRoute allowedRoles={[1, 3]}>
-                  <AdminLayout theme={currentTheme} setTheme={setCurrentTheme} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/*"
-              element={<UserLayout theme={currentTheme} setTheme={setCurrentTheme} />}
-            />
-          </Routes>
+          <ScrollToTop>
+            <Routes>
+              <Route
+                path="admin/*"
+                element={
+                  <ProtectedRoute allowedRoles={[1, 3]}>
+                    <AdminLayout theme={currentTheme} setTheme={setCurrentTheme} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/*"
+                element={<UserLayout theme={currentTheme} setTheme={setCurrentTheme} />}
+              />
+            </Routes>
+          </ScrollToTop>
         )}
     </ChakraProvider>
   );
