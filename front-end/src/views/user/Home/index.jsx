@@ -58,7 +58,7 @@ const Home = () => {
   const coursePopular = useMemo(() => {
     if (!Array.isArray(courses)) return [];
     return courses
-      .filter(course => course.totalReviews > 0, course => course.status === 1)
+      .filter(course => course.status === 1 && course.totalReviews > 0)
       .sort((a, b) => b.totalReviews - a.totalReviews)
       .slice(0, 4);
   }, [courses]);
