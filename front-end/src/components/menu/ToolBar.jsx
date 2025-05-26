@@ -57,7 +57,7 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd, valueSearch, title }) => {
 
     const words = [
         "Nhập từ khóa...",
-        "Phím tắt Ctrl + K",
+        "Phím tắt Ctrl + /",
         ...titles.map(t => `Tìm kiếm ${t}...`)
     ];
 
