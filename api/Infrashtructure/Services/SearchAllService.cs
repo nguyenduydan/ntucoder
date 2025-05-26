@@ -27,7 +27,7 @@ namespace api.Infrashtructure.Services
             int remaining = maxResults;
 
             // === Search Course (Prioritized First) ===
-            var courseQuery = _context.Courses.AsNoTracking();
+            var courseQuery = _context.Courses.AsNoTracking().Where(c => c.Status == 1);
             courseQuery = SearchHelper<Course>.ApplySearchMultiField(courseQuery, keyword, useAnd: false,
                 c => c.CourseName,
                 c => c.Description);
@@ -77,7 +77,7 @@ namespace api.Infrashtructure.Services
             // === Search Blog (Last Priority) ===
             if (remaining > 0)
             {
-                var blogQuery = _context.Blogs.AsNoTracking();
+                var blogQuery = _context.Blogs.AsNoTracking().Where(b => b.Published == 1);
                 blogQuery = SearchHelper<Blog>.ApplySearchMultiField(blogQuery, keyword, useAnd: false,
                     b => b.Title,
                     b => b.Coder.CoderName,
