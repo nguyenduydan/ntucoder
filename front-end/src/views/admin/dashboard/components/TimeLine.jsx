@@ -18,12 +18,12 @@ const TimeDisplay = ({ coder }) => {
     const [now, setNow] = useState(new Date());
     const typing = useDynamicPlaceholder([
         `Xin chào ${coder?.coderName || "bạn"}`,
-        "bạn một ngày tốt lành",
-        "bạn học tốt",
-        "bạn vui vẻ",
-        "bạn thành công",
-        "bạn sức khỏe",
-        "bạn hạnh phúc",
+        "Chúc bạn một ngày tốt lành",
+        "Chúc bạn học tốt",
+        "Chúc bạn vui vẻ",
+        "Chúc bạn thành công",
+        "Chúc bạn sức khỏe",
+        "Chúc bạn hạnh phúc",
     ], 5000);
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const TimeDisplay = ({ coder }) => {
     return (
         <Flex justify="space-between" align="center" mb={8} display={{ base: "none", md: "flex" }}>
             <Text fontSize="md" color="gray.600" fontWeight="bold">
-                Chào {typing}<Cursor cursorColor="black" /> , hôm nay là ngày {formatDateTime(now)}
+                {typing}<Cursor cursorColor="black" /> , hôm nay là ngày {formatDateTime(now)}
             </Text>
         </Flex>
     );
