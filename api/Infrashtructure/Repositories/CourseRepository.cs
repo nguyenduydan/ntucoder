@@ -209,7 +209,6 @@ namespace api.Infrashtructure.Repositories
                 .Include(c => c.Badge)
                 .Include(c => c.Reviews)
                 .AsNoTracking()
-                .Where (c => c.Status == 1)
                 .GroupJoin(enrollCounts,
                     c => c.CourseID,
                     ec => ec.CourseID,
