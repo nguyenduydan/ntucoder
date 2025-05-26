@@ -18,6 +18,8 @@ import {
 } from "@chakra-ui/react";
 import { MdClear } from "react-icons/md";
 import TimeDisplay from "./components/TimeLine";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTitle } from "@/contexts/TitleContext";
 
 // Lazy load các component
 const Stats = lazy(() => import("views/admin/dashboard/components/Stats"));
@@ -44,6 +46,8 @@ const sectionTitles = {
 };
 
 const MainDashBoard = () => {
+    useTitle("Dashboard");
+    const { coder } = useAuth();
     const initialVisibleSections = ["stats", "courses", "coders"];
     const [visibleSections, setVisibleSections] = useState(initialVisibleSections);
     const [loading, setLoading] = useState(false);
@@ -72,24 +76,6 @@ const MainDashBoard = () => {
         setVisibleSections([]);
     };
 
-    const courses = [
-        { id: 1, title: "React cơ bản", enrolls: 1200 },
-        { id: 2, title: "NodeJS nâng cao", enrolls: 950 },
-        { id: 3, title: "Chakra UI từ A-Z", enrolls: 800 },
-    ];
-
-    const blogs = [
-        { id: 1, title: "Học React thế nào?", views: 5000 },
-        { id: 2, title: "Tips tối ưu NodeJS", views: 3500 },
-        { id: 3, title: "Chakra UI đẹp thế nào?", views: 2800 },
-    ];
-
-    const problems = [
-        { id: 1, title: "Tính tổng dãy số", difficulty: "Dễ" },
-        { id: 2, title: "Tìm chuỗi con dài nhất", difficulty: "Trung bình" },
-        { id: 3, title: "Thuật toán Dijkstra", difficulty: "Khó" },
-    ];
-
     const Section = ({ title, children }) => (
         <Box
             transition="all 0.3s ease"
@@ -113,7 +99,6 @@ const MainDashBoard = () => {
             case "courses":
                 return (
                     <Courses
-                        courses={courses}
                         refreshKey={refreshKey}
                         onFinishRefresh={() => setLoading(false)}
                         height="400px"
@@ -130,7 +115,8 @@ const MainDashBoard = () => {
                     />
                 );
             case "problems":
-                return <Problems problems={problems} height="400px" />;
+                return <Problems height="400px" refreshKey={refreshKey}
+                    onFinishRefresh={() => setLoading(false)} />;
             default:
                 return null;
         }
@@ -141,7 +127,7 @@ const MainDashBoard = () => {
     return (
         <ScrollToTop>
             <Container maxW="container.xl" mt={{ base: 40, md: 20 }} pb={10}>
-                <TimeDisplay />
+                <TimeDisplay coder={coder} />
                 {/* UI Select để chọn hiển thị */}
                 <Box mb={10} p={5} shadow="md" borderRadius="lg" bgGradient="linear(to-r, blue.200, purple.300)">
                     <Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} alignItems="center" mb={4}>

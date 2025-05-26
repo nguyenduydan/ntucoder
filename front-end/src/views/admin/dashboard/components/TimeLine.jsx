@@ -14,10 +14,10 @@ const formatDateTime = (dateString) => {
     return dayjs(dateString).tz("Asia/Ho_Chi_Minh").format("DD/MM/YYYY HH:mm:ss");
 };
 
-const TimeDisplay = () => {
+const TimeDisplay = ({ coder }) => {
     const [now, setNow] = useState(new Date());
     const typing = useDynamicPlaceholder([
-        "Bạn nguyễn",
+        `Xin chào ${coder?.coderName || "bạn"}`,
         "bạn một ngày tốt lành",
         "bạn học tốt",
         "bạn vui vẻ",
