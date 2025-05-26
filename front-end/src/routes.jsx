@@ -178,7 +178,7 @@ const routes = [
     ]
   },
   {
-    name: 'XÊP HẠNG',
+    name: 'XẾP HẠNG',
     layout: '/user',
     path: '/ranking',
     icon: <FcApproval size={20} />,
