@@ -56,8 +56,9 @@ const Home = () => {
   const [codersHighest, setCoderHighest] = useState([]);
 
   const coursePopular = useMemo(() => {
+    if (!Array.isArray(courses)) return [];
     return courses
-      .filter(course => course.totalReviews >= 0)
+      .filter(course => course.totalReviews > 0, course => course.status === 1)
       .sort((a, b) => b.totalReviews - a.totalReviews)
       .slice(0, 4);
   }, [courses]);
@@ -67,7 +68,9 @@ const Home = () => {
     setLoading(true);
     try {
       const enrolledRes = await api.get(`/Enrollment/list-enroll/${coder.coderID}`);
-      const enrolledCourses = enrolledRes.data.map(e => e.courseID);
+      const enrolledCourses = Array.isArray(enrolledRes.data)
+        ? enrolledRes.data.map(e => e.courseID)
+        : [];
 
       const response = await getList({
         controller: "Course",
@@ -77,13 +80,13 @@ const Home = () => {
         totalCount: 100
       });
 
-      const allCourses = response.data;
+      const allCourses = Array.isArray(response.data) ? response.data : [];
       const activeCourses = allCourses
         .filter(course => course.status === 1 && enrolledCourses.includes(course.courseID))
         .slice(0, 4);
 
       setCoursesEnrolled(activeCourses);
-      setCourses(allCourses); // Lưu toàn bộ để dùng useMemo lọc top popular
+      setCourses(allCourses); // Save all for useMemo
     } catch (error) {
       console.error("Error fetching courses:", error);
       toast({
@@ -94,6 +97,8 @@ const Home = () => {
         position: "top-right",
         variant: "top-accent"
       });
+      setCourses([]); // Defensive: ensure state is never undefined
+      setCoursesEnrolled([]);
     } finally {
       setLoading(false);
     }
