@@ -20,7 +20,6 @@ namespace api.Infrashtructure.Repositories
              QueryObject query,
              string? sortField = null,
              bool ascending = true,
-             string? searchString = null,
              string? compilerFilter = null)
         {
             var objQuery = _context.Submissions
@@ -41,13 +40,6 @@ namespace api.Infrashtructure.Repositories
                     SubmitTime = a.SubmitTime,
                     SubmissionStatus = a.SubmissionStatus ,
                 });
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
-                var lowerSearch = searchString.ToLower();
-                objQuery = objQuery.Where(c =>
-                    c.CoderName!.ToLower().Contains(lowerSearch) ||
-                    c.ProblemName!.ToLower().Contains(lowerSearch));
-            }
             if (!string.IsNullOrWhiteSpace(compilerFilter))
             {
                 var lowerCompiler = compilerFilter.ToLower();

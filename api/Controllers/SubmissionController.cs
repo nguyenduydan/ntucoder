@@ -27,11 +27,11 @@ namespace api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllSubmissions([FromQuery] QueryObject query, string? sortField = null, bool ascending = true, string? searchString = null, string? compilerFilter = null)
+        public async Task<IActionResult> GetAllSubmissions([FromQuery] QueryObject query, string? sortField = null, bool ascending = true, string? compilerFilter = null)
         {
             try
             {
-                var result = await _submissionRepository.GetAllSubmissionsAsync(query, sortField, ascending, searchString, compilerFilter);
+                var result = await _submissionRepository.GetAllSubmissionsAsync(query, sortField, ascending, compilerFilter);
                 return Ok(result);
             }
             catch (Exception ex)

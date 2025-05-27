@@ -80,12 +80,6 @@ namespace api.Controllers
             return Ok(new { message = "Đăng xuất thành công" });
         }
 
-        [Authorize(Roles = "1")]
-        [HttpGet("protected-route")]
-        public IActionResult ProtectedRoute()
-        {
-            return Ok();
-        }
 
         [Authorize]
         [HttpGet("me")]
