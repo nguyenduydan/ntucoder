@@ -15,7 +15,7 @@ NTUCoder là một hệ thống quản lý và luyện tập lập trình trực
 
 - **Công nghệ:**
   - Backend: ASP.NET Core, Entity Framework Core, Minio, JWT, Oauth2
-  - Frontend: ReactJS + Vite, ChakraUI
+  - Frontend: <img src="https://vitejs.dev/logo.svg" alt="Vite" width="20"/> Vite + <img src="https://raw.githubusercontent.com/github/explore/main/topics/react/react.png" alt="React" width="20"/> ReactJS, ChakraUI
   - Database: MySQL
 
 ## 📁 Cấu trúc thư mục
@@ -54,6 +54,12 @@ front-end/           # Giao diện ReactJS
     ```
 4. Truy cập giao diện tại `http://localhost:3000`
 
+### ⚡️ Công nghệ Frontend
+
+- <img src="https://vitejs.dev/logo.svg" alt="Vite" width="20"/> **Vite**: Công cụ build siêu nhanh cho frontend hiện đại.
+- <img src="https://raw.githubusercontent.com/github/explore/main/topics/react/react.png" alt="React" width="20"/> **ReactJS**: Thư viện xây dựng giao diện người dùng.
+- ChakraUI: Thư viện UI hiện đại, dễ tuỳ biến.
+
 ## 📝 Một số chức năng nổi bật
 
 - Đăng ký tài khoản, đăng nhập, khôi phục mật khẩu
@@ -75,4 +81,3 @@ Mọi đóng góp xây dựng hoặc báo lỗi xin gửi Pull Request hoặc Is
 ---
 
 > Dự án vẫn đang trong quá trình phát triển.
-```
