@@ -16,42 +16,50 @@ namespace api.Infrastructure.Helpers
                 .Split(new[] { ' ', ',', '.', ';', '-', '_', '/' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
+        // Helper: Thay thế tất cả parameter trong expression bằng parameter mới
+        private class ParameterReplacer : ExpressionVisitor
+        {
+            private readonly ParameterExpression _parameter;
+            public ParameterReplacer(ParameterExpression parameter)
+            {
+                _parameter = parameter;
+            }
+            protected override Expression VisitParameter(ParameterExpression node) => _parameter;
+        }
+
         // Search nhiều trường, nhiều token
         // useAnd = true: tất cả token phải match (AND)
         // useAnd = false: ít nhất 1 token match (OR)
         public static IQueryable<T> ApplySearchMultiField(
-     IQueryable<T> query,
-     string? keyword,
-     bool useAnd,
-     params Expression<Func<T, string>>[] selectors)
+            IQueryable<T> query,
+            string? keyword,
+            bool useAnd,
+            params Expression<Func<T, string>>[] selectors)
         {
             if (string.IsNullOrWhiteSpace(keyword) || selectors == null || selectors.Length == 0)
                 return query;
 
             var tokens = Tokenize(keyword);
-
             if (tokens.Length == 0)
                 return query;
 
-            var predicate = useAnd ? PredicateBuilder.True<T>() : PredicateBuilder.False<T>();
-
+            var parameter = Expression.Parameter(typeof(T), "b");
             var efFunctions = Expression.Constant(EF.Functions);
             var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
 
+            Expression? fullPredicate = null;
+
             foreach (var token in tokens)
             {
-                // Mỗi token ghép các trường OR với nhau
-                var tokenPredicate = PredicateBuilder.False<T>();
-
+                Expression? tokenPredicate = null;
                 foreach (var selector in selectors)
                 {
-                    var parameter = selector.Parameters[0];
+                    // Replace parameter in selector with our single parameter
+                    var selectorBody = new ParameterReplacer(parameter).Visit(selector.Body);
 
-                    Expression selectorBody = selector.Body;
-                    if (selectorBody.Type != typeof(string))
-                    {
+                    // Convert về string nếu cần
+                    if (selectorBody!.Type != typeof(string))
                         selectorBody = Expression.Convert(selectorBody, typeof(string));
-                    }
 
                     var toLowerCall = Expression.Call(selectorBody, toLowerMethod!);
 
@@ -60,8 +68,6 @@ namespace api.Infrastructure.Helpers
                         toLowerCall,
                         Expression.Constant(token)
                     );
-
-                    var exactLambda = Expression.Lambda<Func<T, bool>>(exactMatch, parameter);
 
                     // Like match: LIKE %token%
                     var likeCall = Expression.Call(
@@ -72,24 +78,27 @@ namespace api.Infrastructure.Helpers
                         toLowerCall,
                         Expression.Constant($"%{token}%")
                     );
-                    var likeLambda = Expression.Lambda<Func<T, bool>>(likeCall, parameter);
 
-                    // Kết hợp exact OR like để tăng độ chính xác (exact match ưu tiên vì là OR)
-                    var combinedTokenLambda = exactLambda.Or(likeLambda);
+                    var combined = Expression.OrElse(exactMatch, likeCall);
 
-                    tokenPredicate = tokenPredicate.Or(combinedTokenLambda);
+                    tokenPredicate = tokenPredicate == null
+                        ? combined
+                        : Expression.OrElse(tokenPredicate, combined);
                 }
 
-                if (useAnd)
-                    predicate = predicate.And(tokenPredicate);
-                else
-                    predicate = predicate.Or(tokenPredicate);
+                fullPredicate = fullPredicate == null
+                    ? tokenPredicate
+                    : (useAnd
+                        ? Expression.AndAlso(fullPredicate, tokenPredicate!)
+                        : Expression.OrElse(fullPredicate, tokenPredicate!));
             }
 
-            return query.Where(predicate);
+            if (fullPredicate == null)
+                return query;
+
+            var lambda = Expression.Lambda<Func<T, bool>>(fullPredicate, parameter);
+            return query.Where(lambda);
         }
-
-
 
         private static string GetPropertyName(Expression<Func<T, string>> selector)
         {
@@ -103,14 +112,14 @@ namespace api.Infrastructure.Helpers
         }
     }
 
-    // PredicateBuilder mở rộng thêm And
+    // PredicateBuilder giữ lại cho các trường hợp cần thiết, không dùng trực tiếp trong ApplySearchMultiField nữa.
     public static class PredicateBuilder
     {
         public static Expression<Func<T, bool>> True<T>() { return f => true; }
         public static Expression<Func<T, bool>> False<T>() { return f => false; }
 
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1,
-                                                        Expression<Func<T, bool>> expr2)
+                                                      Expression<Func<T, bool>> expr2)
         {
             var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
             return Expression.Lambda<Func<T, bool>>
@@ -118,7 +127,7 @@ namespace api.Infrastructure.Helpers
         }
 
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1,
-                                                        Expression<Func<T, bool>> expr2)
+                                                       Expression<Func<T, bool>> expr2)
         {
             var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
             return Expression.Lambda<Func<T, bool>>

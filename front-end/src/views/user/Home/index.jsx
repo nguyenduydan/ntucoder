@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo, Suspense } from "react";
 import {
   Box as ChakraBox,
   Flex as ChakraFlex,
@@ -12,22 +12,24 @@ import {
   Button,
   VStack,
   Badge,
-  HStack
+  HStack,
+  Spinner
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import SkeletonList from "../Course/components/SkeletonList";
 import { useTitle } from "@/contexts/TitleContext";
-import CourseGrid from "../Course/components/CourseGrid";
 import { getList } from "@/config/apiService";
 import HeroSection from "./components/HeroSection";
 import { useAuth } from "@/contexts/AuthContext";
 import HomeNoLogin from "./components/HomeNoLogin";
 import api from "@/config/apiConfig";
 import { useNavigate } from "react-router-dom";
-import BlogTopViews from "../Blog/components/BlogTopViews";
 import CoderAvatar from "../Course/components/CoderAvatar";
-import MiniCalendar from "@/components/calendar/MiniCalendar";
 import { formatNumber } from "@/utils/utils";
+
+const CourseGrid = React.lazy(() => import("../Course/components/CourseGrid"));
+const BlogTopViews = React.lazy(() => import("../Blog/components/BlogTopViews"));
+const MiniCalendar = React.lazy(() => import("@/components/calendar/MiniCalendar"));
 
 const MotionBox = motion(ChakraBox);
 const MotionFlex = motion(ChakraFlex);
@@ -185,7 +187,9 @@ const Home = () => {
               <SkeletonList />
             </SimpleGrid>
           ) : (
-            <CourseGrid courses={coursePopular} />
+            <Suspense fallback={<Spinner size="xl" color="blue.500" />}>
+              <CourseGrid courses={coursePopular} />
+            </Suspense>
           )}
         </MotionBox>
 
@@ -201,7 +205,9 @@ const Home = () => {
             flexDirection="column"
           >
             <Heading size="lg" mb={10} color="blue.500">Bài viết nổi bật</Heading>
-            <BlogTopViews blogs={blogs} loading={loading} />
+            <Suspense fallback={<Spinner size="xl" color="blue.500" />}>
+              <BlogTopViews blogs={blogs} loading={loading} />
+            </Suspense>
           </MotionFlex>
 
           {/* Bên phải: Hoạt động */}

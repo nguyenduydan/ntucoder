@@ -126,7 +126,7 @@ const Blogs = ({ height, refreshKey, onFinishRefresh }) => {
                 <TabPanels>
                     <TabPanel p={0} maxH="250px" overflowY="auto">
                         {loading ? (
-                            <Center h="100%">
+                            <Center h="250px">
                                 <Spinner size="xl" />
                             </Center>
                         ) : error ? (
@@ -168,7 +168,7 @@ const Blogs = ({ height, refreshKey, onFinishRefresh }) => {
 
                     <TabPanel p={0}>
                         {loading ? (
-                            <Center h="100%">
+                            <Center h="250px">
                                 <Spinner size="xl" />
                             </Center>
                         ) : error ? (
