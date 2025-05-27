@@ -18,15 +18,44 @@ NTUCoder là một hệ thống quản lý và luyện tập lập trình trực
   - Frontend: <img src="https://vitejs.dev/logo.svg" alt="Vite" width="20"/> Vite + <img src="https://raw.githubusercontent.com/github/explore/main/topics/react/react.png" alt="React" width="20"/> ReactJS, ChakraUI
   - Database: MySQL
 
+## 🌐 Truy cập thử nghiệm
+
+- Website: [https://ntucoder-nguyenduydans-projects.vercel.app/](https://ntucoder-nguyenduydans-projects.vercel.app/)
+
 ## 📁 Cấu trúc thư mục
 
 ```
-api/                # Backend API
-  ├─ Infrashtructure/Repositories/  # Các repository thao tác dữ liệu (Problem, Coder, Course, ...)
-  ├─ Models/                       # Định nghĩa các model và context EF
-  └─ ...                          
-front-end/           # Giao diện ReactJS
-  └─ src/views/      # Các trang giao diện (admin, user, ...)
+NTUCoder/
+│
+├── api/                         # Backend API (ASP.NET Core)
+│   ├── Controllers/             # Các controller xử lý HTTP request
+│   ├── Infrashtructure/
+│   │   ├── Repositories/        # Các repository thao tác dữ liệu (Problem, Coder, Course, ...)
+│   │   └── ...                  # Các thành phần hạ tầng khác
+│   ├── Models/                  # Định nghĩa các model, entity và DbContext cho EF Core
+│   ├── DTOs/                    # Các Data Transfer Object (Request, Response)
+│   ├── Services/                # Xử lý logic nghiệp vụ
+│   ├── Helpers/                 # Các lớp tiện ích, helper
+│   ├── Middleware/              # Các middleware cho pipeline ASP.NET Core
+│   ├── appsettings.json         # File cấu hình ứng dụng
+│   └── Program.cs, Startup.cs   # Điểm khởi tạo ứng dụng
+│
+├── front-end/                   # Frontend ReactJS (Vite)
+│   ├── public/                  # Tài nguyên tĩnh (favicon, index.html, ...)
+│   └── src/
+│       ├── assets/              # Ảnh, icon, font, style tĩnh
+│       ├── components/          # Các component dùng lại cho toàn app
+│       ├── hooks/               # Custom React hooks
+│       ├── layouts/             # Các layout dùng chung (MainLayout, AdminLayout, ...)
+│       ├── pages/               # Các trang chính (CoursePage, ProblemPage, ...)
+│       ├── routes/              # Định nghĩa route cho app
+│       ├── services/            # Giao tiếp API, xử lý dữ liệu
+│       ├── store/               # Quản lý state (Redux/Zustand, ...)
+│       ├── theme/               # Tuỳ chỉnh giao diện ChakraUI, theme
+│       └── views/               # Các view (giao diện) phân quyền (admin, user, ...)
+│
+├── README.md                    # File hướng dẫn (bạn đang đọc)
+└── ...                          # Các tệp/thư mục khác (LICENSE, .gitignore, ...)
 ```
 
 ## 🚀 Hướng dẫn cài đặt
