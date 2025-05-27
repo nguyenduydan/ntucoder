@@ -54,11 +54,13 @@ export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }
 
         setLoading(true);
         try {
-            const data = { name, order: Number(order) };
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("order", order);
 
             await createItem({
                 controller: "CourseCategory",
-                data: data,
+                data: formData,
             });
             toast({
                 title: "Thêm mới thành công!",
@@ -100,7 +102,7 @@ export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }
         <Modal size={"2xl"} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader fontSize={"25px"} textAlign={"center"}>Thêm mới nhãn</ModalHeader>
+                <ModalHeader fontSize={"25px"} textAlign={"center"}>Thêm mới loại khóa học</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <FormControl isInvalid={!!errors.name} mb={4}>
@@ -109,7 +111,7 @@ export default function CreateCourseCategoryModal({ isOpen, onClose, fetchData }
                         </FormLabel>
                         <FlushedInput
                             bg={boxColor}
-                            placeholder="Nhập tên nhãn"
+                            placeholder="Nhập tên loại khóa học"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             textColor={textColor}

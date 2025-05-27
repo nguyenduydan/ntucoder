@@ -6,42 +6,36 @@ import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Pagination from "@/components/pagination/pagination";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
-import Create from "@/views/admin/coder/components/Create";
 
-import { getList, Search } from "@/config/apiService"; // bổ sung import Search
+import { getList, Search } from "@/config/apiService";
 import { columnsData } from "views/admin/coder/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
-import useDebounce from "@/hooks/useDebounce"; // hook debounce
+import useDebounce from "@/hooks/useDebounce";
 
 export default function Index() {
   useTitle("Quản lý người dùng");
 
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // State lọc, phân trang
-  const [sortField, setSortField] = useState("name");
+  // State filter + search
+  const [sortField, setSortField] = useState("coderName");
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // State tìm kiếm và debounce từ khóa
   const [keyword, setKeyword] = useState("");
   const debouncedKeyword = useDebounce(keyword, 600);
 
-  // Hàm kiểm tra keyword có hợp lệ
   const isKeywordValid = (k) => typeof k === "string" && k.trim() !== "";
 
   // Query keys
-  const listQueryKey = ["coders", currentPage, pageSize, ascending, sortField];
-  const searchQueryKey = ["codersSearch", debouncedKeyword, currentPage, pageSize];
+  const listQueryKey = ["coder", currentPage, pageSize, ascending, sortField];
+  const searchQueryKey = ["coderSearch", debouncedKeyword, currentPage, pageSize];
 
-  // Query danh sách bình thường (không search)
-  const {
-    data: listData,
-    isLoading: isListLoading,
-  } = useQuery({
+  // Query for list (no keyword)
+  const listQuery = useQuery({
     queryKey: listQueryKey,
     queryFn: () =>
       getList({
@@ -53,7 +47,7 @@ export default function Index() {
       }),
     enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 60000,
+    staleTime: 0,
     retry: 1,
     onError: () => {
       toast({
@@ -68,11 +62,8 @@ export default function Index() {
     },
   });
 
-  // Query tìm kiếm (có keyword)
-  const {
-    data: searchData,
-    isLoading: isSearchLoading,
-  } = useQuery({
+  // Query for search (with keyword)
+  const searchQuery = useQuery({
     queryKey: searchQueryKey,
     queryFn: () =>
       Search({
@@ -83,7 +74,7 @@ export default function Index() {
       }),
     enabled: isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 60000,
+    staleTime: 0,
     retry: 1,
     onError: (error) => {
       toast({
@@ -98,15 +89,14 @@ export default function Index() {
     },
   });
 
-  // Prefetch trang kế tiếp (dù search hay không)
+  // Prefetch next page data
   useEffect(() => {
-    const sourceData = isKeywordValid(debouncedKeyword) ? searchData : listData;
-
-    if (sourceData?.totalPages && currentPage < sourceData.totalPages) {
+    const dataSource = isKeywordValid(debouncedKeyword) ? searchQuery.data : listQuery.data;
+    if (dataSource?.totalPages && currentPage < dataSource.totalPages) {
       const nextPage = currentPage + 1;
       if (isKeywordValid(debouncedKeyword)) {
         queryClient.prefetchQuery({
-          queryKey: ["codersSearch", debouncedKeyword, nextPage, pageSize],
+          queryKey: ["coderSearch", debouncedKeyword, nextPage, pageSize],
           queryFn: () =>
             Search({
               controller: "Coder",
@@ -114,12 +104,10 @@ export default function Index() {
               page: nextPage,
               pageSize,
             }),
-          staleTime: 60000,
-          retry: 1,
         });
       } else {
         queryClient.prefetchQuery({
-          queryKey: ["coders", nextPage, pageSize, ascending, sortField],
+          queryKey: ["coder", nextPage, pageSize, ascending, sortField],
           queryFn: () =>
             getList({
               controller: "Coder",
@@ -128,23 +116,12 @@ export default function Index() {
               ascending,
               sortField,
             }),
-          staleTime: 60000,
-          retry: 1,
         });
       }
     }
-  }, [
-    debouncedKeyword,
-    searchData,
-    listData,
-    currentPage,
-    pageSize,
-    ascending,
-    sortField,
-    queryClient,
-  ]);
+  }, [debouncedKeyword, searchQuery.data, listQuery.data, currentPage, pageSize, ascending, sortField, queryClient]);
 
-  // Xử lý sắp xếp
+  // Handlers
   const handleSort = (field) => {
     if (sortField === field) {
       setAscending(!ascending);
@@ -155,18 +132,15 @@ export default function Index() {
     setCurrentPage(1);
   };
 
-  // Xử lý thay đổi trang
   const handlePageChange = (newPage) => {
     const totalPages = isKeywordValid(debouncedKeyword)
-      ? searchData?.totalPages || 0
-      : listData?.totalPages || 0;
-
+      ? searchQuery.data?.totalPages || 0
+      : listQuery.data?.totalPages || 0;
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Xử lý thay đổi page size
   const handlePageSizeChange = (value) => {
     const newPageSize = parseInt(value, 10);
     if (newPageSize !== pageSize) {
@@ -175,37 +149,33 @@ export default function Index() {
     }
   };
 
-  // Xử lý tìm kiếm từ Toolbar
   const handleSearch = (newKeyword) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
   };
 
-  // Refresh dữ liệu
   const refreshTable = () => {
-    queryClient.invalidateQueries({ queryKey: ["coders"] });
-    queryClient.invalidateQueries({ queryKey: ["codersSearch"] });
+    queryClient.invalidateQueries({ queryKey: ["coder"] });
+    queryClient.invalidateQueries({ queryKey: ["coderSearch"] });
   };
 
-  // Dữ liệu hiển thị tùy search hay không
-  const tableData = isKeywordValid(debouncedKeyword) ? searchData?.data : listData?.data;
+  // Data for rendering
+  const tableData = isKeywordValid(debouncedKeyword) ? searchQuery.data?.data : listQuery.data?.data;
 
   const totalPages = isKeywordValid(debouncedKeyword)
-    ? searchData?.totalPages || 0
-    : listData?.totalPages || 0;
+    ? searchQuery.data?.totalPages || 0
+    : listQuery.data?.totalPages || 0;
 
   const totalRows = isKeywordValid(debouncedKeyword)
-    ? searchData?.totalCount || 0
-    : listData?.totalCount || 0;
+    ? searchQuery.data?.totalCount || 0
+    : listQuery.data?.totalCount || 0;
 
-  const loading = isKeywordValid(debouncedKeyword) ? isSearchLoading : isListLoading;
+  const loading = isKeywordValid(debouncedKeyword) ? searchQuery.isFetching : listQuery.isFetching;
 
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
-
-        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
+        <Toolbar onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
 
         <ColumnsTable
           columnsData={columnsData}
@@ -225,6 +195,7 @@ export default function Index() {
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
         />
+
       </Box>
     </ScrollToTop>
   );

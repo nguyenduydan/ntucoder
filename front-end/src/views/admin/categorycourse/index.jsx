@@ -51,7 +51,7 @@ export default function Index() {
       }),
     enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 9999,
+    staleTime: 0,
     retry: 1,
     onError: () => {
       toast({
@@ -82,7 +82,7 @@ export default function Index() {
       }),
     enabled: isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 9999,
+    staleTime: 0,
     retry: 1,
     onError: (error) => {
       toast({

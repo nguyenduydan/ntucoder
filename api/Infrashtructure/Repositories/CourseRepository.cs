@@ -5,6 +5,8 @@ using api.Infrastructure.Helpers;
 using api.Models.ERD;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -56,8 +58,18 @@ namespace api.Infrashtructure.Repositories
 
             if (dto.ImageFile != null)
             {
-                using var stream = dto.ImageFile.OpenReadStream();
-                var fileName = $"imgCourse/{dto.CourseID + "_" + dto.CoderID}.jpg";
+                using Stream stream = dto.ImageFile.OpenReadStream();
+                // Sinh tên file mã hóa bằng SHA256
+                string raw = $"{dto.CourseID}_{dto.CoderID}_{DateTime.UtcNow.Ticks}";
+                using SHA256 sha256 = SHA256.Create();
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(raw));
+                string hash = BitConverter.ToString(bytes).Replace("-", "").ToLower();
+
+                // Lấy extension gốc, nếu có
+                string ext = Path.GetExtension(dto.ImageFile.FileName);
+                if (string.IsNullOrEmpty(ext)) ext = ".jpg";
+
+                string fileName = $"imgCourse/{hash}{ext}";
                 dto.ImageUrl = await _minioService.UploadFileAsync(stream, fileName, "ntucoder");
             }
 
@@ -113,9 +125,19 @@ namespace api.Infrashtructure.Repositories
 
             if (dto.ImageFile != null)
             {
-                using var stream = dto.ImageFile.OpenReadStream();
-                var fileName = $"imgCourse/{course.CourseID + "_" + course.CoderID}.jpg";
-                course.ImageUrl = await _minioService.UploadFileAsync(stream, fileName, "ntucoder");
+                using Stream stream = dto.ImageFile.OpenReadStream();
+                // Sinh tên file mã hóa bằng SHA256
+                string raw = $"{dto.CourseID}_{dto.CoderID}_{DateTime.UtcNow.Ticks}";
+                using SHA256 sha256 = SHA256.Create();
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(raw));
+                string hash = BitConverter.ToString(bytes).Replace("-", "").ToLower();
+
+                // Lấy extension gốc, nếu có
+                string ext = Path.GetExtension(dto.ImageFile.FileName);
+                if (string.IsNullOrEmpty(ext)) ext = ".jpg";
+
+                string fileName = $"imgCourse/{hash}{ext}";
+                dto.ImageUrl = await _minioService.UploadFileAsync(stream, fileName, "ntucoder");
             }
 
             if (dto.Fee.HasValue || dto.OriginalFee.HasValue)
@@ -193,12 +215,12 @@ namespace api.Infrashtructure.Repositories
                 .GroupBy(e => e.CourseID)
                 .Select(g => new { CourseID = g.Key, Count = g.Count() });
 
-            // Đây là chỗ mới - thống kê review theo CoderID
-            var reviewStatsByCoder = _context.Reviews
-                .GroupBy(r => r.Course.CoderID)
+            // Sửa: Thống kê review theo CourseID (đúng logic trung bình rating từng khóa học)
+            var reviewStatsByCourse = _context.Reviews
+                .GroupBy(r => r.CourseID)
                 .Select(g => new
                 {
-                    CoderID = g.Key,
+                    CourseID = g.Key,
                     AvgRating = g.Average(r => r.Rating),
                     TotalReviews = g.Count()
                 });
@@ -213,13 +235,13 @@ namespace api.Infrashtructure.Repositories
                     c => c.CourseID,
                     ec => ec.CourseID,
                     (c, ec) => new { c, ec })
-               .SelectMany(
+                .SelectMany(
                     temp => temp.ec.DefaultIfEmpty(),
                     (temp, ec) => new { temp.c, EnrollCount = ec != null ? (int?)ec.Count : null })
-
-                .GroupJoin(reviewStatsByCoder,
-                    temp => temp.c.CoderID,
-                    rs => rs.CoderID,
+                // Sửa: Join theo CourseID với reviewStatsByCourse
+                .GroupJoin(reviewStatsByCourse,
+                    temp => temp.c.CourseID,
+                    rs => rs.CourseID,
                     (temp, rs) => new { temp.c, temp.EnrollCount, rs })
                 .SelectMany(
                     temp => temp.rs.DefaultIfEmpty(),
@@ -228,7 +250,7 @@ namespace api.Infrashtructure.Repositories
                         temp.c,
                         temp.EnrollCount,
                         AvgRating = rs != null ? (double?)rs.AvgRating : null,
-                        TotalReviews = rs != null ? rs.TotalReviews : 0
+                        TotalReviews = rs != null ? (int?)rs.TotalReviews : null
                     })
                 .Select(x => new CourseDTO
                 {
@@ -246,9 +268,9 @@ namespace api.Infrashtructure.Repositories
                     BadgeColor = x.c.Badge.Color,
                     ImageUrl = x.c.ImageUrl,
                     Status = x.c.Status,
-                    Rating = x.AvgRating,
+                    Rating = x.AvgRating ?? 0,
+                    TotalReviews = x.TotalReviews ?? 0,
                     EnrollCount = ((int?)x.EnrollCount).GetValueOrDefault(),
-                    TotalReviews = x.c.Reviews != null ? x.c.Reviews.Count() : 0,
                     CreatedAt = x.c.CreatedAt,
                     UpdatedAt = x.c.UpdatedAt,
                 });
@@ -256,28 +278,28 @@ namespace api.Infrashtructure.Repositories
             return query;
         }
 
-        private CourseDTO MapToCourseDto(Course course, int enrollmentCount = 0, double? rating = null)
-        {
-            return new CourseDTO
-            {
-                CourseID = course.CourseID,
-                CourseName = course.CourseName,
-                CoderID = course.CoderID,
-                CreatorName = course.Creator?.CoderName ?? string.Empty,
-                CourseCategoryID = course.CourseCategoryID,
-                CourseCategoryName = course.CourseCategory?.Name ?? string.Empty,
-                Fee = course.Fee,
-                OriginalFee = course.OriginalFee,
-                IsCombo = course.IsCombo,
-                BadgeID = course.BadgeID,
-                BadgeName = course.Badge?.Name ?? string.Empty,
-                BadgeColor = course.Badge?.Color,
-                ImageUrl = course.ImageUrl,
-                Status = course.Status,
-                Rating = rating,
-                TotalReviews = enrollmentCount
-            };
-        }
+        //private CourseDTO MapToCourseDto(Course course, int enrollmentCount = 0, double? rating = null)
+        //{
+        //    return new CourseDTO
+        //    {
+        //        CourseID = course.CourseID,
+        //        CourseName = course.CourseName,
+        //        CoderID = course.CoderID,
+        //        CreatorName = course.Creator?.CoderName ?? string.Empty,
+        //        CourseCategoryID = course.CourseCategoryID,
+        //        CourseCategoryName = course.CourseCategory?.Name ?? string.Empty,
+        //        Fee = course.Fee,
+        //        OriginalFee = course.OriginalFee,
+        //        IsCombo = course.IsCombo,
+        //        BadgeID = course.BadgeID,
+        //        BadgeName = course.Badge?.Name ?? string.Empty,
+        //        BadgeColor = course.Badge?.Color,
+        //        ImageUrl = course.ImageUrl,
+        //        Status = course.Status,
+        //        Rating = rating ?? 0,
+        //        TotalReviews = enrollmentCount
+        //    };
+        //}
 
         private CourseDetailDTO MapToCourseDetailDto(Course course)
         {

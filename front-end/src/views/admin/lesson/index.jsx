@@ -52,7 +52,7 @@ export default function Index() {
       }),
     enabled: !isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 60000,
+    staleTime: 0,
     retry: 1,
     onError: () => {
       toast({
@@ -82,7 +82,7 @@ export default function Index() {
       }),
     enabled: isKeywordValid(debouncedKeyword),
     keepPreviousData: true,
-    staleTime: 60000,
+    staleTime: 0,
     retry: 1,
     onError: () => {
       toast({
@@ -112,7 +112,7 @@ export default function Index() {
               page: nextPage,
               pageSize,
             }),
-          staleTime: 60000,
+          staleTime: 0,
           retry: 1,
         });
       } else {
@@ -126,7 +126,7 @@ export default function Index() {
               ascending,
               sortField,
             }),
-          staleTime: 60000,
+          staleTime: 0,
           retry: 1,
         });
       }

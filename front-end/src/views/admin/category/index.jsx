@@ -39,7 +39,7 @@ export default function Index() {
         sortField,
       }),
     keepPreviousData: true,
-    staleTime: 9999, // cache in 1 minute
+    staleTime: 0, // cache in 1 minute
     retry: 1,
     onError: () => {
       toast({

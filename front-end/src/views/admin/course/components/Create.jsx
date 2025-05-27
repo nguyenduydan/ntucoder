@@ -15,11 +15,16 @@ import {
     ModalCloseButton,
     ModalBody,
     ModalFooter,
-    Select,
-    useColorMode,
     Box,
     Divider,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    useColorMode,
+    Select
 } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import FlushedInput from "@/components/fields/InputField";
 import ImageInput from "@/components/fields/ImageInput";
 import JoditEditor from "jodit-react";
@@ -46,6 +51,8 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
     const [errors, setErrors] = useState({});
     const toast = useToast();
     const [loading, setLoading] = useState(false);
+
+    // ColorMode
     const { colorMode } = useColorMode();
     const textColor = colorMode === 'light' ? 'black' : 'white';
     const boxColor = colorMode === 'light' ? 'gray.100' : 'whiteAlpha.100';
@@ -66,14 +73,14 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
                 imageFile: null,
             });
             setErrors({});
-            fetchCategories(); // Gọi hàm lấy danh mục khóa học khi modal mở
+            fetchCategories();
         }
     }, [isOpen]);
 
     const fetchCategories = async () => {
         try {
-            const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 10 });
-            const badge = await getList({ controller: "Badge", page: 1, pageSize: 10 });
+            const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 100 });
+            const badge = await getList({ controller: "Badge", page: 1, pageSize: 100 });
             setCourseCategories(courseCategory.data);
             setBadge(badge.data);
         } catch (error) {
@@ -87,6 +94,18 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         setCourse((prev) => ({
             ...prev,
             [name]: name === "status" ? parseInt(value, 10) : value,
+        }));
+    };
+
+    // Handler cho menu chọn CourseCategoryID
+    const handleCategoryMenuChange = (value) => {
+        setCourse((prev) => ({
+            ...prev,
+            courseCategoryID: value,
+        }));
+        setErrors((prev) => ({
+            ...prev,
+            courseCategoryID: undefined,
         }));
     };
 
@@ -110,7 +129,6 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         if (!validate()) return;
         setLoading(true);
 
-        // Tạo FormData để gửi dữ liệu
         const formData = new FormData();
         formData.append("coderID", course.coderID);
         formData.append("courseName", course.courseName);
@@ -123,13 +141,11 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         formData.append("description", course.description);
         formData.append("overview", course.overview);
 
-        // Nếu có file ảnh, thêm vào FormData
         if (course.imageFile) {
             formData.append("imageFile", course.imageFile);
         }
         try {
-            await createItem({ controller: "Course", data: formData }); // Gửi FormData lên backend
-
+            await createItem({ controller: "Course", data: formData });
             toast({
                 title: 'Thêm mới khóa học thành công!',
                 status: 'success',
@@ -143,15 +159,11 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
             onClose();
         } catch (error) {
             let errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
-
-            // Kiểm tra xem lỗi có phải đến từ API không
             if (error.response && error.response.data) {
                 errorMessage = error.response.data.message || "Lỗi không xác định từ server.";
             } else if (error.message) {
-                errorMessage = error.message; // Nếu lỗi không phải từ API, lấy message mặc định
+                errorMessage = error.message;
             }
-
-            // Hiển thị thông báo lỗi
             toast({
                 title: "Đã xảy ra lỗi.",
                 description: errorMessage,
@@ -166,6 +178,15 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
         }
     };
 
+    // Tạo options cho menu
+    const courseCategoryOptions = [
+        { value: "", label: "Chọn loại khóa học" },
+        ...courseCategories.map(category => ({
+            value: category.courseCategoryID,
+            label: category.name
+        }))
+    ];
+    const selectedCategory = courseCategoryOptions.find(opt => opt.value === course.courseCategoryID);
 
     return (
         <Modal size={'4xl'} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
@@ -204,24 +225,82 @@ export default function CreateCourseModal({ isOpen, onClose, fetchData }) {
 
                         </GridItem>
                         <GridItem>
+                            {/* Menu chọn loại khóa học */}
                             <FormControl isInvalid={errors.courseCategoryID} mb={4}>
                                 <FormLabel fontWeight="bold">Loại khóa học<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <Select bg={boxColor} name="courseCategoryID" value={course.courseCategoryID} onChange={handleChange} textColor={textColor}>
-                                    <option key="0" value="">Chọn loại khóa học</option>
-                                    {courseCategories.map((category) => (
-                                        <option key={category.courseCategoryID} value={category.courseCategoryID}>{category.name}</option>
-                                    ))}
-                                </Select>
+                                <Menu>
+                                    <MenuButton
+                                        as={Button}
+                                        width="100%"
+                                        height="40px"
+                                        bg={boxColor}
+                                        color={textColor}
+                                        rightIcon={<ChevronDownIcon />}
+                                        textAlign="left"
+                                        borderWidth={errors.courseCategoryID ? '2px' : '1px'}
+                                        borderColor={errors.courseCategoryID ? 'red.500' : 'gray.200'}
+                                        _hover={{ borderColor: errors.courseCategoryID ? 'red.500' : 'blue.400' }}
+                                    >
+                                        {selectedCategory ? selectedCategory.label : "Chọn loại khóa học"}
+                                    </MenuButton>
+                                    <MenuList maxHeight="160px" overflowY="auto" width="100%">
+                                        {courseCategoryOptions.map(opt => (
+                                            <MenuItem
+                                                key={opt.value}
+                                                onClick={() => handleCategoryMenuChange(opt.value)}
+                                                background={opt.value === course.courseCategoryID ? "blue.50" : undefined}
+                                            >
+                                                {opt.label}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu>
                                 <FormErrorMessage>{errors.courseCategoryID}</FormErrorMessage>
                             </FormControl>
                             <FormControl isInvalid={errors.badgeID} mb={4}>
                                 <FormLabel fontWeight="bold">Loại nhãn<Text as="span" color="red.500"> *</Text></FormLabel>
-                                <Select bg={boxColor} name="badgeID" value={course.badgeID} onChange={handleChange} textColor={textColor}>
-                                    <option key="0" value="">Chọn loại nhãn</option>
-                                    {badge.map((badge) => (
-                                        <option key={badge.badgeID} value={badge.badgeID}>{badge.name}</option>
-                                    ))}
-                                </Select>
+                                <Menu>
+                                    <MenuButton
+                                        as={Button}
+                                        width="100%"
+                                        height="40px"
+                                        bg={boxColor}
+                                        color={textColor}
+                                        rightIcon={<ChevronDownIcon />}
+                                        textAlign="left"
+                                        borderWidth={errors.badgeID ? '2px' : '1px'}
+                                        borderColor={errors.badgeID ? 'red.500' : 'gray.200'}
+                                        _hover={{ borderColor: errors.badgeID ? 'red.500' : 'blue.400' }}
+                                    >
+                                        {badge.find(b => b.badgeID === course.badgeID)?.name || "Chọn loại nhãn"}
+                                    </MenuButton>
+                                    <MenuList maxHeight="160px" overflowY="auto" width="100%">
+                                        <MenuItem
+                                            key="0"
+                                            onClick={() =>
+                                                handleChange({
+                                                    target: { name: "badgeID", value: "" }
+                                                })
+                                            }
+                                            background={course.badgeID === "" ? "blue.50" : undefined}
+                                        >
+                                            Chọn loại nhãn
+                                        </MenuItem>
+                                        {badge.map(b => (
+                                            <MenuItem
+                                                key={b.badgeID}
+                                                onClick={() =>
+                                                    handleChange({
+                                                        target: { name: "badgeID", value: b.badgeID }
+                                                    })
+                                                }
+                                                background={b.badgeID === course.badgeID ? "blue.50" : undefined}
+                                            >
+                                                {b.name}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu>
                                 <FormErrorMessage>{errors.badgeID}</FormErrorMessage>
                             </FormControl>
                             <FormControl isInvalid={errors.status}>
