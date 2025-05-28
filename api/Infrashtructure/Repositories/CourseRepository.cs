@@ -159,14 +159,25 @@ namespace api.Infrashtructure.Repositories
                 .Include(c => c.CourseCategory)
                 .Include(c => c.Badge)
                 .Include(c => c.Topics)
-                .Include(c => c.Enrollments).ThenInclude(e => e.Coder)
-                .Include(c => c.Reviews).ThenInclude(r => r.Coder)
+                // ❌ bỏ .Include(c => c.Enrollments)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CourseID == id);
 
             if (course == null)
                 throw new KeyNotFoundException($"Khóa học với ID {id} không tồn tại.");
 
-            return MapToCourseDetailDto(course);
+            // ✅ Lấy số lượng enrollments riêng
+            var totalEnrollments = await _context.Enrollments
+                .CountAsync(e => e.CourseID == id);
+
+            var avgRating = await _context.Reviews
+              .Where(r => r.CourseID == id)
+              .AverageAsync(r => (double?)r.Rating) ?? 0;
+
+            var dto = MapToCourseDetailDto(course);
+            dto.EnrollCount = totalEnrollments;
+            dto.Rating = avgRating;
+            return dto;
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -311,48 +322,29 @@ namespace api.Infrashtructure.Repositories
                 CreatorName = course.Creator?.CoderName ?? string.Empty,
                 CourseCategoryID = course.CourseCategoryID,
                 CourseCategoryName = course.CourseCategory?.Name ?? string.Empty,
-                Fee = course.Fee, // decimal? nên gán thẳng
-                OriginalFee = course.OriginalFee, // decimal? nên gán thẳng
+                Fee = course.Fee,
+                OriginalFee = course.OriginalFee,
                 IsCombo = course.IsCombo,
                 BadgeID = course.BadgeID,
                 BadgeName = course.Badge?.Name ?? string.Empty,
-                BadgeColor = course.Badge?.Color, // string? ok
+                BadgeColor = course.Badge?.Color,
                 ImageUrl = course.ImageUrl,
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt,
                 Description = course.Description,
                 Overview = course.Overview,
-                Rating = course.Reviews.Any()
-                        ? course.Reviews.Average(r => r.Rating)
-                        : 0,
 
-                TotalReviews = course.Enrollments?.Count ?? 0,
                 Topics = course.Topics?.Select(t => new TopicDTO
                 {
                     TopicID = t.TopicID,
                     TopicName = t.TopicName ?? string.Empty
                 }).ToList() ?? new List<TopicDTO>(),
-                Enrollments = course.Enrollments?.Select(e => new EnrollmentDTO
-                {
-                    EnrollmentID = e.EnrollmentID,
-                    CoderID = e.CoderID,
-                    CoderName = e.Coder?.CoderName ?? string.Empty,
-                    EnrolledAt = e.EnrolledAt
-                }).ToList() ?? new List<EnrollmentDTO>(),
-                Reviews = course.Reviews?.Select(r => new ReviewDTO
-                {
-                    ReviewID = r.ReviewID,
-                    CourseID = r.CourseID,
-                    CoderID = r.CoderID,
-                    CoderName = r.Coder?.CoderName ?? "Unknown",
-                    Rating = r.Rating,
-                    Content = r.Content,
-                    CreatedAt = r.CreatedAt
-                }).ToList() ?? new List<ReviewDTO>(),
-                Comments = new List<CommentDTO>() // nếu chưa load, giữ như vậy
+
+                Enrollments = new List<EnrollmentDTO>(), // bỏ chi tiết
+                Reviews = new List<ReviewDTO>(),          // defer load nếu cần
+                Comments = new List<CommentDTO>()         // defer load nếu cần
             };
         }
-
     }
 }

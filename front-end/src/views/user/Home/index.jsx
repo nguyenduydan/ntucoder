@@ -59,8 +59,8 @@ const Home = () => {
   const coursePopular = useMemo(() => {
     if (!Array.isArray(courses)) return [];
     return courses
-      .filter(course => course.status === 1 && course.totalReviews > 0)
-      .sort((a, b) => b.totalReviews - a.totalReviews)
+      .filter(course => course.status === 1 && course.enrollCount > 0)
+      .sort((a, b) => b.enrollCount - a.enrollCount)
       .slice(0, 4);
   }, [courses]);
 
@@ -108,7 +108,8 @@ const Home = () => {
   const fetchTopViewedBlogs = async (count = 3) => {
     try {
       const res = await api.get(`/Blog/TopViewed?count=${count}`);
-      setBlogs(res.data);
+      const blogData = res.data.filter(blog => blog.status === 1 && blog.pinHome === 1);
+      setBlogs(blogData);
     } catch (error) {
       throw error;
     } finally {

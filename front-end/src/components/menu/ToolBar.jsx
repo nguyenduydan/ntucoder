@@ -162,24 +162,26 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd, valueSearch, title }) => {
                         boxShadow="md"
                         w={{ base: "100%", md: "300px", lg: "400px" }}
                     />
-                    <Button
-                        variant="solid"
-                        size="lg"
+                    {onAdd && (
+                        <Button
+                            variant="solid"
+                            size="lg"
 
-                        colorScheme="blackAlpha"
-                        bgGradient="linear(to-l, green.500, green.300)"
-                        borderRadius="xl"
-                        boxShadow="lg"
-                        transition="all 0.3s ease-in-out"
-                        _hover={{
-                            bgGradient: "linear(to-r, green.500, green.300)",
-                            color: "white",
-                        }}
-                        _active={{ transform: "scale(0.90)" }}
-                        onClick={onAdd}
-                    >
-                        Thêm <MdAdd size="25" />
-                    </Button>
+                            colorScheme="blackAlpha"
+                            bgGradient="linear(to-l, green.500, green.300)"
+                            borderRadius="xl"
+                            boxShadow="lg"
+                            transition="all 0.3s ease-in-out"
+                            _hover={{
+                                bgGradient: "linear(to-r, green.500, green.300)",
+                                color: "white",
+                            }}
+                            _active={{ transform: "scale(0.90)" }}
+                            onClick={onAdd}
+                        >
+                            Thêm <MdAdd size="25" />
+                        </Button>
+                    )}
                 </Box>
             </Flex>
 

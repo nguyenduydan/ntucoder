@@ -6,7 +6,7 @@ import ScrollToTop from "@/components/scroll/ScrollToTop";
 import Pagination from "@/components/pagination/pagination";
 import Toolbar from "components/menu/ToolBar";
 import ColumnsTable from "components/separator/ColumnsTable";
-
+import Create from "@/views/admin/coder/components/Create";
 import { getList, Search } from "@/config/apiService";
 import { columnsData } from "views/admin/coder/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
@@ -175,7 +175,8 @@ export default function Index() {
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
+        <Toolbar onAdd={onOpen} onSearch={handleSearch} valueSearch={keyword} title={columnsData} />
+        <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} />
 
         <ColumnsTable
           columnsData={columnsData}

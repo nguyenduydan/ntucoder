@@ -95,6 +95,7 @@ function Navbar(props) {
                         borderRadius="full"
                         onClick={onOpenSearch}
                         readOnly
+                        w={{ base: "150px", md: "250px", lg: "500px" }}
                     />
                     <SearchModal isOpen={isOpenSearch} onClose={onCloseSearch} />
                     <Auth />
@@ -108,6 +109,7 @@ function Navbar(props) {
                         variant="ghost"
                         color={textColor}
                     />
+                    <Auth />
                     <Box
                         fontSize="xl"
                         fontWeight="bold"
@@ -142,7 +144,6 @@ function Navbar(props) {
                                 renderView={renderView}
                             >
                                 <Stack spacing={3} p={3} my="30px">
-                                    <Auth />
                                     <Links direction="column" routes={routes} />
                                     <SearchInput
                                         placeholder={text}

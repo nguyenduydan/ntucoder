@@ -65,7 +65,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                 <Badge bg={course.badgeColor} textTransform="capitalize" fontWeight="normal" textColor={textColor} px="2" borderRadius="md">
                     {course.badgeName}
                 </Badge>
-                <Text fontSize="lg" fontWeight="bold" mt="2">{course.courseName}</Text>
+                <Text fontSize="lg" fontWeight="bold" mt="2" noOfLines={1}>{course.courseName}</Text>
                 <Flex align="center" mt="2">
                     <Text ml="1" fontSize="sm" color="gray.400">{course.creatorName}</Text>
                 </Flex>
@@ -81,7 +81,7 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
                     <Flex>
                         <FaUsers color="gray.400" />
                         <Text ml="1" fontSize="sm" fontWeight="medium">
-                            {formatNumber(course.totalReviews)}
+                            {formatNumber(course.enrollCount)}
                         </Text>
                     </Flex>
                 </Flex>

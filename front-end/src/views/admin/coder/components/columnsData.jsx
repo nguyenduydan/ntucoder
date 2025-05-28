@@ -36,8 +36,8 @@ export const columnsData = [
       const value = row?.role;
       const roleMap = {
         1: { label: "Quản trị viên", color: "blue" },
-        2: { label: "Người dùng", color: "red" },
-        3: { label: "Giáo viên", color: "orange" }
+        2: { label: "Người dùng", color: "yellow" },
+        3: { label: "Giáo viên", color: "green" }
       };
 
       const role = roleMap[value] || { label: "Không xác định", color: "yellow" };

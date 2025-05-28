@@ -1,28 +1,31 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useParams, useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
     Box, Text, Image, Flex, Badge, Icon, Button,
-    Tabs, List, ListItem, TabPanels, Tab, TabPanel, useToast,
-    VStack, HStack, Skeleton, SkeletonText, Accordion, AccordionItem, AccordionButton, AccordionPanel,
+    Tabs, TabPanels, Tab, TabPanel, useToast,
+    VStack, HStack, Skeleton, SkeletonText,
     AlertDialog,
     AlertDialogBody,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogOverlay,
+    Spinner,
+    Center,
 } from "@chakra-ui/react";
 import { FaCheckCircle, FaTrophy, FaUsers, FaStar, FaArrowRight, FaClipboardList, FaFingerprint, FaBookOpen } from "react-icons/fa";
-import { AddIcon, MinusIcon, ArrowBackIcon } from "@chakra-ui/icons";
-import { FaRegFileCode } from "react-icons/fa";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import { formatCurrency } from "@/utils/utils";
 import sanitizeHtml from "@/utils/sanitizedHTML";
 import { useTitle } from "@/contexts/TitleContext";
 import { getDetail } from "@/config/apiService";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/config/apiConfig";
-import Review from "./Review";
 import StickyTabList from "@/components/scroll/StickyTabList";
 import Comment from "./Comment";
+import TopicList from "./TopicList";
+
+const Review = React.lazy(() => import("./Review"));
 
 
 const CourseDetail = () => {
@@ -39,7 +42,17 @@ const CourseDetail = () => {
     const isAuthenticated = useAuth();
     const { coder } = useAuth();
 
+    const [tabIndex, setTabIndex] = useState(0);
+    const [hasViewed, setHasViewed] = useState([true, false, false, false]);
 
+    const handleTabChange = (index) => {
+        setTabIndex(index);
+        setHasViewed((prev) => {
+            const updated = [...prev];
+            updated[index] = true;
+            return updated;
+        });
+    };
 
     const fetchCourse = useCallback(async () => {
         if (isNaN(courseID)) {
@@ -271,7 +284,7 @@ const CourseDetail = () => {
                                     <Text mt={2}> <Box sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.description) }} /></Text>
                                     <HStack mt={4} spacing={4}>
                                         <Text>Tác giả: <Text as="span" color="blue.300">{course?.creatorName}</Text></Text>
-                                        <Icon as={FaUsers} /><Text>{course?.totalReviews || "0"} Học viên</Text>
+                                        <Icon as={FaUsers} /><Text>{course?.enrollCount || "0"} Học viên</Text>
                                         <Icon as={FaStar} color="yellow.400" /> <Text> {course.rating ? course.rating.toFixed(1) : "0"}</Text>
                                     </HStack>
                                 </Box>
@@ -364,135 +377,68 @@ const CourseDetail = () => {
                     </Flex>
 
                     {/* Tabs */}
-                    <Tabs mt={6} colorScheme="blue" bg="white" borderRadius="md">
+                    <Tabs
+                        index={tabIndex}
+                        onChange={handleTabChange}
+                        mt={6}
+                        colorScheme="blue"
+                        bg="white"
+                        borderRadius="md"
+                    >
                         <StickyTabList offsetTop={0}>
                             <Tab>Giới thiệu</Tab>
                             <Tab>Giáo trình</Tab>
                             <Tab>Đánh giá</Tab>
                             <Tab>Bình luận</Tab>
                         </StickyTabList>
+
                         <TabPanels>
                             <TabPanel>
-                                {loading ?
-                                    <SkeletonText noOfLines={4} spacing={3} />
-                                    :
-                                    <Text mt={2}> <Box px={5} py={2} sx={{ wordBreak: "break-word" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }} /></Text>
-                                }
-                            </TabPanel>
-                            {/* Nội dung giáo trình */}
-                            <TabPanel>
-                                {loading ? (
-                                    <SkeletonText noOfLines={5} spacing={4} />
+                                {hasViewed[0] && (loading ? (
+                                    <Center><Spinner color="blue.500" size="md" /></Center>
                                 ) : (
-                                    <List spacing={0}>
-                                        {Array.isArray(course?.topics) && course.topics.length > 0 ? (
-                                            course.topics.map((topic, index) => (
-                                                <ListItem key={topic?.topicID || index} bg="gray.100" borderRadius="md">
-                                                    <Accordion allowToggle>
-                                                        <AccordionItem key={topic?.topicID} border="none">
-                                                            {({ isExpanded }) => (
-                                                                <>
-                                                                    <h2>
-                                                                        <AccordionButton _expanded={{ bg: "gray.200" }} borderRadius="sm">
-                                                                            <Box flex="1" textAlign="left" borderBottomWidth={2} borderStyle="dashed" py={2}>
-                                                                                <Text fontSize="lg">
-                                                                                    <Text as="span" fontWeight="bold">Chủ đề {index + 1}:</Text> {topic?.topicName || "Không có tên"}
-                                                                                </Text>
-                                                                                <Flex alignItems='center' gap={2} fontSize="sm">
-                                                                                    <Text as='span'><FaRegFileCode /></Text>Tổng số bài học: {topic?.lessons?.length || 0}
-                                                                                </Flex>
-                                                                            </Box>
-                                                                            {isExpanded ? <MinusIcon boxSize={4} /> : <AddIcon boxSize={4} />}
-                                                                        </AccordionButton>
-                                                                    </h2>
-                                                                    <AccordionPanel pb={4}>
-                                                                        {topic.lessons?.length ? (
-                                                                            <List spacing={2}>
-                                                                                {topic.lessons.map((lesson) => {
-                                                                                    const isLoggedIn = isAuthenticated.isAuthenticated;
-                                                                                    const key = lesson.lessonID || Math.random(); // đảm bảo key duy nhất
+                                    <Box
+                                        px={5}
+                                        py={2}
+                                        sx={{ wordBreak: 'break-word' }}
+                                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(course?.overview) }}
+                                    />
+                                ))}
+                            </TabPanel>
 
-                                                                                    const LessonItem = (
-                                                                                        <ListItem
-                                                                                            cursor="pointer"
-                                                                                            _hover={{ bg: "gray.300", transform: "scale(1.01)" }}
-                                                                                            transition="all .2s ease-in-out"
-                                                                                            pl={2}
-                                                                                            bg="gray.50"
-                                                                                            borderRadius="sm"
-                                                                                            p={2}
-                                                                                            onClick={() => {
-                                                                                                if (!isLoggedIn) {
-                                                                                                    toast({
-                                                                                                        title: "Bạn cần đăng nhập để truy cập trang này.",
-                                                                                                        status: "warning",
-                                                                                                        duration: 2000,
-                                                                                                        isClosable: true,
-                                                                                                        position: "top",
-                                                                                                        variant: "top-accent",
-                                                                                                    });
-                                                                                                }
-                                                                                            }}
-                                                                                        >
-                                                                                            <Text fontSize="md">📚 {lesson.lessonTitle || "Không có tên bài học"}</Text>
-                                                                                        </ListItem>
-                                                                                    );
+                            <TabPanel>
+                                {hasViewed[1] && (loading ? (
+                                    <Center>
+                                        <Spinner color="blue.500" size="md" />
+                                    </Center>
+                                ) : (
+                                    <TopicList
+                                        course={course}
+                                        isAuthenticated={isAuthenticated}
+                                        isEnrolled={isEnrolled}
+                                        toast={toast}
 
-                                                                                    // Nếu chưa enroll
-                                                                                    if (!isEnrolled) {
-                                                                                        return (
-                                                                                            <Box key={key}>
-                                                                                                <Box cursor="default" >
-                                                                                                    {LessonItem}
-                                                                                                </Box>
-                                                                                            </Box>
-                                                                                        );
-                                                                                    }
+                                    />
+                                ))}
+                            </TabPanel>
 
-                                                                                    // Nếu đã đăng nhập
-                                                                                    if (isLoggedIn) {
-                                                                                        return (
-                                                                                            <Box key={key}>
-                                                                                                <NavLink
-                                                                                                    to={`${location.pathname}/${lesson.lessonID}`}
-                                                                                                    style={({ isActive }) => ({
-                                                                                                        textDecoration: 'none',
-                                                                                                        color: isActive ? 'blue.500' : 'inherit',
-                                                                                                    })}
-                                                                                                >
-                                                                                                    {LessonItem}
-                                                                                                </NavLink>
-                                                                                            </Box>
-                                                                                        );
-                                                                                    }
+                            <TabPanel>
+                                {hasViewed[2] && (loading ? (
+                                    <Center>
+                                        <Spinner color="blue.500" size="md" />
+                                    </Center>
+                                ) : (
+                                    <Suspense fallback={<Spinner color="blue.500" size="md" />}>
+                                        <Review courseId={courseID} />
+                                    </Suspense>
+                                ))}
+                            </TabPanel>
 
-                                                                                    // Nếu chưa đăng nhập
-                                                                                    return (
-                                                                                        <Box key={key}>
-                                                                                            {LessonItem}
-                                                                                        </Box>
-                                                                                    );
-                                                                                })}
-                                                                            </List>
-                                                                        ) : (
-                                                                            <Text fontSize="md" color="gray.500">Không có bài học nào.</Text>
-                                                                        )}
-                                                                    </AccordionPanel>
-
-                                                                </>
-                                                            )}
-                                                        </AccordionItem>
-                                                    </Accordion>
-                                                </ListItem>
-                                            ))
-                                        ) : (
-                                            <Text fontSize="md" color="gray.500">Không có chủ đề nào.</Text>
-                                        )}
-                                    </List>
+                            <TabPanel>
+                                {hasViewed[3] && (
+                                    <Comment courseId={courseID} />
                                 )}
                             </TabPanel>
-                            <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Review courseId={courseID} />}</TabPanel>
-                            <TabPanel>{loading ? <SkeletonText noOfLines={4} spacing={3} /> : <Comment courseId={courseID} />}</TabPanel>
                         </TabPanels>
                     </Tabs>
                 </Box>

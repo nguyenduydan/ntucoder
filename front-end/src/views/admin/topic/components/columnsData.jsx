@@ -80,7 +80,7 @@ export const columnsData = [
 
       return (
         <Badge
-          bg={status === 1 ? "green.400" : "red.400"}
+          bg={status === 1 ? "green.400" : "gray.400"}
           fontSize="sm"
           textColor="white"
           cursor="pointer"
@@ -102,7 +102,7 @@ export const columnsData = [
       detailPath="topic"
       deleteSuccessToast={{
         title: "Đã xóa!",
-        description: "Khóa học đã được xóa thành công.",
+        description: "Chủ đề đã được xóa thành công.",
       }}
       deleteErrorToast={{
         title: "Xóa thất bại!",

@@ -359,7 +359,7 @@ const CommentSection = ({ courseId }) => {
         setGlobalExpand(prev => !prev);
     };
 
-    if (loading) return <Text textAlign="center">Đang tải bình luận...</Text>;
+    if (loading) return <Text textAlign="center" w="100%" maxW="100%">Đang tải bình luận...</Text>;
 
     return (
         <Box w="100%" maxW="100%" mx="auto" px={4} py={2}>
