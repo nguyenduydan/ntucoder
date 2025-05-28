@@ -422,9 +422,9 @@ const CourseDetail = () => {
                                 ))}
                             </TabPanel>
 
-                            <TabPanel>
+                            <TabPanel w="100%" >
                                 {hasViewed[2] && (loading ? (
-                                    <Center>
+                                    <Center w="100%" h="100%">
                                         <Spinner color="blue.500" size="md" />
                                     </Center>
                                 ) : (
