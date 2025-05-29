@@ -58,35 +58,35 @@ namespace api.Infrashtructure.Repositories
 
         public async Task<TopicDetailDTO> GetById(int id)
         {
-           var topic = await _context.Topics.AsNoTracking()
-                .Include(t => t.Course)
-                .Include(t => t.Lessons)
-                .FirstOrDefaultAsync(t => t.TopicID == id);
-
-            if (topic == null)
-            {
-                throw new KeyNotFoundException($"Chủ đề với ID {id} không tồn tại.");
-            }
-
-            return new TopicDetailDTO
-            {
-                TopicID = topic.TopicID,
-                CourseID = topic.CourseID,
-                CourseName = topic.Course.CourseName,
-                TopicName = topic.TopicName,
-                TopicDescription = topic.TopicDescription,
-                CreatedAt = topic.CreatedAt,
-                UpdatedAt = topic.UpdatedAt,
-                Status = topic.Status,
-                Lessons = topic.Lessons.Select(l => new LessonDTO
+            var topicDto = await _context.Topics
+                .AsNoTracking()
+                .Where(t => t.TopicID == id)
+                .Select(t => new TopicDetailDTO
                 {
-                    LessonID = l.LessonID,
-                    LessonTitle = l.LessonTitle,
-                    Status = l.Status,
-                    CreatedAt = l.CreatedAt
-                }).ToList(),
-            };
+                    TopicID = t.TopicID,
+                    CourseID = t.CourseID,
+                    CourseName = t.Course.CourseName,
+                    TopicName = t.TopicName,
+                    TopicDescription = t.TopicDescription,
+                    CreatedAt = t.CreatedAt,
+                    UpdatedAt = t.UpdatedAt,
+                    Status = t.Status,
+                    Lessons = t.Lessons.Select(l => new LessonDTO
+                    {
+                        LessonID = l.LessonID,
+                        LessonTitle = l.LessonTitle,
+                        Status = l.Status,
+                        CreatedAt = l.CreatedAt
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (topicDto == null)
+                throw new KeyNotFoundException($"Chủ đề với ID {id} không tồn tại.");
+
+            return topicDto;
         }
+
 
         public async Task<TopicDTO> CreateAsync(TopicDTO dto)
         {

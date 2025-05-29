@@ -15,7 +15,6 @@ import { useParams } from "react-router-dom";
 
 export default function Index() {
   useTitle("Quản lý testcase");
-
   const { problemId } = useParams();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();

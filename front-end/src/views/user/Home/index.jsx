@@ -108,7 +108,7 @@ const Home = () => {
   const fetchTopViewedBlogs = async (count = 3) => {
     try {
       const res = await api.get(`/Blog/TopViewed?count=${count}`);
-      const blogData = res.data.filter(blog => blog.status === 1 && blog.pinHome === 1);
+      const blogData = res.data.filter(blog => blog.pinHome === 1);
       setBlogs(blogData);
     } catch (error) {
       throw error;

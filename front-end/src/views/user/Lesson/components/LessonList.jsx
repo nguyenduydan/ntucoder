@@ -87,7 +87,7 @@ const LessonList = ({ onSelectLesson }) => {
     }, [courseID, location.pathname]);
 
     return (
-        <Box>
+        <Box px={5}>
             {loading ? (
                 <SkeletonText noOfLines={5} spacing={4} />
             ) : (
@@ -109,10 +109,6 @@ const LessonList = ({ onSelectLesson }) => {
                                                                 <Flex alignItems='center' gap={1}>
                                                                     <FaRegFileCode color="black" />
                                                                     <Text>Tổng số bài học: {topic?.lessons?.length || 0}</Text>
-                                                                </Flex>
-                                                                <Flex alignItems='center' gap={1}>
-                                                                    <FaRegCheckCircle color="black" />
-                                                                    <Text>Tiến độ: {topic?.lessons?.length || 0}</Text>
                                                                 </Flex>
                                                             </Flex>
                                                         </Box>

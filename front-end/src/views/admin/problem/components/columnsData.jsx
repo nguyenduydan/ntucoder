@@ -29,8 +29,11 @@ export const columnsData = [
   {
     Header: "Testcase",
     accessor: "testCase",
-    Cell: ({ row }) => <TestCaseCountCell problemId={row?.problemID} />,
+    Cell: ({ row }) => {
+      return <TestCaseCountCell problemId={row.problemID} count={row.testCaseCount} />;
+    },
   },
+
   {
     Header: "Trạng thái",
     accessor: "published",
@@ -46,8 +49,13 @@ export const columnsData = [
             console.error("Lỗi: Không có problemId");
             return;
           }
-          return api.put(`/Problem/${problemId}`, {
-            published: newStatus,
+          const formData = new FormData();
+          formData.append('Published', newStatus.toString());
+
+          return api.put(`/Problem/${problemId}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
           });
         },
         onSuccess: () => {

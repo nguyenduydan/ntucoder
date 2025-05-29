@@ -19,69 +19,13 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-const CoderRankingTable = ({ coders, loading, currentPage = 1, pageSize = 10, onReset }) => {
+const CoderRankingTable = ({ coders, loading, currentPage = 1, pageSize = 10 }) => {
     const { coder } = useAuth();
     const coderID = coder?.coderID || "";
 
-    // State cho bộ đếm ngược
-    const [timeLeft, setTimeLeft] = useState(0);
-
-    useEffect(() => {
-        let resetTime = localStorage.getItem("rankingResetTime");
-
-        if (!resetTime) {
-            resetTime = Date.now() + SEVEN_DAYS_MS;
-            localStorage.setItem("rankingResetTime", resetTime);
-        } else {
-            resetTime = parseInt(resetTime, 10);
-        }
-
-        const updateTimer = () => {
-            const now = Date.now();
-            const diff = resetTime - now;
-
-            if (diff <= 0) {
-                const newResetTime = now + SEVEN_DAYS_MS;
-                localStorage.setItem("rankingResetTime", newResetTime);
-                setTimeLeft(SEVEN_DAYS_MS);
-
-                // ✅ Gọi lại handlefetchAll từ cha
-                if (onReset && typeof onReset === "function") {
-                    onReset();
-                }
-            } else {
-                setTimeLeft(diff);
-            }
-        };
-
-        updateTimer();
-        const timerId = setInterval(updateTimer, 1000);
-        return () => clearInterval(timerId);
-    }, [onReset]);
-
-
-    // Hàm format ms thành chuỗi: "X ngày HH:mm:ss"
-    const formatTimeLeft = (ms) => {
-        const totalSeconds = Math.floor(ms / 1000);
-        const days = Math.floor(totalSeconds / (24 * 3600));
-        const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-
-        return `${days} ngày ${hours.toString().padStart(2, "0")}:${minutes
-            .toString()
-            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    };
-
     return (
         <Box minH="40vh" overflowX="auto">
-            {/* Hiển thị bộ đếm ngược */}
-            <Box mb={4} p={2} bg="blue.50" borderRadius="md" textAlign="center" fontWeight="semibold" color="blue.700">
-                Reset bảng xếp hạng trong: {formatTimeLeft(timeLeft)}
-            </Box>
-
             <TableContainer overflowX="auto">
                 <Table size="sm" colorScheme="blue" minW="320px">
                     <Thead bg="gray.100" position="sticky" top={0} zIndex={1}>

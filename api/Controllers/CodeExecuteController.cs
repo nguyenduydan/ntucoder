@@ -42,37 +42,25 @@ namespace api.Controllers
                 return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
-
         [HttpPost("try-run")]
         public async Task<IActionResult> TryRunCode([FromBody] TryRunCodeRequestDTO request)
         {
-            TestCaseDTO testcase = await _testCaseRepository.GetSampleTestByProblemIdAsync(request.ProblemId);
-            if (testcase == null)
-            {
-                return BadRequest(new { Error = "Không tìm thấy test case mẫu cho bài toán này." });
-            }
-
             try
             {
-                var result = await _codeExecutionService.TryRunCodeAsync(
+                var results = await _codeExecutionService.TryRunMultipleTestCasesAsync(
                     request.SourceCode,
                     request.CompilerExtension,
-                    testcase.Input,
-                    testcase.Output
+                    request.ProblemId
                 );
-                return Ok(new
-                {
-                    result.Result,
-                    result.Output,
-                    result.Error,
-                    result.TimeDuration
-                });
+
+                return Ok(new { results });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
+
 
         [HttpPost("multi-sub")]
         public async Task<IActionResult> ExecuteMultipleCodes([FromBody] List<int> submissionIds)

@@ -13,7 +13,7 @@ import {
 import { getDetail, getTestCase } from "@/config/apiService";
 import React, { useState, useEffect } from "react";
 
-const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
+const TestResultPanel = ({ hasRun, id, errors, testCaseResult = [] }) => {
     const [testCases, setTestCases] = useState([]);
     const [limitTime, setLimitTime] = useState(null);
 
@@ -56,13 +56,13 @@ const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
 
             <Tabs isLazy variant="enclosed" colorScheme="white" mt={3}>
                 <TabList>
-                    {testCases.length === 0 ? (
-                        <Tab key={0}>Testcase 1</Tab>  // Nếu không có test case, chỉ hiển thị một tab mặc định.
-                    ) : (
-                        testCases.map((_, index) => (
-                            <Tab key={index}>Testcase {index + 1}</Tab>
-                        ))
-                    )}
+                    {testCases.map((_, index) => {
+                        const result = testCaseResult[index];
+                        if (index === 0 || (result && result.result !== "Accepted")) {
+                            return <Tab key={index}>Testcase {index + 1}</Tab>;
+                        }
+                        return null;
+                    })}
                 </TabList>
 
                 <TabPanels>
@@ -100,40 +100,43 @@ const TestResultPanel = ({ hasRun, id, errors, testCaseResult }) => {
                             </Grid>
                         </TabPanel>
                     ) : (
-                        testCases.map((testcase, index) => (
-                            <TabPanel key={index}>
-                                <Grid templateColumns="2fr 1fr" bg="gray.700" p={4} borderRadius="md" fontSize="14px">
-                                    <GridItem>
-                                        <Flex justify="start">
-                                            <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
-                                            <Text>{testcase.input || '" "'}</Text>
-                                        </Flex>
-                                        <Flex justify="start">
-                                            <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
-                                            <Text>{testCaseResult.actualOutput || '" "'}</Text>
-                                        </Flex>
-                                        <Flex justify="start">
-                                            <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
-                                            <Text>{testcase.output || '" "'}</Text>
-                                        </Flex>
-                                        <Flex justify="start">
-                                            <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
-                                            <Text>{limitTime || '" "'} ms</Text>
-                                        </Flex>
-                                        <Flex justify="start">
-                                            <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
-                                            <Text>{testCaseResult.execTime || '" "'} ms</Text>
-                                        </Flex>
-                                    </GridItem>
-                                    <GridItem>
-                                        <Text fontWeight="bold" mr={5}>Hiển thị lỗi</Text>
-                                        <Text bg="black" minH="12vh" borderRadius="md" p={2}>
-                                            {errors || "Không có lỗi"}
-                                        </Text>
-                                    </GridItem>
-                                </Grid>
-                            </TabPanel>
-                        ))
+                        testCases.map((testcase, index) => {
+                            const result = testCaseResult[index] || {};
+                            return (
+                                <TabPanel key={index}>
+                                    <Grid templateColumns="2fr 1fr" bg="gray.700" p={4} borderRadius="md" fontSize="14px">
+                                        <GridItem>
+                                            <Flex justify="start">
+                                                <Text fontWeight="bold" mr={5}>Đầu vào:</Text>
+                                                <Text whiteSpace="pre-wrap">{testcase.input || '""'}</Text>
+                                            </Flex>
+                                            <Flex justify="start">
+                                                <Text fontWeight="bold" mr={5}>Đầu ra thực tế:</Text>
+                                                <Text whiteSpace="pre-wrap">{result.actualOutput || '""'}</Text>
+                                            </Flex>
+                                            <Flex justify="start">
+                                                <Text fontWeight="bold" mr={5}>Đầu ra mong đợi:</Text>
+                                                <Text whiteSpace="pre-wrap">{testcase.output || '""'}</Text>
+                                            </Flex>
+                                            <Flex justify="start">
+                                                <Text fontWeight="bold" mr={5}>Giới hạn thời gian:</Text>
+                                                <Text>{limitTime || '""'} ms</Text>
+                                            </Flex>
+                                            <Flex justify="start">
+                                                <Text fontWeight="bold" mr={5}>Thời gian thực thi:</Text>
+                                                <Text>{result.execTime || '""'} ms</Text>
+                                            </Flex>
+                                        </GridItem>
+                                        <GridItem>
+                                            <Text fontWeight="bold" mr={5}>Hiển thị lỗi</Text>
+                                            <Text bg="black" minH="12vh" borderRadius="md" p={2}>
+                                                {result.error || "Không có lỗi"}
+                                            </Text>
+                                        </GridItem>
+                                    </Grid>
+                                </TabPanel>
+                            );
+                        })
                     )}
                 </TabPanels>
             </Tabs>

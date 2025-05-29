@@ -96,7 +96,7 @@ export default function EditTestCaseModal({ isOpen, onClose, refetchData, testCa
             });
             return;
         }
-        if (!testCase.input || !testCase.output) {
+        if (!testCase.output) {
             toast({
                 title: 'Lỗi',
                 description: 'Không được để trống Input hoặc Output.',

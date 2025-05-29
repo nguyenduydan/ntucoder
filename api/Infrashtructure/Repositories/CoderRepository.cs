@@ -67,7 +67,6 @@ namespace api.Infrashtructure.Repositories
             var coder = await _context.Coders
                         .AsNoTracking()
                         .Include(c => c.Account)
-                        .Include(m => m.Matchs)  // Đảm bảo bao gồm tất cả các Match
                         .FirstOrDefaultAsync(c => c.CoderID == id);
 
             if (coder == null)
@@ -75,8 +74,10 @@ namespace api.Infrashtructure.Repositories
                 throw new KeyNotFoundException($"Không tìm thấy coder với id = {id}.");
             }
 
-            // Tính tổng điểm của coder từ tất cả các match
-           var totalPoints = coder.Matchs.Sum(m => m.Point);
+            // Tính tổng điểm trực tiếp trên DB
+            var totalPoints = await _context.Matches
+                .Where(m => m.CoderID == id)
+                .SumAsync(m => (int?)m.Point) ?? 0;
 
             return new CoderDetailDTO
             {
@@ -94,9 +95,10 @@ namespace api.Infrashtructure.Repositories
                 UpdatedAt = coder.UpdatedAt,
                 UpdatedBy = coder.UpdatedBy,
                 Role = coder.Account.RoleID,
-                TotalPoint = totalPoints, 
+                TotalPoint = totalPoints,
             };
         }
+
 
 
         // Hàm băm mật khẩu – không thay đổi

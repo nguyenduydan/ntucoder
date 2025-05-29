@@ -12,6 +12,7 @@ import { getList, Search } from "@/config/apiService"; // giả sử Search api 
 import { columnsData } from "views/admin/problem/components/columnsData";
 import { useTitle } from "@/contexts/TitleContext";
 import useDebounce from "@/hooks/useDebounce"; // debounce hook
+import api from "@/config/apiConfig";
 
 export default function Index() {
   useTitle("Quản lý bài tập");
@@ -35,6 +36,8 @@ export default function Index() {
   // Query keys
   const listQueryKey = ["problems", currentPage, pageSize, ascending, sortField];
   const searchQueryKey = ["problemsSearch", debouncedKeyword, currentPage, pageSize];
+
+  const [testcaseCounts, setTestcaseCounts] = useState({});
 
   // Load list (không search)
   const {
@@ -199,6 +202,31 @@ export default function Index() {
 
   const loading = isKeywordValid(debouncedKeyword) ? isSearchLoading : isListLoading;
 
+  // Fetch testcase counts whenever data thay đổi
+  useEffect(() => {
+    const sourceData = isKeywordValid(debouncedKeyword) ? searchData : listData;
+    const problemIds = sourceData?.data?.map((item) => item.problemID);
+
+    if (problemIds && problemIds.length > 0) {
+      api.post("/TestCase/count", problemIds, {
+        headers: { "Content-Type": "application/json" }
+      })
+        .then((res) => setTestcaseCounts(res.data))
+        .catch(() => setTestcaseCounts({}));
+
+    }
+  }, [searchData, listData, debouncedKeyword]);
+
+  // Tạo dữ liệu mới với count đính kèm
+  const tableDataWithCount = React.useMemo(() => {
+    if (!tableData) return [];
+
+    return tableData.map((item) => ({
+      ...item,
+      testCaseCount: testcaseCounts[item.problemID] ?? null,
+    }));
+  }, [tableData, testcaseCounts]);
+
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -207,7 +235,7 @@ export default function Index() {
 
         <ColumnsTable
           columnsData={columnsData}
-          tableData={tableData || []}
+          tableData={tableDataWithCount || []}
           loading={loading}
           onSort={handleSort}
           sortField={sortField}

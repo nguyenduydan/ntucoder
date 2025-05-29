@@ -82,7 +82,7 @@ export default function Problem() {
     switch (result) {
       case "Accepted":
       case "Success":
-        setModalTitle("✅ Chạy thử thành công");
+        setModalTitle("✅ Nộp bài thành công");
         setModalMessage("Chúc mừng! Bài làm đúng hoặc không có lỗi.");
         setModalStyles({ bg: "green.100", colorScheme: "green" });
         setIsTestRunSuccess(true);
@@ -110,21 +110,39 @@ export default function Problem() {
     }
   };
 
-
   const handleTestRun = async () => {
     setLoading({ status: true, type: "test" });
+
     try {
       const res = await api.post("/CodeExecute/try-run", {
         sourceCode: code,
         compilerExtension: selectCompiler.compilerExtension,
-        problemId: parseInt(problemID)
+        problemId: parseInt(problemID),
       });
 
       const data = res.data;
 
-      if (data.error) {
+      if (!data.results || data.results.length === 0) {
+        setError("Không có kết quả test case nào được trả về.");
         toast({
-          title: "Lỗi kết nối",
+          title: "Không có kết quả",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+          variant: "left-accent",
+          position: "top",
+        });
+        return;
+      }
+
+      setTestResults(data.results);
+      console.log(data.results);
+      const firstWrong = data.results.find((r) => r.result !== "Accepted");
+
+      if (firstWrong) {
+        setError(firstWrong.error || firstWrong.result || "Có lỗi xảy ra.");
+        toast({
+          title: "Có test case bị sai",
           status: "error",
           duration: 2000,
           isClosable: true,
@@ -132,18 +150,18 @@ export default function Problem() {
           position: "top",
         });
       } else {
-        setTestResults({
-          input: data.input || '',
-          actualOutput: data.output || '',
-          expectedOutput: data.expectedOutput || '',
-          timeLimit: data.timeLimit || '',
-          execTime: data.timeDuration || '',
+        setError(null);
+        toast({
+          title: "Tất cả test case đều đúng 🎉",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          variant: "left-accent",
+          position: "top",
         });
-        setError(data.error || '');
-        ResultModal(data.result);
+        setIsTestRunSuccess(true);
       }
 
-      onOpen();
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu chạy thử:", error);
       toast({
@@ -158,6 +176,7 @@ export default function Problem() {
       setLoading({ status: false, type: "" });
     }
   };
+
 
 
   const handleSubmission = async () => {
@@ -208,16 +227,16 @@ export default function Problem() {
       setSelectCompiler(compiler);
     }
   };
-  const handleNextProblem = () => {
-    if (!problemID) return;
-    const nextProblemID = parseInt(problemID) + 1;
+  // const handleNextProblem = () => {
+  //   if (!problemID) return;
+  //   const nextProblemID = parseInt(problemID) + 1;
 
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.set("problemID", nextProblemID);
+  //   const searchParams = new URLSearchParams(location.search);
+  //   searchParams.set("problemID", nextProblemID);
 
-    navigate(`${location.pathname}?${searchParams.toString()}`);
-    onClose();
-  };
+  //   navigate(`${location.pathname}?${searchParams.toString()}`);
+  //   onClose();
+  // };
 
 
   const handleThemeChange = (e) => {
@@ -334,11 +353,11 @@ export default function Problem() {
               <Button colorScheme={modalStyles.colorScheme} onClick={onClose}>
                 Đóng
               </Button>
-              {isSubmissionSuccess && (
+              {/* {isSubmissionSuccess && (
                 <Button colorScheme="teal" onClick={handleNextProblem}>
                   Bài tiếp theo
                 </Button>
-              )}
+              )} */}
             </Flex>
           </ModalFooter>
 

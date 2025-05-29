@@ -4,6 +4,7 @@ using api.Models.ERD;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
+using api.Infrastructure.Helpers;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -289,6 +290,39 @@ namespace api.Infrashtructure.Repositories
             dto.ProblemID = existing.ProblemID;
             return dto;
         }
+
+        public async Task<PagedResponse<ProblemDTO>> SearchAsync(string? keyword, int page, int pageSize, string? sortField = null, bool ascending = true)
+        {
+            var query = _context.Problems.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = SearchHelper<Problem>.ApplySearchMultiField(query, keyword, useAnd: false,
+                    p => p.ProblemCode,
+                    p => p.ProblemName
+                );
+            }
+
+            query = query.OrderByDescending(p => p.ProblemID);
+
+            var problems = await PagedResponse<Problem>.CreateAsync(query, page, pageSize);
+
+            var dtoList = problems.Data.Select(t => new ProblemDTO
+            {
+                ProblemID = t.ProblemID,
+                ProblemName = t.ProblemName,
+                ProblemCode = t.ProblemCode,
+            }).ToList();
+
+            return new PagedResponse<ProblemDTO>(
+                dtoList,
+                problems.CurrentPage,
+                problems.PageSize,
+                problems.TotalPages,
+                problems.TotalCount
+                );
+        }
+
 
     }
 }

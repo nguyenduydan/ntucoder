@@ -7,6 +7,8 @@ using Microsoft.Extensions.Caching.Memory;
 using api.Infrashtructure.Helpers;
 using api.Infrastructure.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace api.Infrashtructure.Repositories
 {
@@ -82,17 +84,22 @@ namespace api.Infrashtructure.Repositories
             if (!coderExists) throw new ArgumentException("Invalid CoderID");
 
             // Nếu có file Avatar mới thì xử lý upload.
+
             if (dto.ImageFile != null)
             {
-                using (var stream = dto.ImageFile.OpenReadStream())
-                {
-                    var fileName = $"imgBlog/{dto.BlogID + "_" + dto.BlogDate.ToString() + "_" + dto.CoderID}.jpg"; // Đặt tên file theo ID
-                    var bucketName = "ntucoder"; // Tên bucket MinIO
+                using Stream stream = dto.ImageFile.OpenReadStream();
+                // Sinh tên file mã hóa bằng SHA256
+                string raw = $"{dto.BlogID}_{dto.CoderID}_{DateTime.UtcNow.Ticks}";
+                using SHA256 sha256 = SHA256.Create();
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(raw));
+                string hash = BitConverter.ToString(bytes).Replace("-", "").ToLower();
 
-                    // Upload file lên MinIO
-                    var fileUrl = await _minioService.UploadFileAsync(stream, fileName, bucketName);
-                    dto.ImageBlogUrl = fileUrl;
-                }
+                // Lấy extension gốc, nếu có
+                string ext = Path.GetExtension(dto.ImageFile.FileName);
+                if (string.IsNullOrEmpty(ext)) ext = ".jpg";
+
+                string fileName = $"imgBlog/{hash}{ext}";
+                dto.ImageBlogUrl = await _minioService.UploadFileAsync(stream, fileName, "ntucoder");
             }
 
             var blog = new Blog
@@ -191,7 +198,7 @@ namespace api.Infrashtructure.Repositories
         }
 
         // Lấy top view cao nhất
-        public async Task<List<BlogDTO>> GetTopViewedBlogsAsync(int count, bool ascingSort)
+        public async Task<List<BlogDTO>> GetTopViewedBlogsAsync(int count, bool ascingSort = true)
         {
             var query = _context.Blogs
                 .Include(b => b.Coder)
@@ -201,7 +208,7 @@ namespace api.Infrashtructure.Repositories
             // Sắp xếp theo ViewCount tăng hoặc giảm dựa trên ascingSort
             query = ascingSort
                 ? query.OrderBy(b => b.ViewCount)
-                : query.OrderByDescending(b => b.ViewCount);
+                : query.OrderByDescending(b => b.BlogDate);
 
             return await query
                 .Take(count)

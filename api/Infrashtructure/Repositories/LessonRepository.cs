@@ -54,12 +54,11 @@ namespace api.Infrashtructure.Repositories
                 _ => query.OrderBy(c => c.LessonID) 
             };
         }
-
         public async Task<LessonDetailDTO> GetByIdAsync(int id)
         {
             var lesson = await _context.Lessons
                 .AsNoTracking()
-                .Include(l => l.LessonProblems)
+                .Include(l => l.LessonProblems.Where(lp => lp.Problem.Published == 1))
                     .ThenInclude(lp => lp.Problem)
                 .Include(l => l.Topic)
                 .FirstOrDefaultAsync(l => l.LessonID == id);
@@ -89,7 +88,6 @@ namespace api.Infrashtructure.Repositories
                 }).ToList(),
             };
         }
-
 
         public async Task<LessonDTO> CreateAsync (LessonDTO dto)
         {

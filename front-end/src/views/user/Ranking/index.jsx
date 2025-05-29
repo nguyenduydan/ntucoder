@@ -204,7 +204,7 @@ const CoderBoard = () => {
                     />
                 </Flex>
 
-                <CoderRankingTable coders={coders} loading={searchLoading} onReset={handlefetchAll} />
+                <CoderRankingTable coders={coders} loading={searchLoading} />
 
                 <Pagination
                     currentPage={currentPage}

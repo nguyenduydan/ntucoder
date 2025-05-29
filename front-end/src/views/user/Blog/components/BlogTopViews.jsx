@@ -7,7 +7,6 @@ import InfoBlog from './InfoBlog';
 
 const BlogTopViews = ({ blogs = [], loading, }) => {
     const navigate = useNavigate();
-
     return (
         <Box>
             <Stack spacing={5}>
@@ -73,7 +72,7 @@ const BlogTopViews = ({ blogs = [], loading, }) => {
                                     id={item.coderID || item.CoderID}
                                     coderName={LimitText(item.coderName, 15) || LimitText(item.CoderName, 15)}
                                     date={item.blogDate || item.BlogDate}
-                                    view={formatNumber(item.viewCount || item.ViewCount)}
+                                    view={formatNumber(item.viewCount || item.ViewCount || 0)}
                                 />
                             </Box>
                         </Flex>

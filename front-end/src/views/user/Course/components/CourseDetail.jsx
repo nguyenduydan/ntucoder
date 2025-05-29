@@ -69,9 +69,9 @@ const CourseDetail = () => {
         }
 
         try {
-            const response = await getDetail({ controller: "Course", id: courseID });
+            const courseRes = await getDetail({ controller: "Course", id: courseID });
 
-            if (!response || Object.keys(response).length === 0) {
+            if (!courseRes || !courseRes.topics) {
                 toast({
                     title: "Cảnh báo",
                     description: "Không có dữ liệu cho khóa học này.",
@@ -83,31 +83,54 @@ const CourseDetail = () => {
                 return;
             }
 
-            const topics = response.topics || [];
+            // Ban đầu: gán lessons rỗng
+            const topicsWithEmptyLessons = courseRes.topics.map(topic => ({
+                ...topic,
+                lessons: [],
+                isLoadingLessons: true,
+            }));
 
-            const topicsWithLessons = await Promise.all(
-                topics.map(async (topic) => {
-                    try {
-                        const topicData = await getDetail({ controller: "Topic", id: topic.topicID });
-                        const filteredLessons = (topicData.lessons || []).filter(lesson => Number(lesson.status) === 1);
-                        return { ...topic, lessons: filteredLessons };
-                    } catch (error) {
-                        console.log("Error fetching lessons:", error);
-                        return { ...topic, lessons: [] };
-                    }
-                })
-            );
+            setCourse({ ...courseRes, topics: topicsWithEmptyLessons });
+
+            // Sau đó: tải từng topic (lessons riêng)
+            courseRes.topics.forEach(async (topic, index) => {
+                try {
+                    const topicDetail = await getDetail({ controller: "Topic", id: topic.topicID });
+                    const filteredLessons = (topicDetail.lessons || []).filter(lesson => Number(lesson.status) === 1);
+
+                    setCourse(prev => {
+                        if (!prev) return prev;
+                        const updatedTopics = [...prev.topics];
+                        updatedTopics[index] = {
+                            ...updatedTopics[index],
+                            lessons: filteredLessons,
+                            isLoadingLessons: false,
+                        };
+                        return { ...prev, topics: updatedTopics };
+                    });
+                } catch (error) {
+                    console.log(`Lỗi tải topic ${topic.topicID}:`, error);
+                    setCourse(prev => {
+                        if (!prev) return prev;
+                        const updatedTopics = [...prev.topics];
+                        updatedTopics[index] = {
+                            ...updatedTopics[index],
+                            lessons: [],
+                            isLoadingLessons: false,
+                        };
+                        return { ...prev, topics: updatedTopics };
+                    });
+                }
+            });
 
             const problemsCount = await api.get(`/Course/problem-count?courseId=${courseID}`);
-
             setProblems(problemsCount.data);
-            setCourse({ ...response, topics: topicsWithLessons });
 
             if (coder?.coderID) {
                 const isEnrolledRes = await api.get(`/Enrollment/CheckEnrollment`, {
                     params: {
-                        courseId: courseID || '',
-                        coderID: coder.coderID || ''
+                        courseId: courseID,
+                        coderID: coder.coderID
                     }
                 });
                 setIsEnrolled(isEnrolledRes.data.isEnrolled);
@@ -126,6 +149,7 @@ const CourseDetail = () => {
             setLoading(false);
         }
     }, [courseID, coder?.coderID, navigate, toast]);
+
 
     useEffect(() => {
         fetchCourse();

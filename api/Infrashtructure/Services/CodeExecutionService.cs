@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Text.Json;
+using api.DTOs;
 
 namespace api.Infrashtructure.Services
 {
@@ -111,13 +112,6 @@ namespace api.Infrashtructure.Services
             }
 
 
-            // Log the output for the test case to console
-            //Console.WriteLine($"Test Case ID: {testCase.TestCaseID}");
-            //Console.WriteLine($"Input: {testCase.Input.Trim()}");
-            //Console.WriteLine($"Expected Output: {testCase.Output.Trim()}");
-            //Console.WriteLine($"Actual Output: {result.output.Trim()}");
-            //Console.WriteLine($"Test Result: {testResult}");
-
             var checkerLogObj = new
             {
                 DockerCommand = dockerCommand,
@@ -172,7 +166,8 @@ namespace api.Infrashtructure.Services
             string encodedSource = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceCode));
             // Compile và chạy
             string compileCommand = $"echo '{encodedSource}' | base64 -d > {fileName} && g++ {fileName} -o main.out";
-            string runCommand = $"echo '{input.Replace("\"", "\\\"")}' | ./main.out";
+            string normalizedInput = input.Replace(",", " ").Trim();
+            string runCommand = $"echo '{normalizedInput.Replace("\"", "\\\"")}' | ./main.out";
 
             // Lệnh Docker tổng hợp
             string command = $"docker run --rm --name {containerName} {dockerImage} sh -c \"{compileCommand} && {runCommand}\"";
@@ -190,6 +185,9 @@ namespace api.Infrashtructure.Services
                 extension = "." + extension;
             }
 
+            // Chuẩn hóa input: thay dấu phẩy bằng dấu cách
+            string normalizedInput = input.Replace(",", " ").Trim();
+
             string dockerImage = extension switch
             {
                 ".cpp" => "gcc:12",
@@ -200,11 +198,13 @@ namespace api.Infrashtructure.Services
 
             string encodedSource = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceCode));
 
-            string command = compilerExtension.ToLower() switch
+            string escapedInput = normalizedInput.Replace("\"", "\\\"");
+
+            string command = extension switch
             {
-                ".cpp" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d | tee temp.cpp | g++ -x c++ - -o temp.out && echo '{input.Replace("\"", "\\\"")}' | ./temp.out\"",
-                ".java" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d > Main.java && javac Main.java && echo '{input.Replace("\"", "\\\"")}' | java Main\"",
-                ".py" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d > temp.py && echo '{input.Replace("\"", "\\\"")}' | python3 temp.py\"",
+                ".cpp" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d | tee temp.cpp | g++ -x c++ - -o temp.out && echo '{escapedInput}' | ./temp.out\"",
+                ".java" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d > Main.java && javac Main.java && echo '{escapedInput}' | java Main\"",
+                ".py" => $"docker run --rm --name {containerName} {dockerImage} sh -c \"echo '{encodedSource}' | base64 -d > temp.py && echo '{escapedInput}' | python3 temp.py\"",
                 _ => throw new Exception($"Compiler {compilerExtension} không được hỗ trợ.")
             };
 
@@ -233,6 +233,35 @@ namespace api.Infrashtructure.Services
 
             return (testResult, result.Output, result.Error, (int)stopwatch.ElapsedMilliseconds);
         }
+
+
+        public async Task<List<TestRunResultDTO>> TryRunMultipleTestCasesAsync(string sourceCode, string compilerExtension, int problemId)
+        {
+            await using var _context = _contextFactory.CreateDbContext();
+            var testCases = await _context.TestCases
+                .Where(tc => tc.ProblemID == problemId)
+                .OrderBy(tc => tc.TestCaseID)
+                .ToListAsync();
+
+            var results = new List<TestRunResultDTO>();
+
+            foreach (var testCase in testCases)
+            {
+                var (result, output, error, time) = await TryRunCodeAsync(sourceCode, compilerExtension, testCase.Input, testCase.Output);
+                results.Add(new TestRunResultDTO
+                {
+                    Input = testCase.Input,
+                    ExpectedOutput = testCase.Output,
+                    ActualOutput = output,
+                    Result = result,
+                    Error = error,
+                    Time = time
+                });
+            }
+
+            return results;
+        }
+
 
 
         private async Task<(bool IsSuccess, string Output, string Error)> RunProcessAsync(string command, string containerName, int timeMs = 5000)

@@ -68,12 +68,16 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("count")]
-        public async Task<IActionResult> GetTestCaseCount(int problemId)
+        [HttpPost("count")]
+        public async Task<IActionResult> GetTestCaseCounts([FromBody] List<int> problemIds)
         {
-            var count = await _repository.GetTotalTestCasesByProblemIdAsync(problemId);
-            return Ok(new { TotalTestCases = count });
+            if (problemIds == null || !problemIds.Any())
+                return BadRequest("Danh sách problemId rỗng");
+
+            var counts = await _repository.GetTestCaseCountsByProblemIdsAsync(problemIds);
+            return Ok(counts);
         }
+
 
         [HttpGet("sampleTest")]
         public async Task<IActionResult> GetSampleTest(int problemId)

@@ -121,10 +121,18 @@ namespace api.Infrashtructure.Repositories
 
             };
         }
-        public async Task<int> GetTotalTestCasesByProblemIdAsync(int problemId)
+        public async Task<Dictionary<int, int>> GetTestCaseCountsByProblemIdsAsync(List<int> problemIds)
         {
-            return await _context.TestCases.CountAsync(tc => tc.ProblemID == problemId);
+            var counts = await _context.TestCases
+                .Where(tc => problemIds.Contains(tc.ProblemID))
+                .GroupBy(tc => tc.ProblemID)
+                .Select(g => new { ProblemID = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.ProblemID, g => g.Count);
+
+            // Đảm bảo ID nào không có test case vẫn trả về 0
+            return problemIds.ToDictionary(id => id, id => counts.ContainsKey(id) ? counts[id] : 0);
         }
+
         public async Task<bool> DeleteTestCaseAsync(int id)
         {
             var obj = await _context.TestCases.FirstOrDefaultAsync(c => c.TestCaseID == id);

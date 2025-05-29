@@ -154,29 +154,45 @@ namespace api.Infrashtructure.Repositories
 
         public async Task<CourseDetailDTO> GetCourseByIdAsync(int id)
         {
-            var course = await _context.Courses
-                .Include(c => c.Creator)
-                .Include(c => c.CourseCategory)
-                .Include(c => c.Badge)
-                .Include(c => c.Topics)
-                // ❌ bỏ .Include(c => c.Enrollments)
+            var dto = await _context.Courses
+                .Where(c => c.CourseID == id)
+                .Select(c => new CourseDetailDTO
+                {
+                    CourseID = c.CourseID,
+                    CourseName = c.CourseName ?? string.Empty,
+                    CoderID = c.CoderID,
+                    CreatorName = c.Creator.CoderName ?? string.Empty,
+                    CourseCategoryID = c.CourseCategoryID,
+                    CourseCategoryName = c.CourseCategory.Name ?? string.Empty,
+                    Fee = c.Fee,
+                    OriginalFee = c.OriginalFee,
+                    IsCombo = c.IsCombo,
+                    BadgeID = c.BadgeID,
+                    BadgeName = c.Badge.Name ?? string.Empty,
+                    BadgeColor = c.Badge.Color,
+                    ImageUrl = c.ImageUrl,
+                    Status = c.Status,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt,
+                    Description = c.Description,
+                    Overview = c.Overview,
+                    Topics = c.Topics.Select(t => new TopicDTO
+                    {
+                        TopicID = t.TopicID,
+                        TopicName = t.TopicName ?? string.Empty
+                    }).ToList(),
+                    EnrollCount = _context.Enrollments.Count(e => e.CourseID == c.CourseID),
+                    Rating = _context.Reviews
+                        .Where(r => r.CourseID == c.CourseID)
+                        .Select(r => (double?)r.Rating)
+                        .Average() ?? 0
+                })
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CourseID == id);
+                .FirstOrDefaultAsync();
 
-            if (course == null)
+            if (dto == null)
                 throw new KeyNotFoundException($"Khóa học với ID {id} không tồn tại.");
 
-            // ✅ Lấy số lượng enrollments riêng
-            var totalEnrollments = await _context.Enrollments
-                .CountAsync(e => e.CourseID == id);
-
-            var avgRating = await _context.Reviews
-              .Where(r => r.CourseID == id)
-              .AverageAsync(r => (double?)r.Rating) ?? 0;
-
-            var dto = MapToCourseDetailDto(course);
-            dto.EnrollCount = totalEnrollments;
-            dto.Rating = avgRating;
             return dto;
         }
 

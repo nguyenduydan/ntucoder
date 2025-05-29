@@ -13,21 +13,39 @@ namespace api.Controllers
     [ApiController]
     public class ProblemController : ControllerBase
     {
-        private readonly ProblemRepository _problemRepository;
+        private readonly ProblemRepository _repository;
         private readonly AuthService _autService; 
 
         public ProblemController(ProblemRepository problemRepository, AuthService authService)
         {
-            _problemRepository = problemRepository;
+            _repository = problemRepository;
             _autService = authService;
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? keyword, int page = 1, int pageSize = 10)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            try
+            {
+                var result = await _repository.SearchAsync(keyword, page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ nội bộ", error = ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllProblems([FromQuery] QueryObject query, string? sortField = null, bool ascending = true, bool? published = null)
         {
             try
             {
-                var result = await _problemRepository.GetAllProblemsAsync(query, sortField, ascending, published);
+                var result = await _repository.GetAllProblemsAsync(query, sortField, ascending, published);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -48,7 +66,7 @@ namespace api.Controllers
             if(dto.CoderID == -1) return Unauthorized();
             try
             {
-                var result = await _problemRepository.CreateProblemAsync(dto);
+                var result = await _repository.CreateProblemAsync(dto);
                 return CreatedAtAction(nameof(CreateProblem), new { id = result.ProblemID }, result);
             }
             catch (ValidationException ex)
@@ -67,7 +85,7 @@ namespace api.Controllers
         {
             try
             {
-                var problem = await _problemRepository.GetProblemByIdAsync(id);
+                var problem = await _repository.GetProblemByIdAsync(id);
 
                 if (problem == null)
                 {
@@ -93,7 +111,7 @@ namespace api.Controllers
 
             try
             {
-                var result = await _problemRepository.UpdateProblemAsync(id, dto);
+                var result = await _repository.UpdateProblemAsync(id, dto);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
@@ -116,7 +134,7 @@ namespace api.Controllers
         {
             try
             {
-                var isDeleted = await _problemRepository.DeleteProblemAsync(id);
+                var isDeleted = await _repository.DeleteProblemAsync(id);
 
                 if (isDeleted)
                 {
