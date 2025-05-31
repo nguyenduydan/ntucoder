@@ -905,7 +905,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Comment", "ParentComment")
                         .WithMany("Replies")
                         .HasForeignKey("ParentCommentID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Blog");
 

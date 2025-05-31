@@ -150,7 +150,7 @@ const Auth = () => {
                 {isOnline ? (
                     <Flex alignItems="center">
                         {(coder.roleID === 1 || coder.roleID === 3) && (
-                            <NavLink to="/admin/dashboard">
+                            <NavLink to="/admin/course">
                                 <Button
                                     leftIcon={<MdAdminPanelSettings />}
                                     variant="outline"

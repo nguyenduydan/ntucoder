@@ -16,21 +16,13 @@ import {
     Skeleton,
     useColorMode,
     List, ListItem,
-    Tooltip,
-    AlertDialog,
-    AlertDialogOverlay,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogBody,
-    AlertDialogFooter,
     useDisclosure,
+    Spinner,
 } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
 import { NavLink, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineArrowBack, MdEdit } from "react-icons/md";
 import ScrollToTop from "@/components/scroll/ScrollToTop";
-import ProgressBar from "@/components/loading/loadingBar";
 import JoditEditor from "jodit-react";
 import sanitizeHtml from "@/utils/sanitizedHTML";
 import Editor from "@/utils/configEditor";
@@ -41,7 +33,7 @@ import { formatDateTime, formatCurrency } from "@/utils/utils";
 import api from "@/config/apiConfig";
 import ReviewList from "./ReviewList";
 import ToolDetail from "@/components/navbar/ToolDetail";
-
+import EnrollmentList from "./EnrollmentList";
 
 
 const CourseDetail = () => {
@@ -70,9 +62,10 @@ const CourseDetail = () => {
     const listColor = colorMode === 'light' ? 'gray.200' : 'whiteAlpha.300';
 
     const fetchCourseDetail = useCallback(async () => {
+        setLoading(true);
         try {
             const data = await getDetail({ controller: "Course", id });
-            setCourseDetail(data);
+            setCourseDetail(data || []);
             setEditableValues(data);
         } catch (error) {
             toast({
@@ -83,10 +76,13 @@ const CourseDetail = () => {
                 position: "top",
                 variant: "left-accent",
             });
+        } finally {
+            setLoading(false);
         }
     }, [id, toast]);
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             const courseCategory = await getList({ controller: "CourseCategory", page: 1, pageSize: 10 });
             const badge = await getList({ controller: "Badge", page: 1, pageSize: 10 });
@@ -96,6 +92,9 @@ const CourseDetail = () => {
             console.error("Lỗi khi lấy danh mục khóa học:", error);
             setCourseCategories([]);
             setBadge([]);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -267,7 +266,15 @@ const CourseDetail = () => {
 
     if (!course) {
         return (
-            <ProgressBar />
+            <Flex
+                h="100vh"
+                w="100%"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Spinner thickness='4px' speed='0.55s' color='blue.500' size='xl' />
+            </Flex>
         );
     }
     return (
@@ -624,7 +631,7 @@ const CourseDetail = () => {
                         </List>
                     </Box>
                 </Box>
-                {/* Thông tin danh sách coder enrolled */}
+                {/* Thông tin danh sách coder enrolled - Updated */}
                 <Box
                     px="25px"
                     position="fixed"
@@ -639,89 +646,32 @@ const CourseDetail = () => {
                         boxShadow="lg"
                         w={{ base: "100%", md: "50vh" }}
                         minH="40vh"
+                        maxH="70vh" // Add max height to prevent overflow
                         mx="auto"
-                        overflow="auto"
-                        overflowY="auto"
+                        overflow="hidden" // Change to hidden since EnrollmentList handles scroll
                     >
-                        <Text align="center" fontSize={25} mb={5} fontWeight="bold">
+                        <Text align="center" fontSize={25} mb={1} fontWeight="bold">
                             Danh sách người đăng ký
                         </Text>
 
-                        <List spacing={4}>
-                            {course.enrollments.map((coder, index) => (
-                                <Flex
-                                    key={coder.coderID}
-                                    align="center"
-                                    justify="space-between"
-                                    bg="transparent"
-                                >
-                                    <Tooltip label={`Xem chi tiết ${coder.coderName}`} placement="top" hasArrow>
-                                        <NavLink
-                                            to={`/admin/coder/detail/${coder.coderID}`}
-                                            style={{ flex: 1, textDecoration: "none" }}
-                                        >
-                                            <Box
-                                                bg={listColor}
-                                                p={2}
-                                                borderRadius="md"
-                                                _hover={{ transform: "translateY(-3px)" }}
-                                                transition="all 0.1s ease-in-out"
-                                            >
-                                                <Text fontWeight="bold" whiteSpace="normal" color={textColor}>
-                                                    {index + 1}: {coder.coderName}
-                                                </Text>
-                                            </Box>
-                                        </NavLink>
-                                    </Tooltip>
-                                    <Tooltip label="Xóa người dùng" placement="top" hasArrow>
-                                        <IconButton
-                                            icon={<DeleteIcon />}
-                                            colorScheme="red"
-                                            size="sm"
-                                            aria-label="Xóa"
-                                            isRound
-                                            ml={2}
-                                            onClick={() => confirmDelete(coder.coderID)}
-                                        />
-                                    </Tooltip>
-                                </Flex>
-                            ))}
-                        </List>
-
-                        {/* Confirm Delete Dialog */}
-                        <AlertDialog
-                            isOpen={isDeleteOpen}
-                            leastDestructiveRef={cancelRef}
-                            onClose={isDeleting ? () => { } : onDeleteClose} // không đóng khi loading
-                            isCentered
+                        {/* Replace the old List with new EnrollmentList component */}
+                        <Box
+                            maxH="calc(70vh - 100px)" // Calculate height minus header
+                            overflowY="auto"
+                            pr={2} // Add padding for scrollbar
                         >
-                            <AlertDialogOverlay>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                        Xác nhận xóa
-                                    </AlertDialogHeader>
-
-                                    <AlertDialogBody>
-                                        Bạn có chắc muốn xóa người dùng này khỏi khóa học?
-                                    </AlertDialogBody>
-
-                                    <AlertDialogFooter>
-                                        <Button ref={cancelRef} onClick={onDeleteClose} isDisabled={isDeleting}>
-                                            Hủy
-                                        </Button>
-                                        <Button
-                                            colorScheme="red"
-                                            onClick={handleConfirmDelete}
-                                            ml={3}
-                                            isLoading={isDeleting}
-                                            loadingText="Đang xóa"
-                                        >
-                                            Xóa
-                                        </Button>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialogOverlay>
-                        </AlertDialog>
+                            <EnrollmentList
+                                courseID={id}
+                                onEnrollmentDeleted={(coderID) => {
+                                    // Optional: Trigger any additional updates needed
+                                    console.log('Enrollment deleted for coder:', coderID);
+                                    // You might want to update course stats or other related data
+                                }}
+                                pageSize={10}
+                                sortField="enrolledAt"
+                                ascending={false}
+                            />
+                        </Box>
                     </Box>
                 </Box>
             </Grid>

@@ -151,17 +151,20 @@ const Toolbar = ({ onSearch, onFilterChange, onAdd, valueSearch, title }) => {
                     justifyContent="flex-end"
                     alignItems="center"
                 >
-                    <SearchInput
-                        type="text"
-                        placeholder={text}
-                        color={textColor}
-                        value={valueSearch}
-                        onChange={handleInputChange}
-                        bg={bgColor}
-                        borderRadius="full"
-                        boxShadow="md"
-                        w={{ base: "100%", md: "300px", lg: "400px" }}
-                    />
+                    {onSearch && (
+                        <SearchInput
+                            type="text"
+                            placeholder={text}
+                            color={textColor}
+                            value={valueSearch}
+                            onChange={handleInputChange}
+                            bg={bgColor}
+                            borderRadius="full"
+                            boxShadow="md"
+                            w={{ base: "100%", md: "300px", lg: "400px" }}
+                        />
+                    )}
+
                     {onAdd && (
                         <Button
                             variant="solid"

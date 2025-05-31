@@ -18,14 +18,14 @@ const iconMap = {
     "Người dùng": FaUserAlt,
     "Khóa học": FaBookOpen,
     "Bài tập": FaPuzzlePiece,
-    "Số người đăng ký": FaBookOpen,
+    "Số lượt đăng ký": FaBookOpen,
 };
 
 const colorMap = {
     "Người dùng": "purple",
     "Khóa học": "teal",
     "Bài tập": "orange",
-    "Số người đăng ký": "blue",
+    "Số lượt đăng ký": "blue",
 };
 
 // Motion wrapper
@@ -71,7 +71,7 @@ const Stats = ({ refreshKey, onFinishRefresh }) => {
         { label: "Người dùng", value: counts.users },
         { label: "Khóa học", value: counts.courses },
         { label: "Bài tập", value: counts.problems },
-        { label: "Số người đăng ký", value: counts.enrolls }
+        { label: "Số lượt đăng ký", value: counts.enrolls }
     ];
 
     return (

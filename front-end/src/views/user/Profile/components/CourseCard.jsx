@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Box, Text, Image, Flex, Progress, useColorModeValue, HStack } from "@chakra-ui/react";
+import { Box, Text, Image, Flex, Progress, useColorModeValue, HStack, Tooltip } from "@chakra-ui/react";
 import { StarIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { toSlug, formatNumber } from "@/utils/utils";
@@ -77,10 +77,11 @@ const CourseCard = ({ course, isPlaceholder = false }) => {
             />
 
             <Box px={4} py={2}>
-                <Text fontSize="lg" fontWeight="bold" color="blue">
-                    {course.courseName}
-                </Text>
-
+                <Tooltip label={course.courseName} placement="top" hasArrow>
+                    <Text fontSize="lg" fontWeight="bold" color="blue" noOfLines={1}>
+                        {course.courseName}
+                    </Text>
+                </Tooltip>
                 <Flex align="center" mt="2" >
                     <Flex flex={1}>
                         <HStack spacing={0.5}>

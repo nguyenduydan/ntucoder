@@ -9,7 +9,8 @@ import {
     ModalCloseButton,
     Button,
     Box, Heading, Text, VStack, HStack, Progress, Divider, Icon, useToast,
-    Spinner
+    Spinner,
+    Center
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import api from '@/config/apiConfig';
@@ -115,7 +116,9 @@ const ReviewList = ({ courseId, isOpen, onClose }) => {
                         {/* Danh sách đánh giá */}
                         <Heading size="md" mb={4}>Đánh giá của người học</Heading>
                         {loading ? (
-                            <Spinner />
+                            <Center>
+                                <Spinner thickness="5px" speed="0.65s" color="blue.500" size="lg" />
+                            </Center>
                         ) : (
                             reviewsToShow.length === 0 ? (
                                 <Text>Chưa có đánh giá nào.</Text>

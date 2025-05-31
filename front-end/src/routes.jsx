@@ -36,7 +36,7 @@ const routes = [
     path: '/dashboard',
     icon: <FcHome size={20} />,
     component: <MainDashboard />,
-    allowedRoles: [1, 3],
+    allowedRoles: [1],
   },
   {
     name: 'Loại khóa học',

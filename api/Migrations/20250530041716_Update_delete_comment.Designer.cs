@@ -12,8 +12,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250521162032_Delete_TotalView_column_Courses")]
-    partial class Delete_TotalView_column_Courses
+    [Migration("20250530041716_Update_delete_comment")]
+    partial class Update_delete_comment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -908,7 +908,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.ERD.Comment", "ParentComment")
                         .WithMany("Replies")
                         .HasForeignKey("ParentCommentID")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Blog");
 

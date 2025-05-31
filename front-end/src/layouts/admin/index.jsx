@@ -189,7 +189,7 @@ export default function Dashboard(props) {
                 <Suspense fallback={<SpinnerLoading />}>
                   <Routes>
                     {getRoutes(routes)}
-                    <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route index element={<Navigate to="/admin/course" replace />} />
                     <Route path="testcase/:problemId" element={<TestCase />} />
                     {/* Optional: route 404 */}
                     <Route path="*" element={<NotFound />} />

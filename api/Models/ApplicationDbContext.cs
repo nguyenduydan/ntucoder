@@ -226,25 +226,21 @@ namespace api.Models
                 entity.Property(c => c.CommentTime)
                       .IsRequired();
 
-                // 🔁 Quan hệ đệ quy (reply)
                 entity.HasOne(c => c.ParentComment)
                       .WithMany(c => c.Replies)
                       .HasForeignKey(c => c.ParentCommentID)
-                      .OnDelete(DeleteBehavior.Restrict); // Không xóa đệ quy
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                // 🔗 Quan hệ với Blog (nullable)
                 entity.HasOne(c => c.Blog)
                       .WithMany(b => b.Comments)
                       .HasForeignKey(c => c.BlogID)
                       .OnDelete(DeleteBehavior.SetNull);
 
-                // 🔗 Quan hệ với Course (nullable)
                 entity.HasOne(c => c.Course)
                       .WithMany(cu => cu.Comments)
                       .HasForeignKey(c => c.CourseID)
                       .OnDelete(DeleteBehavior.SetNull);
 
-                // 👤 Quan hệ với Coder (bắt buộc)
                 entity.HasOne(c => c.Coder)
                       .WithMany(coder => coder.Comments)
                       .HasForeignKey(c => c.CoderID)

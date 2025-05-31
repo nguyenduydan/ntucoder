@@ -11,8 +11,8 @@ import {
     Textarea,
     IconButton,
     useToast,
-    Spinner,
-    Skeleton
+    Skeleton,
+    Container
 } from '@chakra-ui/react';
 import React, { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +28,6 @@ const CourseBox = lazy(() => import('./components/CourseLearning'));
 const BlogBox = lazy(() => import('./components/BlogBox'));
 const ActionBox = lazy(() => import('./components/ActionBox'));
 const HistoryBox = lazy(() => import('./components/HistorySubmission'));
-
 
 const Profile = () => {
     useTitle("Hồ sơ cá nhân");
@@ -67,7 +66,6 @@ const Profile = () => {
     const isEmailValid = !!info?.coderEmail;
     const isPhoneValid = !!info?.phoneNumber;
 
-
     const handleEditClick = () => {
         setDescription(info?.description || "");
         setIsEditing(true);
@@ -82,7 +80,7 @@ const Profile = () => {
         try {
             const dataToSend = { description };
 
-            console.log("Dữ liệu gửi lên API:", dataToSend);  // <-- kiểm tra dữ liệu gửi
+            console.log("Dữ liệu gửi lên API:", dataToSend);
 
             await updateItem({
                 controller: 'Coder',
@@ -115,14 +113,14 @@ const Profile = () => {
         }
     };
 
-
     return (
-        <Box maxW="180vh" minH="100vh" mx="auto" mb={5}>
-            <Box mt={5} ms={10}>
+        <Container maxW="full" minH="100vh" p={0}>
+            {/* Back Button */}
+            <Box mt={{ base: 3, md: 5 }} mx={{ base: 4, md: 10 }}>
                 <Button
                     colorScheme="blue"
                     variant="link"
-                    size="md"
+                    size={{ base: "sm", md: "md" }}
                     onClick={() => window.history.back()}
                     leftIcon={<FaArrowLeft />}
                     _hover={{
@@ -132,137 +130,207 @@ const Profile = () => {
                     Quay lại
                 </Button>
             </Box>
-            <Grid templateColumns={{ base: "1fr", md: "1fr 2fr" }} gap={4} mx={5} p={4}>
-                {/* Avatar and menu */}
-                <GridItem
-                    bgGradient="linear(to-b, blue.600, purple.500)"
-                    p={4}
-                    borderRadius="md"
-                    color="black"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="left"
-                    boxShadow="md"
-                    maxW="345px"
+
+            {/* Main Content */}
+            <Box mx={{ base: 2, sm: 4, md: 5 }} p={{ base: 2, md: 4 }} mb={5}>
+                <Grid
+                    templateColumns={{
+                        base: "1fr",
+                        lg: "minmax(300px, 400px) 1fr"
+                    }}
+                    gap={{ base: 4, md: 6 }}
+                    alignItems="start"
                 >
-                    <ProfileHeader
-                        info={info}
-                        isAllowShow={isAllowShow}
-                        isOpen={isOpen}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                        fetchData={fetchData}
-                        coderID={coderID}
-                    />
-                    <Divider my={2} />
-                    {/* Thông tin cơ bản */}
-                    <BasicInfo
-                        info={info}
-                        isCoderNameValid={isCoderNameValid}
-                        isAllowShow={isAllowShow}
-                        isEmailValid={isEmailValid}
-                        isPhoneValid={isPhoneValid} />
-                    <Divider my={2} />
-
-                    {/* Giới thiệu */}
-                    <Box textColor="white" minH="10vh">
-                        <Text fontSize="xl" mt={2} textTransform="uppercase" fontWeight="bold">
-                            Giới thiệu
-                        </Text>
-
-                        {(isEditing) ? (
-                            <Box>
-                                <Textarea
-                                    value={description}
-                                    onChange={(e) => {
-                                        if (e.target.value.length <= 200) {
-                                            setDescription(e.target.value);
-                                        }
-                                    }}
-                                    maxLength={200}
-                                    mt={2}
-                                    placeholder="Nhập giới thiệu"
-                                    bg="white"
-                                    color="black"
-                                    h="100px"
-                                    resize="none"
-                                />
-                                <Flex justify="space-between" align="center" mt={1}>
-                                    <Text fontSize="sm" color="white">
-                                        {description.length}/200 ký tự
-                                    </Text>
-                                    <Flex gap={2}>
-                                        <IconButton
-                                            aria-label="save"
-                                            icon={<FaCheck />}
-                                            size="sm"
-                                            colorScheme="green"
-                                            onClick={handleSave}
-                                        />
-                                        <IconButton
-                                            aria-label="cancel"
-                                            icon={<FaTimes />}
-                                            size="sm"
-                                            colorScheme="red"
-                                            onClick={handleCancel}
-                                        />
-                                    </Flex>
-                                </Flex>
-                            </Box>
-                        ) : (
-                            <Flex mt={2} justifyContent="space-between" alignContent="center" alignItems="center">
-                                <Text w="100%" fontSize="md">{info?.description || ""}</Text>
-                                {isAllowShow &&
-                                    <Tooltip placement="top" label="Chỉnh sửa">
-                                        <IconButton
-                                            aria-label="edit"
-                                            icon={<FaEdit />}
-                                            size="sm"
-                                            color="white"
-                                            ml={2}
-                                            bg="transparent"
-                                            _hover={{ color: "black", bg: "gray.300" }}
-                                            onClick={handleEditClick}
-                                        />
-                                    </Tooltip>
-                                }
-                            </Flex>
-                        )}
-                    </Box>
-                </GridItem>
-
-                {/* Personal information */}
-                <GridItem minW="980px">
-                    {/* Course learning */}
-                    <Suspense fallback={<Skeleton height="393px" w="100%" />}>
-                        <CourseBox coderID={id || coderID} />
-                    </Suspense>
-                    <Grid
-                        templateColumns={{ base: "1fr", md: "1fr 0.7fr" }}
-                        gap={4}
-                        h="75vh"
-                        mt={5}
+                    {/* Left Sidebar - Profile Info */}
+                    <GridItem
+                        bgGradient="linear(to-b, blue.600, purple.500)"
+                        p={{ base: 3, md: 4 }}
+                        borderRadius="md"
+                        color="black"
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="left"
+                        boxShadow="md"
+                        w="full"
+                        maxW={{ base: "full", lg: "400px" }}
+                        mx={{ base: 0, lg: 0 }}
                     >
-                        <GridItem overflow="hidden">
-                            <Suspense fallback={<Skeleton height="100%" w="100%" />}>
-                                <BlogBox coderID={id || coderID} />
-                            </Suspense>
-                        </GridItem>
-                        <GridItem overflow="hidden">
-                            <Suspense fallback={<Skeleton height="100%" w="100%" />}>
-                                <ActionBox coderID={id || coderID} />
-                            </Suspense>
-                        </GridItem>
-                    </Grid>
-                    <GridItem mt={5} overflow="hidden">
-                        <Suspense fallback={<Skeleton height="393px" w="100%" />}>
-                            <HistoryBox coderId={id || coderID} />
-                        </Suspense>
+                        <ProfileHeader
+                            info={info}
+                            isAllowShow={isAllowShow}
+                            isOpen={isOpen}
+                            onOpen={onOpen}
+                            onClose={onClose}
+                            fetchData={fetchData}
+                            coderID={coderID}
+                        />
+                        <Divider my={2} />
+
+                        {/* Basic Info */}
+                        <BasicInfo
+                            info={info}
+                            isCoderNameValid={isCoderNameValid}
+                            isAllowShow={isAllowShow}
+                            isEmailValid={isEmailValid}
+                            isPhoneValid={isPhoneValid}
+                        />
+                        <Divider my={2} />
+
+                        {/* Description Section */}
+                        <Box textColor="white" minH={{ base: "8vh", md: "10vh" }}>
+                            <Text
+                                fontSize={{ base: "lg", md: "xl" }}
+                                mt={2}
+                                textTransform="uppercase"
+                                fontWeight="bold"
+                            >
+                                Giới thiệu
+                            </Text>
+
+                            {(isEditing) ? (
+                                <Box>
+                                    <Textarea
+                                        value={description}
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 200) {
+                                                setDescription(e.target.value);
+                                            }
+                                        }}
+                                        maxLength={200}
+                                        mt={2}
+                                        placeholder="Nhập giới thiệu"
+                                        bg="white"
+                                        color="black"
+                                        h={{ base: "80px", md: "100px" }}
+                                        resize="none"
+                                        fontSize={{ base: "sm", md: "md" }}
+                                    />
+                                    <Flex
+                                        justify="space-between"
+                                        align="center"
+                                        mt={1}
+                                        direction={{ base: "column", sm: "row" }}
+                                        gap={{ base: 2, sm: 0 }}
+                                    >
+                                        <Text fontSize="sm" color="white">
+                                            {description.length}/200 ký tự
+                                        </Text>
+                                        <Flex gap={2}>
+                                            <IconButton
+                                                aria-label="save"
+                                                icon={<FaCheck />}
+                                                size="sm"
+                                                colorScheme="green"
+                                                onClick={handleSave}
+                                            />
+                                            <IconButton
+                                                aria-label="cancel"
+                                                icon={<FaTimes />}
+                                                size="sm"
+                                                colorScheme="red"
+                                                onClick={handleCancel}
+                                            />
+                                        </Flex>
+                                    </Flex>
+                                </Box>
+                            ) : (
+                                <Flex
+                                    mt={2}
+                                    justifyContent="space-between"
+                                    alignContent="center"
+                                    alignItems="flex-start"
+                                    direction={{ base: "column", sm: "row" }}
+                                    gap={{ base: 2, sm: 0 }}
+                                >
+                                    <Text
+                                        w="100%"
+                                        fontSize={{ base: "sm", md: "md" }}
+                                        lineHeight="1.4"
+                                        wordBreak="break-word"
+                                    >
+                                        {info?.description || "Chưa có giới thiệu"}
+                                    </Text>
+                                    {isAllowShow && (
+                                        <Tooltip placement="top" label="Chỉnh sửa">
+                                            <IconButton
+                                                aria-label="edit"
+                                                icon={<FaEdit />}
+                                                size="sm"
+                                                color="white"
+                                                ml={{ base: 0, sm: 2 }}
+                                                mt={{ base: 2, sm: 0 }}
+                                                bg="transparent"
+                                                _hover={{ color: "black", bg: "gray.300" }}
+                                                onClick={handleEditClick}
+                                                alignSelf={{ base: "flex-end", sm: "center" }}
+                                            />
+                                        </Tooltip>
+                                    )}
+                                </Flex>
+                            )}
+                        </Box>
                     </GridItem>
 
-                </GridItem>
-            </Grid>
-        </Box >
+                    {/* Right Content - Main Information */}
+                    <GridItem w="full">
+                        {/* Course Learning Section */}
+                        <Box mb={{ base: 4, md: 5 }}>
+                            <Suspense fallback={
+                                <Skeleton height={{ base: "250px", md: "393px" }} w="100%" />
+                            }>
+                                <CourseBox coderID={id || coderID} />
+                            </Suspense>
+                        </Box>
+
+                        {/* Blog and Action Grid */}
+                        <Grid
+                            templateColumns={{
+                                base: "1fr",
+                                md: "1fr",
+                                lg: "1fr 0.7fr"
+                            }}
+                            gap={{ base: 4, md: 4 }}
+                            h={{
+                                base: "auto",
+                                md: "60vh",
+                                lg: "75vh"
+                            }}
+                            mb={{ base: 4, md: 5 }}
+                        >
+                            <GridItem
+                                overflow="hidden"
+                                minH={{ base: "300px", md: "400px" }}
+                            >
+                                <Suspense fallback={
+                                    <Skeleton height="100%" w="100%" />
+                                }>
+                                    <BlogBox coderID={id || coderID} />
+                                </Suspense>
+                            </GridItem>
+                            <GridItem
+                                overflow="hidden"
+                                minH={{ base: "300px", md: "400px" }}
+                            >
+                                <Suspense fallback={
+                                    <Skeleton height="100%" w="100%" />
+                                }>
+                                    <ActionBox coderID={id || coderID} />
+                                </Suspense>
+                            </GridItem>
+                        </Grid>
+
+                        {/* History Section */}
+                        <GridItem overflow="hidden">
+                            <Suspense fallback={
+                                <Skeleton height={{ base: "250px", md: "393px" }} w="100%" />
+                            }>
+                                <HistoryBox coderId={id || coderID} />
+                            </Suspense>
+                        </GridItem>
+                    </GridItem>
+                </Grid>
+            </Box>
+        </Container>
     );
 };
 

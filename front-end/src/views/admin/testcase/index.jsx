@@ -102,7 +102,7 @@ export default function Index() {
   return (
     <ScrollToTop>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-        <Toolbar onAdd={onOpen} onSearch={(keyword) => console.log(keyword)} />
+        <Toolbar onAdd={onOpen} />
         <Create isOpen={isOpen} onClose={onClose} fetchData={refreshTable} problemID={problemId} />
 
         <ColumnsTable

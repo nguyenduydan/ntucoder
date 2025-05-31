@@ -15,27 +15,34 @@ namespace api.Infrashtructure.Repositories
             _context = context; 
         }
 
-        public async Task<PagedResponse<EnrollmentDTO>> GetListAsync(QueryObject query, string? sortField = null, bool ascending = true)
+        public async Task<PagedResponse<EnrollmentDTO>> GetListAsync(QueryObject query, string? sortField = null, bool ascending = true, int? courseID = null)
         {
-            var latestEnrollmentsPerCoder = await _context.Enrollments
-                .GroupBy(e => e.CoderID)
-                .Select(g => g.OrderByDescending(e => e.EnrolledAt).First().EnrollmentID)
-                .ToListAsync();
-
-            var queryData = _context.Enrollments
+            var baseQuery = _context.Enrollments
                 .AsNoTracking()
-                .Where(e => latestEnrollmentsPerCoder.Contains(e.EnrollmentID))
                 .Include(e => e.Coder)
                 .Include(e => e.Course)
+                .AsQueryable();
+
+            // Bắt buộc phải có courseID để lọc
+            if (courseID.HasValue)
+            {
+                baseQuery = baseQuery.Where(e => e.CourseID == courseID.Value);
+            }
+
+            // Select dữ liệu cần thiết
+            var queryData = baseQuery
                 .Select(e => new EnrollmentDTO
                 {
                     CoderID = e.CoderID,
                     CourseID = e.CourseID,
                     EnrolledAt = e.EnrolledAt,
+                    CoderName = e.Coder.CoderName
                 });
 
+            // Apply sorting
             queryData = ApplySorting(queryData, sortField, ascending);
 
+            // Tạo paged response
             var enrollment = await PagedResponse<EnrollmentDTO>.CreateAsync(
                 queryData,
                 query.Page,
@@ -44,6 +51,7 @@ namespace api.Infrashtructure.Repositories
 
             return enrollment;
         }
+
 
 
         public IQueryable<EnrollmentDTO> ApplySorting(IQueryable<EnrollmentDTO> query, string? sortField, bool ascending)

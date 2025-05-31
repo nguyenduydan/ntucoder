@@ -24,9 +24,9 @@ namespace api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] QueryObject query, string? sortField = null, bool ascending = true)
+        public async Task<IActionResult> GetList([FromQuery] QueryObject query, string? sortField = null, bool ascending = true, int? courseID = null)
         {
-            var result = await _enrollmentRepository.GetListAsync(query, sortField, ascending);
+            var result = await _enrollmentRepository.GetListAsync(query, sortField, ascending, courseID);
             return Ok(result);
         }
 

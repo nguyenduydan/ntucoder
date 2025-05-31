@@ -4,7 +4,7 @@ import { Box, Text, Tooltip, Button, Spinner, Center, Image, Flex } from '@chakr
 import { toSlug, LimitText, formatViewCount } from '@/utils/utils';
 import sanitizeHtml from '@/utils/sanitizedHTML';
 import { useNavigate } from 'react-router-dom';
-import InfoBlog from '../../Blog/components/InfoBlog';
+import InfoBlog from '@/views/user/Blog/components/InfoBlog';
 
 const BlogCaurosel = ({ blogs, loading }) => {
     const navigate = useNavigate();
@@ -28,11 +28,11 @@ const BlogCaurosel = ({ blogs, loading }) => {
     return (
         <Slider
             infinite={true}
-            speed={500}
+            speed={5000}
             slidesToShow={1}
             slidesToScroll={1}
             autoplay={true}
-            autoplaySpeed={5000}
+            autoplaySpeed={0}
             arrows={false}
         >
             {blogs.map((blog) => {
