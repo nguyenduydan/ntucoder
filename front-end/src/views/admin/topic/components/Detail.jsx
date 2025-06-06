@@ -156,7 +156,7 @@ const TopicDetail = () => {
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
                         <Link>
                             <Button
-                                onClick={() => navigate(`/admin/topic`)}
+                                onClick={() => navigate(-1)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="teal"

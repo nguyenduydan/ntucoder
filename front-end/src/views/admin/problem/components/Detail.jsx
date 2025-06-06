@@ -208,7 +208,7 @@ const ProblemDetail = () => {
                     <Flex justifyContent="end" align="end" px={{ base: "10px", md: "25px" }}>
                         <Link>
                             <Button
-                                onClick={() => navigate(`/admin/problem`)}
+                                onClick={() => navigate(-1)}
                                 variant="solid"
                                 size="lg"
                                 colorScheme="teal"
