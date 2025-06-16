@@ -34,19 +34,6 @@ export default function Footer() {
           base: "center",
           xl: "start",
         }}
-        mb={{ base: "20px", xl: "0px" }}>
-        {" "}
-        &copy; {1900 + new Date().getYear()}
-        <Text as='span' fontWeight='500' ms='4px'>
-          Horizon UI. All Rights Reserved.
-        </Text>
-      </Text>
-      <Text
-        color={textColor}
-        textAlign={{
-          base: "center",
-          xl: "start",
-        }}
         mb={{ base: "20px", xl: "0px" }}
       >
         Designed by FogVN

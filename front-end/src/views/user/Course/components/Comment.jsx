@@ -398,7 +398,8 @@ const CommentSection = ({ courseId }) => {
 
             {/* Phần danh sách bình luận có scroll */}
             <Box
-                height="400px"
+                minH="100px"
+                maxH="400px"
                 overflowY="auto"
                 borderColor="gray.200"
                 borderRadius="md"

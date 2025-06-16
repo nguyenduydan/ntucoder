@@ -70,14 +70,7 @@ namespace api.Infrashtructure.Repositories
 
         public async Task<SubmissionDTO> CreateSubmissionAsync(SubmissionDTO dto)
         {
-            var exists = await _context.Submissions
-                .AnyAsync(s => s.CoderID == dto.CoderID && s.ProblemID == dto.ProblemID);
-
-            if (exists)
-            {
-                throw new InvalidOperationException("Bạn đã nộp bài cho bài tập này rồi.");
-            }
-
+            
             var submission = new Submission
             {
                 ProblemID = dto.ProblemID,

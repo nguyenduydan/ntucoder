@@ -53,12 +53,8 @@ namespace api.Infrashtructure.Services
                     .ThenInclude(a => a.Role)
                     .AsNoTracking();
 
-                coderQuery = SearchHelper<Coder>.ApplySearchMultiField(coderQuery, keyword, useAnd: false,
-                    c => c.CoderName,
-                    c => c.CoderEmail,
-                    c => c.Account.UserName,
-                    c => c.PhoneNumber,
-                    c => c.Account.Role.Name);
+                coderQuery = SearchHelper<Coder>.ApplySearchMultiField(coderQuery, keyword, useAnd: true,
+                    c => c.CoderName);
 
                 var coders = await coderQuery
                     .OrderBy(c => c.CoderName)

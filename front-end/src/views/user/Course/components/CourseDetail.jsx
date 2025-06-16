@@ -357,7 +357,7 @@ const CourseDetail = () => {
                                     <HStack><Icon as={FaFingerprint} /><Text>Truy cập trọn đời</Text></HStack>
                                     <HStack><Icon as={FaTrophy} /><Text>Chứng chỉ khi hoàn thành</Text></HStack>
                                 </VStack>
-                                {isEnrolled === true && course?.topics?.[0]?.lessons?.[0]?.lessonID ? (
+                                {isEnrolled === true ? (
                                     <Flex direction="column" gap={4}>
                                         <NavLink to={`${location.pathname}/${course.topics[0].lessons[0].lessonID}`}>
                                             <Button

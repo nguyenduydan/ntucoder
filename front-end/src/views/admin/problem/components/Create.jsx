@@ -636,7 +636,7 @@ export default function BulkCreateProblemModal({ isOpen, onClose, fetchData }) {
                                                     <CodeEditor
                                                         height="300px"
                                                         theme={theme}
-                                                        language={monacoLang}
+                                                        language={monacoLang || "cpp"}
                                                         value={problem.testCode}
                                                         onChange={(value) => handleEditorChange(index, 'testCode', value || '')}
                                                         options={{

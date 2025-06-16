@@ -136,7 +136,7 @@ export default function Problem() {
       }
 
       setTestResults(data.results);
-      console.log(data.results);
+
       const firstWrong = data.results.find((r) => r.result !== "Accepted");
 
       if (firstWrong) {
@@ -302,12 +302,11 @@ export default function Problem() {
 
             <Button
               leftIcon={<FaHandPointUp />}
-              color={isTestRunSuccess ? "green" : "gray.500"}
+              color="green"
               borderRadius="md"
               onClick={handleSubmission}
               isLoading={loading.status && loading.type === "submit"}
               loadingText="Đang chạy..."
-              isDisabled={!isTestRunSuccess || loading.status || problemID === null}
             >
               Nộp bài
             </Button>

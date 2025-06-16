@@ -9,6 +9,7 @@ const NotFound = React.lazy(() => import('views/user/NotFound.jsx'));
 import ProtectedRoute from "components/protectedRouter/ProtectedRoute";
 import Profile from "views/user/Profile";
 import LoadingScreen from "@/components/loading/ScreenLoading";
+import Footer from "@/layouts/user/components/footer";
 
 export default function Home(props) {
     const { ...rest } = props;
@@ -16,8 +17,36 @@ export default function Home(props) {
     const textColor = useColorModeValue("black", "white");
     const location = useLocation();
 
+    // Danh sách các trang không hiển thị footer
+    const footerBlacklist = useMemo(() => [
+        "/user/full-screen-maps",
+    ], []);
+
+    // Danh sách các pattern regex để ẩn footer
+    const footerBlacklistPatterns = useMemo(() => [
+        /^\/course\/[^\/]+\/\d+$/, // Pattern cho /course/slug/id
+        /^\/lesson\/[^\/]+\/\d+$/, // Pattern cho /lesson/slug/id (nếu có)
+        // Thêm các pattern khác nếu cần
+    ], []);
+
     // Kiểm tra xem có phải route full screen map hay không
     const isFullScreenMap = location.pathname === "/user/full-screen-maps";
+
+    // Kiểm tra xem có nên hiển thị footer hay không
+    const shouldShowFooter = useMemo(() => {
+        // Kiểm tra exact match và prefix match
+        const isInBlacklist = footerBlacklist.some(path =>
+            location.pathname === path ||
+            location.pathname.startsWith(path + "/")
+        );
+
+        // Kiểm tra pattern match
+        const isMatchPattern = footerBlacklistPatterns.some(pattern =>
+            pattern.test(location.pathname)
+        );
+
+        return !isInBlacklist && !isMatchPattern;
+    }, [location.pathname, footerBlacklist, footerBlacklistPatterns]);
 
     // Lọc route thuộc layout user
     const userRoutes = useMemo(() => routes.filter((r) => r.layout === "/user"), []);
@@ -93,6 +122,9 @@ export default function Home(props) {
                     </Suspense>
                 </Box>
             )}
+
+            {/* Footer chỉ hiển thị khi không có trong blacklist */}
+            {shouldShowFooter && <Footer />}
         </Box>
     );
 }
